@@ -22,16 +22,32 @@
                     <tr>
                         <th scope="row">Nameservers</th>
                         <td>
-                            <ul>
+                            <table>
                                 {% for nameserver in object.nameservers.all %}
-                                <li>
-                                    <a href="{% url 'plugins:netbox_dns:nameserver' pk=nameserver.pk %}">
-                                        {{ nameserver }}
-                                    </a>
-                                </li>
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'plugins:netbox_dns:nameserver' pk=nameserver.pk %}">
+                                            {{ nameserver }}
+                                        </a>
+                                    </td>
+                                </tr>
                                 {% endfor %}
-                            </ul>
+                            </table>
                         </td>
+                    {% if nameserver_warnings %}
+                    <tr>
+                        <th class="text-warning" scope="row">Warnings</th>
+                        <td>
+                            <table>
+                                {% for warning in nameserver_warnings %}
+                                <tr>
+                                    <td class="text-warning">{{ warning }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
                     </tr>
                     <tr>
                         <th scope="row">Default TTL</th>

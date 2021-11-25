@@ -45,6 +45,13 @@ class ZoneView(generic.ObjectView):
 
     queryset = Zone.objects.all()
 
+    def get_extra_context(self, request, instance):
+        nameserver_warnings = instance.check_nameservers()
+
+        return {
+            "nameserver_warnings": nameserver_warnings,
+        }
+
 
 class ZoneEditView(generic.ObjectEditView):
     """View for editing and creating a Zone instance."""
