@@ -53,6 +53,7 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
             "soa_mname",
             "soa_rname",
             "soa_serial",
+            "soa_serial_auto",
             "soa_refresh",
             "soa_retry",
             "soa_expire",
@@ -94,6 +95,11 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
         required=True,
         label="SOA Responsible",
         help_text="Mailbox of the zone's administrator",
+    )
+    soa_serial_auto = forms.BooleanField(
+        required=True,
+        label="Generate SOA Serial",
+        help_text="Automatically generate the SOA Serial",
     )
     soa_serial = IntegerField(
         required=True,
@@ -137,16 +143,19 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
             "soa_ttl",
             "soa_mname",
             "soa_rname",
+            "soa_serial_auto",
             "soa_serial",
             "soa_refresh",
             "soa_retry",
             "soa_expire",
             "soa_minimum",
         )
-
         widgets = {
             "status": StaticSelect(),
             "soa_mname": StaticSelect(),
+        }
+        help_texts = {
+            "soa_mname": "Primary name server for the zone",
         }
 
 

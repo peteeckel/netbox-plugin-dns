@@ -1,8 +1,11 @@
 import ipaddress
 
+from math import ceil
+from time import time
+
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.db.models.functions import Length
 from django.urls import reverse
 
@@ -125,6 +128,11 @@ class Zone(PrimaryModel):
         verbose_name="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
     )
+    soa_serial_auto = models.BooleanField(
+        verbose_name="Generate SOA Serial",
+        help_text="Automatically generate the SOA Serial field",
+        default=True,
+    )
 
     objects = RestrictedQuerySet.as_manager()
 
@@ -185,6 +193,18 @@ class Zone(PrimaryModel):
                 value=soa_value,
                 managed=True,
             )
+
+    def get_auto_serial(self):
+        records = Record.objects.filter(zone=self).exclude(type=Record.SOA)
+        if records:
+            soa_serial = records.aggregate(Max('last_updated')).get('last_updated__max').timestamp()
+        else:
+            soa_serial = ceil(time())
+
+        if self.last_updated:
+            soa_serial = ceil(max(soa_serial, self.last_updated.timestamp()))
+
+        return soa_serial
 
     def save(self, *args, **kwargs):
         new_zone = self.pk is None
