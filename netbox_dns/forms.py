@@ -3,10 +3,16 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     MinValueValidator,
+    MaxValueValidator,
     validate_ipv6_address,
     validate_ipv4_address,
 )
-from django.forms import CharField, IntegerField
+from django.forms import (
+    CharField,
+    IntegerField,
+    BooleanField,
+    NullBooleanField,
+)
 from django.urls import reverse_lazy
 
 from extras.forms import (
@@ -98,7 +104,7 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
         label="SOA Responsible",
         help_text="Mailbox of the zone's administrator",
     )
-    soa_serial_auto = forms.BooleanField(
+    soa_serial_auto = BooleanField(
         required=False,
         label="Generate SOA Serial",
         help_text="Automatically generate the SOA Serial",
@@ -323,10 +329,15 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
         required=False,
         label="SOA Responsible",
     )
+    soa_serial_auto = NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label="Generate SOA Serial",
+    )
     soa_serial = IntegerField(
         required=False,
         label="SOA Serial",
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(1),MaxValueValidator(4294967295)],
     )
     soa_refresh = IntegerField(
         required=False,
@@ -361,6 +372,7 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
             "tags",
             "soa_ttl",
             "soa_rname",
+            "soa_serial_auto",
             "soa_serial",
             "soa_refresh",
             "soa_retry",
@@ -459,7 +471,7 @@ class RecordForm(BootstrapMixin, forms.ModelForm):
         else:
             return self.cleaned_data["zone"].default_ttl
 
-    disable_ptr = forms.BooleanField(
+    disable_ptr = BooleanField(
         label="Disable PTR",
         required=False,
     )
@@ -589,7 +601,7 @@ class RecordBulkEditForm(
             attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:zone-list")}
         ),
     )
-    disable_ptr = forms.NullBooleanField(
+    disable_ptr = NullBooleanField(
         required=False, widget=BulkEditNullBooleanSelect(), label="Disable PTR"
     )
     ttl = IntegerField(
