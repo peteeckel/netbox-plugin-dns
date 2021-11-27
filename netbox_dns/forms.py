@@ -38,13 +38,13 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
     """Form for creating a new Zone object."""
 
     def __init__(self, *args, **kwargs):
-        """Override the __init__ method in order to provide the initial value for the default_ttl field"""
+        """Override the __init__ method in order to provide the initial value for the default fields"""
         super().__init__(*args, **kwargs)
 
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
         def _initialize(initial, setting):
-            if not initial.get(setting, None):
+            if initial.get(setting, None) in (None, ''):
                 initial[setting] = defaults.get(f"zone_{setting}", None)
 
         for setting in (
@@ -52,7 +52,6 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
             "soa_ttl",
             "soa_mname",
             "soa_rname",
-            "soa_serial",
             "soa_serial_auto",
             "soa_refresh",
             "soa_retry",
@@ -63,6 +62,9 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
 
         if self.initial.get("soa_ttl", None) is None:
             self.initial["soa_ttl"] = self.initial.get("default_ttl", None)
+
+        if self.initial.get("soa_serial_auto"):
+            self.initial["soa_serial"] = None
 
     def clean_default_ttl(self):
         return (
@@ -97,12 +99,12 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
         help_text="Mailbox of the zone's administrator",
     )
     soa_serial_auto = forms.BooleanField(
-        required=True,
+        required=False,
         label="Generate SOA Serial",
         help_text="Automatically generate the SOA Serial",
     )
     soa_serial = IntegerField(
-        required=True,
+        required=False,
         label="SOA Serial",
         help_text="Serial number of the current zone data version",
         validators=[MinValueValidator(1)],

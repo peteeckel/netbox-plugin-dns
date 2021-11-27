@@ -1,7 +1,7 @@
 import ipaddress
 
 from math import ceil
-from time import time
+from datetime import datetime
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
@@ -199,12 +199,16 @@ class Zone(PrimaryModel):
         if records:
             soa_serial = records.aggregate(Max('last_updated')).get('last_updated__max').timestamp()
         else:
-            soa_serial = ceil(time())
+            soa_serial = ceil(datetime.now().timestamp())
 
         if self.last_updated:
             soa_serial = ceil(max(soa_serial, self.last_updated.timestamp()))
 
         return soa_serial
+
+    def update_serial(self):
+        self.last_updated = datetime.now()
+        self.save()
 
     def save(self, *args, **kwargs):
         new_zone = self.pk is None
@@ -212,6 +216,9 @@ class Zone(PrimaryModel):
             renamed_zone = Zone.objects.get(pk=self.pk).name != self.name
         else:
             renamed_zone = False
+
+        if self.soa_serial_auto:
+            self.soa_serial = self.get_auto_serial()
 
         super().save(*args, **kwargs)
 
@@ -242,7 +249,6 @@ class Zone(PrimaryModel):
 
         for record in address_records:
             record.update_ptr_record()
-
 
 @extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class Record(PrimaryModel):
@@ -447,8 +453,16 @@ class Record(PrimaryModel):
 
         super().save(*args, **kwargs)
 
+        zone = self.zone
+        if self.type != self.SOA and zone.soa_serial_auto:
+            zone.update_serial()
+
     def delete(self, *args, **kwargs):
         if self.ptr_record:
             self.ptr_record.delete()
 
         super().delete(*args, **kwargs)
+
+        zone = self.zone
+        if zone.soa_serial_auto:
+            zone.update_serial()
