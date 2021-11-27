@@ -197,7 +197,11 @@ class Zone(PrimaryModel):
     def get_auto_serial(self):
         records = Record.objects.filter(zone=self).exclude(type=Record.SOA)
         if records:
-            soa_serial = records.aggregate(Max('last_updated')).get('last_updated__max').timestamp()
+            soa_serial = (
+                records.aggregate(Max("last_updated"))
+                .get("last_updated__max")
+                .timestamp()
+            )
         else:
             soa_serial = ceil(datetime.now().timestamp())
 
@@ -249,6 +253,7 @@ class Zone(PrimaryModel):
 
         for record in address_records:
             record.update_ptr_record()
+
 
 @extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class Record(PrimaryModel):

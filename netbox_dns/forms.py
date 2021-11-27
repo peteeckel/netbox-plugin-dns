@@ -44,7 +44,7 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
         def _initialize(initial, setting):
-            if initial.get(setting, None) in (None, ''):
+            if initial.get(setting, None) in (None, ""):
                 initial[setting] = defaults.get(f"zone_{setting}", None)
 
         for setting in (
