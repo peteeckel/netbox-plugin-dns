@@ -99,10 +99,10 @@ class Zone(PrimaryModel):
         verbose_name="SOA RName",
     )
     soa_serial = models.PositiveIntegerField(
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         verbose_name="SOA Serial",
-        validators=[MinValueValidator(1), MaxValueValidator(2147483647)],
+        validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
     )
     soa_refresh = models.PositiveIntegerField(
         blank=False,

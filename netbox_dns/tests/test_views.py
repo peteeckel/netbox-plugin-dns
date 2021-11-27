@@ -38,6 +38,7 @@ class ZoneTestCase(
         "soa_expire": 2592000,
         "soa_ttl": 86400,
         "soa_minimum": 3600,
+        "soa_serial_auto": False,
     }
     zone_value_string = ",".join(str(value) for value in zone_data.values())
     zone_key_string = ",".join(zone_data.keys())
@@ -134,6 +135,7 @@ class RecordTestCase(
         "soa_expire": 2592000,
         "soa_ttl": 86400,
         "soa_minimum": 3600,
+        "soa_serial_auto": False,
     }
 
     csv_data = (
