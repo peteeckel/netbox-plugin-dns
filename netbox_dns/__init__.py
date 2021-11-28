@@ -1,6 +1,6 @@
 from extras.plugins import PluginConfig
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 
 class DNSConfig(PluginConfig):
@@ -16,7 +16,6 @@ class DNSConfig(PluginConfig):
     default_settings = {
         "zone_default_ttl": 86400,
         "zone_soa_serial_auto": True,
-        "zone_soa_serial": 1,
         "zone_soa_refresh": 172800,
         "zone_soa_retry": 7200,
         "zone_soa_expire": 2592000,
