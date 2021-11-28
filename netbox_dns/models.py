@@ -242,16 +242,15 @@ class Zone(PrimaryModel):
     def delete(self, *args, **kwargs):
         with transaction.atomic():
             address_records = list(self.record_set.filter(ptr_record__isnull=False))
-            ptr_records = self.record_set.filter(address_record__isnull=False)
-
             for record in address_records:
                 record.ptr_record.delete()
 
-            address_records.extend(record.address_record for record in ptr_records)
+            ptr_records = self.record_set.filter(address_record__isnull=False)
+            update_ptr_records = [record.address_record for record in ptr_records]
 
             super().delete(*args, **kwargs)
 
-        for record in address_records:
+        for record in update_ptr_records:
             record.update_ptr_record()
 
 
