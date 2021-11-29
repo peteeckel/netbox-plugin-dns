@@ -34,7 +34,7 @@ def create_initial_ns_records(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("netbox_dns", "0004_create_ptr_for_a_aaaa_records"),
+        ("netbox_dns", "0005_zone_soa_serial_auto"),
     ]
 
     operations = [
