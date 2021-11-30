@@ -74,6 +74,16 @@ class RecordFilter(PrimaryModelFilterSet):
     value = django_filters.CharFilter(
         lookup_expr="icontains",
     )
+    zone_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Zone.objects.all(),
+        label="Parent Zone ID",
+    )
+    zone = django_filters.ModelMultipleChoiceFilter(
+        field_name="zone__name",
+        to_field_name="name",
+        queryset=Zone.objects.all(),
+        label="Parent Zone",
+    )
     tag = TagFilter()
     managed = django_filters.BooleanFilter()
 
