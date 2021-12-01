@@ -273,8 +273,23 @@ class ZoneCSVForm(CustomFieldModelCSVForm):
     def clean_soa_rname(self):
         return self._clean_field_with_defaults("soa_rname")
 
+    def clean_soa_serial_auto(self):
+        try:
+            return self._clean_field_with_defaults("soa_serial_auto")
+        except ValidationError:
+            if self.cleaned_data["soa_serial"] or self._get_default_value("soa_serial"):
+                return None
+            else:
+                raise
+
     def clean_soa_serial(self):
-        return self._clean_field_with_defaults("soa_serial")
+        try:
+            return self._clean_field_with_defaults("soa_serial")
+        except ValidationError:
+            if self.cleaned_data["soa_serial_auto"] or self._get_default_value("soa_serial_auto"):
+                return None
+            else:
+                raise
 
     def clean_soa_refresh(self):
         return self._clean_field_with_defaults("soa_refresh")
@@ -381,7 +396,7 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
         """
         cleaned_data = super().clean()
         if cleaned_data.get("soa_serial_auto"):
-            soa_serial = None
+            cleaned_data["soa_serial"] = None
 
     class Meta:
         nullable_fields = []
