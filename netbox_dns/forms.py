@@ -325,6 +325,16 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
         label="SOA TTL",
         validators=[MinValueValidator(1)],
     )
+    soa_mname = DynamicModelChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label="SOA Primary Nameserver",
+        widget=APISelect(
+            attrs={
+                "data-url": reverse_lazy("plugins-api:netbox_dns-api:nameserver-list")
+            }
+        ),
+    )
     soa_rname = CharField(
         required=False,
         label="SOA Responsible",
