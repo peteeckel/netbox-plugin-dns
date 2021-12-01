@@ -216,6 +216,10 @@ class ZoneCSVForm(CustomFieldModelCSVForm):
         required=False,
         help_text="Mailbox of the zone's administrator",
     )
+    soa_serial_auto = BooleanField(
+        required=False,
+        help_text="Generate the SOA serial",
+    )
     soa_serial = IntegerField(
         required=False,
         help_text="Serial number of the current zone data version",
@@ -293,6 +297,7 @@ class ZoneCSVForm(CustomFieldModelCSVForm):
             "soa_ttl",
             "soa_mname",
             "soa_rname",
+            "soa_serial_auto",
             "soa_serial",
             "soa_refresh",
             "soa_retry",
@@ -347,7 +352,7 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
     soa_serial = IntegerField(
         required=False,
         label="SOA Serial",
-        validators=[MinValueValidator(1),MaxValueValidator(4294967295)],
+        validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
     )
     soa_refresh = IntegerField(
         required=False,
@@ -369,6 +374,14 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
         label="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
     )
+
+    def clean(self):
+        """
+        If soa_serial_auto is True, set soa_serial to None.
+        """
+        cleaned_data = super().clean()
+        if cleaned_data.get("soa_serial_auto"):
+            soa_serial = None
 
     class Meta:
         nullable_fields = []

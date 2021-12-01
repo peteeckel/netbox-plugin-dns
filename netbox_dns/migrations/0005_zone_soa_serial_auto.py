@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="zone",
             name="soa_serial_auto",
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(default=False),
+            preserve_default=False,
         ),
         migrations.AlterField(
             model_name="zone",

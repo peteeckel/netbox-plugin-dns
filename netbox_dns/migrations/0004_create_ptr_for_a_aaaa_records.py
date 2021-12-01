@@ -23,6 +23,7 @@ def cleanup_disable_ptr(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [
         ("netbox_dns", "0003_soa_managed_records"),
