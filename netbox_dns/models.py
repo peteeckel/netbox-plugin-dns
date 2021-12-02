@@ -242,6 +242,11 @@ class Zone(PrimaryModel):
         nameservers = self.nameservers.all()
 
         ns_warnings = []
+        ns_errors = []
+
+        if not nameservers:
+            ns_errors.append(f"No nameservers are configured for zone {self.name}")
+
         for nameserver in nameservers:
             ns_domain = ".".join(nameserver.name.split(".")[1:])
             if not ns_domain:
@@ -264,7 +269,7 @@ class Zone(PrimaryModel):
                     f"Nameserver {nameserver.name} does not have an address record in zone {ns_zone.name}"
                 )
 
-        return ns_warnings
+        return ns_warnings, ns_errors
 
     def save(self, *args, **kwargs):
         new_zone = self.pk is None
