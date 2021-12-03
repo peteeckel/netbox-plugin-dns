@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="zone",
             name="soa_serial",
-            field=models.PositiveIntegerField(
+            field=models.BigIntegerField(
                 blank=True,
                 null=True,
                 validators=[

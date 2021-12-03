@@ -98,7 +98,7 @@ class Zone(PrimaryModel):
         null=False,
         verbose_name="SOA RName",
     )
-    soa_serial = models.PositiveIntegerField(
+    soa_serial = models.BigIntegerField(
         blank=True,
         null=True,
         verbose_name="SOA Serial",
