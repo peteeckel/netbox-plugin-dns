@@ -272,11 +272,14 @@ class Zone(PrimaryModel):
                 record.ptr_record.delete()
 
             ptr_records = self.record_set.filter(address_record__isnull=False)
-            deleted_ptr_records = [pk for pk in ptr_records]
+            update_records = [
+                record.pk
+                for record in Record.objects.filter(ptr_record__in=ptr_records)
+            ]
 
             super().delete(*args, **kwargs)
 
-        for record in Record.objects.filter(ptr_record__in=deleted_ptr_records):
+        for record in Record.objects.filter(pk__in=update_records):
             record.update_ptr_record()
 
 
