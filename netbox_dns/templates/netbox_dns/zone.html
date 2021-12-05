@@ -48,6 +48,20 @@
                         </td>
                     </tr>
                     {% endif %}
+                    {% if nameserver_errors %}
+                    <tr>
+                        <th class="text-danger" scope="row">Errors</th>
+                        <td>
+                            <table>
+                                {% for error in nameserver_errors %}
+                                <tr>
+                                    <td class="text-danger">{{ error }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
                     </tr>
                     <tr>
                         <th scope="row">Default TTL</th>

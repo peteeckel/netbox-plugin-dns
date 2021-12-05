@@ -46,10 +46,11 @@ class ZoneView(generic.ObjectView):
     queryset = Zone.objects.all()
 
     def get_extra_context(self, request, instance):
-        nameserver_warnings = instance.check_nameservers()
+        ns_warnings, ns_errors = instance.check_nameservers()
 
         return {
-            "nameserver_warnings": nameserver_warnings,
+            "nameserver_warnings": ns_warnings,
+            "nameserver_errors": ns_errors,
         }
 
 
