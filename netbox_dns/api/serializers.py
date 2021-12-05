@@ -99,6 +99,7 @@ class ZoneSerializer(PrimaryModelSerializer):
             "soa_mname",
             "soa_rname",
             "soa_serial",
+            "soa_serial_auto",
             "soa_refresh",
             "soa_retry",
             "soa_expire",

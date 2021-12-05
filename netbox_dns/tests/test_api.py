@@ -38,6 +38,7 @@ class ZoneTest(
         "soa_retry",
         "soa_rname",
         "soa_serial",
+        "soa_serial_auto",
         "soa_ttl",
         "status",
         "tags",
@@ -51,12 +52,12 @@ class ZoneTest(
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",
-        "soa_serial": 2021110401,
         "soa_refresh": 172800,
         "soa_retry": 7200,
         "soa_expire": 2592000,
         "soa_ttl": 86400,
         "soa_minimum": 3600,
+        "soa_serial_auto": False,
     }
 
     @classmethod
@@ -145,6 +146,7 @@ class RecordTest(
             "soa_expire": 2592000,
             "soa_ttl": 86400,
             "soa_minimum": 3600,
+            "soa_serial_auto": False,
         }
 
         zones = (

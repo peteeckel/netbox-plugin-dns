@@ -3,10 +3,16 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     MinValueValidator,
+    MaxValueValidator,
     validate_ipv6_address,
     validate_ipv4_address,
 )
-from django.forms import CharField, IntegerField
+from django.forms import (
+    CharField,
+    IntegerField,
+    BooleanField,
+    NullBooleanField,
+)
 from django.urls import reverse_lazy
 
 from extras.forms import (
@@ -38,13 +44,13 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
     """Form for creating a new Zone object."""
 
     def __init__(self, *args, **kwargs):
-        """Override the __init__ method in order to provide the initial value for the default_ttl field"""
+        """Override the __init__ method in order to provide the initial value for the default fields"""
         super().__init__(*args, **kwargs)
 
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
         def _initialize(initial, setting):
-            if not initial.get(setting, None):
+            if initial.get(setting, None) in (None, ""):
                 initial[setting] = defaults.get(f"zone_{setting}", None)
 
         for setting in (
@@ -52,7 +58,7 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
             "soa_ttl",
             "soa_mname",
             "soa_rname",
-            "soa_serial",
+            "soa_serial_auto",
             "soa_refresh",
             "soa_retry",
             "soa_expire",
@@ -62,6 +68,9 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
 
         if self.initial.get("soa_ttl", None) is None:
             self.initial["soa_ttl"] = self.initial.get("default_ttl", None)
+
+        if self.initial.get("soa_serial_auto"):
+            self.initial["soa_serial"] = None
 
     def clean_default_ttl(self):
         return (
@@ -95,8 +104,13 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
         label="SOA Responsible",
         help_text="Mailbox of the zone's administrator",
     )
+    soa_serial_auto = BooleanField(
+        required=False,
+        label="Generate SOA Serial",
+        help_text="Automatically generate the SOA Serial",
+    )
     soa_serial = IntegerField(
-        required=True,
+        required=False,
         label="SOA Serial",
         help_text="Serial number of the current zone data version",
         validators=[MinValueValidator(1)],
@@ -137,16 +151,19 @@ class ZoneForm(BootstrapMixin, CustomFieldModelForm):
             "soa_ttl",
             "soa_mname",
             "soa_rname",
+            "soa_serial_auto",
             "soa_serial",
             "soa_refresh",
             "soa_retry",
             "soa_expire",
             "soa_minimum",
         )
-
         widgets = {
             "status": StaticSelect(),
             "soa_mname": StaticSelect(),
+        }
+        help_texts = {
+            "soa_mname": "Primary name server for the zone",
         }
 
 
@@ -198,6 +215,10 @@ class ZoneCSVForm(CustomFieldModelCSVForm):
     soa_rname = CharField(
         required=False,
         help_text="Mailbox of the zone's administrator",
+    )
+    soa_serial_auto = BooleanField(
+        required=False,
+        help_text="Generate the SOA serial",
     )
     soa_serial = IntegerField(
         required=False,
@@ -252,8 +273,25 @@ class ZoneCSVForm(CustomFieldModelCSVForm):
     def clean_soa_rname(self):
         return self._clean_field_with_defaults("soa_rname")
 
+    def clean_soa_serial_auto(self):
+        try:
+            return self._clean_field_with_defaults("soa_serial_auto")
+        except ValidationError:
+            if self.cleaned_data["soa_serial"] or self._get_default_value("soa_serial"):
+                return None
+            else:
+                raise
+
     def clean_soa_serial(self):
-        return self._clean_field_with_defaults("soa_serial")
+        try:
+            return self._clean_field_with_defaults("soa_serial")
+        except ValidationError:
+            if self.cleaned_data["soa_serial_auto"] or self._get_default_value(
+                "soa_serial_auto"
+            ):
+                return None
+            else:
+                raise
 
     def clean_soa_refresh(self):
         return self._clean_field_with_defaults("soa_refresh")
@@ -276,6 +314,7 @@ class ZoneCSVForm(CustomFieldModelCSVForm):
             "soa_ttl",
             "soa_mname",
             "soa_rname",
+            "soa_serial_auto",
             "soa_serial",
             "soa_refresh",
             "soa_retry",
@@ -322,10 +361,15 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
         required=False,
         label="SOA Responsible",
     )
+    soa_serial_auto = NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label="Generate SOA Serial",
+    )
     soa_serial = IntegerField(
         required=False,
         label="SOA Serial",
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
     )
     soa_refresh = IntegerField(
         required=False,
@@ -348,6 +392,14 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
         validators=[MinValueValidator(1)],
     )
 
+    def clean(self):
+        """
+        If soa_serial_auto is True, set soa_serial to None.
+        """
+        cleaned_data = super().clean()
+        if cleaned_data.get("soa_serial_auto"):
+            cleaned_data["soa_serial"] = None
+
     class Meta:
         nullable_fields = []
 
@@ -360,6 +412,7 @@ class ZoneBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldModelBulkEd
             "tags",
             "soa_ttl",
             "soa_rname",
+            "soa_serial_auto",
             "soa_serial",
             "soa_refresh",
             "soa_retry",
@@ -458,7 +511,7 @@ class RecordForm(BootstrapMixin, forms.ModelForm):
         else:
             return self.cleaned_data["zone"].default_ttl
 
-    disable_ptr = forms.BooleanField(
+    disable_ptr = BooleanField(
         label="Disable PTR",
         required=False,
     )
@@ -598,7 +651,7 @@ class RecordBulkEditForm(
             attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:zone-list")}
         ),
     )
-    disable_ptr = forms.NullBooleanField(
+    disable_ptr = NullBooleanField(
         required=False, widget=BulkEditNullBooleanSelect(), label="Disable PTR"
     )
     ttl = IntegerField(

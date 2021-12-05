@@ -32,6 +32,7 @@ class ZoneTable(BaseTable):
             "default_ttl",
             "soa_mname",
             "soa_rname",
+            "soa_serial",
         )
         default_columns = (
             "pk",

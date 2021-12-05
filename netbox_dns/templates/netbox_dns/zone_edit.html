@@ -1,0 +1,77 @@
+{% extends 'generic/object_edit.html' %}
+{% load static %}
+{% load form_helpers %}
+{% load helpers %}
+
+{% block form %}
+    <div class="field-group my-5">
+        {% render_field form.name %}
+        {% render_field form.status %}
+        {% render_field form.nameservers %}
+        {% render_field form.default_ttl %}
+    </div>
+    <div class="field-group my-5">
+        {% render_field form.soa_ttl %}
+        {% render_field form.soa_mname %}
+        {% render_field form.soa_rname %}
+        {% render_field form.soa_refresh %}
+        {% render_field form.soa_retry %}
+        {% render_field form.soa_expire %}
+        {% render_field form.soa_minimum %}
+        {% render_field form.soa_serial_auto %}
+        {% render_field form.soa_serial %}
+
+<!--
+        <div class="field-group my-5">
+            <div class="row mb-2">
+                <h6 class="offset-sm-3">SOA Serial Number</h6>
+            </div>
+            {% with soa_serial_auto=form.initial.soa_serial_auto %}
+                <div class="row mb-2">
+                    <div class="offset-sm-3">
+                        <ul class="nav nav-pills" role="tablist">
+                            <li role="presentation" class="nav-item">
+                                <button
+                                    role="tab"
+                                    type="button"
+                                    id="auto_tab"
+                                    data-bs-toggle="tab"
+                                    aria-controls="auto"
+                                    data-bs-target="#auto"
+                                    class="nav-link {% if soa_serial_auto %}active{% endif %}">
+                                    Automatic
+                                </button>
+                            </li>
+                            <li role="presentation" class="nav-item">
+                                <button
+                                    role="tab"
+                                    type="button"
+                                    id="manual_tab"
+                                    data-bs-toggle="tab"
+                                    aria-controls="manual"
+                                    data-bs-target="#manual"
+                                    class="nav-link {% if not soa_serial_auto %}active{% endif %}">
+                                    Manual
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="tab-content p-0 border-0">
+                    <div class="tab-pane {% if soa_serial_auto %}active{% endif %}" id="auto" role="tabpanel" aria-labeled-by="auto_tab">
+                        <input type="hidden" name="form.soa_serial_auto" value=True />
+                    </div>
+                    <div class="tab-pane {% if not soa_serial_auto %}active{% endif %}" id="manual" role="tabpanel" aria-labeled-by="manual_tab">
+                        <input type="hidden" name="form.soa_serial_auto" value=False />
+                        {% render_field form.soa_serial %}
+                    </div>
+                </div>
+            {% endwith %}
+        </div>
+    </div>
+    <div class="field-group my-5">
+        {% render_field form.tags %}
+-->
+
+    </div>
+{% endblock %}

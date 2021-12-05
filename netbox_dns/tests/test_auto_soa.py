@@ -31,6 +31,7 @@ class AutoSOATest(TestCase):
         "soa_ttl": 86400,
         "soa_minimum": 3600,
         "soa_serial": 1,
+        "soa_serial_auto": False
     }
 
     @classmethod
