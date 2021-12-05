@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-dns"
-version = "0.6.0"
+version = "0.6.7"
 description = "Netbox Dns is a netbox plugin for managing zone, nameserver and record inventory."
 readme = "README.md"
 homepage = "https://github.com/auroraresearchlab/netbox-dns"
