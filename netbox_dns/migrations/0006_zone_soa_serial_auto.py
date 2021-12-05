@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("netbox_dns", "0004_create_ptr_for_a_aaaa_records"),
+        ("netbox_dns", "0005_update_ns_records"),
     ]
 
     operations = [
