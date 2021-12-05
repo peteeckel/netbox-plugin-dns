@@ -1,9 +1,12 @@
 import ipaddress
 
+from math import ceil
+from datetime import datetime
+
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.db.models.functions import Length
 from django.urls import reverse
 
@@ -99,11 +102,11 @@ class Zone(PrimaryModel):
         null=False,
         verbose_name="SOA RName",
     )
-    soa_serial = models.PositiveIntegerField(
-        blank=False,
-        null=False,
+    soa_serial = models.BigIntegerField(
+        blank=True,
+        null=True,
         verbose_name="SOA Serial",
-        validators=[MinValueValidator(1), MaxValueValidator(2147483647)],
+        validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
     )
     soa_refresh = models.PositiveIntegerField(
         blank=False,
@@ -128,6 +131,11 @@ class Zone(PrimaryModel):
         null=False,
         verbose_name="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
+    )
+    soa_serial_auto = models.BooleanField(
+        verbose_name="Generate SOA Serial",
+        help_text="Automatically generate the SOA Serial field",
+        default=True,
     )
 
     objects = RestrictedQuerySet.as_manager()
@@ -238,12 +246,35 @@ class Zone(PrimaryModel):
 
         return ns_warnings
 
+    def get_auto_serial(self):
+        records = Record.objects.filter(zone=self).exclude(type=Record.SOA)
+        if records:
+            soa_serial = (
+                records.aggregate(Max("last_updated"))
+                .get("last_updated__max")
+                .timestamp()
+            )
+        else:
+            soa_serial = ceil(datetime.now().timestamp())
+
+        if self.last_updated:
+            soa_serial = ceil(max(soa_serial, self.last_updated.timestamp()))
+
+        return soa_serial
+
+    def update_serial(self):
+        self.last_updated = datetime.now()
+        self.save()
+
     def save(self, *args, **kwargs):
         new_zone = self.pk is None
         if not new_zone:
             renamed_zone = Zone.objects.get(pk=self.pk).name != self.name
         else:
             renamed_zone = False
+
+        if self.soa_serial_auto:
+            self.soa_serial = self.get_auto_serial()
 
         super().save(*args, **kwargs)
 
@@ -491,8 +522,16 @@ class Record(PrimaryModel):
 
         super().save(*args, **kwargs)
 
+        zone = self.zone
+        if self.type != self.SOA and zone.soa_serial_auto:
+            zone.update_serial()
+
     def delete(self, *args, **kwargs):
         if self.ptr_record:
             self.ptr_record.delete()
 
         super().delete(*args, **kwargs)
+
+        zone = self.zone
+        if zone.soa_serial_auto:
+            zone.update_serial()
