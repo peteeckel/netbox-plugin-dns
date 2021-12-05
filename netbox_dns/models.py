@@ -1,10 +1,14 @@
 import ipaddress
 
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.functions import Length
 from django.urls import reverse
+
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 
 from extras.utils import extras_features
 from netbox.models import PrimaryModel, TaggableManager
@@ -186,6 +190,59 @@ class Zone(PrimaryModel):
                 managed=True,
             )
 
+    def update_ns_records(self, nameservers):
+        ns_name = "@"
+        ns_ttl = self.default_ttl
+
+        delete_ns = self.record_set.filter(type=Record.NS, managed=True).exclude(
+            value__in=nameservers
+        )
+        for record in delete_ns:
+            record.delete()
+
+        for ns in nameservers:
+            Record.objects.update_or_create(
+                zone_id=self.pk,
+                type=Record.NS,
+                name=ns_name,
+                ttl=ns_ttl,
+                value=ns,
+                managed=True,
+            )
+
+    def check_nameservers(self):
+        nameservers = self.nameservers.all()
+
+        ns_warnings = []
+        ns_errors = []
+
+        if not nameservers:
+            ns_errors.append(f"No nameservers are configured for zone {self.name}")
+
+        for nameserver in nameservers:
+            ns_domain = ".".join(nameserver.name.split(".")[1:])
+            if not ns_domain:
+                continue
+
+            try:
+                ns_zone = Zone.objects.get(name=ns_domain)
+            except ObjectDoesNotExist:
+                continue
+
+            ns_name = nameserver.name.split(".")[0]
+            address_records = Record.objects.filter(
+                Q(zone=ns_zone),
+                Q(Q(name=f"{nameserver.name}.") | Q(name=ns_name)),
+                Q(Q(type=Record.A) | Q(type=Record.AAAA)),
+            )
+
+            if not address_records:
+                ns_warnings.append(
+                    f"Nameserver {nameserver.name} does not have an address record in zone {ns_zone.name}"
+                )
+
+        return ns_warnings, ns_errors
+
     def save(self, *args, **kwargs):
         new_zone = self.pk is None
         if not new_zone:
@@ -222,6 +279,19 @@ class Zone(PrimaryModel):
 
         for record in address_records:
             record.update_ptr_record()
+
+
+@receiver(m2m_changed, sender=Zone.nameservers.through)
+def update_ns_records(**kwargs):
+    if kwargs.get("action") not in ["post_add", "post_remove"]:
+        return
+
+    zone = kwargs.get("instance")
+    nameservers = zone.nameservers.all()
+
+    new_nameservers = [f'{ns.name.rstrip(".")}.' for ns in nameservers]
+
+    zone.update_ns_records(new_nameservers)
 
 
 @extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
