@@ -7,7 +7,7 @@ from netbox.forms import (
     NetBoxModelForm,
 )
 
-from utilities.forms import TagFilterField
+from utilities.forms.fields import TagFilterField
 
 from netbox_dns.models import NameServer
 from netbox_dns.utilities import name_to_unicode

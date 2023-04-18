@@ -10,16 +10,15 @@ from netbox.forms import (
     NetBoxModelImportForm,
     NetBoxModelForm,
 )
-from utilities.forms import (
-    BulkEditNullBooleanSelect,
+from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
     TagFilterField,
     CSVChoiceField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
-    APISelect,
-    add_blank_choice,
 )
+from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
+from utilities.forms import add_blank_choice
 
 from netbox_dns.models import View, Zone, ZoneStatusChoices, NameServer
 from netbox_dns.utilities import name_to_unicode
