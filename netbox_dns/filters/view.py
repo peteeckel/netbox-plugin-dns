@@ -13,7 +13,7 @@ class ViewFilter(NetBoxModelFilterSet):
 
     class Meta:
         model = View
-        fields = ("name",)
+        fields = ("id", "name")
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""
