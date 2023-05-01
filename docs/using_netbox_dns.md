@@ -50,7 +50,7 @@ Now Netbox DNS should show up under "Plugins" at the bottom of the left-hand sid
 Currently Netbox DNS can manage four different object types: Views, Name Servers, Zones, and Records.
 
 ### Views
-Views are a concept to optinally partition the DNS namespace into groups of zones that are isolated from each other. They are mainly used for split horizon DNS setups, for example in cases when there is is a different DNS resolution requirement for external and internal clients where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
+Views are a concept to optinally partition the DNS namespace into groups of zones that are isolated from each other. They are mainly used for split horizon DNS setups, for example in cases when there is a different DNS resolution requirement for external and internal clients where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
 
 When Views are defined, each zone can optionally be associated with a specific view. There are two consequences of using views:
 
@@ -89,7 +89,7 @@ Field           | Required | Explanation
 **Tags**        | No       | Netbox tags assigned to the view. Tags can be used to categorise views by arbitrary criteria such as Production/Test/Development systems
 
 ### Name servers
-Names erver objects correspond to name servers in the DNS infrastructure and are basically fully qualified domain names (FQDN) of hosts running name server instances. 
+Name server objects correspond to name servers in the DNS infrastructure and are basically fully qualified domain names (FQDN) of hosts running name server instances.
 
 A Name Server object is required for a zones MNAME field in the SOA record, defining the primary server for the zone data, and for NS records inside each zone, defining the name servers that are serving as data sources for a zone's authoritative information. The primary name server is not necessarily one of the authoritative name servers.
 
