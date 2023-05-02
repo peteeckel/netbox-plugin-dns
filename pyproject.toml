@@ -13,7 +13,7 @@ keywords = ["netbox", "netbox-plugin", "dns"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-dnspython = "^2.2,1"
+dnspython = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^5.2"
