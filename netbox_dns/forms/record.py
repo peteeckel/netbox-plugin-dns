@@ -1,11 +1,4 @@
 from django import forms
-
-from django.forms import (
-    CharField,
-    IntegerField,
-    BooleanField,
-    NullBooleanField,
-)
 from django.urls import reverse_lazy
 
 from netbox.forms import (
@@ -14,19 +7,15 @@ from netbox.forms import (
     NetBoxModelImportForm,
     NetBoxModelForm,
 )
-from utilities.forms import (
-    add_blank_choice,
-    BulkEditNullBooleanSelect,
+from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
     TagFilterField,
-    StaticSelect,
     CSVChoiceField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
-    APISelect,
-    StaticSelectMultiple,
-    add_blank_choice,
 )
+from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
+from utilities.forms import add_blank_choice
 
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
@@ -42,11 +31,11 @@ class RecordForm(NetBoxModelForm):
         if initial_name:
             self.initial["name"] = name_to_unicode(initial_name)
 
-    disable_ptr = BooleanField(
+    disable_ptr = forms.BooleanField(
         label="Disable PTR",
         required=False,
     )
-    ttl = IntegerField(
+    ttl = forms.IntegerField(
         required=False,
         label="TTL",
     )
@@ -66,12 +55,6 @@ class RecordForm(NetBoxModelForm):
             "tags",
         )
 
-        widgets = {
-            "zone": StaticSelect(),
-            "type": StaticSelect(),
-            "status": StaticSelect(),
-        }
-
 
 class RecordFilterForm(NetBoxModelFilterSetForm):
     """Form for filtering Record instances."""
@@ -81,20 +64,18 @@ class RecordFilterForm(NetBoxModelFilterSetForm):
     type = forms.MultipleChoiceField(
         choices=add_blank_choice(RecordTypeChoices),
         required=False,
-        widget=StaticSelectMultiple(),
     )
-    name = CharField(
+    name = forms.CharField(
         required=False,
         label="Name",
     )
-    value = CharField(
+    value = forms.CharField(
         required=False,
         label="Value",
     )
     status = forms.ChoiceField(
         choices=add_blank_choice(RecordStatusChoices),
         required=False,
-        widget=StaticSelect(),
     )
     zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
@@ -147,7 +128,7 @@ class RecordImportForm(NetBoxModelImportForm):
         required=False,
         help_text="Record status",
     )
-    ttl = IntegerField(
+    ttl = forms.IntegerField(
         required=False,
         help_text="TTL",
     )
@@ -193,25 +174,23 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
     type = forms.ChoiceField(
         choices=add_blank_choice(RecordTypeChoices),
         required=False,
-        widget=StaticSelect(),
     )
-    value = CharField(
+    value = forms.CharField(
         required=False,
         label="Value",
     )
     status = forms.ChoiceField(
         choices=add_blank_choice(RecordStatusChoices),
         required=False,
-        widget=StaticSelect(),
     )
-    ttl = IntegerField(
+    ttl = forms.IntegerField(
         required=False,
         label="TTL",
     )
-    disable_ptr = NullBooleanField(
+    disable_ptr = forms.NullBooleanField(
         required=False, widget=BulkEditNullBooleanSelect(), label="Disable PTR"
     )
-    description = CharField(max_length=200, required=False)
+    description = forms.CharField(max_length=200, required=False)
 
     fieldsets = (
         (

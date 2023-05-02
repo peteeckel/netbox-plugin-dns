@@ -73,7 +73,7 @@ class ZoneTestCase(
         )
 
         cls.csv_update_data = (
-            "id,name,status,description,view",
+            "id,status,description,view",
             f"{cls.zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,",
             f"{cls.zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{cls.views[0].name}",
         )
