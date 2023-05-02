@@ -1,13 +1,13 @@
 from extras.plugins import PluginConfig
 
-__version__ = "0.17.0"
+__version__ = "0.18.0-beta1"
 
 
 class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = "Netbox DNS"
     description = "Netbox DNS"
-    min_version = "3.5.0"
+    min_version = "3.5"
     version = __version__
     author = "Peter Eckel"
     author_email = "pe-netbox-plugin-dns@hindenburgring.com"

@@ -1,4 +1,4 @@
-from django.forms import CharField
+from django import forms
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -6,7 +6,7 @@ from netbox.forms import (
     NetBoxModelImportForm,
     NetBoxModelForm,
 )
-from utilities.forms import TagFilterField
+from utilities.forms.fields import TagFilterField
 
 from netbox_dns.models import View
 
@@ -22,7 +22,7 @@ class ViewForm(NetBoxModelForm):
 class ViewFilterForm(NetBoxModelFilterSetForm):
     """Form for filtering View instances."""
 
-    name = CharField(
+    name = forms.CharField(
         required=False,
         label="Name",
     )
@@ -40,7 +40,7 @@ class ViewImportForm(NetBoxModelImportForm):
 class ViewBulkEditForm(NetBoxModelBulkEditForm):
     model = View
 
-    description = CharField(max_length=200, required=False)
+    description = forms.CharField(max_length=200, required=False)
 
     class Meta:
         nullable_fields = ["description"]

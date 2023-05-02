@@ -31,7 +31,7 @@ jobs:
           path: netbox-plugin-dns
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -40,7 +40,7 @@ jobs:
         with:
           repository: "netbox-community/netbox"
           path: netbox
-          ref: develop
+          ref: master
 
       - name: install netbox_dns
         working-directory: netbox-plugin-dns

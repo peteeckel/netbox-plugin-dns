@@ -1,6 +1,6 @@
 <h1 align="center">NetBox DNS</h1>
 
-<p align="center"><i>NetBox DNS is a NetBox plugin for managing DNS data.</i></p>
+<p align="center"><i>NetBox DNS is a NetBox plugin for managing DNS views, zones, name servers and records.</i></p>
 
 <div align="center">
 <a href="https://pypi.org/project/netbox-plugin-dns/"><img src="https://img.shields.io/pypi/v/netbox-plugin-dns" alt="PyPi"/></a>
@@ -14,16 +14,17 @@
 
 ## Features
 
-* Manage name servers
+* Manage DNS name servers
 * Manage DNS zone information, automatically generating SOA and NS records
+* Manage DNS records
 * Automatically create and update PTR records for A and AAAA records
-* Optionally organize zones in views to cater for split horizon DNS and multi site deployments
+* Optionally organize DNS zones in views to cater for split horizon DNS and multi-site deployments
 
 NetBox DNS is using the standardized NetBox plugin interface, so it also takes advantage of the NetBox tagging and change log features.
 
 ## Requirements
 
-* NetBox 3.4 or higher
+* NetBox 3.5 or higher
 * Python 3.8 or higher
 
 ## Installation & Configuration
