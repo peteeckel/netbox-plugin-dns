@@ -4,7 +4,7 @@ There are some use cases in which it seems desirable to use the NetBox interface
 While this is not the primary purpose of NetBox or, specifically, NetBox DNS, NetBox still provides means of providing that kind of functionality. For example, NetBox can trigger external tools using Webhooks, run automated reports on its data models, and can also provide so-called 'Custom Scripts' which are basically Python modules that operate on NetBox data.
 
 ## Exporting Zone Files from NetBox DNS
-One request that was formulated in [NetBox DNS issue #8](https://github.com/auroraresearchlab/netbox-dns/issues/8) concerns the export of zone data as zone files. This document describes the implementation of a custom script that can serve as a basis for own developments that perform this and similar actions.
+One request that was formulated in [NetBox DNS issue #8](https://github.com/peteeckel/netbox-plugin-dns/issues/8) concerns the export of zone data as zone files. This document describes the implementation of a custom script that can serve as a basis for own developments that perform this and similar actions.
 
 ### Preparing NetBox
 Some configuration steps are necessary to enable the use of the exporter script.

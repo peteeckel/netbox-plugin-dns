@@ -7,10 +7,10 @@ class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = "Netbox DNS"
     description = "Netbox DNS"
-    min_version = "3.4.0"
+    min_version = "3.5.0"
     version = __version__
-    author = "Aurora Research Lab"
-    author_email = "info@aurorabilisim.com"
+    author = "Peter Eckel"
+    author_email = "pe-netbox-plugin-dns@hindenburgring.com"
     required_settings = []
     default_settings = {
         "zone_default_ttl": 86400,
