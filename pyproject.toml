@@ -16,7 +16,7 @@ python = "^3.8"
 dnspython = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^5.2"
+pytest = "^7.2"
 black = "^21.8b0"
 
 [build-system]
