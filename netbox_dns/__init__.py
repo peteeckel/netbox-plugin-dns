@@ -1,6 +1,6 @@
 from extras.plugins import PluginConfig
 
-__version__ = "0.18.0-beta4"
+__version__ = "0.18.0-beta5"
 
 
 class DNSConfig(PluginConfig):
