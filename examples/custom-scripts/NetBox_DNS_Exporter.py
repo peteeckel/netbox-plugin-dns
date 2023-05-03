@@ -54,7 +54,7 @@ $TTL {{ zone.default_ttl }}
 {{ record.name.ljust(32) }}    {{ (record.ttl|string if record.ttl is not none else '').ljust(8) }} IN {{ record.type.ljust(8) }}    {{ record.value }}
 {% endfor %}\
 '''
-    jinja_env = Environment(loader=DictLoader({"zone_file": zone_template}))
+    jinja_env = Environment(loader=DictLoader({"zone_file": zone_template}), autoescape=True)
     template = jinja_env.get_template("zone_file")
 
     def run(self, data, commit):
