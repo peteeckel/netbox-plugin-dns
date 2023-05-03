@@ -1,6 +1,10 @@
 from extras.plugins import PluginConfig
 
+<<<<<<< Updated upstream
 __version__ = "0.17.0"
+=======
+__version__ = "0.18.0-beta2"
+>>>>>>> Stashed changes
 
 
 class DNSConfig(PluginConfig):

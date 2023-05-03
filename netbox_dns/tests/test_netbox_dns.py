@@ -11,7 +11,11 @@ class NetboxDnsVersionTestCase(SimpleTestCase):
     """
 
     def test_version(self):
+<<<<<<< Updated upstream
         assert __version__ == "0.17.0"
+=======
+        assert __version__ == "0.18.0-beta2"
+>>>>>>> Stashed changes
 
 
 class AppTest(APITestCase):
