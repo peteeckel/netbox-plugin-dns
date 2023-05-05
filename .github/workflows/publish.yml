@@ -8,6 +8,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: NetBox DNS Deployment
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

@@ -24,7 +24,7 @@ Netbox DNS is available as a PyPi module and can be installed using pip:
 
 ```
 $ source /opt/netbox/venv/bin/activate
-(venv) $ pip install netbox-dns
+(venv) $ pip install netbox-plugin-dns
 ```
 This will install Netbox DNS and all prerequisites within the Netbox virtual environment.
 
@@ -32,7 +32,7 @@ This will install Netbox DNS and all prerequisites within the Netbox virtual env
 To have Netbox DNS updated when a Netbox update is performed, include it in the local requirements file for Netbox:
 
 ```
-echo netbox-dns >> /opt/netbox/local_requirements.txt
+echo netbox-plugin-dns >> /opt/netbox/local_requirements.txt
 ```
 If the local requirements file does not exist, this command will create it.
 

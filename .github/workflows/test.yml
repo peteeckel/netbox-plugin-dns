@@ -28,7 +28,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          path: netbox-dns
+          path: netbox-plugin-dns
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -43,7 +43,7 @@ jobs:
           ref: master
 
       - name: install netbox_dns
-        working-directory: netbox-dns
+        working-directory: netbox-plugin-dns
         run: |
           # include tests directory for test
           sed -i 's/exclude/#exclude/g' pyproject.toml
@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies & set up configuration
         working-directory: netbox
         run: |
-          ln -s $(pwd)/../netbox-dns/media/configuration.testing.py netbox/netbox/configuration.py
+          ln -s $(pwd)/../netbox-plugin-dns/media/configuration.testing.py netbox/netbox/configuration.py
 
           python -m pip install --upgrade pip
           pip install -r requirements.txt -U

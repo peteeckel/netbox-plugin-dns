@@ -34,23 +34,23 @@ $ git config --global user.name 'your name'
 $ git config --global user.email 'your email'
 ```
 
-* Fork `netbox-dns` to your GitHub account by clicking the __Fork__ button.
+* Fork `netbox-plugin-dns` to your GitHub account by clicking the __Fork__ button.
 * Clone the your forked repository locally.
 
 ```
-$ git clone https://github.com/YOUR-GITHUB-USERNAME/netbox-dns.git
-$ cd netbox-dns
+$ git clone https://github.com/YOUR-GITHUB-USERNAME/netbox-plugin-dns.git
+$ cd netbox-plugin-dns
 ```
 
 * Add main repository as upstream remote.
 
 ```
-$ git remote add upstream https://github.com/auroraresearchlab/netbox-dns.git
+$ git remote add upstream https://github.com/peteeckel/netbox-plugin-dns.git
 ```
 
 * Install NetBox. Please see [NetBox Installation](https://github.com/netbox-community/netbox#installation)
 * Activate NetBox virtual environment: `source netbox/.venv/bin/activate`
-* Install `netbox-dns`
+* Install `netbox-plugin-dns`
 
 ```
 $ poetry install

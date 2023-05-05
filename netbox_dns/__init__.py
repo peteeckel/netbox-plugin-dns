@@ -1,6 +1,6 @@
 from extras.plugins import PluginConfig
 
-__version__ = "0.18.0-beta1"
+__version__ = "0.18.0"
 
 
 class DNSConfig(PluginConfig):
@@ -9,8 +9,8 @@ class DNSConfig(PluginConfig):
     description = "Netbox DNS"
     min_version = "3.5"
     version = __version__
-    author = "Aurora Research Lab"
-    author_email = "info@aurorabilisim.com"
+    author = "Peter Eckel"
+    author_email = "pe-netbox-plugin-dns@hindenburgring.com"
     required_settings = []
     default_settings = {
         "zone_default_ttl": 86400,
