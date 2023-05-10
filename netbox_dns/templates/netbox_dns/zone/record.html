@@ -11,7 +11,7 @@
         <input type="hidden" name="return_url" value="{% if return_url %}{{ return_url }}{% else %}{{ request.path }}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}{% endif %}" />
 
         <div class="card">
-            <div class="card-body htmx-container" id="object_list">
+            <div class="card-body htmx-container table-responsive" id="object_list">
                 {% include 'htmx/table.html' %}
             </div>
         </div>
