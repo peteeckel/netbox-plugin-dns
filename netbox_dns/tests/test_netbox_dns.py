@@ -5,20 +5,12 @@ from netbox_dns import __version__
 from netbox_dns.tests.custom import APITestCase
 
 
-class NetboxDnsVersionTestCase(SimpleTestCase):
-    """
-    Test for netbox_dns package
-    """
-
+class NetBoxDNSVersionTestCase(SimpleTestCase):
     def test_version(self):
         assert __version__ == "0.18.2"
 
 
 class AppTest(APITestCase):
-    """
-    Test the availability of the NetBox DNS API root
-    """
-
     def test_root(self):
         url = reverse("plugins-api:netbox_dns-api:api-root")
         response = self.client.get(f"{url}?format=api", **self.header)

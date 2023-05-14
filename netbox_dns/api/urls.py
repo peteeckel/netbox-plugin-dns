@@ -1,7 +1,7 @@
 from netbox.api.routers import NetBoxRouter
 
 from netbox_dns.api.views import (
-    NetboxDNSRootView,
+    NetBoxDNSRootView,
     ViewViewSet,
     ZoneViewSet,
     NameServerViewSet,
@@ -9,7 +9,7 @@ from netbox_dns.api.views import (
 )
 
 router = NetBoxRouter()
-router.APIRootView = NetboxDNSRootView
+router.APIRootView = NetBoxDNSRootView
 
 router.register("views", ViewViewSet)
 router.register("zones", ZoneViewSet)

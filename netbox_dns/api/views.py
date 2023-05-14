@@ -15,13 +15,9 @@ from netbox_dns.filters import ViewFilter, ZoneFilter, NameServerFilter, RecordF
 from netbox_dns.models import View, Zone, NameServer, Record
 
 
-class NetboxDNSRootView(APIRootView):
-    """
-    NetboxDNS API root view
-    """
-
+class NetBoxDNSRootView(APIRootView):
     def get_view_name(self):
-        return "NetboxDNS"
+        return "NetBoxDNS"
 
 
 class ViewViewSet(NetBoxModelViewSet):
