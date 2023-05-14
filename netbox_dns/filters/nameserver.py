@@ -13,7 +13,7 @@ class NameServerFilter(NetBoxModelFilterSet):
 
     class Meta:
         model = NameServer
-        fields = ("name",)
+        fields = ("id", "name")
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""
