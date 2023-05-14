@@ -28,7 +28,7 @@ class ZoneFilter(NetBoxModelFilterSet):
 
     class Meta:
         model = Zone
-        fields = ("name", "view", "status", "nameservers", "active")
+        fields = ("id", "name", "view", "status", "nameservers", "active")
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""
