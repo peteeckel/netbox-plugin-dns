@@ -451,7 +451,7 @@ class Zone(NetBoxModel):
         if self.view is None:
             if (
                 Zone.objects.exclude(pk=self.pk)
-                .filter(name=self.name, view__isnull=True)
+                .filter(name=self.name.rstrip("."), view__isnull=True)
                 .exists()
             ):
                 raise ValidationError(
