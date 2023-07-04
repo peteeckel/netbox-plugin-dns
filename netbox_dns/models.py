@@ -289,10 +289,13 @@ class Zone(NetBoxModel):
         )
 
     def __str__(self):
-        try:
-            name = dns_name.from_text(self.name, origin=None).to_unicode()
-        except dns_name.IDNAException:
-            name = self.name
+        if self.name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
+            name = ". (root zone)"
+        else:
+            try:
+                name = dns_name.from_text(self.name, origin=None).to_unicode()
+            except dns_name.IDNAException:
+                name = self.name
 
         if self.view:
             return f"[{self.view}] {name}"

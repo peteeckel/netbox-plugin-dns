@@ -58,6 +58,7 @@ class NameValidationTest(TestCase):
             "123456789"
             + ".12345678" * 26
             + ".example.com.",  # 256 octets, trailing dot
+            ".",  # root zone
         )
 
         for name in names:
@@ -65,6 +66,19 @@ class NameValidationTest(TestCase):
                 Zone.objects.create(
                     name=name, **self.zone_data, soa_mname=self.nameserver
                 )
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "enable_root_zones": True,
+            }
+        }
+    )
+    def test_name_validation_ok_root_zone(self):
+        zone = Zone.objects.create(
+            name=".", **self.zone_data, soa_mname=self.nameserver
+        )
+        self.assertEqual(zone.name, ".")
 
     @override_settings(
         PLUGINS_CONFIG={

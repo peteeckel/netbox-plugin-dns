@@ -355,3 +355,19 @@ For instance, the IDN `exämple.com` is represented in Punycode as `xn--exmple-c
 ![IDN Example](images/IDNExample.png)
 
 Internally, all IDNs are handled in a normalised form as Punycode. This ensures that the data coming from NetBox DNS can be handled by any tool and easily exported to name servers without any need for conversion to the standard format.
+
+## Root Zones
+
+NetBox DNS provides experimental support for managing root zones. Root zones are usually maintained by the ICANN, but there are special cases in which it may make sense to use internal root name servers. Normally the root zone, designated by the name `.`, cannot be used in NetBox DNS as the name fails validation, but if necessary this can be enabled by setting the configuration flag `enable_root_zones` in the file `/opt/netbox/netbox/netbox/configuration.py` as follows:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'enable_root_zones': True,
+        ...
+    },
+}
+```
+
+This feature is disabled by default.

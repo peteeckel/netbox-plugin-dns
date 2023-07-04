@@ -4,6 +4,8 @@ from dns import name as dns_name
 from dns.exception import DNSException
 from netaddr import IPNetwork, AddrFormatError
 
+from extras.plugins import get_plugin_config
+
 
 class NameFormatError(Exception):
     pass
@@ -38,6 +40,9 @@ def arpa_to_prefix(arpa_name):
 
 
 def name_to_unicode(name):
+    if name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
+        return "."
+
     try:
         return dns_name.from_text(name, origin=None).to_unicode()
     except dns_name.IDNAException:
@@ -54,6 +59,9 @@ def value_to_unicode(value):
 
 
 def normalize_name(name):
+    if name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
+        return "."
+
     try:
         return (
             dns_name.from_text(name, origin=dns_name.root)
