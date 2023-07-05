@@ -58,6 +58,7 @@ class NameValidationTest(TestCase):
             "123456789"
             + ".12345678" * 26
             + ".example.com.",  # 256 octets, trailing dot
+            ".",  # root zone
         )
 
         for name in names:
@@ -69,9 +70,20 @@ class NameValidationTest(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
+                "enable_root_zones": True,
+            }
+        }
+    )
+    def test_name_validation_ok_root_zone(self):
+        zone = Zone.objects.create(
+            name=".", **self.zone_data, soa_mname=self.nameserver
+        )
+        self.assertEqual(zone.name, ".")
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
                 "tolerate_underscores_in_hostnames": True,
-                "tolerate_leading_underscore_types": ["TXT", "SRV"],
-                "tolerate_non_rfc1035_types": [],
             }
         }
     )
@@ -91,8 +103,6 @@ class NameValidationTest(TestCase):
         PLUGINS_CONFIG={
             "netbox_dns": {
                 "tolerate_underscores_in_hostnames": True,
-                "tolerate_leading_underscore_types": ["TXT", "SRV"],
-                "tolerate_non_rfc1035_types": [],
             }
         }
     )
