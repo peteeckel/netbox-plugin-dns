@@ -84,8 +84,6 @@ class NameValidationTest(TestCase):
         PLUGINS_CONFIG={
             "netbox_dns": {
                 "tolerate_underscores_in_hostnames": True,
-                "tolerate_leading_underscore_types": ["TXT", "SRV"],
-                "tolerate_non_rfc1035_types": [],
             }
         }
     )
@@ -105,8 +103,6 @@ class NameValidationTest(TestCase):
         PLUGINS_CONFIG={
             "netbox_dns": {
                 "tolerate_underscores_in_hostnames": True,
-                "tolerate_leading_underscore_types": ["TXT", "SRV"],
-                "tolerate_non_rfc1035_types": [],
             }
         }
     )

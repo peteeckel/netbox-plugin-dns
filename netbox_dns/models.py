@@ -858,7 +858,7 @@ class Record(NetBoxModel):
             )
 
         if self.type not in get_plugin_config(
-            "netbox_dns", "tolerate_non_rfc1035_types"
+            "netbox_dns", "tolerate_non_rfc1035_types", default=list()
         ):
             try:
                 validate_extended_hostname(
@@ -866,7 +866,9 @@ class Record(NetBoxModel):
                     (
                         self.type
                         in get_plugin_config(
-                            "netbox_dns", "tolerate_leading_underscore_types"
+                            "netbox_dns",
+                            "tolerate_leading_underscore_types",
+                            default=list(),
                         )
                     ),
                 )
