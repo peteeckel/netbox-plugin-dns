@@ -33,6 +33,7 @@ class NameValidationTest(TestCase):
             "123456" + ".12345678" * 26 + ".example2.com.",  # 255 octets, trailing dot
             "x" * 63 + ".example1.com",  # longest label 63 octets
             "x" * 63 + ".example2.com.",  # longest label 63 octets, trailing dot
+            "0-32.10.10.10.in-addr.arpa",  # RFC2317 zone name
         )
 
         for name in names:

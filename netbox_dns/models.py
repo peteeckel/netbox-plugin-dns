@@ -321,7 +321,7 @@ class Zone(NetBoxModel):
 
     @property
     def is_reverse_zone(self):
-        return self.name.endswith(".arpa")
+        return self.name.endswith(".arpa") and self.network_from_name is not None
 
     @property
     def view_filter(self):
