@@ -657,7 +657,7 @@ class Record(NetBoxModel):
         max_length=255,
     )
     value = models.CharField(
-        max_length=1000,
+        max_length=65535,
     )
     status = models.CharField(
         max_length=50,
