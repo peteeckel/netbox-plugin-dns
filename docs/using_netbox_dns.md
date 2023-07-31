@@ -341,7 +341,7 @@ PLUGINS_CONFIG = {
         ...
         'allow_underscores_in_hostnames': True,
         'tolerate_leading_underscore_types': ["TXT", "SRV", "CNAME"]
-        'tolerate_non_rfc1035_types': `["X25"]`
+        'tolerate_non_rfc1035_types': ["X25"]
     },
 }
 ```
