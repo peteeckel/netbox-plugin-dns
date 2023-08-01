@@ -54,6 +54,7 @@ class ZoneSerializer(NetBoxModelSerializer):
     active = serializers.BooleanField(
         required=False,
         read_only=True,
+        allow_null=True,
     )
 
     def create(self, validated_data):
@@ -141,12 +142,14 @@ class RecordSerializer(NetBoxModelSerializer):
         many=False,
         read_only=True,
         required=False,
+        allow_null=True,
         help_text="PTR record generated from an address",
     )
     address_record = NestedRecordSerializer(
         many=False,
         read_only=True,
         required=False,
+        allow_null=True,
         help_text="Address record defining the PTR",
     )
     zone = NestedZoneSerializer(
