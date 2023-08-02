@@ -34,6 +34,7 @@ class NestedZoneSerializer(WritableNestedSerializer):
     active = serializers.BooleanField(
         required=False,
         read_only=True,
+        allow_null=True,
     )
 
     class Meta:
@@ -69,6 +70,7 @@ class NestedRecordSerializer(WritableNestedSerializer):
     active = serializers.BooleanField(
         required=False,
         read_only=True,
+        allow_null=True,
     )
 
     class Meta:
