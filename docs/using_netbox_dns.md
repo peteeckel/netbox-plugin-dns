@@ -371,3 +371,25 @@ PLUGINS_CONFIG = {
 ```
 
 This feature is disabled by default.
+
+## Uniqueness of Records
+
+There is no standard requiring that records need to be unique within a zone, so it's perfectly legal to create records with the same name, type and value to a zone where the same record already exists. Use cases for this are, however, very rare, and on the other hand allowing duplicate records can cause problems with bulk imports and automated updates to zones.
+
+For this reason there is a configuration setting that makes NetBox DNS enforce uniqueness of records in a way that no record can be created with a given name, type and value in a zone where an active record with the same values already exists:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'enforce_unique_records': True,
+        ...
+    },
+}
+```
+
+This feature is disabled by default.
+
+Note that setting this option to `True` in an existing NetBox installation does not affect duplicate records that are already present in the database, and so it might make sense to clean them up manually or by script. It won't be possible to save any changes to either of the duplicate records as long as the other one is still present and active.
+
+It can also be a useful strategy to set `enforce_unique_records` to `True` while doing bulk imports, then set it to the default value `False` after the imports are done if importing is a one-off task.

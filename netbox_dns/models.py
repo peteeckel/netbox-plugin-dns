@@ -899,6 +899,26 @@ class Record(NetBoxModel):
                 }
             ) from None
 
+    def check_unique(self):
+        if not get_plugin_config("netbox_dns", "enforce_unique_records", False):
+            return
+
+        if not self.is_active:
+            return
+
+        records = Record.objects.filter(
+            zone=self.zone,
+            name=self.name,
+            value=self.value,
+            status__in=Record.ACTIVE_STATUS_LIST,
+        )
+        if len(records):
+            raise ValidationError(
+                {
+                    "value": f"There is already an active record for name {self.name} in zone {self.zone} with value {self.value}."
+                }
+            ) from None
+
     def clean_fields(self, *args, **kwargs):
         self.type = self.type.upper()
         super().clean_fields(*args, **kwargs)
@@ -906,6 +926,7 @@ class Record(NetBoxModel):
     def clean(self, *args, **kwargs):
         self.validate_name()
         self.validate_value()
+        self.check_unique()
 
         if not self.is_active:
             return

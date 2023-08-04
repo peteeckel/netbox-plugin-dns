@@ -28,6 +28,7 @@ class DNSConfig(PluginConfig):
         ],
         "tolerate_non_rfc1035_types": [],
         "enable_root_zones": False,
+        "enforce_unique_records": False,
     }
     base_url = "netbox-dns"
 
