@@ -39,10 +39,15 @@ class NameValidationTest(TestCase):
                 soa_mname=cls.nameserver,
                 name="zone240" + 22 * ".987654321" + ".example.com.",
             ),
+            Zone(
+                **cls.zone_data,
+                soa_mname=cls.nameserver,
+                name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
+            ),
         )
         Zone.objects.bulk_create(cls.zones)
         for zone in cls.zones:
-            zone.clean()
+            zone.save()
 
     def test_name_validation_ok(self):
         records = (

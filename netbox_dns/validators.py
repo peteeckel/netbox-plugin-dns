@@ -15,9 +15,9 @@ def has_invalid_double_dash(name):
 
 def validate_fqdn(name):
     if get_plugin_config("netbox_dns", "tolerate_underscores_in_hostnames"):
-        regex = rf"^{UNDERSCORE_LABEL}(\.{UNDERSCORE_LABEL})+\.?$"
+        regex = rf"^(\*|{UNDERSCORE_LABEL})(\.{UNDERSCORE_LABEL})+\.?$"
     else:
-        regex = rf"^{LABEL}(\.{LABEL})+\.?$"
+        regex = rf"^(\*|{LABEL})(\.{LABEL})+\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
         raise ValidationError(f"Not a valid fully qualified DNS host name")
