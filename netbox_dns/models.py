@@ -43,7 +43,7 @@ from netbox_dns.validators import (
     validate_extended_hostname,
 )
 
-from extras.plugins import get_plugin_config
+from extras.plugins.utils import get_plugin_config
 
 
 class NameServer(NetBoxModel):
