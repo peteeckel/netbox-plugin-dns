@@ -7,7 +7,7 @@ class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = "NetBox DNS"
     description = "NetBox plugin for DNS data"
-    min_version = "3.5"
+    min_version = "3.5.8"
     version = __version__
     author = "Peter Eckel"
     author_email = "pe-netbox-plugin-dns@hindenburgring.com"
