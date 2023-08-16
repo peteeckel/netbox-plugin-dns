@@ -4,7 +4,7 @@ from dns import name as dns_name
 from dns.exception import DNSException
 from netaddr import IPNetwork, AddrFormatError
 
-from extras.plugins import get_plugin_config
+from extras.plugins.utils import get_plugin_config
 
 
 class NameFormatError(Exception):

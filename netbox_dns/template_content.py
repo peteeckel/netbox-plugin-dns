@@ -1,6 +1,7 @@
 from django.db.models.functions import Length
 
-from extras.plugins import PluginTemplateExtension, get_plugin_config
+from extras.plugins.utils import get_plugin_config
+from extras.plugins import PluginTemplateExtension
 
 from netbox_dns.models import Record, RecordTypeChoices, Zone
 from netbox_dns.tables import RelatedRecordTable, RelatedZoneTable
