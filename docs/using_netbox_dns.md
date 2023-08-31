@@ -16,7 +16,7 @@ The installation of plugins in general is described in the [NetBox documentation
 ### Requirements
 The installation of NetBox DNS requires a Python interpreter and a working NetBox deployment. Supported versions are currently:
 
-* NetBox 3.2 or higher
+* NetBox 3.5.8 or higher
 * Python 3.8 or higher
 
 ### Installation of NetBox DNS
