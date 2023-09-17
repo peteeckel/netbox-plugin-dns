@@ -2,13 +2,12 @@ import django_filters
 from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
+from tenancy.filtersets import TenancyFilterSet
 
 from netbox_dns.models import View, Zone, ZoneStatusChoices
 
 
-class ZoneFilter(NetBoxModelFilterSet):
-    """Filter capabilities for Zone instances."""
-
+class ZoneFilter(TenancyFilterSet, NetBoxModelFilterSet):
     status = django_filters.ChoiceFilter(
         choices=ZoneStatusChoices,
     )
@@ -28,7 +27,7 @@ class ZoneFilter(NetBoxModelFilterSet):
 
     class Meta:
         model = Zone
-        fields = ("id", "name", "view", "status", "nameservers", "active")
+        fields = ("id", "name", "view", "status", "nameservers", "active", "tenant")
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""

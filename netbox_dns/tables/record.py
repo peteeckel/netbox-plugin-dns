@@ -7,14 +7,13 @@ from netbox.tables import (
     TagColumn,
     ActionsColumn,
 )
+from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import Record
 from netbox_dns.utilities import value_to_unicode
 
 
-class RecordBaseTable(NetBoxTable):
-    """Base class for tables displaying Records"""
-
+class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     zone = tables.Column(
         linkify=True,
     )
@@ -45,8 +44,6 @@ class RecordBaseTable(NetBoxTable):
 
 
 class RecordTable(RecordBaseTable):
-    """Table for displaying Record objects."""
-
     pk = ToggleColumn()
     status = ChoiceFieldColumn()
     disable_ptr = tables.BooleanColumn(
@@ -76,6 +73,8 @@ class RecordTable(RecordBaseTable):
             "tags",
             "active",
             "description",
+            "tenant",
+            "tenant_group",
         )
         default_columns = (
             "zone",
@@ -89,8 +88,6 @@ class RecordTable(RecordBaseTable):
 
 
 class ManagedRecordTable(RecordBaseTable):
-    """Table for displaying managed Record objects."""
-
     address_record = tables.Column(
         verbose_name="Address Record",
         linkify=True,

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
+from tenancy.api.nested_serializers import NestedTenantSerializer
 
 from netbox_dns.api.nested_serializers import (
     NestedViewSerializer,
@@ -15,6 +16,7 @@ class ViewSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:view-detail"
     )
+    tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     class Meta:
         model = View
@@ -28,6 +30,7 @@ class ViewSerializer(NetBoxModelSerializer):
             "created",
             "last_updated",
             "custom_fields",
+            "tenant",
         )
 
 
@@ -56,6 +59,7 @@ class ZoneSerializer(NetBoxModelSerializer):
         read_only=True,
         allow_null=True,
     )
+    tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     def create(self, validated_data):
         nameservers = validated_data.pop("nameservers", None)
@@ -103,6 +107,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             "soa_minimum",
             "active",
             "custom_fields",
+            "tenant",
         )
 
 
@@ -117,6 +122,7 @@ class NameServerSerializer(NetBoxModelSerializer):
         default=None,
         help_text="Zones served by the authoritative nameserver",
     )
+    tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     class Meta:
         model = NameServer
@@ -131,6 +137,7 @@ class NameServerSerializer(NetBoxModelSerializer):
             "created",
             "last_updated",
             "custom_fields",
+            "tenant",
         )
 
 
@@ -161,6 +168,7 @@ class RecordSerializer(NetBoxModelSerializer):
         required=False,
         read_only=True,
     )
+    tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     class Meta:
         model = Record
@@ -184,4 +192,5 @@ class RecordSerializer(NetBoxModelSerializer):
             "address_record",
             "active",
             "custom_fields",
+            "tenant",
         )

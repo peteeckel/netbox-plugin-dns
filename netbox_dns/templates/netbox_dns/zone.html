@@ -33,6 +33,15 @@
                     </tr>
                     {% endif %}
                     <tr>
+                        <th scope="row">Tenant</th>
+                        <td>
+                            {% if object.tenant.group %}
+                                {{ object.tenant.group|linkify }} /
+                            {% endif %}
+                            {{ object.tenant|linkify|placeholder }}
+                        </td>
+                    </tr>
+                    <tr>
                         <th scope="row">Status</th>
                         <td>{{ object.status }}</td>
                     </tr>
