@@ -53,6 +53,17 @@
                         <td><a href="{% url 'plugins:netbox_dns:zone_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
                         {% endif %}
                     </tr>
+                    {% if not object.managed %}
+                    <tr>
+                        <th scope="row">Tenant</th>
+                        <td>
+                            {% if object.tenant.group %}
+                                {{ object.tenant.group|linkify }} /
+                            {% endif %}
+                            {{ object.tenant|linkify|placeholder }}
+                        </td>
+                    </tr>
+                    {% endif %}
                     <tr>
                         <th scope="row">Type</th>
                         <td>{{ object.type }}</td>
