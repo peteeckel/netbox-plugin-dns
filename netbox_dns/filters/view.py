@@ -2,21 +2,17 @@ import django_filters
 from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
+from tenancy.filtersets import TenancyFilterSet
 
 from netbox_dns.models import View
 
 
-class ViewFilter(NetBoxModelFilterSet):
-    """Filter capabilities for View instances."""
-
-    name = django_filters.CharFilter()
-
+class ViewFilter(NetBoxModelFilterSet, TenancyFilterSet):
     class Meta:
         model = View
-        fields = ("id", "name")
+        fields = ("id", "name", "tenant")
 
     def search(self, queryset, name, value):
-        """Perform the filtered search."""
         if not value.strip():
             return queryset
         qs_filter = Q(name__icontains=value)

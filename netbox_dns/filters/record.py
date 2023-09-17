@@ -2,11 +2,12 @@ import django_filters
 from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
+from tenancy.filtersets import TenancyFilterSet
 
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices
 
 
-class RecordFilter(NetBoxModelFilterSet):
+class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
     """Filter capabilities for Record instances."""
 
     type = django_filters.MultipleChoiceFilter(
@@ -38,7 +39,7 @@ class RecordFilter(NetBoxModelFilterSet):
 
     class Meta:
         model = Record
-        fields = ("id", "type", "name", "value", "status", "zone", "managed")
+        fields = ("id", "type", "name", "value", "status", "zone", "managed", "tenant")
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""
