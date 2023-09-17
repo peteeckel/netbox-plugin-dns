@@ -1,11 +1,12 @@
 import django_tables2 as tables
 
 from netbox.tables import NetBoxTable, TagColumn
+from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import NameServer
 
 
-class NameServerTable(NetBoxTable):
+class NameServerTable(TenancyColumnsMixin, NetBoxTable):
     """Table for displaying NameServer objects."""
 
     name = tables.Column(
@@ -25,6 +26,8 @@ class NameServerTable(NetBoxTable):
             "name",
             "description",
             "tags",
+            "tenant",
+            "tenant_group",
         )
         default_columns = (
             "pk",

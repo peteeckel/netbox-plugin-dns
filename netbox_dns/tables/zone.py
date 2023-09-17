@@ -6,13 +6,12 @@ from netbox.tables import (
     TagColumn,
     ActionsColumn,
 )
+from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import Zone
 
 
-class ZoneTable(NetBoxTable):
-    """Table for displaying Zone objects."""
-
+class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
@@ -46,6 +45,8 @@ class ZoneTable(NetBoxTable):
             "soa_mname",
             "soa_rname",
             "soa_serial",
+            "tenant",
+            "tenant_group",
         )
         default_columns = (
             "pk",
