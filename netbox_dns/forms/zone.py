@@ -19,14 +19,14 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
 from utilities.forms import add_blank_choice
+from tenancy.models import Tenant
+from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import View, Zone, ZoneStatusChoices, NameServer
 from netbox_dns.utilities import name_to_unicode
 
 
-class ZoneForm(NetBoxModelForm):
-    """Form for creating a new Zone object."""
-
+class ZoneForm(TenancyForm, NetBoxModelForm):
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
@@ -110,6 +110,7 @@ class ZoneForm(NetBoxModelForm):
             ),
         ),
         ("Tags", ("tags",)),
+        ("Tenancy", ("tenant_group", "tenant")),
     )
 
     def __init__(self, *args, **kwargs):
@@ -188,6 +189,7 @@ class ZoneForm(NetBoxModelForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "tenant",
         )
         help_texts = {
             "view": "View the zone belongs to",
@@ -195,10 +197,13 @@ class ZoneForm(NetBoxModelForm):
         }
 
 
-class ZoneFilterForm(NetBoxModelFilterSetForm):
-    """Form for filtering Zone instances."""
-
+class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Zone
+    fieldsets = (
+        (None, ("q", "filter_id", "tag")),
+        ("Attributes", ("view_id", "status", "name", "nameservers")),
+        ("Tenant", ("tenant_group_id", "tenant_id")),
+    )
 
     view_id = DynamicModelMultipleChoiceField(
         queryset=View.objects.all(),
@@ -279,6 +284,12 @@ class ZoneImportForm(NetBoxModelImportForm):
     soa_minimum = forms.IntegerField(
         required=False,
         help_text="Minimum TTL for negative results, e.g. NXRRSET",
+    )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        required=False,
+        to_field_name="name",
+        help_text="Assigned tenant",
     )
 
     def _get_default_value(self, field):
@@ -370,6 +381,7 @@ class ZoneImportForm(NetBoxModelImportForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "tenant",
         )
 
 
@@ -445,6 +457,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         label="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
     )
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     model = Zone
 
@@ -457,6 +470,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
                 "nameservers",
                 "default_ttl",
                 "description",
+                "tenant",
             ),
         ),
         (

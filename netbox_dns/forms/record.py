@@ -16,14 +16,14 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
 from utilities.forms import add_blank_choice
+from tenancy.models import Tenant
+from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
 
-class RecordForm(NetBoxModelForm):
-    """Form for creating a new Record object."""
-
+class RecordForm(TenancyForm, NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -40,6 +40,24 @@ class RecordForm(NetBoxModelForm):
         label="TTL",
     )
 
+    fieldsets = (
+        (
+            "Record",
+            (
+                "name",
+                "zone",
+                "type",
+                "value",
+                "status",
+                "ttl",
+                "disable_ptr",
+                "description",
+                "tags",
+            ),
+        ),
+        ("Tenancy", ("tenant_group", "tenant")),
+    )
+
     class Meta:
         model = Record
 
@@ -53,13 +71,17 @@ class RecordForm(NetBoxModelForm):
             "disable_ptr",
             "description",
             "tags",
+            "tenant",
         )
 
 
-class RecordFilterForm(NetBoxModelFilterSetForm):
-    """Form for filtering Record instances."""
-
+class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Record
+    fieldsets = (
+        (None, ("q", "filter_id", "tag")),
+        ("Attributes", ("view_id", "zone_id", "name", "value", "status")),
+        ("Tenant", ("tenant_group_id", "tenant_id")),
+    )
 
     type = forms.MultipleChoiceField(
         choices=add_blank_choice(RecordTypeChoices),
@@ -137,6 +159,12 @@ class RecordImportForm(NetBoxModelImportForm):
         label="Disable PTR",
         help_text="Disable generation of a PTR record",
     )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        to_field_name="name",
+        required=False,
+        help_text="Assigned tenant",
+    )
 
     def is_valid(self):
         try:
@@ -158,6 +186,7 @@ class RecordImportForm(NetBoxModelImportForm):
             "ttl",
             "disable_ptr",
             "description",
+            "tenant",
         )
 
 
@@ -191,11 +220,21 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
         required=False, widget=BulkEditNullBooleanSelect(), label="Disable PTR"
     )
     description = forms.CharField(max_length=200, required=False)
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     fieldsets = (
         (
             None,
-            ("zone", "type", "value", "status", "ttl", "disable_ptr", "description"),
+            (
+                "zone",
+                "type",
+                "value",
+                "status",
+                "ttl",
+                "disable_ptr",
+                "description",
+                "tenant",
+            ),
         ),
     )
-    nullable_fields = ("description", "ttl")
+    nullable_fields = ("description", "ttl", "tenant")
