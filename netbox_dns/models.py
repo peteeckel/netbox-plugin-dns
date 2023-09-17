@@ -56,6 +56,13 @@ class NameServer(NetBoxModel):
         max_length=200,
         blank=True,
     )
+    tenant = models.ForeignKey(
+        to="tenancy.Tenant",
+        on_delete=models.PROTECT,
+        related_name="netbox_dns_nameservers",
+        blank=True,
+        null=True,
+    )
 
     clone_fields = ["name", "description"]
 
@@ -257,6 +264,13 @@ class Zone(NetBoxModel):
     arpa_network = NetworkField(
         verbose_name="ARPA Network",
         help_text="Network related to a reverse lookup zone (.arpa)",
+        blank=True,
+        null=True,
+    )
+    tenant = models.ForeignKey(
+        to="tenancy.Tenant",
+        on_delete=models.PROTECT,
+        related_name="netbox_dns_zones",
         blank=True,
         null=True,
     )
@@ -702,6 +716,13 @@ class Record(NetBoxModel):
         max_length=200,
         blank=True,
     )
+    tenant = models.ForeignKey(
+        to="tenancy.Tenant",
+        on_delete=models.PROTECT,
+        related_name="netbox_dns_records",
+        blank=True,
+        null=True,
+    )
     ip_address = AddressField(
         verbose_name="Related IP Address",
         help_text="IP address related to an address (A/AAAA) or PTR record",
@@ -1023,6 +1044,13 @@ class View(NetBoxModel):
     description = models.CharField(
         max_length=200,
         blank=True,
+    )
+    tenant = models.ForeignKey(
+        to="tenancy.Tenant",
+        on_delete=models.PROTECT,
+        related_name="netbox_dns_views",
+        blank=True,
+        null=True,
     )
 
     clone_fields = ["name", "description"]
