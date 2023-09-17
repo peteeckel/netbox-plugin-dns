@@ -7,6 +7,7 @@ import dns
 from dns import rdata, rdatatype, rdataclass
 from dns import name as dns_name
 from dns.rdtypes.ANY import SOA
+from dns.exception import DNSException
 
 from netaddr import IPNetwork, AddrFormatError, IPAddress
 
@@ -481,6 +482,16 @@ class Zone(NetBoxModel):
             raise ValidationError(
                 {
                     "name": exc,
+                }
+            ) from None
+
+        try:
+            soa_rname = dns_name.from_text(self.soa_rname, origin=dns_name.root)
+            validate_fqdn(self.soa_rname)
+        except (DNSException, ValidationError) as exc:
+            raise ValidationError(
+                {
+                    "soa_rname": exc,
                 }
             ) from None
 
