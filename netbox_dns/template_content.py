@@ -3,7 +3,7 @@ from django.db.models.functions import Length
 from extras.plugins.utils import get_plugin_config
 from extras.plugins import PluginTemplateExtension
 
-from netbox_dns.models import Record, RecordTypeChoices, Zone
+from netbox_dns.models import Record, RecordTypeChoices, Zone, View, NameServer
 from netbox_dns.tables import RelatedRecordTable, RelatedZoneTable
 
 
@@ -61,5 +61,40 @@ class RelatedDNSPointerZones(PluginTemplateExtension):
         )
 
 
+class RelatedDNSObjects(PluginTemplateExtension):
+    model = "tenancy.tenant"
+
+    def left_page(self):
+        obj = self.context.get("object")
+        request = self.context.get("request")
+
+        related_dns_models = (
+            (
+                View.objects.restrict(request.user, "view").filter(tenant=obj),
+                "tenant_id",
+            ),
+            (
+                NameServer.objects.restrict(request.user, "view").filter(tenant=obj),
+                "tenant_id",
+            ),
+            (
+                Zone.objects.restrict(request.user, "view").filter(tenant=obj),
+                "tenant_id",
+            ),
+            (
+                Record.objects.restrict(request.user, "view").filter(tenant=obj),
+                "tenant_id",
+            ),
+        )
+
+        return self.render(
+            "netbox_dns/related_dns_objects.html",
+            extra_context={
+                "related_dns_models": related_dns_models,
+            },
+        )
+
+
+template_extensions = [RelatedDNSObjects]
 if get_plugin_config("netbox_dns", "feature_ipam_integration"):
-    template_extensions = [RelatedDNSRecords, RelatedDNSPointerZones]
+    template_extensions += [RelatedDNSRecords, RelatedDNSPointerZones]

@@ -9,6 +9,7 @@ NetBox DNS is a plugin for NetBox designed to manage DNS data. In the current ve
 * Basic integrity checks of the entered data
 * Optional organisation of zones in views, i.e. to facilitate split-horizon DNS setups
 * Support for NetBox custom fields, custom links, export templates etc.
+* Support for NetBox tenancy
 
 ## Installation and Configuration
 The installation of plugins in general is described in the [NetBox documentation](https://netbox.readthedocs.io/en/stable/plugins/).
@@ -67,6 +68,14 @@ A view detail view:
 
 ![View Detail](images/ViewDetail.png)
 
+If the view is used by any zones, there is an additional tab listing the zones that use the view.
+
+![View DetailZones](images/ViewDetailZones.png)
+
+Additonally there is another tab showing the change log for the view.
+
+![View DetailZonesChangeLog](images/ViewDetailChangeLog.png)
+
 #### Permissions
 The following Django permissions are applicable to View objects:
 
@@ -85,6 +94,7 @@ The following fields are defined for views:
 Field           | Required | Explanation
 -----           | -------- | -----------
 **Name**        | Yes      | The name of the view
+**Tenant**      | No       | The tenant the view is assined to
 **Description** | No       | A short textual description of the view
 **Tags**        | No       | NetBox tags assigned to the view. Tags can be used to categorise views by arbitrary criteria such as Production/Test/Development systems
 
@@ -117,12 +127,23 @@ For name servers the following fields are defined:
 Field           | Required | Explanation
 -----           | -------- | -----------
 **Name**        | Yes      | The fully qualified domain name (FQDN) of the name server
+**Tenant**      | No       | The tenant the name server is assined to
 **Description** | No       | A short textual description of the name server
 **Tags**        | No       | NetBox tags assigned to the name server. Tags can be used to categorise name servers by arbitrary criteria such as Production/Test/Development systems
 
 A name server detail view:
 
 ![Name Server Detail](images/NameserverDetail.png)
+
+If the view is used as an authoritative name server for any zones, there is an additional tab listing the zones that use it.
+
+![View DetailZones](images/NameServerDetailZones.png)
+
+Similarly, if the name server is listed as the primary nameserver for zones in their SOA MNAME field, there is another tab listing those zones.
+
+![View DetailZonesChangeLog](images/NameServerDetailSOAZones.png)
+
+Like with views, another tab lists the change log entries for the name server.
 
 ### Zones
 Zone objects correspond to DNS zones to be served. Each zone contains resource records (RRs) of various types and zone specific configuration information that affects how the zone data is propagated and cached.
@@ -146,6 +167,7 @@ Field           | Required | Default  | Explanation
 -----           | -------- | -------  | -----------
 **Name**        | Yes      |          | The name of the zone. This is an FQDN that represents the DNS domain containing host names to be resolved or one of the special zones `in-addr.arpa` or `ip6.arpa`, which are reserved for the resolution of IPv4 and IPv6 addresses by the DNS infrastructure
 **View**        | No       |          | If the zone is associated with a view, the name of that view. In this case, the zone name is also prefixed with the view name in brackets to make zones easier to distinguish in lists. If the zone is not associated with a view, this field is not displayed
+**Tenant**      | No       |          | The tenant the zone is assigned to
 **Status**      | Yes      | Active   | The zone's status. Possible values are "active", "reserved", "deprecated" or "parked". All zone status except "Active" are considered inactive, which has implications for the records in a zone as well as for PTR records in reverse zones that are automatically generated for address records in the zone
 **Nameservers** | No       | see [Default Settings](#config)) | The list of authoritative name servers for the zone
 **Default TTL** | Yes      | see [Default Settings](#config)) | The default TTL for all records in the zone if none is specified
@@ -198,6 +220,14 @@ If the checkbox is not ticked, the SERIAL field is mandatory and the user is res
 A zone in detail view:
 
 ![Zone Detail](images/ZoneDetail.png)
+
+If there are records in the zone, a second tab shows a list of these records.
+
+![Zone DetailRecords](images/ZoneDetailRecords.png)
+
+Another tab shows all managed records in the zone. Since at the very least there is  the SOA record, this tab is always visible. Note that managed records are not editable, so there are no 'edit' and 'delete'-buttons for records in the managed records tab.
+
+![Zone DetailManagedRecords](images/ZoneDetailManagedRecords.png)
 
 #### <a name="zone_defaults"></a>Zone Default settings
 Zone default settings can be configured in the plugin configuration of NetBox. The following settings are available:
@@ -294,14 +324,6 @@ Note that for managed records there are no buttons for deleting, editing or clon
 #### Displaying records
 Records can either be displayed by opening the record list view from the "Reocrds" or "Managed Records" navigation item on the left, or per zone via the respective tabs in the zone defail view. In any case, the tables can be filtered by name, value, zone, or tags to narrow down the set of records displayed.
 
-The list of standard records for a specific zone using the "Records" tab in the zone detail view:
-
-![Records per Zone](images/ZoneRecords.png)
-
-The list of managed records for a specific zone using the "Managed Records" tab in the zone detail view:
-
-![Managed Records per Zone](images/ZoneManagedRecords.png)
-
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
 
@@ -393,3 +415,15 @@ This feature is disabled by default.
 Note that setting this option to `True` in an existing NetBox installation does not affect duplicate records that are already present in the database, and so it might make sense to clean them up manually or by script. It won't be possible to save any changes to either of the duplicate records as long as the other one is still present and active.
 
 It can also be a useful strategy to set `enforce_unique_records` to `True` while doing bulk imports, then set it to the default value `False` after the imports are done if importing is a one-off task.
+
+## Tenancy
+
+With NetBox DNS 0.19.0 support for the NetBox tenancy feature was added. It is possible to assign all NetBox DNS objects except for managed records to a tenant, making it easier to filter DNS resources by criteria like their assignment to a customer or department.
+
+Tenancy does not have any impact on uniqueness constraints within NetBox DNS.
+
+The NetBox detail view for tenants shows a table of NetBox DNS objects assigned to a specific tenant.
+
+![NetBox Tenant Detail](images/NetBoxTenantDetail.png)
+
+The colums of the table on the left side are clickable and link to filtered lists showing the related views, nameservers, zones and records.
