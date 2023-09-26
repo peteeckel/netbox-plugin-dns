@@ -11,6 +11,7 @@ class DNSConfig(PluginConfig):
     version = __version__
     author = "Peter Eckel"
     author_email = "pe-netbox-plugin-dns@hindenburgring.com"
+    middleware = ['netbox_dns.middleware.IpamCouplingMiddleware']
     required_settings = []
     default_settings = {
         "zone_default_ttl": 86400,
@@ -21,6 +22,7 @@ class DNSConfig(PluginConfig):
         "zone_soa_expire": 2592000,
         "zone_soa_minimum": 3600,
         "feature_ipam_integration": False,
+        "feature_ipam_coupling": False,
         "tolerate_underscores_in_hostnames": False,
         "tolerate_leading_underscore_types": [
             "TXT",
