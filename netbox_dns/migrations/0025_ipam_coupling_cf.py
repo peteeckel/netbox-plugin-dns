@@ -49,7 +49,7 @@ def delete_ipam_coupling_cf(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("netbox_dns", "0023_alter_record_value"),
+        ("netbox_dns", "0024_tenancy.py"),
     ]
 
     operations = [
