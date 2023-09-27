@@ -11,7 +11,7 @@ class DNSConfig(PluginConfig):
     version = __version__
     author = "Peter Eckel"
     author_email = "pe-netbox-plugin-dns@hindenburgring.com"
-    middleware = ['netbox_dns.middleware.IpamCouplingMiddleware']
+    middleware = ["netbox_dns.middleware.IpamCouplingMiddleware"]
     required_settings = []
     default_settings = {
         "zone_default_ttl": 86400,

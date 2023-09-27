@@ -8,6 +8,7 @@ from netbox_dns.models import Zone, Record, RecordTypeChoices
 from utilities.exceptions import PermissionsViolation, AbortRequest
 from utilities.permissions import resolve_permission
 
+
 class Action:
     def __init__(self, request):
         self.request = request
@@ -30,7 +31,7 @@ class Action:
         if ip.id is None and name and zone_id:
             zone = Zone.objects.get(id=zone_id)
             if ip.family == 6:
-                type = RecordTypeChoices.AAAA 
+                type = RecordTypeChoices.AAAA
             else:
                 type = RecordTypeChoices.A
             value = str(ip.address.ip)
@@ -38,14 +39,13 @@ class Action:
             # Create a DNS record *without saving* in order to check permissions
             record = Record(name=name, zone=zone, type=type, value=value)
             user = self.request.user
-            check_record_permission(user, record, 'netbox_dns.add_record')
+            check_record_permission(user, record, "netbox_dns.add_record")
 
     #
     # Handle DNS record operation after IPAddress has been created or modified
     #
     def post_save(self, sender, **kwargs):
-
-        # Do not process specific field update (eg. dns_hostname modify) 
+        # Do not process specific field update (eg. dns_hostname modify)
         if kwargs.get("update_fields"):
             return
 
@@ -65,13 +65,13 @@ class Action:
             if record_id := ip.custom_field_data.get("dns_record"):
                 record = Record.objects.get(id=record_id)
                 # Clear all custom fields related to DNS if permission ok
-                check_record_permission(user, record, 'netbox_dns.delete_record')
+                check_record_permission(user, record, "netbox_dns.delete_record")
 
                 ip.dns_name = ""
                 ip.custom_field_data["dns_record"] = None
                 ip.custom_field_data["name"] = ""
                 ip.custom_field_data["zone"] = None
-                ip.save(update_fields=['custom_field_data', 'dns_name'])
+                ip.save(update_fields=["custom_field_data", "dns_name"])
                 record.delete()
 
         # Modify or add DNS record
@@ -82,33 +82,41 @@ class Action:
                 record = Record.objects.get(id=record_id)
                 record.name, record.zone = name, zone
                 record.value = str(ip.address.ip)
-                record.type = RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
-                check_record_permission(user, record, 'netbox_dns.change_record')
+                record.type = (
+                    RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
+                )
+                check_record_permission(user, record, "netbox_dns.change_record")
                 record.save()
                 # Update dns_name field with FQDN
                 ip.dns_name = f"{name}.{zone.name}"
-                ip.save(update_fields=['dns_name'])
+                ip.save(update_fields=["dns_name"])
 
             # create DNS record
             else:
-                record = Record(name = name, zone = zone, \
-                    type = RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A, \
-                    value = str(ip.address.ip), managed = True)
+                record = Record(
+                    name=name,
+                    zone=zone,
+                    type=RecordTypeChoices.AAAA
+                    if ip.family == 6
+                    else RecordTypeChoices.A,
+                    value=str(ip.address.ip),
+                    managed=True,
+                )
 
-                check_record_permission(user, record, 'netbox_dns.add_record', commit=True)
-                # link record to IP Address 
+                check_record_permission(
+                    user, record, "netbox_dns.add_record", commit=True
+                )
+                # link record to IP Address
                 ip.custom_field_data["dns_record"] = record.id
                 # cosmetic: update dns_name field with FQDN
                 ip.dns_name = f"{name}.{zone.name}"
                 # Save modified field in IP after creating record
-                ip.save(update_fields=['custom_field_data', 'dns_name'])
-
+                ip.save(update_fields=["custom_field_data", "dns_name"])
 
     #
-    # Delete DNS record before deleting IP address 
+    # Delete DNS record before deleting IP address
     #
     def pre_delete(self, sender, **kwargs):
-
         # Get IPAddress instance
         ip = kwargs.get("instance")
         # Get DNS record if any
@@ -117,8 +125,9 @@ class Action:
             # Delete DNS record if it already exists
             record = Record.objects.get(id=record_id)
             user = self.request.user
-            check_record_permission(user, record, 'netbox_dns.delete_record')
+            check_record_permission(user, record, "netbox_dns.delete_record")
             record.delete()
+
 
 #
 # Filter through permissions. Simulate adding the record in the "add" case.
@@ -126,7 +135,6 @@ class Action:
 # This is necessary to avoid the cascading effects of PTR creation.
 #
 def check_record_permission(user, record, perm, commit=False):
-
     # Check that the user has been granted the required permission(s).
     action = resolve_permission(perm)[1]
 
@@ -137,13 +145,13 @@ def check_record_permission(user, record, perm, commit=False):
         with transaction.atomic():
             # Save record when adding
             # Rollback is done at the end of the transaction, unless committed
-            if action == 'add':
+            if action == "add":
                 record.save()
 
             # Update the view's QuerySet to filter only the permitted objects
             queryset = Record.objects.all()
             queryset = queryset.restrict(user, action)
-            # Check that record conforms to permissions 
+            # Check that record conforms to permissions
             # → must be included in the restricted queryset
             if not queryset.filter(pk=record.pk).exists():
                 raise PermissionDenied()
@@ -161,17 +169,18 @@ def check_record_permission(user, record, perm, commit=False):
 
 class IpamCouplingMiddleware:
     def __init__(self, get_response):
-        if not get_plugin_config('netbox_dns', 'feature_ipam_coupling'):
+        if not get_plugin_config("netbox_dns", "feature_ipam_coupling"):
             raise MiddlewareNotUsed
 
         self.get_response = get_response
 
     def __call__(self, request):
-        # connect signals to actions 
+        # connect signals to actions
         action = Action(request)
-        connections = [ (signals.pre_save,     action.pre_save),
-                        (signals.post_save,    action.post_save),
-                        (signals.pre_delete,   action.pre_delete)
+        connections = [
+            (signals.pre_save, action.pre_save),
+            (signals.post_save, action.post_save),
+            (signals.pre_delete, action.pre_delete),
         ]
         for signal, receiver in connections:
             signal.connect(receiver, sender=IPAddress)
