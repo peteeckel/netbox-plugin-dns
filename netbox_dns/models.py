@@ -9,7 +9,8 @@ from dns import name as dns_name
 from dns.rdtypes.ANY import SOA
 from dns.exception import DNSException
 
-from netaddr import IPNetwork, AddrFormatError, IPAddress
+from netaddr import IPNetwork, AddrFormatError
+from ipam.models import IPAddress
 
 from django.core.validators import (
     MinValueValidator,
@@ -556,6 +557,12 @@ class Zone(NetBoxModel):
             ):
                 record.update_ptr_record()
 
+            # Fix name in IPAddress when zone name is changed
+            if get_plugin_config("netbox_dns", "feature_ipam_coupling") and name_changed:
+                for ip in IPAddress.objects.filter(custom_field_data__zone=self.pk):
+                    ip.dns_name = f'{ip.custom_field_data["name"]}.{self.name}'
+                    ip.save(update_fields=["dns_name"])
+
         self.update_soa_record()
 
     def delete(self, *args, **kwargs):
@@ -569,6 +576,15 @@ class Zone(NetBoxModel):
                 record.pk
                 for record in Record.objects.filter(ptr_record__in=ptr_records)
             ]
+
+            if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
+                # Remove coupling from IPAddress to DNS record when zone is deleted
+                for ip in IPAddress.objects.filter(custom_field_data__zone=self.pk):
+                    ip.dns_name = ""
+                    ip.custom_field_data["name"] = ""
+                    ip.custom_field_data["dns_record"] = None
+                    ip.custom_field_data["zone"] = None
+                    ip.save(update_fields=["dns_name","custom_field_data"])
 
             super().delete(*args, **kwargs)
 

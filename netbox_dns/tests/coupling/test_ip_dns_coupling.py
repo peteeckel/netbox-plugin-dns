@@ -230,4 +230,91 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         record_id = ip_address.custom_field_data.get("dns_record")
         self.assertEqual(record_id, None)
         # Check if dns_name is empty
-        self.assertEqual(ip_address.dns_name, f"")
+        self.assertEqual(ip_address.dns_name, "")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_rename_zone_existing_ip(self):
+        addr = IPNetwork("10.0.0.29/24")
+        zone = self.zone
+        name = "test-rename-zone-existing-ip"
+        new_zone_name = "newzone.example.com"
+
+        # Grant permissions to user
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_zone")
+
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
+        # Create IP Address
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            dns_name=f"{name}.{zone.name}",
+            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+        )
+
+        url = reverse("plugins-api:netbox_dns-api:zone-list") + str(zone.id) + "/"
+        data = {"name": new_zone_name}
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        # Check response
+        self.assertTrue(status.is_success(response.status_code))
+        # Re-read IPAddress object
+        ip_address = IPAddress.objects.get(id=ip_address.id)
+        # Check if dns_name has correct value
+        self.assertEqual(ip_address.dns_name, f"{name}.{new_zone_name}")
+    
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_delete_zone_existing_ip(self):
+        addr = IPNetwork("10.0.0.30/24")
+        zone = self.zone
+        name = "test-delete-zone-existing-ip"
+
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
+        # Create IP Address
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            dns_name=f"{name}.{zone.name}",
+            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+        )
+
+        # Grant permissions to user
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.delete_zone")
+        self.add_permissions("netbox_dns.delete_record")
+
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
+        # Create IP Address
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            dns_name=f"{name}.{zone.name}",
+            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+        )
+
+        url = reverse("plugins-api:netbox_dns-api:zone-list") + str(zone.id) + "/"
+        response = self.client.delete(url, **self.header)
+
+        # Check response
+        self.assertTrue(status.is_success(response.status_code))
+        # Check if record has been deleted
+        self.assertEqual(Record.objects.filter(id=record.id).count(), 0)
+        # Re-read IPAddress object
+        ip_address = IPAddress.objects.get(id=ip_address.id)
+        # Check if dns_name is empty
+        self.assertEqual(ip_address.dns_name, "")
+        # Check if record_id has been removed
+        record_id = ip_address.custom_field_data.get("dns_record")
+        self.assertEqual(record_id, None)
+        # Check if custom field "name" is empty
+        cf_name = ip_address.custom_field_data.get("name")
+        self.assertEqual(cf_name, "")
