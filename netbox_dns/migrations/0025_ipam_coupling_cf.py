@@ -18,7 +18,8 @@ def add_ipam_coupling_cf(apps, schema_editor):
     zone_object_type = ContentType.objects.get_for_model(Zone)
     record_object_type = ContentType.objects.get_for_model(Record)
     cf_name = CustomField.objects.create(
-        name="name", type=CustomFieldTypeChoices.TYPE_TEXT, required=False
+        name="name", type=CustomFieldTypeChoices.TYPE_TEXT, required=False,
+        group_name="DNS",
     )
     cf_name.content_types.set([ipaddress_object_type])
     cf_zone = CustomField.objects.create(
@@ -26,6 +27,7 @@ def add_ipam_coupling_cf(apps, schema_editor):
         type=CustomFieldTypeChoices.TYPE_OBJECT,
         object_type=zone_object_type,
         required=False,
+        group_name="DNS",
     )
     cf_zone.content_types.set([ipaddress_object_type])
     cf_dns_record = CustomField.objects.create(
@@ -35,6 +37,7 @@ def add_ipam_coupling_cf(apps, schema_editor):
         required=False,
         ui_visibility=CustomFieldVisibilityChoices.VISIBILITY_READ_ONLY,
         label="DNS record",
+        group_name="DNS",
     )
     cf_dns_record.content_types.set([ipaddress_object_type])
 
