@@ -18,7 +18,7 @@ def add_ipam_coupling_cf(apps, schema_editor):
     zone_object_type = ContentType.objects.get_for_model(Zone)
     record_object_type = ContentType.objects.get_for_model(Record)
     cf_name = CustomField.objects.create(
-        name="name", type=CustomFieldTypeChoices.TYPE_TEXT, required=False,
+        name="name", type=CustomFieldTypeChoices.TYPE_TEXT, required=False
     )
     cf_name.content_types.set([ipaddress_object_type])
     cf_zone = CustomField.objects.create(
