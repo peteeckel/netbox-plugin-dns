@@ -91,22 +91,32 @@ class Action:
                 ip.dns_name = f"{name}.{zone.name}"
                 ip.save(update_fields=["dns_name"])
 
-            # create DNS record
             else:
-                record = Record(
-                    name=name,
-                    zone=zone,
-                    type=RecordTypeChoices.AAAA
-                    if ip.family == 6
-                    else RecordTypeChoices.A,
-                    value=str(ip.address.ip),
-                    managed=True,
-                )
+                # Fetch an existing (unmanaged) DNS record or create a new one
+                type = (RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A)
+                value = str(ip.address.ip)
+                try:
+                    record = Record.objects.get(
+                        name=name,
+                        zone=zone,
+                        value=value,
+                        type=type,
+                        managed=False
+                    )
+                    record.managed = True
+                except:
+                    record = Record(
+                        name=name,
+                        zone=zone,
+                        type=type,
+                        value=value,
+                        managed=True,
+                    )
 
                 check_record_permission(
                     user, record, "netbox_dns.add_record", commit=True
                 )
-                # link record to IP Address
+                # Link record to IP Address
                 ip.custom_field_data["dns_record"] = record.id
                 # cosmetic: update dns_name field with FQDN
                 ip.dns_name = f"{name}.{zone.name}"
@@ -145,6 +155,7 @@ def check_record_permission(user, record, perm, commit=False):
         with transaction.atomic():
             # Save record when adding
             # Rollback is done at the end of the transaction, unless committed
+
             if action == "add":
                 record.save()
 

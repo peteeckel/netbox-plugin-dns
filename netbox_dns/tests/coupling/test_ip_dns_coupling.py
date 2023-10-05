@@ -65,6 +65,37 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.assertEqual(ipaddress.dns_name, f"{name}.{zone.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_existing_dns_record(self):
+        zone = self.zone
+        name = "test-create-ip-existing-dns-record"
+        addr = "10.0.0.25/24"
+
+        # Create DNS record
+        A = RecordTypeChoices.A
+        v = str(IPNetwork(addr).ip)
+        record = Record.objects.create(name=name, zone=zone, type=A, value=v)
+
+        # Grant permissions to user
+        self.add_permissions("ipam.add_ipaddress")
+        self.add_permissions("netbox_dns.add_record")
+
+        url = reverse("ipam-api:ipaddress-list")
+        data = {"address": addr, "custom_fields": {"zone": zone.id, "name": name}}
+        response = self.client.post(url, data, format="json", **self.header)
+
+        self.assertTrue(status.is_success(response.status_code))
+
+        # Check if "record" has been linked to and is now managed
+        record_id = response.data["custom_fields"]["dns_record"]["id"]
+        self.assertEqual(record_id, record.id)
+        record = Record.objects.get(id=record.id)
+        self.assertTrue(record.managed)
+        # Check value of dns_name
+        ipaddress = IPAddress.objects.get(id=response.data["id"])
+        self.assertEqual(ipaddress.dns_name, f"{name}.{zone.name}")
+
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_create_ip_missing_dns_permission(self):
         zone = self.zone
         name = "test-create-ip-missing-dns-perm"
