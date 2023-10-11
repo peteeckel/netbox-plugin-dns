@@ -16,7 +16,7 @@ def remove_ipam_coupling_cf_dns_record(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("ipam", "0067_ipaddress_index_host"),
+        ("ipam", "0066_iprange_mark_utilized"),
         ("netbox_dns", "0025_ipam_coupling_cf"),
     ]
 
