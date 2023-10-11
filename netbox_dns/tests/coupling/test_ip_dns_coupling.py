@@ -55,14 +55,14 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.assertTrue(status.is_success(response.status_code))
 
         # Check if "record" has been created, is managed and has correct name and zone
-        record_id = response.data["custom_fields"]["dns_record"]["id"]
-        record = Record.objects.get(id=record_id)
+        ip_id = response.data["id"]
+        record = Record.objects.get(ipam_ip_address=ip_id)
         self.assertEqual(record.name, name)
         self.assertEqual(record.zone.id, zone.id)
         self.assertTrue(record.managed)
         # Check value of dns_name
-        ipaddress = IPAddress.objects.get(id=response.data["id"])
-        self.assertEqual(ipaddress.dns_name, f"{name}.{zone.name}")
+        ip_address = IPAddress.objects.get(id=ip_id)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_create_ip_existing_dns_record(self):
@@ -86,14 +86,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.assertTrue(status.is_success(response.status_code))
 
         # Check if "record" has been linked to and is now managed
-        record_id = response.data["custom_fields"]["dns_record"]["id"]
-        self.assertEqual(record_id, record.id)
-        record = Record.objects.get(id=record.id)
+        ip_address = IPAddress.objects.get(id=response.data["id"])
+        record = Record.objects.get(ipam_ip_address=ip_address)
         self.assertTrue(record.managed)
+        self.assertEqual(record.name, name)
+        self.assertEqual(record.zone, zone)
         # Check value of dns_name
-        ipaddress = IPAddress.objects.get(id=response.data["id"])
-        self.assertEqual(ipaddress.dns_name, f"{name}.{zone.name}")
-
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_create_ip_missing_dns_permission(self):
@@ -128,11 +127,17 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Create DNS record and IP Address
         A = RecordTypeChoices.A
         s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+            custom_field_data={"name": name, "zone": zone.id},
+        )
+        record = Record.objects.create(
+            name=name,
+            zone=zone,
+            type=A,
+            value=s_addr,
+            ipam_ip_address=ip_address,
         )
 
         # Delete address
@@ -140,17 +145,16 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         response = self.client.delete(url, **self.header)
         # Check response
         self.assertTrue(status.is_success(response.status_code))
-        # Check if IP address has been deleted
-        self.assertEqual(IPAddress.objects.filter(id=ip_address.id).count(), 0)
         # Check if DNS record has been deleted
         self.assertEqual(Record.objects.filter(id=record.id).count(), 0)
+        # Check if IP address has been deleted
+        self.assertEqual(IPAddress.objects.filter(id=ip_address.id).count(), 0)
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_modify_name_existing_ip(self):
         addr = IPNetwork("10.0.0.27/24")
         zone = self.zone
         name = "test-modify-name-existing-ip"
-
         newname = "newname"
         zone2 = self.zone2
 
@@ -158,15 +162,21 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
         self.add_permissions("netbox_dns.change_record")
 
-        # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
         # Create IP Address
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+            custom_field_data={"name": name, "zone": zone.id},
+        )
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(
+            name=name,
+            zone=zone,
+            type=A,
+            value=s_addr,
+            ipam_ip_address=ip_address,
         )
 
         # Change name and zone
@@ -177,13 +187,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check response
         self.assertTrue(status.is_success(response.status_code))
 
-        # Fetch record with name and zone, check if they match
-        record_query = Record.objects.filter(name=newname)
-        record_id = ip_address.custom_field_data.get("dns_record")
-        self.assertEqual(record_query[0].id, record_id)
-
-        # Check value of dns_name
+        # Check if ip still point to a record and if record matches
         ip_address = IPAddress.objects.get(id=ip_address.id)
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, newname)
+        self.assertEqual(record_query[0].zone, zone2)
+        # Check value of dns_name
         self.assertEqual(ip_address.dns_name, f"{newname}.{zone2.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
@@ -198,15 +208,21 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Grant permissions to user
         self.add_permissions("ipam.change_ipaddress")
 
-        # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
         # Create IP Address
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+            custom_field_data={"name": name, "zone": zone.id},
+        )
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(
+            name=name,
+            zone=zone,
+            type=A,
+            value=s_addr,
+            ipam_ip_address=ip_address,
         )
 
         # Change name and zone
@@ -217,12 +233,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check response
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        # Re-read IPAddress object
-        ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check for no changes
-        record_id = ip_address.custom_field_data.get("dns_record")
-        record_query = Record.objects.filter(name=name)
-        self.assertEqual(record_query[0].id, record_id)
+        ip_address = IPAddress.objects.get(id=ip_address.id)
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        # Check value of dns_name
         self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
@@ -235,16 +252,21 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
         self.add_permissions("netbox_dns.delete_record")
 
-        # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
         # Create IP Address
-
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+            custom_field_data={"name": name, "zone": zone.id},
+        )
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(
+            name=name,
+            zone=zone,
+            type=A,
+            value=s_addr,
+            ipam_ip_address=ip_address,
         )
 
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
@@ -254,14 +276,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check response
         self.assertTrue(status.is_success(response.status_code))
         # Check if record has been deleted
-        self.assertEqual(Record.objects.filter(id=record.id).count(), 0)
+        self.assertEqual(Record.objects.filter(ipam_ip_address=ip_address).count(), 0)
         # Re-read IPAddress object
         ip_address = IPAddress.objects.get(id=ip_address.id)
-        # Check if record_id has been removed
-        record_id = ip_address.custom_field_data.get("dns_record")
-        self.assertEqual(record_id, None)
         # Check if dns_name is empty
         self.assertEqual(ip_address.dns_name, "")
+        cf_name = ip_address.custom_field_data.get("name")
+        self.assertEqual(cf_name, "")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_rename_zone_existing_ip(self):
@@ -274,16 +295,21 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
         self.add_permissions("netbox_dns.change_zone")
 
-        # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
         # Create IP Address
-
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+            custom_field_data={"name": name, "zone": zone.id},
+        )
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(
+            name=name,
+            zone=zone,
+            type=A,
+            value=s_addr,
+            ipam_ip_address=ip_address,
         )
 
         url = reverse("plugins-api:netbox_dns-api:zone-list") + str(zone.id) + "/"
@@ -296,7 +322,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check if dns_name has correct value
         self.assertEqual(ip_address.dns_name, f"{name}.{new_zone_name}")
-    
+        # Check if record zone has correct name
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].zone.name, new_zone_name)
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_delete_zone_existing_ip(self):
@@ -304,33 +333,23 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         zone = self.zone
         name = "test-delete-zone-existing-ip"
 
-        # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
         # Create IP Address
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
+            custom_field_data={"name": name, "zone": zone.id},
+        )
+        # Create DNS record
+        A = RecordTypeChoices.A
+        s_addr = str(addr.ip)
+        record = Record.objects.create(
+            name=name, zone=zone, type=A, value=s_addr, ipam_ip_address=ip_address
         )
 
         # Grant permissions to user
         self.add_permissions("ipam.change_ipaddress")
         self.add_permissions("netbox_dns.delete_zone")
         self.add_permissions("netbox_dns.delete_record")
-
-        # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=s_addr)
-        # Create IP Address
-
-        ip_address = IPAddress.objects.create(
-            address=addr,
-            dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id, "dns_record": record.id},
-        )
 
         url = reverse("plugins-api:netbox_dns-api:zone-list") + str(zone.id) + "/"
         response = self.client.delete(url, **self.header)
@@ -343,9 +362,6 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check if dns_name is empty
         self.assertEqual(ip_address.dns_name, "")
-        # Check if record_id has been removed
-        record_id = ip_address.custom_field_data.get("dns_record")
-        self.assertEqual(record_id, None)
         # Check if custom field "name" is empty
         cf_name = ip_address.custom_field_data.get("name")
         self.assertEqual(cf_name, "")

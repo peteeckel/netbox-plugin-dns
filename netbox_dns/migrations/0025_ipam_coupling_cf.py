@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from extras.models import CustomField
 
 from extras.choices import CustomFieldTypeChoices, CustomFieldVisibilityChoices
-from ipam.models import IPAddress, Prefix
+from ipam.models import IPAddress
 from netbox_dns.models import Record, RecordTypeChoices, Zone, NameServer
 
 

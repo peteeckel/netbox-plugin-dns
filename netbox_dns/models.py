@@ -585,7 +585,6 @@ class Zone(NetBoxModel):
                 for ip in IP.objects.filter(custom_field_data__zone=self.pk):
                     ip.dns_name = ""
                     ip.custom_field_data["name"] = ""
-                    ip.custom_field_data["dns_record"] = None
                     ip.custom_field_data["zone"] = None
                     ip.save(update_fields=["dns_name", "custom_field_data"])
 
@@ -748,7 +747,14 @@ class Record(NetBoxModel):
         blank=True,
         null=True,
     )
-
+    ipam_ip_address = models.ForeignKey(
+        verbose_name="IPAM IP Address",
+        to="ipam.IPAddress",
+        on_delete=models.CASCADE,
+        related_name="netbox_dns_records",
+        blank=True,
+        null=True,
+    )
     objects = RecordManager()
     raw_objects = RestrictedQuerySet.as_manager()
 

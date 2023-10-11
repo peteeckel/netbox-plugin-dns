@@ -61,14 +61,11 @@ class Action:
 
         # Delete DNS record because name and zone have been removed
         if name == zone == None:
-            # Get current dns record
-            if record_id := ip.custom_field_data.get("dns_record"):
-                record = Record.objects.get(id=record_id)
-                # Clear all custom fields related to DNS if permission ok
+            # Find the record pointing to this IP Address
+            for record in Record.objects.filter(ipam_ip_address=ip):
+                # If permission ok, clear all fields related to DNS
                 check_record_permission(user, record, "netbox_dns.delete_record")
-
                 ip.dns_name = ""
-                ip.custom_field_data["dns_record"] = None
                 ip.custom_field_data["name"] = ""
                 ip.custom_field_data["zone"] = None
                 ip.save(update_fields=["custom_field_data", "dns_name"])
@@ -76,10 +73,10 @@ class Action:
 
         # Modify or add DNS record
         else:
-            # Does the object already have a DNS record ?
-            # Modify DNS record
-            if record_id := ip.custom_field_data.get("dns_record"):
-                record = Record.objects.get(id=record_id)
+            # If DNS record already point to this IP, modify it
+            query = Record.objects.filter(ipam_ip_address=ip)
+            if query.count() != 0:
+                record = query[0]
                 record.name, record.zone = name, zone
                 record.value = str(ip.address.ip)
                 record.type = (
@@ -90,34 +87,26 @@ class Action:
                 # Update dns_name field with FQDN
                 ip.dns_name = f"{name}.{zone.name}"
                 ip.save(update_fields=["dns_name"])
+                # FIXME: what to do with the previous IP becomes when it is uncoupled
 
             else:
-                # Fetch an existing (unmanaged) DNS record or create a new one
+                # Create a new record
                 type = RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
-                value = str(ip.address.ip)
-                try:
-                    record = Record.objects.get(
-                        name=name, zone=zone, value=value, type=type, managed=False
-                    )
-                    record.managed = True
-                except:
-                    record = Record(
-                        name=name,
-                        zone=zone,
-                        type=type,
-                        value=value,
-                        managed=True,
-                    )
-
+                record = Record(
+                    name=name,
+                    zone=zone,
+                    type=type,
+                    value=str(ip.address.ip),
+                    ipam_ip_address=ip,
+                    managed=True,
+                )
                 check_record_permission(
                     user, record, "netbox_dns.add_record", commit=True
                 )
-                # Link record to IP Address
-                ip.custom_field_data["dns_record"] = record.id
                 # cosmetic: update dns_name field with FQDN
                 ip.dns_name = f"{name}.{zone.name}"
                 # Save modified field in IP after creating record
-                ip.save(update_fields=["custom_field_data", "dns_name"])
+                ip.save(update_fields=["dns_name"])
 
     #
     # Delete DNS record before deleting IP address
@@ -125,11 +114,7 @@ class Action:
     def pre_delete(self, sender, **kwargs):
         # Get IPAddress instance
         ip = kwargs.get("instance")
-        # Get DNS record if any
-        record_id = ip.custom_field_data.get("dns_record")
-        if record_id:
-            # Delete DNS record if it already exists
-            record = Record.objects.get(id=record_id)
+        for record in Record.objects.filter(ipam_ip_address=ip):
             user = self.request.user
             check_record_permission(user, record, "netbox_dns.delete_record")
             record.delete()
