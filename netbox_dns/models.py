@@ -558,7 +558,10 @@ class Zone(NetBoxModel):
                 record.update_ptr_record()
 
             # Fix name in IP Address when zone name is changed
-            if get_plugin_config("netbox_dns", "feature_ipam_coupling") and name_changed:
+            if (
+                get_plugin_config("netbox_dns", "feature_ipam_coupling")
+                and name_changed
+            ):
                 for ip in IP.objects.filter(custom_field_data__zone=self.pk):
                     ip.dns_name = f'{ip.custom_field_data["name"]}.{self.name}'
                     ip.save(update_fields=["dns_name"])
@@ -584,7 +587,7 @@ class Zone(NetBoxModel):
                     ip.custom_field_data["name"] = ""
                     ip.custom_field_data["dns_record"] = None
                     ip.custom_field_data["zone"] = None
-                    ip.save(update_fields=["dns_name","custom_field_data"])
+                    ip.save(update_fields=["dns_name", "custom_field_data"])
 
             super().delete(*args, **kwargs)
 
