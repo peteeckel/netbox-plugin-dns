@@ -6,6 +6,7 @@ from ipam.models import IPAddress
 from django.contrib.contenttypes.models import ContentType
 from extras.models import CustomField
 
+
 def remove_ipam_coupling_cf_dns_record(apps, schema_editor):
     ipaddress_object_type = ContentType.objects.get_for_model(IPAddress)
     CustomField.objects.get(
@@ -31,5 +32,5 @@ class Migration(migrations.Migration):
                 to="ipam.ipaddress",
             ),
         ),
-        migrations.RunPython(remove_ipam_coupling_cf_dns_record)
+        migrations.RunPython(remove_ipam_coupling_cf_dns_record),
     ]
