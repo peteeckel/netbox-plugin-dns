@@ -93,15 +93,11 @@ class Action:
 
             else:
                 # Fetch an existing (unmanaged) DNS record or create a new one
-                type = (RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A)
+                type = RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
                 value = str(ip.address.ip)
                 try:
                     record = Record.objects.get(
-                        name=name,
-                        zone=zone,
-                        value=value,
-                        type=type,
-                        managed=False
+                        name=name, zone=zone, value=value, type=type, managed=False
                     )
                     record.managed = True
                 except:
