@@ -87,8 +87,6 @@ class Action:
                 # Update dns_name field with FQDN
                 ip.dns_name = f"{name}.{zone.name}"
                 ip.save(update_fields=["dns_name"])
-                # FIXME: what to do with the previous IP becomes when it is uncoupled
-
             else:
                 # Create a new record
                 type = RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
