@@ -140,8 +140,7 @@ def check_record_permission(user, record, perm, commit=False):
                 record.save()
 
             # Update the view's QuerySet to filter only the permitted objects
-            queryset = Record.objects.all()
-            queryset = queryset.restrict(user, action)
+            queryset = Record.objects.restrict(user, action)
             # Check that record conforms to permissions
             # → must be included in the restricted queryset
             if not queryset.filter(pk=record.pk).exists():
