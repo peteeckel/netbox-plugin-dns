@@ -83,9 +83,12 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         addr = "10.0.0.25/24"
 
         # Create DNS record
-        A = RecordTypeChoices.A
-        v = str(IPNetwork(addr).ip)
-        record = Record.objects.create(name=name, zone=zone, type=A, value=v)
+        record = Record.objects.create(
+            name=name,
+            zone=zone,
+            type=RecordTypeChoices.A,
+            value=str(IPNetwork(addr).ip),
+        )
 
         # Grant permissions to user
         self.add_permissions("ipam.add_ipaddress")

@@ -23,18 +23,18 @@ class Action:
         if kwargs.get("update_fields"):
             return
 
-        ip = kwargs.get("instance")
-        name = ip.custom_field_data.get("ipaddress_dns_record_name")
-        zone_id = ip.custom_field_data.get("ipaddress_dns_zone_id")
+        ip_address = kwargs.get("instance")
+        name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
+        zone_id = ip_address.custom_field_data.get("ipaddress_dns_zone_id")
 
         # Handle new IP Address only; name and zone must both be defined
-        if ip.id is None and name and zone_id:
+        if ip_address.id is None and name and zone_id:
             zone = Zone.objects.get(id=zone_id)
-            if ip.family == 6:
+            if ip_address.family == 6:
                 type = RecordTypeChoices.AAAA
             else:
                 type = RecordTypeChoices.A
-            value = str(ip.address.ip)
+            value = str(ip_address.address.ip)
 
             # Create a DNS record *without saving* in order to check permissions
             record = Record(name=name, zone=zone, type=type, value=value)
@@ -50,9 +50,9 @@ class Action:
             return
 
         user = self.request.user
-        ip = kwargs.get("instance")
-        name = ip.custom_field_data.get("ipaddress_dns_record_name")
-        zone_id = ip.custom_field_data.get("ipaddress_dns_zone_id")
+        ip_address = kwargs.get("instance")
+        name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
+        zone_id = ip_address.custom_field_data.get("ipaddress_dns_zone_id")
         zone = Zone.objects.get(id=zone_id) if zone_id else None
 
         # Clear the other field if one is empty, which is inconsistent
@@ -64,55 +64,55 @@ class Action:
         # Delete DNS record because name and zone have been removed
         if zone is None:
             # Find the record pointing to this IP Address
-            for record in ip.netbox_dns_records.all():
+            for record in ip_address.netbox_dns_records.all():
                 # If permission ok, clear all fields related to DNS
                 check_record_permission(user, record, "netbox_dns.delete_record")
-                ip.dns_name = ""
-                ip.custom_field_data["ipaddress_dns_record_name"] = ""
-                ip.save(update_fields=["custom_field_data", "dns_name"])
+                ip_address.dns_name = ""
+                ip_address.custom_field_data["ipaddress_dns_record_name"] = ""
+                ip_address.save(update_fields=["custom_field_data", "dns_name"])
                 record.delete()
 
         # Modify or add DNS record
         else:
             # If DNS record already point to this IP, modify it
-            record = ip.netbox_dns_records.first()
+            record = ip_address.netbox_dns_records.first()
             if record is not None:
                 record.name, record.zone = name, zone
-                record.value = str(ip.address.ip)
+                record.value = str(ip_address.address.ip)
                 record.type = (
-                    RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
+                    RecordTypeChoices.AAAA if ip_address.family == 6 else RecordTypeChoices.A
                 )
                 check_record_permission(user, record, "netbox_dns.change_record")
                 record.save()
                 # Update dns_name field with FQDN
-                ip.dns_name = record.fqdn.rstrip(".")
-                ip.save(update_fields=["dns_name"])
+                ip_address.dns_name = record.fqdn.rstrip(".")
+                ip_address.save(update_fields=["dns_name"])
             else:
                 # Create a new record
-                type = RecordTypeChoices.AAAA if ip.family == 6 else RecordTypeChoices.A
+                type = RecordTypeChoices.AAAA if ip_address.family == 6 else RecordTypeChoices.A
                 record = Record(
                     name=name,
                     zone=zone,
                     type=type,
-                    value=str(ip.address.ip),
-                    ipam_ip_address=ip,
+                    value=str(ip_address.address.ip),
+                    ipam_ip_address=ip_address,
                     managed=True,
                 )
                 check_record_permission(
                     user, record, "netbox_dns.add_record", commit=True
                 )
                 # cosmetic: update dns_name field with FQDN
-                ip.dns_name = record.fqdn.rstrip(".")
+                ip_address.dns_name = record.fqdn.rstrip(".")
                 # Save modified field in IP after creating record
-                ip.save(update_fields=["dns_name"])
+                ip_address.save(update_fields=["dns_name"])
 
     #
     # Delete DNS record before deleting IP address
     #
     def pre_delete(self, sender, **kwargs):
         # Get IPAddress instance
-        ip = kwargs.get("instance")
-        for record in ip.netbox_dns_records.all():
+        ip_address = kwargs.get("instance")
+        for record in ip_address.netbox_dns_records.all():
             user = self.request.user
             check_record_permission(user, record, "netbox_dns.delete_record")
             record.delete()
@@ -149,11 +149,11 @@ def check_record_permission(user, record, perm, commit=False):
                 raise AbortRequest("Normal Exit")
 
     # Catch "Normal Exit" without modification, rollback transaction
-    except AbortRequest as e:
+    except AbortRequest as exc:
         pass
 
-    except Exception as e:
-        raise e
+    except Exception as exc:
+        raise exc
 
 
 class IpamCouplingMiddleware:
