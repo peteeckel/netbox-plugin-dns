@@ -56,11 +56,13 @@ class Action:
         zone = Zone.objects.get(id=zone_id) if zone_id else None
 
         # Clear the other field if one is empty, which is inconsistent
-        if (name and not zone) or (zone and not name):
-            zone = name = None
+        if name is None:
+            zone = None
+        elif zone is None:
+            name = None
 
         # Delete DNS record because name and zone have been removed
-        if name == zone == None:
+        if zone is None:
             # Find the record pointing to this IP Address
             for record in ip.netbox_dns_records.all():
                 # If permission ok, clear all fields related to DNS
