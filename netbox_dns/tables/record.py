@@ -92,6 +92,10 @@ class ManagedRecordTable(RecordBaseTable):
         verbose_name="Address Record",
         linkify=True,
     )
+    ipam_ip_address = tables.Column(
+        verbose_name="IPAM IP Address",
+        linkify=True,
+    )
     actions = ActionsColumn(actions=("changelog",))
 
     class Meta(NetBoxTable.Meta):
@@ -104,6 +108,7 @@ class ManagedRecordTable(RecordBaseTable):
             "value",
             "unicode_value",
             "address_record",
+            "ipam_ip_address",
             "active",
         )
         default_columns = (
