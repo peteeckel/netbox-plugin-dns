@@ -970,14 +970,17 @@ class Record(NetBoxModel):
         )
 
         if self.type == RecordTypeChoices.CNAME:
-            if records.exists():
+            if records.exclude(type=RecordTypeChoices.NSEC).exists():
                 raise ValidationError(
                     {
                         "type": f"There is already an active record for name {self.name} in zone {self.zone}, CNAME is not allowed."
                     }
                 ) from None
 
-        elif records.filter(type=RecordTypeChoices.CNAME).exists():
+        elif (
+            records.filter(type=RecordTypeChoices.CNAME).exists()
+            and self.type != RecordTypeChoices.NSEC
+        ):
             raise ValidationError(
                 {
                     "type": f"There is already an active CNAME record for name {self.name} in zone {self.zone}, no other record allowed."
