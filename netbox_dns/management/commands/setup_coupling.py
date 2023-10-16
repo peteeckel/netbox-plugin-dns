@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.contenttypes.models import ContentType
 from extras.models import CustomField
-from extras.choices import CustomFieldTypeChoices, CustomFieldVisibilityChoices
+from extras.choices import CustomFieldTypeChoices
 from ipam.models import IPAddress
 from netbox_dns.models import Record, Zone
 
