@@ -58,9 +58,8 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
                 group_name="DNS",
             )
             cf_zone.content_types.set([ipaddress_object_type])
-        except: 
+        except:
             pass
-
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_create_ip(self):
