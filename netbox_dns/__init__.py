@@ -59,6 +59,8 @@ class DNSConfig(PluginConfig):
                     " custom fields."
                 )
 
+        super().ready()
+
 
 #
 # Initialize plugin config
