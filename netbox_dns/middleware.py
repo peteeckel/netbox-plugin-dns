@@ -62,7 +62,7 @@ class Action:
         # Delete DNS record because name and zone have been removed
         if name == zone == None:
             # Find the record pointing to this IP Address
-            for record in Record.objects.filter(ipam_ip_address=ip):
+            for record in ip.netbox_dns_records.all():
                 # If permission ok, clear all fields related to DNS
                 check_record_permission(user, record, "netbox_dns.delete_record")
                 ip.dns_name = ""
@@ -74,9 +74,8 @@ class Action:
         # Modify or add DNS record
         else:
             # If DNS record already point to this IP, modify it
-            query = Record.objects.filter(ipam_ip_address=ip)
-            if query.count() != 0:
-                record = query[0]
+            record = ip.netbox_dns_records.first()
+            if record is not None:
                 record.name, record.zone = name, zone
                 record.value = str(ip.address.ip)
                 record.type = (
@@ -112,7 +111,7 @@ class Action:
     def pre_delete(self, sender, **kwargs):
         # Get IPAddress instance
         ip = kwargs.get("instance")
-        for record in Record.objects.filter(ipam_ip_address=ip):
+        for record in ip.netbox_dns_records.all():
             user = self.request.user
             check_record_permission(user, record, "netbox_dns.delete_record")
             record.delete()
