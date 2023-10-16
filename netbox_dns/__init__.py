@@ -38,30 +38,25 @@ class DNSConfig(PluginConfig):
     base_url = "netbox-dns"
 
     def ready(self):
+        #
         # Check if required custom field exist for IPAM coupling
+        #
         if self.default_settings["feature_ipam_coupling"]:
             from extras.models import CustomField
             from ipam.models import IPAddress
             from django.contrib.contenttypes.models import ContentType
 
             objtype = ContentType.objects.get_for_model(IPAddress)
-            required_cf = ("name", "zone")
-            present_cf = sum(
-                [
-                    CustomField.objects.filter(name=cf, content_types=objtype).count()
-                    for cf in required_cf
-                ]
-            )
-            if present_cf != len(required_cf):
+            required_cf = ("ipaddress_dns_record_name", "ipaddress_dns_zone_id")
+
+            if CustomField.objects.filter(
+                name__in=required_cf, content_types=objtype
+            ).count() < len(required_cf):
                 logger.warning(
-                    "\n".join(
-                        (
-                            "WARNING: feature_ipam_coupling WON'T WORK!",
-                            "Custom fields for IPAM-DNS coupling are MISSING",
-                            "Please run the following NetBox command:",
-                            "python manage.py setup_coupling",
-                        )
-                    )
+                    "'feature_ipam_coupling' is enabled, but the required custom"
+                    " fields for IPAM-DNS coupling are missing. Please run the"
+                    " Django management command 'setup_coupling' to create the"
+                    " custom fields."
                 )
 
 
