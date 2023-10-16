@@ -562,8 +562,10 @@ class Zone(NetBoxModel):
                 get_plugin_config("netbox_dns", "feature_ipam_coupling")
                 and name_changed
             ):
-                for ip in IP.objects.filter(custom_field_data__zone=self.pk):
-                    ip.dns_name = f'{ip.custom_field_data["name"]}.{self.name}'
+                for ip in IP.objects.filter(
+                    custom_field_data__ipaddress_dns_zone_id=self.pk
+                ):
+                    ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
                     ip.save(update_fields=["dns_name"])
 
         self.update_soa_record()
@@ -582,10 +584,12 @@ class Zone(NetBoxModel):
 
             if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
                 # Remove coupling from IPAddress to DNS record when zone is deleted
-                for ip in IP.objects.filter(custom_field_data__zone=self.pk):
+                for ip in IP.objects.filter(
+                    custom_field_data__ipaddress_dns_zone_id=self.pk
+                ):
                     ip.dns_name = ""
-                    ip.custom_field_data["name"] = ""
-                    ip.custom_field_data["zone"] = None
+                    ip.custom_field_data["ipaddress_dns_record_name"] = ""
+                    ip.custom_field_data["ipaddress_dns_zone_id"] = None
                     ip.save(update_fields=["dns_name", "custom_field_data"])
 
             super().delete(*args, **kwargs)

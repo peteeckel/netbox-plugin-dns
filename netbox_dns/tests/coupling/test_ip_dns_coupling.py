@@ -55,7 +55,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("netbox_dns.add_record")
 
         url = reverse("ipam-api:ipaddress-list")
-        data = {"address": addr, "custom_fields": {"zone": zone.id, "name": name}}
+        data = {
+            "address": addr,
+            "custom_fields": {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+            },
+        }
         response = self.client.post(url, data, format="json", **self.header)
 
         self.assertTrue(status.is_success(response.status_code))
@@ -86,7 +92,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("netbox_dns.add_record")
 
         url = reverse("ipam-api:ipaddress-list")
-        data = {"address": addr, "custom_fields": {"zone": zone.id, "name": name}}
+        data = {
+            "address": addr,
+            "custom_fields": {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+            },
+        }
         response = self.client.post(url, data, format="json", **self.header)
 
         self.assertTrue(status.is_success(response.status_code))
@@ -111,7 +123,13 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("ipam.add_ipaddress")
 
         url = reverse("ipam-api:ipaddress-list")
-        data = {"address": addr, "custom_fields": {"zone": zone.id, "name": name}}
+        data = {
+            "address": addr,
+            "custom_fields": {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+            },
+        }
         response = self.client.post(url, data, format="json", **self.header)
 
         # Should be denied
@@ -136,7 +154,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id},
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+            },
         )
         record = Record.objects.create(
             name=name,
@@ -172,7 +193,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id},
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+            },
         )
         # Create DNS record
         A = RecordTypeChoices.A
@@ -187,7 +211,12 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
 
         # Change name and zone
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
-        data = {"custom_fields": {"name": newname, "zone": zone2.id}}
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_name": newname,
+                "ipaddress_dns_zone_id": zone2.id,
+            }
+        }
         response = self.client.patch(url, data, format="json", **self.header)
 
         # Check response
@@ -218,7 +247,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id},
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+            },
         )
         # Create DNS record
         A = RecordTypeChoices.A
@@ -233,7 +265,12 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
 
         # Change name and zone
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
-        data = {"custom_fields": {"name": newname, "zone": zone2.id}}
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_name": newname,
+                "ipaddress_dns_zone_id": zone2.id,
+            }
+        }
         response = self.client.patch(url, data, format="json", **self.header)
 
         # Check response
@@ -262,7 +299,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id},
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+            },
         )
         # Create DNS record
         A = RecordTypeChoices.A
@@ -276,7 +316,7 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         )
 
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
-        data = {"custom_fields": {"zone": None}}
+        data = {"custom_fields": {"ipaddress_dns_zone_id": None}}
         response = self.client.patch(url, data, format="json", **self.header)
 
         # Check response
@@ -287,7 +327,7 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check if dns_name is empty
         self.assertEqual(ip_address.dns_name, "")
-        cf_name = ip_address.custom_field_data.get("name")
+        cf_name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
         self.assertEqual(cf_name, "")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
@@ -305,7 +345,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id},
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+            },
         )
         # Create DNS record
         A = RecordTypeChoices.A
@@ -343,7 +386,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
-            custom_field_data={"name": name, "zone": zone.id},
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+            },
         )
         # Create DNS record
         A = RecordTypeChoices.A
@@ -368,6 +414,6 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check if dns_name is empty
         self.assertEqual(ip_address.dns_name, "")
-        # Check if custom field "name" is empty
-        cf_name = ip_address.custom_field_data.get("name")
+        # Check if custom field "ipaddress_dns_record_name" is empty
+        cf_name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
         self.assertEqual(cf_name, "")

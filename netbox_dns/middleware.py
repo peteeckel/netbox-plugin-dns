@@ -24,8 +24,8 @@ class Action:
             return
 
         ip = kwargs.get("instance")
-        name = ip.custom_field_data.get("name")
-        zone_id = ip.custom_field_data.get("zone")
+        name = ip.custom_field_data.get("ipaddress_dns_record_name")
+        zone_id = ip.custom_field_data.get("ipaddress_dns_zone_id")
 
         # Handle new IP Address only; name and zone must both be defined
         if ip.id is None and name and zone_id:
@@ -51,8 +51,8 @@ class Action:
 
         user = self.request.user
         ip = kwargs.get("instance")
-        name = ip.custom_field_data.get("name")
-        zone_id = ip.custom_field_data.get("zone")
+        name = ip.custom_field_data.get("ipaddress_dns_record_name")
+        zone_id = ip.custom_field_data.get("ipaddress_dns_zone_id")
         zone = Zone.objects.get(id=zone_id) if zone_id else None
 
         # Clear the other field if one is empty, which is inconsistent
@@ -66,8 +66,8 @@ class Action:
                 # If permission ok, clear all fields related to DNS
                 check_record_permission(user, record, "netbox_dns.delete_record")
                 ip.dns_name = ""
-                ip.custom_field_data["name"] = ""
-                ip.custom_field_data["zone"] = None
+                ip.custom_field_data["ipaddress_dns_record_name"] = ""
+                ip.custom_field_data["ipaddress_dns_zone_id"] = None
                 ip.save(update_fields=["custom_field_data", "dns_name"])
                 record.delete()
 

@@ -19,7 +19,7 @@ class Command(BaseCommand):
         ipaddress_object_type = ContentType.objects.get_for_model(IPAddress)
         zone_object_type = ContentType.objects.get_for_model(Zone)
         record_object_type = ContentType.objects.get_for_model(Record)
-        customfields = ("name", "zone")
+        customfields = ("ipaddress_dns_record_name", "ipaddress_dns_zone_id")
 
         if options["remove"]:
             for cf in customfields:
@@ -31,6 +31,7 @@ class Command(BaseCommand):
                     self.stderr.write(f"Custom field '{cf}' does not exist!")
                 else:
                     self.stdout.write(f"Custom field '{cf}' removed")
+
         else:
             msg = ""
             for cf in customfields:
@@ -55,14 +56,16 @@ class Command(BaseCommand):
                 )
 
             cf_name = CustomField.objects.create(
-                name="name",
+                name="ipaddress_dns_record_name",
+                label="Name",
                 type=CustomFieldTypeChoices.TYPE_TEXT,
                 required=False,
                 group_name="DNS",
             )
             cf_name.content_types.set([ipaddress_object_type])
             cf_zone = CustomField.objects.create(
-                name="zone",
+                name="ipaddress_dns_zone_id",
+                label="Zone",
                 type=CustomFieldTypeChoices.TYPE_OBJECT,
                 object_type=zone_object_type,
                 required=False,
