@@ -2,7 +2,7 @@ from django.db import transaction
 from django.db.models import signals
 from django.core.exceptions import MiddlewareNotUsed, PermissionDenied
 
-from ipam.models.ip import IPAddress
+from ipam.models import IPAddress
 from extras.plugins import get_plugin_config
 from netbox_dns.models import Zone, Record, RecordTypeChoices
 from utilities.exceptions import PermissionsViolation, AbortRequest
