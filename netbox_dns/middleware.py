@@ -86,7 +86,7 @@ class Action:
                 check_record_permission(user, record, "netbox_dns.change_record")
                 record.save()
                 # Update dns_name field with FQDN
-                ip.dns_name = f"{name}.{zone.name}"
+                ip.dns_name = record.fqdn.rstrip(".")
                 ip.save(update_fields=["dns_name"])
             else:
                 # Create a new record
@@ -103,7 +103,7 @@ class Action:
                     user, record, "netbox_dns.add_record", commit=True
                 )
                 # cosmetic: update dns_name field with FQDN
-                ip.dns_name = f"{name}.{zone.name}"
+                ip.dns_name = record.fqdn.rstrip(".")
                 # Save modified field in IP after creating record
                 ip.save(update_fields=["dns_name"])
 
