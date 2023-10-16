@@ -135,9 +135,9 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Should be denied
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         # No IP address should have been created
-        self.assertEqual(IPAddress.objects.filter(address=addr).count(), 0)
+        self.assertFalse(IPAddress.objects.filter(address=addr).exists())
         # No DNS Record should have been created
-        self.assertEqual(Record.objects.filter(name=name, zone_id=zone.id).count(), 0)
+        self.assertFalse(Record.objects.filter(name=name, zone_id=zone.id).exists())
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_delete_ip(self):
@@ -173,9 +173,9 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check response
         self.assertTrue(status.is_success(response.status_code))
         # Check if DNS record has been deleted
-        self.assertEqual(Record.objects.filter(id=record.id).count(), 0)
+        self.assertFalse(Record.objects.filter(id=record.id).exists())
         # Check if IP address has been deleted
-        self.assertEqual(IPAddress.objects.filter(id=ip_address.id).count(), 0)
+        self.assertFalse(IPAddress.objects.filter(id=ip_address.id).exists())
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_modify_name_existing_ip(self):
@@ -322,7 +322,7 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check response
         self.assertTrue(status.is_success(response.status_code))
         # Check if record has been deleted
-        self.assertEqual(Record.objects.filter(ipam_ip_address=ip_address).count(), 0)
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
         # Re-read IPAddress object
         ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check if dns_name is empty
@@ -409,7 +409,7 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check response
         self.assertTrue(status.is_success(response.status_code))
         # Check if record has been deleted
-        self.assertEqual(Record.objects.filter(id=record.id).count(), 0)
+        self.assertFalse(Record.objects.filter(id=record.id).exists())
         # Re-read IPAddress object
         ip_address = IPAddress.objects.get(id=ip_address.id)
         # Check if dns_name is empty
