@@ -69,7 +69,6 @@ class Action:
                 check_record_permission(user, record, "netbox_dns.delete_record")
                 ip.dns_name = ""
                 ip.custom_field_data["ipaddress_dns_record_name"] = ""
-                ip.custom_field_data["ipaddress_dns_zone_id"] = None
                 ip.save(update_fields=["custom_field_data", "dns_name"])
                 record.delete()
 
