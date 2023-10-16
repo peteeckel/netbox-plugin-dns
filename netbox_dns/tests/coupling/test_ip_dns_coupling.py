@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.test import override_settings
 from django.contrib.contenttypes.models import ContentType
+from django.core import management
 
 from rest_framework import status
 from utilities.testing import APITestCase
@@ -38,28 +39,10 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         )
         cls.prefix = Prefix.objects.create(prefix=cls.network)
 
-        # Add custom fields if necessary
-        ipaddress_object_type = ContentType.objects.get_for_model(IPAddress)
-        zone_object_type = ContentType.objects.get_for_model(Zone)
-        record_object_type = ContentType.objects.get_for_model(Record)
-        try:
-            cf_name = CustomField.objects.create(
-                name="name",
-                type=CustomFieldTypeChoices.TYPE_TEXT,
-                required=False,
-                group_name="DNS",
-            )
-            cf_name.content_types.set([ipaddress_object_type])
-            cf_zone = CustomField.objects.create(
-                name="zone",
-                type=CustomFieldTypeChoices.TYPE_OBJECT,
-                object_type=zone_object_type,
-                required=False,
-                group_name="DNS",
-            )
-            cf_zone.content_types.set([ipaddress_object_type])
-        except:
-            pass
+        #
+        # Add the required custom fields
+        #
+        management.call_command("setup_coupling")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_create_ip(self):
