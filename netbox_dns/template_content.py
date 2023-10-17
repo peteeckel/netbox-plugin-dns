@@ -4,59 +4,41 @@ from extras.plugins.utils import get_plugin_config
 from extras.plugins import PluginTemplateExtension
 
 from netbox_dns.models import Record, RecordTypeChoices, Zone, View, NameServer
-from netbox_dns.tables import RelatedRecordTable, RelatedZoneTable
+from netbox_dns.tables import RelatedRecordTable
 
 
 class RelatedDNSRecords(PluginTemplateExtension):
     model = "ipam.ipaddress"
 
     def right_page(self):
-        obj = self.context.get("object")
+        ip_address = self.context.get("object")
 
-        address_records = Record.objects.filter(
-            ip_address=obj.address.ip,
-            type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
-        )
-        pointer_records = Record.objects.filter(
-            ip_address=obj.address.ip, type=RecordTypeChoices.PTR
-        )
-        address_record_table = RelatedRecordTable(
-            data=address_records,
-        )
-        pointer_record_table = RelatedRecordTable(
-            data=pointer_records,
-        )
+        address_records = ip_address.netbox_dns_records.all()
+        pointer_records = [
+            address_record.ptr_record
+            for address_record in address_records
+            if address_record.ptr_record is not None
+        ]
+
+        if address_records:
+            address_record_table = RelatedRecordTable(
+                data=address_records,
+            )
+        else:
+            address_record_table = None
+
+        if pointer_records:
+            pointer_record_table = RelatedRecordTable(
+                data=pointer_records,
+            )
+        else:
+            pointer_record_table = None
 
         return self.render(
             "netbox_dns/record/related.html",
             extra_context={
                 "related_address_records": address_record_table,
                 "related_pointer_records": pointer_record_table,
-            },
-        )
-
-
-class RelatedDNSPointerZones(PluginTemplateExtension):
-    model = "ipam.prefix"
-
-    def full_width_page(self):
-        obj = self.context.get("object")
-
-        pointer_zones = (
-            Zone.objects.filter(
-                arpa_network__net_contains_or_equals=obj.prefix
-            ).order_by(Length("name").desc())[:1]
-            | Zone.objects.filter(arpa_network__net_contained=obj.prefix)
-        ).order_by("name")
-
-        pointer_zone_table = RelatedZoneTable(
-            data=pointer_zones,
-        )
-
-        return self.render(
-            "netbox_dns/zone/related.html",
-            extra_context={
-                "related_pointer_zones": pointer_zone_table,
             },
         )
 
@@ -96,5 +78,5 @@ class RelatedDNSObjects(PluginTemplateExtension):
 
 
 template_extensions = [RelatedDNSObjects]
-if get_plugin_config("netbox_dns", "feature_ipam_integration"):
-    template_extensions += [RelatedDNSRecords, RelatedDNSPointerZones]
+if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
+    template_extensions.append(RelatedDNSRecords)

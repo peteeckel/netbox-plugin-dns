@@ -24,7 +24,6 @@ class DNSConfig(PluginConfig):
         "zone_soa_retry": 7200,
         "zone_soa_expire": 2592000,
         "zone_soa_minimum": 3600,
-        "feature_ipam_integration": False,
         "feature_ipam_coupling": False,
         "tolerate_underscores_in_hostnames": False,
         "tolerate_leading_underscore_types": [
