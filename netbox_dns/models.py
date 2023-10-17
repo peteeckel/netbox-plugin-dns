@@ -969,13 +969,14 @@ class Record(NetBoxModel):
         records = Record.objects.filter(
             zone=self.zone,
             name=self.name,
+            type=self.type,
             value=self.value,
             status__in=Record.ACTIVE_STATUS_LIST,
         )
         if len(records):
             raise ValidationError(
                 {
-                    "value": f"There is already an active record for name {self.name} in zone {self.zone} with value {self.value}."
+                    "value": f"There is already an active {self.type} record for name {self.name} in zone {self.zone} with value {self.value}."
                 }
             ) from None
 
