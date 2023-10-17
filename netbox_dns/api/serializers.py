@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
+from ipam.api.nested_serializers import NestedIPAddressSerializer
 from tenancy.api.nested_serializers import NestedTenantSerializer
 
 from netbox_dns.api.nested_serializers import (
@@ -168,6 +169,13 @@ class RecordSerializer(NetBoxModelSerializer):
         required=False,
         read_only=True,
     )
+    ipam_ip_address = NestedIPAddressSerializer(
+        many=False,
+        read_only=True,
+        required=False,
+        allow_null=True,
+        help_text="IPAddress linked to the record",
+    )
     tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     class Meta:
@@ -193,4 +201,5 @@ class RecordSerializer(NetBoxModelSerializer):
             "active",
             "custom_fields",
             "tenant",
+            "ipam_ip_address",
         )

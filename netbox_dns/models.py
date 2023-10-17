@@ -9,7 +9,7 @@ from dns import name as dns_name
 from dns.rdtypes.ANY import SOA
 from dns.exception import DNSException
 
-from netaddr import IPNetwork, AddrFormatError, IPAddress
+from ipam.models import IPAddress
 
 from django.core.validators import (
     MinValueValidator,
@@ -556,6 +556,17 @@ class Zone(NetBoxModel):
             ):
                 record.update_ptr_record()
 
+            # Fix name in IP Address when zone name is changed
+            if (
+                get_plugin_config("netbox_dns", "feature_ipam_coupling")
+                and name_changed
+            ):
+                for ip in IPAddress.objects.filter(
+                    custom_field_data__ipaddress_dns_zone_id=self.pk
+                ):
+                    ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
+                    ip.save(update_fields=["dns_name"])
+
         self.update_soa_record()
 
     def delete(self, *args, **kwargs):
@@ -569,6 +580,16 @@ class Zone(NetBoxModel):
                 record.pk
                 for record in Record.objects.filter(ptr_record__in=ptr_records)
             ]
+
+            if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
+                # Remove coupling from IPAddress to DNS record when zone is deleted
+                for ip in IPAddress.objects.filter(
+                    custom_field_data__ipaddress_dns_zone_id=self.pk
+                ):
+                    ip.dns_name = ""
+                    ip.custom_field_data["ipaddress_dns_record_name"] = ""
+                    ip.custom_field_data["ipaddress_dns_zone_id"] = None
+                    ip.save(update_fields=["dns_name", "custom_field_data"])
 
             super().delete(*args, **kwargs)
 
@@ -729,7 +750,14 @@ class Record(NetBoxModel):
         blank=True,
         null=True,
     )
-
+    ipam_ip_address = models.ForeignKey(
+        verbose_name="IPAM IP Address",
+        to="ipam.IPAddress",
+        on_delete=models.CASCADE,
+        related_name="netbox_dns_records",
+        blank=True,
+        null=True,
+    )
     objects = RecordManager()
     raw_objects = RestrictedQuerySet.as_manager()
 

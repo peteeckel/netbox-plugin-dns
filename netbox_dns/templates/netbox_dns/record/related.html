@@ -2,9 +2,9 @@
 
 {% if perms.netbox_dns.view_record %}
 {% if related_address_records %}
-{% include 'inc/panel_table.html' with table=related_address_records heading='Related DNS Address Records' %}
+{% include 'inc/panel_table.html' with table=related_address_records heading='Related DNS Address Record' %}
 {% endif %}
 {% if related_pointer_records %}
-{% include 'inc/panel_table.html' with table=related_pointer_records heading='Related DNS Pointer Records' %}
+{% include 'inc/panel_table.html' with table=related_pointer_records heading='Related DNS Pointer Record' %}
 {% endif %}
 {% endif %}
