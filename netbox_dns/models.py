@@ -587,7 +587,7 @@ class Zone(NetBoxModel):
                     custom_field_data__ipaddress_dns_zone_id=self.pk
                 ):
                     ip.dns_name = ""
-                    ip.custom_field_data["ipaddress_dns_record_name"] = ""
+                    ip.custom_field_data["ipaddress_dns_record_name"] = None
                     ip.custom_field_data["ipaddress_dns_zone_id"] = None
                     ip.save(update_fields=["dns_name", "custom_field_data"])
 

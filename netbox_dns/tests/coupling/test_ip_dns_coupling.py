@@ -1,14 +1,11 @@
 from django.urls import reverse
 from django.test import override_settings
-from django.contrib.contenttypes.models import ContentType
 from django.core import management
 
 from rest_framework import status
 from utilities.testing import APITestCase
 
-from extras.models import CustomField
-from extras.choices import CustomFieldTypeChoices
-from ipam.models import IPAddress, Prefix
+from ipam.models import IPAddress
 from netaddr import IPNetwork
 from netbox_dns.models import Record, Zone, NameServer, RecordTypeChoices
 
@@ -37,7 +34,6 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         cls.zone2 = Zone.objects.create(
             name="zone2.example.com", **cls.zone_data, soa_mname=cls.nameserver
         )
-        cls.prefix = Prefix.objects.create(prefix=cls.network)
 
         #
         # Add the required custom fields
@@ -152,8 +148,6 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.add_permissions("netbox_dns.delete_record")
 
         # Create DNS record and IP Address
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
         ip_address = IPAddress.objects.create(
             address=addr,
             dns_name=f"{name}.{zone.name}",
@@ -165,8 +159,8 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         record = Record.objects.create(
             name=name,
             zone=zone,
-            type=A,
-            value=s_addr,
+            type=RecordTypeChoices.A,
+            value=str(addr.ip),
             ipam_ip_address=ip_address,
         )
 
@@ -202,13 +196,11 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
             },
         )
         # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(
+        Record.objects.create(
             name=name,
             zone=zone,
-            type=A,
-            value=s_addr,
+            type=RecordTypeChoices.A,
+            value=str(addr.ip),
             ipam_ip_address=ip_address,
         )
 
@@ -256,13 +248,11 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
             },
         )
         # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(
+        Record.objects.create(
             name=name,
             zone=zone,
-            type=A,
-            value=s_addr,
+            type=RecordTypeChoices.A,
+            value=str(addr.ip),
             ipam_ip_address=ip_address,
         )
 
@@ -308,13 +298,11 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
             },
         )
         # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(
+        Record.objects.create(
             name=name,
             zone=zone,
-            type=A,
-            value=s_addr,
+            type=RecordTypeChoices.A,
+            value=str(addr.ip),
             ipam_ip_address=ip_address,
         )
 
@@ -331,7 +319,7 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         # Check if dns_name is empty
         self.assertEqual(ip_address.dns_name, "")
         cf_name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
-        self.assertEqual(cf_name, "")
+        self.assertIsNone(cf_name)
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_rename_zone_existing_ip(self):
@@ -354,13 +342,11 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
             },
         )
         # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
-        record = Record.objects.create(
+        Record.objects.create(
             name=name,
             zone=zone,
-            type=A,
-            value=s_addr,
+            type=RecordTypeChoices.A,
+            value=str(addr.ip),
             ipam_ip_address=ip_address,
         )
 
@@ -395,10 +381,12 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
             },
         )
         # Create DNS record
-        A = RecordTypeChoices.A
-        s_addr = str(addr.ip)
         record = Record.objects.create(
-            name=name, zone=zone, type=A, value=s_addr, ipam_ip_address=ip_address
+            name=name,
+            zone=zone,
+            type=RecordTypeChoices.A,
+            value=str(addr.ip),
+            ipam_ip_address=ip_address,
         )
 
         # Grant permissions to user
@@ -419,4 +407,4 @@ class IPAddressDNSRecordCouplingTest(APITestCase):
         self.assertEqual(ip_address.dns_name, "")
         # Check if custom field "ipaddress_dns_record_name" is empty
         cf_name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
-        self.assertEqual(cf_name, "")
+        self.assertIsNone(cf_name)
