@@ -427,3 +427,68 @@ The NetBox detail view for tenants shows a table of NetBox DNS objects assigned 
 ![NetBox Tenant Detail](images/NetBoxTenantDetail.png)
 
 The colums of the table on the left side are clickable and link to filtered lists showing the related views, nameservers, zones and records.
+
+## IPAM Coupling
+
+Starting with NetBox DNS 0.20.0, a new experimental feature providing coupling between NetBox DNS and NetBox IPAM data is available. This feature can be used to link IP addresses in IPAM to NetBox DNS address records. The old IPAM integration feature was dropped in favour of the new and improved functionality.
+
+Thanks to Jean Benoît for this contribution!
+
+### Enabling IPAM Coupling
+
+The new experimental feature needs to be enabled in the NetBox configuration file by setting its flag:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'feature_ipam_coupling': True,
+        ...
+    },
+}
+```
+
+In addition, two custom fields on `ipam.IPAddress` objects are required for the feature to work. These custom fields can be created using the Django management command `setup_coupling`:
+
+```
+/opt/netbox/netbox/manage.py setup_coupling
+```
+
+In order to remove the custom fields and all related data, the same command can be used with the option `--remove`.
+
+After these steps, a restart of NetBox is required.
+
+### Using IPAM Coupling
+
+With the new custom fields it is possible to automatically generate a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom in the DNS group.
+
+![Custom Fields for IPAM Coupling](images/IPAMCouplingCustomFields.png)
+
+When the IP address is saved, NetBox DNS now automatically creates a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address is set to the FQDN of the resulting address record.
+
+The IP address is now linked to the address record in the following ways:
+
+* When one of the custom fields for the IP address is updated, the DNS record is updated as well. This includes changing the name as well as moving it to a different DNS zone
+* When the IP address is deleted, the managed DNS record is deleted as well
+* When the DNS zone is renamed, the 'DNS Name' for the IP address is updated to reflect the zone's new name
+* When the DNS zone is deleted, the address record is deleted and the connection from the IP address object is cleared
+
+### Additional Information for IP Addresses and DNS Records
+
+When a link between an IP address and a DNS address record is present, there are some additional panes in the IPAM IP address and NetBox DNS record view, as well as in the detail views for NetBox DNS managed records.
+
+#### IP Address Information
+
+If a DNS address record is linked to an IP address, the detail view for the IP address contains an additional pane showing that address record.
+
+![Related DNS Address Record](images/IPAMCouplingRelatedAddressRecord.png)
+
+If NetBox DNS also created a PTR record for the linked DNS address record, the detail view for the IP address contains an a second additional pane showing that pointer record.
+
+![Related DNS Address Record](images/IPAMCouplingRelatedPointerRecord.png)
+
+#### DNS Record Information
+
+The detail views for the address and pointer records created for coupled IP addresses include a link to that IP address, which can be used to navigate to the address.
+
+![Record Detail View for Coupled IP Address](images/IPAMCouplingRecordDetailView.png)
