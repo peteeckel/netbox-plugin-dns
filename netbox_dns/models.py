@@ -786,6 +786,8 @@ class Record(NetBoxModel):
             )
         except dns_name.IDNAException:
             name = self.name
+        except dns_name.LabelTooLong as exc:
+            name = f"{self.name[:59]}..."
 
         return f"{name} [{self.type}]"
 
