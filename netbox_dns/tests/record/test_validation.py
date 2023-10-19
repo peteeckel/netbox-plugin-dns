@@ -261,7 +261,6 @@ class RecordValidationTest(TestCase):
 
         name1 = "test1"
         name2 = "test2"
-        address = "fe80:dead:beef:1::42"
 
         f_record1 = Record(
             zone=f_zone,

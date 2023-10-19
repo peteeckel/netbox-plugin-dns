@@ -320,7 +320,7 @@ class ZoneImportForm(NetBoxModelImportForm):
 
     def clean_soa_mname(self):
         soa_mname = self._clean_field_with_defaults("soa_mname")
-        if type(soa_mname) == str:
+        if isinstance(soa_mname, str):
             try:
                 soa_mname = NameServer.objects.get(name=soa_mname)
             except NameServer.DoesNotExist:

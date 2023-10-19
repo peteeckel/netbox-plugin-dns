@@ -1,7 +1,5 @@
 from dns import name as dns_name
 
-from django.urls import reverse
-
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 

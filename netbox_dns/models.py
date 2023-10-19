@@ -9,27 +9,24 @@ from dns import name as dns_name
 from dns.rdtypes.ANY import SOA
 from dns.exception import DNSException
 
-from ipam.models import IPAddress
-
 from django.core.validators import (
     MinValueValidator,
     MaxValueValidator,
 )
-
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
 from django.db.models import Q, Max, ExpressionWrapper, BooleanField
 from django.db.models.functions import Length
 from django.urls import reverse
-
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
-from utilities.querysets import RestrictedQuerySet
-from utilities.choices import ChoiceSet
-
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
+from utilities.querysets import RestrictedQuerySet
+from utilities.choices import ChoiceSet
+from extras.plugins.utils import get_plugin_config
+from ipam.models import IPAddress
 
 from netbox_dns.fields import NetworkField, AddressField
 from netbox_dns.utilities import (
@@ -43,8 +40,6 @@ from netbox_dns.validators import (
     validate_domain_name,
     validate_extended_hostname,
 )
-
-from extras.plugins.utils import get_plugin_config
 
 
 class NameServer(NetBoxModel):
@@ -500,7 +495,7 @@ class Zone(NetBoxModel):
             ) from None
 
         try:
-            soa_rname = dns_name.from_text(self.soa_rname, origin=dns_name.root)
+            dns_name.from_text(self.soa_rname, origin=dns_name.root)
             validate_fqdn(self.soa_rname)
         except (DNSException, ValidationError) as exc:
             raise ValidationError(

@@ -1,5 +1,6 @@
-from extras.plugins import PluginConfig
 import logging
+
+from extras.plugins import PluginConfig
 
 logger = logging.getLogger("netbox.config")
 

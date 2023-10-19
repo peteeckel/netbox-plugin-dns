@@ -1,5 +1,4 @@
 from utilities.testing import ViewTestCases
-from utilities.testing import create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import NameServer, View, Zone, ZoneStatusChoices
@@ -51,8 +50,6 @@ class ZoneTestCase(
             Zone(name="zone3.example.com", **cls.zone_data, soa_mname=ns1),
         )
         Zone.objects.bulk_create(cls.zones)
-
-        tags = create_tags("Alpha", "Bravo", "Charlie")
 
         cls.bulk_edit_data = {
             "status": ZoneStatusChoices.STATUS_PARKED,
