@@ -229,7 +229,6 @@ class AutoNSTest(TestCase):
             )
 
     def test_delete_soa_ns_exception(self):
-        zone = self.zone
         nameserver = self.nameservers[0]
 
         with self.assertRaisesRegexp(
