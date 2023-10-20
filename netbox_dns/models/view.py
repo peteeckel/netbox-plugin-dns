@@ -28,6 +28,11 @@ class View(ObjectModificationMixin, NetBoxModel):
     default_view = models.BooleanField(
         default=False,
     )
+    prefixes = models.ManyToManyField(
+        to="ipam.Prefix",
+        related_name="netbox_dns_views",
+        blank=True,
+    )
     tenant = models.ForeignKey(
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
