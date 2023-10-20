@@ -35,6 +35,33 @@
         </div>
         <div class="col col-md-6">
             {% include 'inc/panels/tags.html' %}
+            <div class="card">
+                <h5 class="card-header">
+                    IPAM Prefixes
+                </h5>
+                <div class="card-body">
+                    <table class="table table-hover attr-table">
+                        {% for prefix in object.prefixes.all %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'ipam:prefix' pk=prefix.pk %}">
+                                    {{ prefix }}
+                                </a>
+                            </td>
+                            {% if prefix.vrf %}
+                            <td>
+                                <a href="{% url 'ipam:vrf' pk=prefix.vrf.pk %}">
+                                    {{ prefix.vrf }}
+                                </a>
+                            </td>
+                            {% else %}
+                            <td>Global</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
