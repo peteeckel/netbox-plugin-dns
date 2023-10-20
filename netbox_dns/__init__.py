@@ -1,8 +1,7 @@
-import logging
+import sys
 
 from extras.plugins import PluginConfig
-
-logger = logging.getLogger("netbox.config")
+from extras.plugins.utils import get_plugin_config
 
 __version__ = "0.20.2"
 
@@ -39,9 +38,9 @@ class DNSConfig(PluginConfig):
 
     def ready(self):
         #
-        # Check if required custom field exist for IPAM coupling
+        # Check if required custom fields exist for IPAM coupling
         #
-        if self.default_settings["feature_ipam_coupling"]:
+        if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
             from extras.models import CustomField
             from ipam.models import IPAddress
             from django.contrib.contenttypes.models import ContentType
@@ -52,11 +51,12 @@ class DNSConfig(PluginConfig):
             if CustomField.objects.filter(
                 name__in=required_cf, content_types=objtype
             ).count() < len(required_cf):
-                logger.warning(
-                    "'feature_ipam_coupling' is enabled, but the required custom"
-                    " fields for IPAM-DNS coupling are missing. Please run the"
-                    " Django management command 'setup_coupling' to create the"
-                    " custom fields."
+                print(
+                    "WARNING: 'feature_ipam_coupling' is enabled, but the required"
+                    " custom fields for IPAM DNS coupling are missing. Please run"
+                    " the Django management command 'setup_coupling' to create the"
+                    " custom fields.",
+                    file=sys.stderr,
                 )
 
         super().ready()
