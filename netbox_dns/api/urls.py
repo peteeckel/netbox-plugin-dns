@@ -11,6 +11,7 @@ from netbox_dns.api.views import (
     ZoneTemplateViewSet,
     RecordTemplateViewSet,
 )
+from netbox_dns.api.ipam.views import PrefixViewSet
 
 router = NetBoxRouter()
 router.APIRootView = NetBoxDNSRootView
@@ -23,5 +24,7 @@ router.register("registrars", RegistrarViewSet)
 router.register("contacts", ContactViewSet)
 router.register("zonetemplates", ZoneTemplateViewSet)
 router.register("recordtemplates", RecordTemplateViewSet)
+
+router.register("prefixes", PrefixViewSet)
 
 urlpatterns = router.urls
