@@ -15,8 +15,10 @@ from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
+from ipam.models import Prefix
 
 from netbox_dns.models import View
+from netbox_dns.extras.fields import PrefixDynamicModelMultipleChoiceField
 
 
 __all__ = (
@@ -28,14 +30,28 @@ __all__ = (
 
 
 class ViewForm(TenancyForm, NetBoxModelForm):
+    prefixes = PrefixDynamicModelMultipleChoiceField(
+        queryset=Prefix.objects.all(),
+        required=False,
+        label="IPAM Prefixes",
+    )
+
     fieldsets = (
         FieldSet("name", "default_view", "description", "tags", name="View"),
         FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("prefixes", name="IPAM"),
     )
 
     class Meta:
         model = View
-        fields = ("name", "default_view", "description", "tags", "tenant")
+        fields = (
+            "name",
+            "default_view",
+            "description",
+            "tags",
+            "tenant",
+            "prefixes",
+        )
 
 
 class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
