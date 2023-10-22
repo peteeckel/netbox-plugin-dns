@@ -22,3 +22,22 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
         model = View
         fields = ("description",)
         default_columns = ("name", "default_view")
+
+
+class RelatedViewTable(TenancyColumnsMixin, NetBoxTable):
+    actions = ActionsColumn(actions=())
+
+    name = tables.Column(
+        linkify=True,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = View
+        fields = (
+            "name",
+            "description",
+            "tenant",
+            "tenant_group"
+            "tags",
+        )
+        default_columns = ("name", "description")
