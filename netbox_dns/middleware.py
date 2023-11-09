@@ -4,7 +4,7 @@ from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, Validati
 
 from ipam.models import IPAddress
 from ipam.choices import IPAddressStatusChoices
-from extras.plugins import get_plugin_config
+from extras.plugins.utils import get_plugin_config
 from netbox.signals import post_clean
 from utilities.permissions import resolve_permission
 
