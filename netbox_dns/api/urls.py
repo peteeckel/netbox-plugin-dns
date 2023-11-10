@@ -6,6 +6,8 @@ from netbox_dns.api.views import (
     ZoneViewSet,
     NameServerViewSet,
     RecordViewSet,
+    RegistrarViewSet,
+    ContactViewSet,
 )
 
 router = NetBoxRouter()
@@ -15,5 +17,7 @@ router.register("views", ViewViewSet)
 router.register("zones", ZoneViewSet)
 router.register("nameservers", NameServerViewSet)
 router.register("records", RecordViewSet)
+router.register("registrars", RegistrarViewSet)
+router.register("contacts", ContactViewSet)
 
 urlpatterns = router.urls

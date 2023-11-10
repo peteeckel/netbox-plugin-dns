@@ -86,6 +86,24 @@ class ZoneBulkDeleteView(generic.BulkDeleteView):
     table = ZoneTable
 
 
+class RegistrationViewTab(ViewTab):
+    def render(self, instance):
+        if instance.is_registered:
+            return super().render(instance)
+
+        return None
+
+
+@register_model_view(Zone, "registration")
+class ZoneRegistrationView(generic.ObjectView):
+    queryset = Zone.objects.all()
+    template_name = "netbox_dns/zone/registration.html"
+
+    tab = RegistrationViewTab(
+        label="Registration",
+    )
+
+
 @register_model_view(Zone, "records")
 class ZoneRecordListView(generic.ObjectChildrenView):
     queryset = Zone.objects.all()

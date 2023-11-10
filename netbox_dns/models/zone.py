@@ -97,7 +97,7 @@ class Zone(NetBoxModel):
         blank=True,
     )
     nameservers = models.ManyToManyField(
-        "NameServer",
+        to="NameServer",
         related_name="zones",
         blank=True,
     )
@@ -113,7 +113,7 @@ class Zone(NetBoxModel):
         validators=[MinValueValidator(1)],
     )
     soa_mname = models.ForeignKey(
-        "NameServer",
+        to="NameServer",
         related_name="zones_soa",
         verbose_name="SOA MName",
         on_delete=models.PROTECT,
@@ -175,6 +175,56 @@ class Zone(NetBoxModel):
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
         related_name="netbox_dns_zones",
+        blank=True,
+        null=True,
+    )
+    registrar = models.ForeignKey(
+        to="Registrar",
+        on_delete=models.SET_NULL,
+        verbose_name="Registrar",
+        help_text="The external registrar the domain is registered with",
+        blank=True,
+        null=True,
+    )
+    registry_domain_id = models.CharField(
+        verbose_name="Registry Domain ID",
+        help_text="The ID of the domain assigned by the registry",
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+    registrant = models.ForeignKey(
+        to="Contact",
+        on_delete=models.SET_NULL,
+        verbose_name="Registrant",
+        help_text="The owner of the domain",
+        blank=True,
+        null=True,
+    )
+    admin_c = models.ForeignKey(
+        to="Contact",
+        on_delete=models.SET_NULL,
+        verbose_name="Admin Contact",
+        related_name="admin_c_zones",
+        help_text="The administrative contact for the domain",
+        blank=True,
+        null=True,
+    )
+    tech_c = models.ForeignKey(
+        to="Contact",
+        on_delete=models.SET_NULL,
+        verbose_name="Tech Contact",
+        related_name="tech_c_zones",
+        help_text="The technical contact for the domain",
+        blank=True,
+        null=True,
+    )
+    billing_c = models.ForeignKey(
+        to="Contact",
+        on_delete=models.SET_NULL,
+        verbose_name="Billing Contact",
+        related_name="billing_c_zones",
+        help_text="The billing contact for the domain",
         blank=True,
         null=True,
     )
@@ -241,6 +291,20 @@ class Zone(NetBoxModel):
     @property
     def is_reverse_zone(self):
         return self.name.endswith(".arpa") and self.network_from_name is not None
+
+    @property
+    def is_registered(self):
+        return any(
+            field is not None
+            for field in (
+                self.registrar,
+                self.registry_domain_id,
+                self.registrant,
+                self.admin_c,
+                self.tech_c,
+                self.billing_c,
+            )
+        )
 
     @property
     def view_filter(self):
@@ -525,6 +589,12 @@ class ZoneIndex(SearchIndex):
     fields = (
         ("name", 100),
         ("view", 150),
+        ("registrar", 300),
+        ("registry_domain_id", 300),
+        ("registrant", 300),
+        ("admin_c", 300),
+        ("tech_c", 300),
+        ("billing_c", 300),
         ("description", 500),
         ("soa_rname", 1000),
         ("soa_mname", 1000),

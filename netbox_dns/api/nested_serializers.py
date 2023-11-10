@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
 
-from netbox_dns.models import View, Zone, NameServer, Record
+from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
 
 
 #
@@ -87,3 +87,29 @@ class NestedRecordSerializer(WritableNestedSerializer):
             "zone",
             "active",
         ]
+
+
+#
+# Registrars
+#
+class NestedRegistrarSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:registrar-detail"
+    )
+
+    class Meta:
+        model = Registrar
+        fields = ["display", "id", "url", "name", "iana_id"]
+
+
+#
+# Contacts
+#
+class NestedContactSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:contact-detail"
+    )
+
+    class Meta:
+        model = Contact
+        fields = ["display", "id", "url", "name", "contact_id"]

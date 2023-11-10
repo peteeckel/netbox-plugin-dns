@@ -1,0 +1,71 @@
+{% extends 'generic/object.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col col-md-6">
+            <div class="card">
+                <h5 class="card-header">Contact</h5>
+                <div class="card-body">
+                    <table class="table table-hover attr-table">
+                        <tr>
+                            <th scope="row">Name</th>
+                            <td>{{ object.name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Contact ID</th>
+                            <td>{{ object.contact_id }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Organization</th>
+                            <td>{{ object.organization }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Street</th>
+                            <td>{{ object.street }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">City</th>
+                            <td>{{ object.city }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">State/Province</th>
+                            <td>{{ object.state_province }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Postal Code</th>
+                            <td>{{ object.postal_code }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Country</th>
+                            <td>{{ object.country }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone</th>
+                            <td>{{ object.phone }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone Extension</th>
+                            <td>{{ object.phone_ext }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fax</th>
+                            <td>{{ object.fax }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fax Extension</th>
+                            <td>{{ object.fax_ext }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>{{ object.email }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% include 'inc/panels/custom_fields.html' %}
+        </div>
+        <div class="col col-md-6">
+            {% include 'inc/panels/tags.html' %}
+        </div>
+    </div>
+{% endblock %}

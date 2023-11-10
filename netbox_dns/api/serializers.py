@@ -9,8 +9,10 @@ from netbox_dns.api.nested_serializers import (
     NestedZoneSerializer,
     NestedNameServerSerializer,
     NestedRecordSerializer,
+    NestedRegistrarSerializer,
+    NestedContactSerializer,
 )
-from netbox_dns.models import View, Zone, NameServer, Record
+from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
 
 
 class ViewSerializer(NetBoxModelSerializer):
@@ -54,6 +56,36 @@ class ZoneSerializer(NetBoxModelSerializer):
         read_only=False,
         required=False,
         help_text="Primary nameserver for the zone",
+    )
+    registrar = NestedRegistrarSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The registrar the domain is registered with",
+    )
+    registrant = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The owner of the domain",
+    )
+    admin_c = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The administrative contact for the domain",
+    )
+    tech_c = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The technical contact for the domain",
+    )
+    billing_c = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The billing contact for the domain",
     )
     active = serializers.BooleanField(
         required=False,
@@ -106,6 +138,12 @@ class ZoneSerializer(NetBoxModelSerializer):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "tech_c",
+            "admin_c",
+            "billing_c",
             "active",
             "custom_fields",
             "tenant",
@@ -202,4 +240,57 @@ class RecordSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
             "ipam_ip_address",
+        )
+
+
+class RegistrarSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:registrar-detail"
+    )
+
+    class Meta:
+        model = Registrar
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "iana_id",
+            "referral_url",
+            "whois_server",
+            "abuse_email",
+            "abuse_phone",
+            "created",
+            "last_updated",
+            "custom_fields",
+        )
+
+
+class ContactSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:contact-detail"
+    )
+
+    class Meta:
+        model = Contact
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "contact_id",
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            "created",
+            "last_updated",
+            "custom_fields",
         )

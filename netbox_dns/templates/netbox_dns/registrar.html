@@ -1,0 +1,50 @@
+{% extends 'generic/object.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col col-md-6">
+            <div class="card">
+                <h5 class="card-header">Registrar</h5>
+                <div class="card-body">
+                    <table class="table table-hover attr-table">
+                        <tr>
+                            <th scope="row">Name</th>
+                            <td>{{ object.name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">IANA ID</th>
+                            <td>{{ object.iana_id }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <h5 class="card-header">Contact Details</h5>
+                <div class="card-body">
+                    <table class="table table-hover attr-table">
+                        <tr>
+                            <th scope="row">Referral URL</th>
+                            <td><a href="{{ object.referral_url }}">{{ object.referral_url }}</a></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">WHOIS Server</th>
+                            <td>{{ object.whois_server }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Abuse Email</th>
+                            <td>{{ object.abuse_email }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Abuse Phone</th>
+                            <td>{{ object.abuse_phone }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% include 'inc/panels/custom_fields.html' %}
+        </div>
+        <div class="col col-md-6">
+            {% include 'inc/panels/tags.html' %}
+        </div>
+    </div>
+{% endblock %}

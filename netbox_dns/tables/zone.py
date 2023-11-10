@@ -28,6 +28,21 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     default_ttl = tables.Column(
         verbose_name="Default TTL",
     )
+    registrar = tables.Column(
+        linkify=True,
+    )
+    registrant = tables.Column(
+        linkify=True,
+    )
+    admin_c = tables.Column(
+        linkify=True,
+    )
+    tech_c = tables.Column(
+        linkify=True,
+    )
+    billing_c = tables.Column(
+        linkify=True,
+    )
 
     def render_name(self, value, record):
         return record.display_name
@@ -45,6 +60,12 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "soa_mname",
             "soa_rname",
             "soa_serial",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
             "tenant",
             "tenant_group",
         )
