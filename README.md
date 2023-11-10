@@ -24,7 +24,7 @@ NetBox DNS is using the standardized NetBox plugin interface, so it also takes a
 
 ## Requirements
 
-* NetBox 3.5.8 or higher
+* NetBox 3.5.0 or higher
 * Python 3.8 or higher
 
 ## Installation & Configuration

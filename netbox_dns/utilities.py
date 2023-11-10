@@ -4,7 +4,12 @@ from dns import name as dns_name
 from dns.exception import DNSException
 from netaddr import IPNetwork, AddrFormatError
 
-from extras.plugins.utils import get_plugin_config
+try:
+    # NetBox 3.5.0 - 3.5.7, 3.5.9+
+    from extras.plugins import get_plugin_config
+except ImportError:
+    # NetBox 3.5.8
+    from extras.plugins.utils import get_plugin_config
 
 
 class NameFormatError(Exception):

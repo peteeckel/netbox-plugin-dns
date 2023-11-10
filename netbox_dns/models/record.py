@@ -14,7 +14,13 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from utilities.querysets import RestrictedQuerySet
 from utilities.choices import ChoiceSet
-from extras.plugins.utils import get_plugin_config
+
+try:
+    # NetBox 3.5.0 - 3.5.7, 3.5.9+
+    from extras.plugins import get_plugin_config
+except ImportError:
+    # NetBox 3.5.8
+    from extras.plugins.utils import get_plugin_config
 
 from netbox_dns.fields import AddressField
 from netbox_dns.utilities import (

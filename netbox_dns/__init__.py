@@ -1,7 +1,13 @@
 import sys
 
 from extras.plugins import PluginConfig
-from extras.plugins.utils import get_plugin_config
+
+try:
+    # NetBox 3.5.0 - 3.5.7, 3.5.9+
+    from extras.plugins import get_plugin_config
+except ImportError:
+    # NetBox 3.5.8
+    from extras.plugins.utils import get_plugin_config
 
 __version__ = "0.20.2"
 
@@ -10,7 +16,7 @@ class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = "NetBox DNS"
     description = "NetBox plugin for DNS data"
-    min_version = "3.5.8"
+    min_version = "3.5.0"
     version = __version__
     author = "Peter Eckel"
     author_email = "pe-netbox-plugin-dns@hindenburgring.com"
