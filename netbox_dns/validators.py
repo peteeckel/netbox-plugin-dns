@@ -2,7 +2,12 @@ import re
 
 from django.core.exceptions import ValidationError
 
-from extras.plugins.utils import get_plugin_config
+try:
+    # NetBox 3.5.0 - 3.5.7, 3.5.9+
+    from extras.plugins import get_plugin_config
+except ImportError:
+    # NetBox 3.5.8
+    from extras.plugins.utils import get_plugin_config
 
 LABEL = r"[a-z0-9][a-z0-9-]*(?<!-)"
 UNDERSCORE_LABEL = r"[a-z0-9][a-z0-9-_]*(?<![-_])"
