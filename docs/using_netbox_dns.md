@@ -8,6 +8,7 @@ NetBox DNS is a plugin for NetBox designed to manage DNS data. In the current ve
 * API endpoints that can be used to export View, Name Server, Zone and Record data via the NetBox REST or GraphQL APIs
 * Basic integrity checks of the entered data
 * Optional organisation of zones in views, i.e. to facilitate split-horizon DNS setups
+* Management of domain registration related information, such as registrars and contacts related to WHOIS information
 * Support for NetBox custom fields, custom links, export templates etc.
 * Support for NetBox tenancy
 
@@ -208,7 +209,24 @@ The zone's SOA record is assembled from these fields by contatenating them and p
 
 All SOA fields are required. Default settings can be configured in the Django configuration file, see [Zone Default Settings](#zone_defaults)).
 
-#### Automatic SOA SERIAL generation
+#### Domain Registration Fields
+For zones that are registered as public DNS domains, there is a third set of fields available that reflects the domain's registration data.
+
+Field                      | Required | Explanation
+---------                  | -------- | -----------
+**Registry**               | No       | The registry used to register the domain
+**Registry Domain ID**     | No       | The domain ID assigned by the registry on registration
+**Registrant**             | No       | The owner of the domain
+**Administrative Contact** | No       | The administrative contact for the domain
+**Technical Contact**      | No       | The technical contact for the domain
+**Billing Contact**        | No       | The billing contact for the domain
+
+All fields are optional.
+
+If there is registration information for a zone, the zone's detail view contains an additional 'Registration' tab showing that information.
+
+
+### Automatic SOA SERIAL generation
 SOA SERIAL fields are crucial for the propagation of zone data from primary name servers to secondaries, as the process involves checking the zone's serial number on the secondary against the serial number on the primary and only performing the update when the primary has a higher serial number or the interval specified in the SOA EXPIRE field has passed.
 
 This is especially important when PTR records are automatically created from A and AAAA records and an update to a forward zone thus can lead to one or several reverse zones being updated behind the scenes as well.
@@ -229,7 +247,7 @@ Another tab shows all managed records in the zone. Since at the very least there
 
 ![Zone DetailManagedRecords](images/ZoneDetailManagedRecords.png)
 
-#### <a name="zone_defaults"></a>Zone Default settings
+### <a name="zone_defaults"></a>Zone Default settings
 Zone default settings can be configured in the plugin configuration of NetBox. The following settings are available:
 
 Setting                 | Variable               | Factory Default
@@ -269,7 +287,7 @@ Record objects correspond to resource records (RR) that within zones. NetBox DNS
 There is exactly one SOA record per zone, so SOA records cannot be created manually at all. NS and PTR records do not have that kind of restriction and can be created and maintained manually if they have not been created by NetBox ("Managed Records'), although that should also be required in special cases.
 
 #### Permissions
-The following Django permissions are applicable to Name Server objects:
+The following Django permissions are applicable to NameServer objects:
 
 Permission                 | Action
 ----------                 | ------
@@ -323,6 +341,90 @@ Note that for managed records there are no buttons for deleting, editing or clon
 
 #### Displaying records
 Records can either be displayed by opening the record list view from the "Reocrds" or "Managed Records" navigation item on the left, or per zone via the respective tabs in the zone defail view. In any case, the tables can be filtered by name, value, zone, or tags to narrow down the set of records displayed.
+
+### Registrars
+Registrar objects relate to the DNS domain registrarion and represent the registrar information for DNS domains related to zones. A DNS zone does not necessarily need to be registered: Zones that are not available via public DNS or that are sub-zones of registered zones do not require registration. In most cases registration information is only required (and possible) for second level domains.
+
+Registrar objects relate to the registration institutions responsible for registering domains with the TLD registries. A list of accredited registrars is available on the [ICANN web site](https://www.icann.org/en/accredited-registrars).
+
+#### Permissions
+The following Django permissions are applicable to Registrar objects:
+
+Permission                    | Action
+----------                    | ------
+`netbox_dns.add_registrar`    | Create new registrar objects
+`netbox_dns.change_registrar` | Edit registrar information
+`netbox_dns.delete_registrar` | Delete a registrar object
+`netbox_dns.view_registrar`   | View registrar information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for registrars:
+
+Field             | Required | Explanation
+-----             | -------- | -----------
+**Name**          | Yes      | A unique name for the registrar
+**IANA ID**       | No       | A numeric ID assigned by the IANA on accredtiation of the registrar
+**Referral URL**  | No       | The URL of the registrar's web presence
+**WHOIS Server**  | No       | The WHOIS server for the registrar
+**Abuse Email**   | No       | The Email address used to report abuse cases for a domain
+**Abuse Phone**   | No       | The phone number used to report abuse cases for a domain
+
+The fields are closely related to the WHOIS fields for the registrar for a domain. More information can be found on the [ICANN web site](https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en)
+
+#### Displaying Registrars
+A registrar in detail view:
+
+![Registrar Detail](images/RegistrarDetail.png)
+
+If there are zones registered for the registrar, a second tab shows a list of these zones.
+
+![Registrar DetailZones](images/RegistrarDetailZones.png)
+
+### Contacts
+
+#### Permissions
+The following Django permissions are applicable to Contact objects:
+
+Permission                  | Action
+----------                  | ------
+`netbox_dns.add_contact`    | Create new contact objects
+`netbox_dns.change_contact` | Edit contact information
+`netbox_dns.delete_contact` | Delete a contact object
+`netbox_dns.view_contact`   | View contact information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for contacts:
+
+Field               | Required | Explanation
+-----               | -------- | -----------
+**Name**            | No       | A name for the contact. The name is not necessarily unique, because the same person might have many DNS contacts, sometimes also called 'handles'.
+**Contact ID**      | Yes      | A unique ID, usually assigned by the Registrar, that identifies the person or organisation. 
+**Organization**    | No       | An organization the contact is associated with
+**Street**          | No       | The street of the contact's address
+**City**            | No       | The city of the contact's address
+**State/Province**  | No       | The state or province the contact is located in
+**Postal Code**     | No       | The postal code of the contact's address
+**Country**         | No       | The ISO3166 country code of the contact's address
+**Phone**           | No       | The phone number of the contact
+**Phone Extension** | No       | The phone extension of the contact
+**Fax**             | No       | The fax number of the contact
+**Fax Extension**   | No       | The fax extension of the contact
+**Email**           | No       | The Email address of the contact
+
+The fields are closely related to the WHOIS fields for the registrant, admin contact, tech contact and billing contact for a domain. More information can be found on the [ICANN web site](https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en)
+
+#### Displaying Contacts
+A contact in detail view:
+
+![Contact Detail](images/ContactDetail.png)
+
+If there are zones registered for the contact, a second tab shows a list of these zones.
+
+![Contact DetailZones](images/ContactDetailZones.png)
 
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
