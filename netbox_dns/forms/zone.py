@@ -22,7 +22,14 @@ from utilities.forms import add_blank_choice
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import View, Zone, ZoneStatusChoices, NameServer
+from netbox_dns.models import (
+    View,
+    Zone,
+    ZoneStatusChoices,
+    NameServer,
+    Registrar,
+    Contact,
+)
 from netbox_dns.utilities import name_to_unicode
 
 
@@ -109,6 +116,17 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
                 "soa_serial",
             ),
         ),
+        (
+            "Domain Registration",
+            (
+                "registrar",
+                "registry_domain_id",
+                "registrant",
+                "admin_c",
+                "tech_c",
+                "billing_c",
+            ),
+        ),
         ("Tags", ("tags",)),
         ("Tenancy", ("tenant_group", "tenant")),
     )
@@ -189,6 +207,12 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
             "tenant",
         )
         help_texts = {
@@ -284,6 +308,55 @@ class ZoneImportForm(NetBoxModelImportForm):
     soa_minimum = forms.IntegerField(
         required=False,
         help_text="Minimum TTL for negative results, e.g. NXRRSET",
+    )
+    registrar = CSVModelChoiceField(
+        queryset=Registrar.objects.all(),
+        required=False,
+        to_field_name="name",
+        help_text="Registrar the domain is registered with",
+        error_messages={
+            "invalid_choice": "Registrar not found.",
+        },
+    )
+    registry_domain_id = forms.CharField(
+        required=False,
+        help_text="Domain ID assigned by the registry",
+    )
+    registrant = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Owner of the domain",
+        error_messages={
+            "invalid_choice": "Registrant contact ID not found",
+        },
+    )
+    admin_c = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Administrative contact for the domain",
+        error_messages={
+            "invalid_choice": "Administrative contact ID not found",
+        },
+    )
+    tech_c = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Technical contact for the domain",
+        error_messages={
+            "invalid_choice": "Technical contact ID not found",
+        },
+    )
+    billing_c = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Billing contact for the domain",
+        error_messages={
+            "invalid_choice": "Billing contact ID not found",
+        },
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -381,6 +454,12 @@ class ZoneImportForm(NetBoxModelImportForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
             "tenant",
         )
 
@@ -457,6 +536,56 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         label="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
     )
+    registrar = DynamicModelChoiceField(
+        queryset=Registrar.objects.all(),
+        required=False,
+        widget=APISelect(
+            attrs={
+                "data-url": reverse_lazy("plugins-api:netbox_dns-api:registrar-list")
+            }
+        ),
+    )
+    registry_domain_id = forms.CharField(
+        required=False,
+        label="Registry Domain ID",
+    )
+    registrant = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    admin_c = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Administrative Contact",
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    tech_c = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Technical Contact",
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    billing_c = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Billing Contact",
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        required=False,
+        to_field_name="name",
+        help_text="Assigned tenant",
+    )
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     model = Zone
@@ -487,8 +616,28 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
                 "soa_minimum",
             ),
         ),
+        (
+            "Domain Registration",
+            (
+                "registrar",
+                "registry_domain_id",
+                "registrant",
+                "admin_c",
+                "tech_c",
+                "billing_c",
+            ),
+        ),
     )
-    nullable_fields = ("view", "description")
+    nullable_fields = (
+        "view",
+        "description",
+        "registrar",
+        "registry_domain_id",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+    )
 
     def clean(self):
         """

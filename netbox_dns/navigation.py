@@ -96,6 +96,50 @@ managed_record_menu_item = PluginMenuItem(
     permissions=["netbox_dns.view_record"],
 )
 
+registrar_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:registrar_list",
+    link_text="Registrars",
+    permissions=["netbox_dns.view_registrar"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:registrar_add",
+            "Add",
+            "mdi mdi-plus-thick",
+            ButtonColorChoices.GREEN,
+            permissions=["netbox_dns.add_registrar"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:registrar_import",
+            "Import",
+            "mdi mdi-upload",
+            ButtonColorChoices.CYAN,
+            permissions=["netbox_dns.add_registrar"],
+        ),
+    ),
+)
+
+contact_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:contact_list",
+    link_text="Contacts",
+    permissions=["netbox_dns.view_contact"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:contact_add",
+            "Add",
+            "mdi mdi-plus-thick",
+            ButtonColorChoices.GREEN,
+            permissions=["netbox_dns.add_contact"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:contact_import",
+            "Import",
+            "mdi mdi-upload",
+            ButtonColorChoices.CYAN,
+            permissions=["netbox_dns.add_contact"],
+        ),
+    ),
+)
+
 menu = PluginMenu(
     label="NetBox DNS",
     groups=(
@@ -107,6 +151,13 @@ menu = PluginMenu(
                 nameserver_menu_item,
                 record_menu_item,
                 managed_record_menu_item,
+            ),
+        ),
+        (
+            "Domain Registration",
+            (
+                registrar_menu_item,
+                contact_menu_item,
             ),
         ),
     ),

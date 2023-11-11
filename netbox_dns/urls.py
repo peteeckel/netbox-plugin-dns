@@ -2,7 +2,7 @@ from django.urls import path
 
 from netbox.views.generic import ObjectChangeLogView
 
-from netbox_dns.models import View, Zone, Record, NameServer
+from netbox_dns.models import View, Zone, Record, NameServer, Contact, Registrar
 from netbox_dns.views import (
     # zone
     ZoneListView,
@@ -14,6 +14,7 @@ from netbox_dns.views import (
     ZoneBulkDeleteView,
     ZoneRecordListView,
     ZoneManagedRecordListView,
+    ZoneRegistrationView,
     # nameserver
     NameServerListView,
     NameServerView,
@@ -43,6 +44,24 @@ from netbox_dns.views import (
     ViewBulkEditView,
     ViewBulkDeleteView,
     ViewZoneListView,
+    # contact
+    ContactListView,
+    ContactView,
+    ContactDeleteView,
+    ContactEditView,
+    ContactBulkImportView,
+    ContactBulkEditView,
+    ContactBulkDeleteView,
+    ContactZoneListView,
+    # registrar
+    RegistrarListView,
+    RegistrarView,
+    RegistrarDeleteView,
+    RegistrarEditView,
+    RegistrarBulkImportView,
+    RegistrarBulkEditView,
+    RegistrarBulkDeleteView,
+    RegistrarZoneListView,
 )
 
 app_name = "netbox_dns"
@@ -70,6 +89,11 @@ urlpatterns = [
         "zones/<int:pk>/managedrecords/",
         ZoneManagedRecordListView.as_view(),
         name="zone_managed_records",
+    ),
+    path(
+        "zones/<int:pk>/registration/",
+        ZoneRegistrationView.as_view(),
+        name="zone_registration",
     ),
     #
     # NameServer urls
@@ -155,5 +179,77 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="view_changelog",
         kwargs={"model": View},
+    ),
+    #
+    # Contact urls
+    #
+    path("contacts/", ContactListView.as_view(), name="contact_list"),
+    path("contacts/add/", ContactEditView.as_view(), name="contact_add"),
+    path("contacts/import/", ContactBulkImportView.as_view(), name="contact_import"),
+    path("contacts/edit/", ContactBulkEditView.as_view(), name="contact_bulk_edit"),
+    path(
+        "contacts/delete/",
+        ContactBulkDeleteView.as_view(),
+        name="contact_bulk_delete",
+    ),
+    path("contacts/<int:pk>/", ContactView.as_view(), name="contact"),
+    path("contacts/<int:pk>/edit/", ContactEditView.as_view(), name="contact_edit"),
+    path(
+        "contacts/<int:pk>/delete/",
+        ContactDeleteView.as_view(),
+        name="contact_delete",
+    ),
+    path(
+        "contacts/<int:pk>/zones/",
+        ContactZoneListView.as_view(),
+        name="contact_zones",
+    ),
+    path(
+        "contacts/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="contact_changelog",
+        kwargs={"model": Contact},
+    ),
+    #
+    # Registrar urls
+    #
+    path("registrars/", RegistrarListView.as_view(), name="registrar_list"),
+    path("registrars/add/", RegistrarEditView.as_view(), name="registrar_add"),
+    path(
+        "registrars/import/",
+        RegistrarBulkImportView.as_view(),
+        name="registrar_import",
+    ),
+    path(
+        "registrars/edit/",
+        RegistrarBulkEditView.as_view(),
+        name="registrar_bulk_edit",
+    ),
+    path(
+        "registrars/delete/",
+        RegistrarBulkDeleteView.as_view(),
+        name="registrar_bulk_delete",
+    ),
+    path("registrars/<int:pk>/", RegistrarView.as_view(), name="registrar"),
+    path(
+        "registrars/<int:pk>/edit/",
+        RegistrarEditView.as_view(),
+        name="registrar_edit",
+    ),
+    path(
+        "registrars/<int:pk>/delete/",
+        RegistrarDeleteView.as_view(),
+        name="registrar_delete",
+    ),
+    path(
+        "registrars/<int:pk>/zones/",
+        RegistrarZoneListView.as_view(),
+        name="registrar_zones",
+    ),
+    path(
+        "registrars/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="registrar_changelog",
+        kwargs={"model": Registrar},
     ),
 ]

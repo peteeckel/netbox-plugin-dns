@@ -1,0 +1,40 @@
+{% extends 'netbox_dns/zone/base.html' %}
+{% load helpers %}
+
+{% block content %}
+<div class="card">
+    <h5 class="card-header">Domain Registration</h5>
+    <div class="card-body">
+        <table class="table table-hover attr-table">
+            <tr>
+                <th scope="row">Registrar</th>
+                <td>{{ object.registrar|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Registry Domain ID</th>
+                <td>{{ object.registry_domain_id|placeholder }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Registrant</th>
+                <td>{{ object.registrant|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Administrative Contact</th>
+                <td>{{ object.admin_c|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Technical Contact</th>
+                <td>{{ object.tech_c|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Billing Contact</th>
+                <td>{{ object.billing_c|linkify|placeholder }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+{% endblock modals %}

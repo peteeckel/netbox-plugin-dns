@@ -10,9 +10,18 @@ from netbox_dns.api.serializers import (
     ZoneSerializer,
     NameServerSerializer,
     RecordSerializer,
+    RegistrarSerializer,
+    ContactSerializer,
 )
-from netbox_dns.filters import ViewFilter, ZoneFilter, NameServerFilter, RecordFilter
-from netbox_dns.models import View, Zone, NameServer, Record
+from netbox_dns.filters import (
+    ViewFilter,
+    ZoneFilter,
+    NameServerFilter,
+    RecordFilter,
+    RegistrarFilter,
+    ContactFilter,
+)
+from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
 
 
 class NetBoxDNSRootView(APIRootView):
@@ -91,3 +100,15 @@ class RecordViewSet(NetBoxModelViewSet):
             raise serializers.ValidationError(f"{v_object} is managed, refusing update")
 
         return super().update(request, *args, **kwargs)
+
+
+class RegistrarViewSet(NetBoxModelViewSet):
+    queryset = Registrar.objects.all()
+    serializer_class = RegistrarSerializer
+    filterset_class = RegistrarFilter
+
+
+class ContactViewSet(NetBoxModelViewSet):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    filterset_class = ContactFilter
