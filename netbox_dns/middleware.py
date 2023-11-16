@@ -168,7 +168,8 @@ class Action:
             #
             # Name/Zone CF data has been removed: Remove the DNS address record
             #
-            ip_address.netbox_dns_records.all().delete()
+            for record in ip_address.netbox_dns_records.all():
+                record.delete()
 
         else:
             #
