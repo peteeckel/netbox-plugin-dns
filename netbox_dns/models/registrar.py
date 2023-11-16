@@ -15,6 +15,7 @@ class Registrar(NetBoxModel):
     )
     iana_id = models.IntegerField(
         verbose_name="IANA ID",
+        null=True,
         blank=True,
     )
     referral_url = models.URLField(
