@@ -511,8 +511,18 @@ class Zone(NetBoxModel):
                 }
             )
 
+        if self.is_reverse_zone:
+            self.arpa_network = self.network_from_name
+
         if self.rfc2317_prefix is None:
             self.rfc2317_parent_managed = False
+
+        elif self.arpa_network is not None:
+            raise ValidationError(
+                {
+                    "rfc2317_prefix": f"A regular reverse zone can not be used as an RFC2317 zone."
+                }
+            )
 
         elif self.rfc2317_parent_managed:
             rfc2317_parent_zone = (
@@ -550,9 +560,6 @@ class Zone(NetBoxModel):
 
         if self.soa_serial_auto:
             self.soa_serial = self.get_auto_serial()
-
-        if self.is_reverse_zone:
-            self.arpa_network = self.network_from_name
 
         super().save(*args, **kwargs)
 
