@@ -27,6 +27,12 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     default_ttl = tables.Column(
         verbose_name="Default TTL",
     )
+    rfc2317_prefix = tables.Column(
+        verbose_name="RFC2317 Prefix",
+    )
+    rfc2317_parent_zone = tables.Column(
+        linkify=True,
+    )
     registrar = tables.Column(
         linkify=True,
     )
@@ -59,6 +65,9 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "soa_mname",
             "soa_rname",
             "soa_serial",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "rfc2317_parent_zone",
             "registrar",
             "registry_domain_id",
             "registrant",
