@@ -511,6 +511,32 @@ class Zone(NetBoxModel):
                 }
             )
 
+        if self.rfc2317_prefix is None:
+            self.rfc2317_parent_managed = False
+
+        elif self.rfc2317_parent_managed:
+            rfc2317_parent_zone = (
+                Zone.objects.filter(
+                    self.view_filter,
+                    arpa_network__isnull=False,
+                    arpa_network__net_contains=self.rfc2317_prefix,
+                )
+                .order_by("arpa_network__net_mask_length")
+                .last()
+            )
+
+            if rfc2317_parent_zone is None:
+                raise ValidationError(
+                    {
+                        "rfc2317_parent_managed": f"Parent zone not found in view {self.view}."
+                    }
+                )
+
+            self.rfc2317_parent_zone = rfc2317_parent_zone
+
+        else:
+            self.rfc2317_parent_zone = None
+
     def save(self, *args, **kwargs):
         self.full_clean()
 
