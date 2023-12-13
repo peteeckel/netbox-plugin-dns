@@ -29,7 +29,7 @@ except ImportError:
     # NetBox 3.5.8
     from extras.plugins.utils import get_plugin_config
 
-from netbox_dns.fields import NetworkField
+from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
     arpa_to_prefix,
     name_to_unicode,
@@ -225,6 +225,26 @@ class Zone(NetBoxModel):
         verbose_name="Billing Contact",
         related_name="billing_c_zones",
         help_text="The billing contact for the domain",
+        blank=True,
+        null=True,
+    )
+    rfc2317_prefix = RFC2317NetworkField(
+        verbose_name="RCF2317 Prefix",
+        help_text="RFC2317 IPv4 prefix prefix with a length of at least 25 bits",
+        blank=True,
+        null=True,
+    )
+    rfc2317_parent_managed = models.BooleanField(
+        verbose_name="RFC2317 Parent Managed",
+        help_text="The parent zone for the RFC2317 zone is managed by NetBox DNS",
+        default=True,
+    )
+    rfc2317_parent_zone = models.ForeignKey(
+        to="self",
+        on_delete=models.SET_NULL,
+        verbose_name="RFC2317 Parent Zone",
+        related_name="rfc2317_child_zones",
+        help_text="Parent zone for RFC2317 reverse zones",
         blank=True,
         null=True,
     )
