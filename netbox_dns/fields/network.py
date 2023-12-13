@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from django.db.models import Lookup
+from django.db.models import Lookup, Transform
 from django.core.exceptions import ValidationError
 
 from netaddr import AddrFormatError, IPNetwork
@@ -104,7 +104,17 @@ class NetworkField(models.Field):
         return "cidr"
 
 
+class NetMaskLength(Transform):
+    function = "MASKLEN"
+    lookup_name = "net_mask_length"
+
+    @property
+    def output_field(self):
+        return IntegerField()
+
+
 NetworkField.register_lookup(NetContains)
 NetworkField.register_lookup(NetContained)
 NetworkField.register_lookup(NetContainsOrEquals)
 NetworkField.register_lookup(NetContainedOrEqual)
+NetworkField.register_lookup(NetMaskLength)
