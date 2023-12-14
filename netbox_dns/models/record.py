@@ -251,7 +251,24 @@ class Record(NetBoxModel):
         return self.type == RecordTypeChoices.PTR
 
     @property
+    def rfc2317_name(self):
+        return self.value.split(".")[-1]
+
+    @property
     def ptr_zone(self):
+        if self.type == RecordTypeChoices.A:
+            ptr_zone = (
+                zone.Zone.objects.filter(
+                    self.zone.view_filter,
+                    rfc2317_prefix__net_contains=self.value,
+                )
+                .order_by("rfc2317_prefix__net_mask_length")
+                .last()
+            )
+
+            if ptr_zone is not None:
+                return ptr_zone
+
         ptr_zone = (
             zone.Zone.objects.filter(
                 self.zone.view_filter, arpa_network__net_contains=self.value
@@ -277,9 +294,13 @@ class Record(NetBoxModel):
                     self.ptr_record = None
             return
 
-        ptr_name = dns_name.from_text(
-            ipaddress.ip_address(self.value).reverse_pointer
-        ).relativize(dns_name.from_text(ptr_zone.name))
+        if ptr_zone.is_rfc2317_zone:
+            ptr_name = self.rfc2317_name
+        else:
+            ptr_name = dns_name.from_text(
+                ipaddress.ip_address(self.value).reverse_pointer
+            ).relativize(dns_name.from_text(ptr_zone.name))
+
         ptr_value = self.fqdn
         ptr_record = self.ptr_record
 
