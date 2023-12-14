@@ -313,6 +313,10 @@ class Zone(NetBoxModel):
         return self.name.endswith(".arpa") and self.network_from_name is not None
 
     @property
+    def is_rfc2317_zone(self):
+        return self.rfc2317_prefix is not None
+
+    @property
     def is_registered(self):
         return any(
             field is not None
@@ -528,7 +532,6 @@ class Zone(NetBoxModel):
             rfc2317_parent_zone = (
                 Zone.objects.filter(
                     self.view_filter,
-                    arpa_network__isnull=False,
                     arpa_network__net_contains=self.rfc2317_prefix,
                 )
                 .order_by("arpa_network__net_mask_length")
