@@ -339,6 +339,9 @@ class Zone(NetBoxModel):
     def record_count(self, managed=False):
         return record.Record.objects.filter(zone=self, managed=managed).count()
 
+    def rfc2317_child_zone_count(self):
+        return Zone.objects.filter(rfc2317_parent_zone=self).count()
+
     def update_soa_record(self):
         soa_name = "@"
         soa_ttl = self.soa_ttl
@@ -625,7 +628,9 @@ class Zone(NetBoxModel):
                 address_record.update_ptr_record()
 
             if self.rfc2317_parent_managed:
-                for ptr_record in self.record_set.filter(type=record.RecordTypeChoices.PTR, managed=True):
+                for ptr_record in self.record_set.filter(
+                    type=record.RecordTypeChoices.PTR, managed=True
+                ):
                     ptr_record.update_rfc2317_cname_record()
 
         elif name_changed or view_changed or status_changed:
