@@ -123,6 +123,10 @@
                         <th scope="row">RFC 2317 PTR Record</th>
                         <td><a href="{% url 'plugins:netbox_dns:record' pk=object.rfc2317_ptr_record.pk %}">{{ object.rfc2317_ptr_record }}</td>
                     </tr>
+                    <tr>
+                        <th scope="row">Address Record</th>
+                        <td><a href="{% url 'plugins:netbox_dns:record' pk=object.rfc2317_ptr_record.address_record.pk %}">{{ object.rfc2317_ptr_record.address_record }}</td>
+                    </tr>
                     {% endif %}
                     <tr>
                         <th scope="row">Status</th>
