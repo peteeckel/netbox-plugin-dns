@@ -624,6 +624,10 @@ class Zone(NetBoxModel):
             for address_record in address_records:
                 address_record.update_ptr_record()
 
+            if self.rfc2317_parent_managed:
+                for ptr_record in self.record_set.filter(type=record.RecordTypeChoices.PTR, managed=True):
+                    ptr_record.update_rfc2317_cname_record()
+
         elif name_changed or view_changed or status_changed:
             for address_record in self.record_set.filter(
                 type__in=(record.RecordTypeChoices.A, record.RecordTypeChoices.AAAA)

@@ -177,6 +177,15 @@ class Record(NetBoxModel):
         blank=True,
         null=True,
     )
+    rfc2317_cname_record = models.OneToOneField(
+        "self",
+        on_delete=models.CASCADE,
+        related_name="rfc2317_ptr_record",
+        verbose_name="RFC2317 CNAME record",
+        null=True,
+        blank=True,
+    )
+
     objects = RecordManager()
     raw_objects = RestrictedQuerySet.as_manager()
 
@@ -343,6 +352,31 @@ class Record(NetBoxModel):
         if self.pk:
             super().save()
 
+    def update_rfc2317_cname_record(self):
+        if self.zone.rfc2317_parent_managed:
+            cname_name = dns_name.from_text(
+                ipaddress.ip_address(self.ip_address).reverse_pointer
+            ).relativize(dns_name.from_text(self.zone.rfc2317_parent_zone.name))
+
+            if self.rfc2317_cname_record is not None:
+                self.rfc2317_cname_record.name = cname_name
+                self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
+                self.rfc2317_cname_record.value = self.fqdn
+                self.rfc2317_cname_record.save()
+            else:
+                self.rfc2317_cname_record = Record.objects.create(
+                    name=cname_name,
+                    type=RecordTypeChoices.CNAME,
+                    zone=self.zone.rfc2317_parent_zone,
+                    managed=True,
+                    value=self.fqdn,
+                )
+
+        else:
+            if self.rfc2317_cname_record is not None:
+                self.rfc2317_cname_record.delete()
+                self.rfc2317_cname_record = None
+
     def validate_name(self):
         try:
             zone = dns_name.from_text(self.zone.name, origin=dns_name.root)
@@ -481,8 +515,12 @@ class Record(NetBoxModel):
         if self.is_ptr_record:
             if self.zone.is_rfc2317_zone:
                 self.ip_address = self.address_from_rfc2317_name
+
+                if self.zone.rfc2317_parent_managed:
+                    self.update_rfc2317_cname_record()
             else:
                 self.ip_address = self.address_from_name
+
         elif self.is_address_record:
             self.ip_address = self.value
         else:
@@ -501,6 +539,9 @@ class Record(NetBoxModel):
             zone.update_serial()
 
     def delete(self, *args, **kwargs):
+        if self.rfc2317_cname_record:
+            self.rfc2317_cname_record.delete()
+
         if self.ptr_record:
             self.ptr_record.delete()
 
