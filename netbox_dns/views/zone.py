@@ -146,3 +146,23 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
         return Record.objects.restrict(request.user, "view").filter(
             zone=parent, managed=True
         )
+
+
+@register_model_view(Zone, "rfc2317_child_zones")
+class ZoneRFC2317ChildZoneListView(generic.ObjectChildrenView):
+    queryset = Zone.objects.all()
+    child_model = Zone
+    table = ZoneTable
+    filterset = ZoneFilter
+    template_name = "netbox_dns/zone/rfc2317_child_zone.html"
+    actions = ("changelog",)
+
+    tab = ViewTab(
+        label="RFC2317 Child Zones",
+        permission="netbox_dns.view_zone",
+        badge=lambda obj: obj.rfc2317_child_zone_count(),
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        return parent.rfc2317_child_zones.all()
