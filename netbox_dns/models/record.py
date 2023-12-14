@@ -252,14 +252,15 @@ class Record(NetBoxModel):
 
     @property
     def ptr_zone(self):
-        ptr_zones = zone.Zone.objects.filter(
-            self.zone.view_filter, arpa_network__net_contains=self.value
-        ).order_by(Length("name").desc())
+        ptr_zone = (
+            zone.Zone.objects.filter(
+                self.zone.view_filter, arpa_network__net_contains=self.value
+            )
+            .order_by("arpa_network__net_mask_length")
+            .last()
+        )
 
-        if len(ptr_zones):
-            return ptr_zones[0]
-
-        return None
+        return ptr_zone
 
     def update_ptr_record(self):
         ptr_zone = self.ptr_zone
