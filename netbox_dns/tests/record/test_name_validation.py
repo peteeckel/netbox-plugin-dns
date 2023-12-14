@@ -186,13 +186,23 @@ class NameValidationTest(TestCase):
         }
     )
     def test_txt_validation_tolerant_ok(self):
-        record = Record.objects.create(
-            name="_dmarc",
-            zone=self.zones[0],
-            type=RecordTypeChoices.TXT,
-            value="v=DMARC1;p=reject",
+        records = (
+            {
+                "name": "_dmarc",
+                "zone": self.zones[0],
+                "type": RecordTypeChoices.TXT,
+                "value": "v=DMARC1;p=reject",
+            },
+            {
+                "name": "key1_op16._domainkey",
+                "zone": self.zones[0],
+                "type": RecordTypeChoices.TXT,
+                "value": "test",
+            },
         )
-        self.assertEqual(record.name, "_dmarc")
+        for record in records:
+            record_object = Record.objects.create(**record)
+            self.assertEqual(record_object.name, record.get("name"))
 
     @override_settings(
         PLUGINS_CONFIG={
