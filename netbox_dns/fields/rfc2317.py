@@ -5,7 +5,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
-from .network import NetContains, NetContained, NetMaskLength
+from .network import NetContains, NetContained, NetOverlap, NetMaskLength
 
 INVALID_RFC2317 = "RFC2317 requires an IPv4 prefix with a length of at least 25 bits."
 
@@ -83,4 +83,5 @@ class RFC2317NetworkField(models.Field):
 
 RFC2317NetworkField.register_lookup(NetContains)
 RFC2317NetworkField.register_lookup(NetContained)
+RFC2317NetworkField.register_lookup(NetOverlap)
 RFC2317NetworkField.register_lookup(NetMaskLength)

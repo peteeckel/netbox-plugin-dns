@@ -518,36 +518,50 @@ class Zone(NetBoxModel):
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name
 
-        if self.rfc2317_prefix is None:
-            self.rfc2317_parent_managed = False
-
-        elif self.arpa_network is not None:
-            raise ValidationError(
-                {
-                    "rfc2317_prefix": f"A regular reverse zone can not be used as an RFC2317 zone."
-                }
-            )
-
-        elif self.rfc2317_parent_managed:
-            rfc2317_parent_zone = (
-                Zone.objects.filter(
-                    self.view_filter,
-                    arpa_network__net_contains=self.rfc2317_prefix,
-                )
-                .order_by("arpa_network__net_mask_length")
-                .last()
-            )
-
-            if rfc2317_parent_zone is None:
+        if self.is_rfc2317_zone:
+            if self.arpa_network is not None:
                 raise ValidationError(
                     {
-                        "rfc2317_parent_managed": f"Parent zone not found in view {self.view}."
+                        "rfc2317_prefix": f"A regular reverse zone can not be used as an RFC2317 zone."
                     }
                 )
 
-            self.rfc2317_parent_zone = rfc2317_parent_zone
+            if self.rfc2317_parent_managed:
+                rfc2317_parent_zone = (
+                    Zone.objects.filter(
+                        self.view_filter,
+                        arpa_network__net_contains=self.rfc2317_prefix,
+                    )
+                    .order_by("arpa_network__net_mask_length")
+                    .last()
+                )
+
+                if rfc2317_parent_zone is None:
+                    raise ValidationError(
+                        {
+                            "rfc2317_parent_managed": f"Parent zone not found in view {self.view}."
+                        }
+                    )
+
+                self.rfc2317_parent_zone = rfc2317_parent_zone
+            else:
+                self.rfc2317_parent_zone = None
+
+            overlapping_zones = Zone.objects.filter(
+                self.view_filter,
+                rfc2317_prefix__net_overlap=self.rfc2317_prefix,
+                active=True,
+            ).exclude(pk=self.pk)
+
+            if overlapping_zones.exists():
+                raise ValidationError(
+                    {
+                        "rfc2317_prefix": f"RFC2317 prefix overlaps with zone {overlapping_zones.first()}."
+                    }
+                )
 
         else:
+            self.rfc2317_parent_managed = False
             self.rfc2317_parent_zone = None
 
     def save(self, *args, **kwargs):
@@ -560,6 +574,9 @@ class Zone(NetBoxModel):
         name_changed = not new_zone and old_zone.name != self.name
         view_changed = not new_zone and old_zone.view != self.view
         status_changed = not new_zone and old_zone.status != self.status
+        rfc2317_changed = (
+            not new_zone and old_zone.rfc2317_prefix != self.rfc2317_prefix
+        )
 
         if self.soa_serial_auto:
             self.soa_serial = self.get_auto_serial()
@@ -575,9 +592,35 @@ class Zone(NetBoxModel):
             )
             address_records = record.Record.objects.filter(
                 Q(ptr_record__isnull=True) | Q(ptr_record__zone__in=zones),
-                type__in=(record.RecordTypeChoices.A, record.RecordTypeChoices.AAAA),
+                type__in=(
+                    record.RecordTypeChoices.A,
+                    record.RecordTypeChoices.AAAA,
+                ),
                 disable_ptr=False,
             )
+
+            for address_record in address_records:
+                address_record.update_ptr_record()
+
+        if (
+            new_zone
+            or name_changed
+            or view_changed
+            or status_changed
+            or rfc2317_changed
+        ) and self.is_rfc2317_zone:
+            zones = Zone.objects.filter(
+                self.view_filter,
+                arpa_network__net_contains=self.rfc2317_prefix,
+            )
+            address_records = record.Record.objects.filter(
+                Q(ptr_record__isnull=True)
+                | Q(ptr_record__zone__in=zones)
+                | Q(ptr_record__zone=self),
+                type=record.RecordTypeChoices.A,
+                disable_ptr=False,
+            )
+
             for address_record in address_records:
                 address_record.update_ptr_record()
 

@@ -46,6 +46,16 @@ class NetContainedOrEqual(Lookup):
         return "%s <<= %s" % (lhs, rhs), params
 
 
+class NetOverlap(Lookup):
+    lookup_name = "net_overlap"
+
+    def as_sql(self, qn, connection):
+        lhs, lhs_params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        params = lhs_params + rhs_params
+        return "%s && %s" % (lhs, rhs), params
+
+
 class NetworkFormField(forms.Field):
     def to_python(self, value):
         if not value:
@@ -117,4 +127,5 @@ NetworkField.register_lookup(NetContains)
 NetworkField.register_lookup(NetContained)
 NetworkField.register_lookup(NetContainsOrEquals)
 NetworkField.register_lookup(NetContainedOrEqual)
+NetworkField.register_lookup(NetOverlap)
 NetworkField.register_lookup(NetMaskLength)

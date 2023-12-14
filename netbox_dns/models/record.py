@@ -236,6 +236,14 @@ class Record(NetBoxModel):
         return None
 
     @property
+    def address_from_rfc2317_name(self):
+        prefix = self.zone.rfc2317_prefix
+        if prefix is not None:
+            return ".".join(str(prefix.ip).split(".")[0:3] + [self.name])
+
+        return None
+
+    @property
     def is_active(self):
         return (
             self.status in Record.ACTIVE_STATUS_LIST
@@ -471,7 +479,10 @@ class Record(NetBoxModel):
         self.full_clean()
 
         if self.is_ptr_record:
-            self.ip_address = self.address_from_name
+            if self.zone.is_rfc2317_zone:
+                self.ip_address = self.address_from_rfc2317_name
+            else:
+                self.ip_address = self.address_from_name
         elif self.is_address_record:
             self.ip_address = self.value
         else:
