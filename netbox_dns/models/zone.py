@@ -506,11 +506,9 @@ class Zone(NetBoxModel):
                 self.save()
                 return
 
-            if self.rfc2317_parent_zone == rfc2317_parent_zone:
-                return
-
-            self.rfc2317_parent_zone = rfc2317_parent_zone
-            self.save()
+            if self.rfc2317_parent_zone != rfc2317_parent_zone:
+                self.rfc2317_parent_zone = rfc2317_parent_zone
+                self.save()
 
         for ptr_record in self.record_set.filter(
             type=record.RecordTypeChoices.PTR,
@@ -607,11 +605,9 @@ class Zone(NetBoxModel):
         name_changed = not new_zone and old_zone.name != self.name
         view_changed = not new_zone and old_zone.view != self.view
         status_changed = not new_zone and old_zone.status != self.status
-        rfc2317_changed = (
-            not new_zone and (
-                old_zone.rfc2317_prefix != self.rfc2317_prefix
-                or old_zone.rfc2317_parent_managed != self.rfc2317_parent_managed
-            )
+        rfc2317_changed = not new_zone and (
+            old_zone.rfc2317_prefix != self.rfc2317_prefix
+            or old_zone.rfc2317_parent_managed != self.rfc2317_parent_managed
         )
 
         if self.soa_serial_auto:
@@ -702,6 +698,10 @@ class Zone(NetBoxModel):
                     ptr_record__in=ptr_records
                 )
             ]
+
+            for ptr_record in ptr_records:
+                if ptr_record.rfc2317_cname_record is not None:
+                    ptr_record.rfc2317_cname_record.delete()
 
             rfc2317_child_zones = [
                 child_zone.pk for child_zone in self.rfc2317_child_zones.all()
