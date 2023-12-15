@@ -268,7 +268,11 @@ class Record(NetBoxModel):
         return self.type == RecordTypeChoices.PTR
 
     @property
-    def rfc2317_name(self):
+    def rfc2317_ptr_name(self):
+        return self.value.split(".")[-1]
+
+    @property
+    def rfc2317_ptr_cname_name(self):
         return self.value.split(".")[-1]
 
     @property
@@ -312,7 +316,7 @@ class Record(NetBoxModel):
             return
 
         if ptr_zone.is_rfc2317_zone:
-            ptr_name = self.rfc2317_name
+            ptr_name = self.rfc2317_ptr_name
         else:
             ptr_name = dns_name.from_text(
                 ipaddress.ip_address(self.value).reverse_pointer
@@ -477,11 +481,35 @@ class Record(NetBoxModel):
         if not self.is_active:
             return
 
-        records = (
-            Record.objects.filter(name=self.name, zone=self.zone)
-            .exclude(pk=self.pk)
-            .exclude(active=False)
-        )
+        records = Record.objects.filter(
+            name=self.name, zone=self.zone, active=True
+        ).exclude(pk=self.pk)
+
+        if self.type == RecordTypeChoices.A and not self.disable_ptr:
+            ptr_zone = self.ptr_zone
+
+            if (
+                ptr_zone is not None
+                and ptr_zone.is_rfc2317_zone
+                and ptr_zone.rfc2317_parent_managed
+            ):
+                ptr_cname_zone = ptr_zone.rfc2317_parent_zone
+                ptr_cname_name = self.rfc2317_ptr_cname_name
+
+                if (
+                    Record.objects.filter(
+                        zone=ptr_cname_zone,
+                        name=ptr_cname_name,
+                        active=True,
+                    )
+                    .exclude(type=RecordTypeChoices.NSEC)
+                    .exists()
+                ):
+                    raise ValidationError(
+                        {
+                            "value": f"There is already an active record for name {ptr_cname_name} in zone {ptr_cname_zone}, RFC2317 CNAME is not allowed."
+                        }
+                    ) from None
 
         if self.type == RecordTypeChoices.CNAME:
             if records.exclude(type=RecordTypeChoices.NSEC).exists():
