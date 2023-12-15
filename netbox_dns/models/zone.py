@@ -512,10 +512,10 @@ class Zone(NetBoxModel):
             self.rfc2317_parent_zone = rfc2317_parent_zone
             self.save()
 
-            for ptr_record in self.record_set.filter(
-                type=record.RecordTypeChoices.PTR,
-            ):
-                ptr_record.update_rfc2317_cname_record()
+        for ptr_record in self.record_set.filter(
+            type=record.RecordTypeChoices.PTR,
+        ):
+            ptr_record.update_rfc2317_cname_record()
 
     def clean(self, *args, **kwargs):
         self.check_name_conflict()
@@ -608,7 +608,10 @@ class Zone(NetBoxModel):
         view_changed = not new_zone and old_zone.view != self.view
         status_changed = not new_zone and old_zone.status != self.status
         rfc2317_changed = (
-            not new_zone and old_zone.rfc2317_prefix != self.rfc2317_prefix
+            not new_zone and (
+                old_zone.rfc2317_prefix != self.rfc2317_prefix
+                or old_zone.rfc2317_parent_managed != self.rfc2317_parent_managed
+            )
         )
 
         if self.soa_serial_auto:
