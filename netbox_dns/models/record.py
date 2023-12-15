@@ -334,6 +334,13 @@ class Record(NetBoxModel):
         ptr_value = self.fqdn
         ptr_record = self.ptr_record
 
+        if ptr_record is not None:
+            if (
+                not ptr_record.zone.is_rfc2317_zone
+                and ptr_record.rfc2317_cname_record is not None
+            ):
+                ptr_record.rfc2317_cname_record.delete()
+
         with transaction.atomic():
             if ptr_record is not None:
                 if ptr_record.zone.pk != ptr_zone.pk:
