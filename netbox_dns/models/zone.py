@@ -237,7 +237,7 @@ class Zone(NetBoxModel):
     rfc2317_parent_managed = models.BooleanField(
         verbose_name="RFC2317 Parent Managed",
         help_text="The parent zone for the RFC2317 zone is managed by NetBox DNS",
-        default=True,
+        default=False,
     )
     rfc2317_parent_zone = models.ForeignKey(
         to="self",
