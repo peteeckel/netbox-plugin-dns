@@ -118,14 +118,23 @@
                         <td><a href="{% url 'plugins:netbox_dns:record' pk=object.rfc2317_cname_record.pk %}">{{ object.rfc2317_cname_record }}</td>
                     </tr>
                     {% endif %}
-                    {% if object.rfc2317_ptr_record %}
+                    {% if object.rfc2317_ptr_records.all|length %}
                     <tr>
-                        <th scope="row">RFC 2317 PTR Record</th>
-                        <td><a href="{% url 'plugins:netbox_dns:record' pk=object.rfc2317_ptr_record.pk %}">{{ object.rfc2317_ptr_record }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Address Record</th>
-                        <td><a href="{% url 'plugins:netbox_dns:record' pk=object.rfc2317_ptr_record.address_record.pk %}">{{ object.rfc2317_ptr_record.address_record }}</td>
+                        <th scope="row">RFC 2317 Records</th>
+                        <td>
+                            <table>
+                                <tr>
+                                    <th>Address Record</th>
+                                    <th>PTR Record</th>
+                                </tr>
+                                {% for record in object.rfc2317_ptr_records.all %}
+                                <tr>
+                                    <td><a href="{% url 'plugins:netbox_dns:record' pk=record.address_record.pk %}">{{ record.address_record }}</td>
+                                    <td><a href="{% url 'plugins:netbox_dns:record' pk=record.pk %}">{{ record }}</td>
+                                </td>
+                                {% endfor %}
+                            </table>
+                        </td>
                     </tr>
                     {% endif %}
                     <tr>

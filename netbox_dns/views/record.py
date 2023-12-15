@@ -52,8 +52,6 @@ class RecordView(generic.ObjectView):
 
 
 class RecordEditView(generic.ObjectEditView):
-    """View for editing a Record instance."""
-
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"
     )
