@@ -501,7 +501,8 @@ class Zone(NetBoxModel):
             rfc2317_parent_zone = self.get_rfc2317_parent_zone()
 
             if rfc2317_parent_zone is None:
-                self.rfc2317_parent_managed = None
+                self.rfc2317_parent_managed = False
+                self.rfc2317_parent_zone = None
                 self.save()
                 return
 
