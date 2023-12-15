@@ -57,6 +57,18 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text="Primary nameserver for the zone",
     )
+    rfc2317_parent_zone = NestedZoneSerializer(
+        many=False,
+        read_only=True,
+        required=False,
+        help_text="RFC2317 arent zone for the zone",
+    )
+    rfc2317_child_zones = NestedZoneSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        help_text="RFC2317 child zones of the zone",
+    )
     registrar = NestedRegistrarSerializer(
         many=False,
         read_only=False,
@@ -138,6 +150,10 @@ class ZoneSerializer(NetBoxModelSerializer):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "rfc2317_parent_zone",
+            "rfc2317_child_zones",
             "registrar",
             "registry_domain_id",
             "registrant",
