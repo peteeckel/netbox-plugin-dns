@@ -274,10 +274,15 @@ class Record(NetBoxModel):
     @property
     def rfc2317_ptr_cname_name(self):
         assert self.type == RecordTypeChoices.A
-        if self.ptr_record is not None and self.ptr_record.zone.rfc2317_parent_zone is not None:
+        if (
+            self.ptr_record is not None
+            and self.ptr_record.zone.rfc2317_parent_zone is not None
+        ):
             return dns_name.from_text(
                 ipaddress.ip_address(self.value).reverse_pointer
-            ).relativize(dns_name.from_text(self.ptr_record.zone.rfc2317_parent_zone.name))
+            ).relativize(
+                dns_name.from_text(self.ptr_record.zone.rfc2317_parent_zone.name)
+            )
 
     @property
     def ptr_zone(self):
@@ -386,7 +391,7 @@ class Record(NetBoxModel):
                         zone=self.zone.rfc2317_parent_zone,
                         managed=True,
                         value=self.fqdn,
-                )
+                    )
                 self.rfc2317_cname_record = rfc2317_cname_record
 
         else:
