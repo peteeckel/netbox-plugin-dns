@@ -316,6 +316,19 @@ class Zone(NetBoxModel):
     def is_rfc2317_zone(self):
         return self.rfc2317_prefix is not None
 
+    def get_rfc2317_parent_zone(self):
+        if not self.is_rfc2317_zone:
+            return
+
+        return (
+            Zone.objects.filter(
+                self.view_filter,
+                arpa_network__net_contains=self.rfc2317_prefix,
+            )
+            .order_by("arpa_network__net_mask_length")
+            .last()
+        )
+
     @property
     def is_registered(self):
         return any(
@@ -480,6 +493,29 @@ class Zone(NetBoxModel):
                     }
                 )
 
+    def update_rfc2317_parent_zone(self):
+        if not self.is_rfc2317_zone:
+            return
+
+        if self.rfc2317_parent_managed:
+            rfc2317_parent_zone = self.get_rfc2317_parent_zone()
+
+            if rfc2317_parent_zone is None:
+                self.rfc2317_parent_managed = None
+                self.save()
+                return
+
+            if self.rfc2317_parent_zone == rfc2317_parent_zone:
+                return
+
+            self.rfc2317_parent_zone = rfc2317_parent_zone
+            self.save()
+
+            for ptr_record in self.record_set.filter(
+                type=record.RecordTypeChoices.PTR,
+            ):
+                ptr_record.update_rfc2317_cname_record()
+
     def clean(self, *args, **kwargs):
         self.check_name_conflict()
 
@@ -530,14 +566,7 @@ class Zone(NetBoxModel):
                 )
 
             if self.rfc2317_parent_managed:
-                rfc2317_parent_zone = (
-                    Zone.objects.filter(
-                        self.view_filter,
-                        arpa_network__net_contains=self.rfc2317_prefix,
-                    )
-                    .order_by("arpa_network__net_mask_length")
-                    .last()
-                )
+                rfc2317_parent_zone = self.get_rfc2317_parent_zone()
 
                 if rfc2317_parent_zone is None:
                     raise ValidationError(
@@ -605,6 +634,13 @@ class Zone(NetBoxModel):
             for address_record in address_records:
                 address_record.update_ptr_record()
 
+            rfc2317_child_zones = Zone.objects.filter(
+                rfc2317_prefix__net_contained=self.arpa_network,
+                rfc2317_parent_managed=True,
+            )
+            for child_zone in rfc2317_child_zones:
+                child_zone.update_rfc2317_parent_zone()
+
         if (
             new_zone
             or name_changed
@@ -627,11 +663,7 @@ class Zone(NetBoxModel):
             for address_record in address_records:
                 address_record.update_ptr_record()
 
-            if self.rfc2317_parent_managed:
-                for ptr_record in self.record_set.filter(
-                    type=record.RecordTypeChoices.PTR, managed=True
-                ):
-                    ptr_record.update_rfc2317_cname_record()
+            self.update_rfc2317_parent_zone()
 
         elif name_changed or view_changed or status_changed:
             for address_record in self.record_set.filter(
@@ -666,8 +698,11 @@ class Zone(NetBoxModel):
                 )
             ]
 
+            rfc2317_child_zones = [
+                child_zone.pk for child_zone in self.rfc2317_child_zones.all()
+            ]
+
             if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
-                # Remove coupling from IPAddress to DNS record when zone is deleted
                 for ip in IPAddress.objects.filter(
                     custom_field_data__ipaddress_dns_zone_id=self.pk
                 ):
@@ -680,6 +715,9 @@ class Zone(NetBoxModel):
 
         for address_record in record.Record.objects.filter(pk__in=update_records):
             address_record.update_ptr_record()
+
+        for child_zone in Zone.objects.filter(pk__in=rfc2317_child_zones):
+            child_zone.update_rfc2317_parent_zone()
 
 
 @receiver(m2m_changed, sender=Zone.nameservers.through)
