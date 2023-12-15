@@ -634,12 +634,13 @@ class Zone(NetBoxModel):
             for address_record in address_records:
                 address_record.update_ptr_record()
 
-            rfc2317_child_zones = Zone.objects.filter(
-                rfc2317_prefix__net_contained=self.arpa_network,
-                rfc2317_parent_managed=True,
-            )
-            for child_zone in rfc2317_child_zones:
-                child_zone.update_rfc2317_parent_zone()
+            if self.arpa_network.version == 4:
+                rfc2317_child_zones = Zone.objects.filter(
+                    rfc2317_prefix__net_contained=self.arpa_network,
+                    rfc2317_parent_managed=True,
+                )
+                for child_zone in rfc2317_child_zones:
+                    child_zone.update_rfc2317_parent_zone()
 
         if (
             new_zone
