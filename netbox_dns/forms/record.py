@@ -79,7 +79,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Record
     fieldsets = (
         (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("view_id", "zone_id", "name", "value", "status")),
+        ("Attributes", ("view_id", "zone_id", "name", "type", "value", "status")),
         ("Tenant", ("tenant_group_id", "tenant_id")),
     )
 
