@@ -461,6 +461,7 @@ class ZoneImportForm(NetBoxModelImportForm):
             "tech_c",
             "billing_c",
             "tenant",
+            "tags",
         )
 
 

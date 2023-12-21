@@ -68,6 +68,7 @@ class NameServerImportForm(NetBoxModelImportForm):
             "name",
             "description",
             "tenant",
+            "tags",
         )
 
 
