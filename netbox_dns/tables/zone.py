@@ -4,7 +4,6 @@ from netbox.tables import (
     ChoiceFieldColumn,
     NetBoxTable,
     TagColumn,
-    ActionsColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
