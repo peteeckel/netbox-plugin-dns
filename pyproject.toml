@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-plugin-dns"
-version = "0.21.7"
+version = "0.21.8"
 description = "NetBox DNS is a NetBox plugin for managing DNS data."
 authors = ["Peter Eckel <pe-netbox-dns@hindenburgring.com>"]
 homepage = "https://github.com/peteeckel/netbox-plugin-dns"
