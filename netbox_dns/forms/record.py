@@ -187,6 +187,7 @@ class RecordImportForm(NetBoxModelImportForm):
             "disable_ptr",
             "description",
             "tenant",
+            "tags",
         )
 
 

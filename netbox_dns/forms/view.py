@@ -53,7 +53,7 @@ class ViewImportForm(NetBoxModelImportForm):
 
     class Meta:
         model = View
-        fields = ("name", "description", "tenant")
+        fields = ("name", "description", "tenant", "tags")
 
 
 class ViewBulkEditForm(NetBoxModelBulkEditForm):

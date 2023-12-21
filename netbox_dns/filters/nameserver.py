@@ -9,7 +9,7 @@ from netbox_dns.models import NameServer
 class NameServerFilter(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = NameServer
-        fields = ("id", "name", "tenant")
+        fields = ("id", "name", "tenant", "tag")
 
     def search(self, queryset, name, value):
         if not value.strip():
