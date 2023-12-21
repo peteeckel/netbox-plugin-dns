@@ -231,7 +231,7 @@ class AutoNSTest(TestCase):
     def test_delete_soa_ns_exception(self):
         nameserver = self.nameservers[0]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ProtectedError, r"protected foreign keys: 'Zone\.soa_mname'."
         ):
             nameserver.delete()
@@ -242,7 +242,7 @@ class AutoNSTest(TestCase):
 
         zone.nameservers.add(nameserver)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ProtectedError, r"protected foreign keys: 'Zone\.soa_mname'."
         ):
             nameserver.delete()
