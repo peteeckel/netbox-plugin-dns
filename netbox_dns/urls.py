@@ -133,6 +133,12 @@ urlpatterns = [
         name="nameserver_delete",
     ),
     path(
+        "nameservers/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="nameserver_journal",
+        kwargs={"model": NameServer},
+    ),
+    path(
         "nameservers/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),
         name="nameserver_changelog",
@@ -186,6 +192,12 @@ urlpatterns = [
     path("views/<int:pk>/edit/", ViewEditView.as_view(), name="view_edit"),
     path("views/<int:pk>/delete/", ViewDeleteView.as_view(), name="view_delete"),
     path("views/<int:pk>/zones/", ViewZoneListView.as_view(), name="view_zones"),
+    path(
+        "views/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="view_journal",
+        kwargs={"model": View},
+    ),
     path(
         "views/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),
