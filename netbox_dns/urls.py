@@ -217,7 +217,7 @@ urlpatterns = [
         name="contact_zones",
     ),
     path(
-        "contactss/<int:pk>/journal/",
+        "contacts/<int:pk>/journal/",
         ObjectJournalView.as_view(),
         name="contact_journal",
         kwargs={"model": Contact}
