@@ -82,7 +82,7 @@ urlpatterns = [
         "zones/<int:pk>/journal/",
         ObjectJournalView.as_view(),
         name="zone_journal",
-        kwargs={"model": Zone}
+        kwargs={"model": Zone},
     ),
     path(
         "zones/<int:pk>/changelog/",
@@ -163,7 +163,7 @@ urlpatterns = [
         "records/<int:pk>/journal/",
         ObjectJournalView.as_view(),
         name="record_journal",
-        kwargs={"model": Record}
+        kwargs={"model": Record},
     ),
     path(
         "records/<int:pk>/changelog/",
@@ -220,7 +220,7 @@ urlpatterns = [
         "contacts/<int:pk>/journal/",
         ObjectJournalView.as_view(),
         name="contact_journal",
-        kwargs={"model": Contact}
+        kwargs={"model": Contact},
     ),
     path(
         "contacts/<int:pk>/changelog/",
@@ -268,7 +268,7 @@ urlpatterns = [
         "registrars/<int:pk>/journal/",
         ObjectJournalView.as_view(),
         name="registrar_journal",
-        kwargs={"model": Registrar}
+        kwargs={"model": Registrar},
     ),
     path(
         "registrars/<int:pk>/changelog/",
