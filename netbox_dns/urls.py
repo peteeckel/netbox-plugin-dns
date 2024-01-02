@@ -1,6 +1,6 @@
 from django.urls import path
 
-from netbox.views.generic import ObjectChangeLogView
+from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_dns.models import View, Zone, Record, NameServer, Contact, Registrar
 from netbox_dns.views import (
@@ -79,6 +79,12 @@ urlpatterns = [
     path("zones/<int:pk>/delete/", ZoneDeleteView.as_view(), name="zone_delete"),
     path("zones/<int:pk>/edit/", ZoneEditView.as_view(), name="zone_edit"),
     path(
+        "zones/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="zone_journal",
+        kwargs={"model": Zone},
+    ),
+    path(
         "zones/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),
         name="zone_changelog",
@@ -127,6 +133,12 @@ urlpatterns = [
         name="nameserver_delete",
     ),
     path(
+        "nameservers/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="nameserver_journal",
+        kwargs={"model": NameServer},
+    ),
+    path(
         "nameservers/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),
         name="nameserver_changelog",
@@ -154,6 +166,12 @@ urlpatterns = [
     path("records/<int:pk>/edit/", RecordEditView.as_view(), name="record_edit"),
     path("records/<int:pk>/delete/", RecordDeleteView.as_view(), name="record_delete"),
     path(
+        "records/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="record_journal",
+        kwargs={"model": Record},
+    ),
+    path(
         "records/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),
         name="record_changelog",
@@ -174,6 +192,12 @@ urlpatterns = [
     path("views/<int:pk>/edit/", ViewEditView.as_view(), name="view_edit"),
     path("views/<int:pk>/delete/", ViewDeleteView.as_view(), name="view_delete"),
     path("views/<int:pk>/zones/", ViewZoneListView.as_view(), name="view_zones"),
+    path(
+        "views/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="view_journal",
+        kwargs={"model": View},
+    ),
     path(
         "views/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),
@@ -203,6 +227,12 @@ urlpatterns = [
         "contacts/<int:pk>/zones/",
         ContactZoneListView.as_view(),
         name="contact_zones",
+    ),
+    path(
+        "contacts/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="contact_journal",
+        kwargs={"model": Contact},
     ),
     path(
         "contacts/<int:pk>/changelog/",
@@ -245,6 +275,12 @@ urlpatterns = [
         "registrars/<int:pk>/zones/",
         RegistrarZoneListView.as_view(),
         name="registrar_zones",
+    ),
+    path(
+        "registrars/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="registrar_journal",
+        kwargs={"model": Registrar},
     ),
     path(
         "registrars/<int:pk>/changelog/",
