@@ -59,6 +59,7 @@ class IPAMCouplingAPITest(APITestCase):
             "custom_fields": {
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": None,
             },
         }
         response = self.client.post(url, data, format="json", **self.header)
@@ -70,6 +71,39 @@ class IPAMCouplingAPITest(APITestCase):
 
         self.assertEqual(address_record.name, name)
         self.assertEqual(address_record.zone, zone)
+        self.assertEqual(address_record.ttl, None)
+        self.assertTrue(address_record.managed)
+
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_with_dns_permission_ttl(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = "10.0.0.25/24"
+
+        self.add_permissions("ipam.add_ipaddress")
+        self.add_permissions("netbox_dns.add_record")
+
+        url = reverse("ipam-api:ipaddress-list")
+        data = {
+            "address": address,
+            "custom_fields": {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        }
+        response = self.client.post(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_201_CREATED)
+
+        ip_address = IPAddress.objects.get(pk=response.data["id"])
+        address_record = ip_address.netbox_dns_records.first()
+
+        self.assertEqual(address_record.name, name)
+        self.assertEqual(address_record.zone, zone)
+        self.assertEqual(address_record.ttl, 4223)
         self.assertTrue(address_record.managed)
 
         self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
@@ -88,6 +122,7 @@ class IPAMCouplingAPITest(APITestCase):
             "custom_fields": {
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": None,
             },
         }
         response = self.client.post(url, data, format="json", **self.header)
@@ -111,6 +146,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
@@ -144,6 +180,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
@@ -171,6 +208,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
@@ -207,6 +245,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
@@ -235,6 +274,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -242,7 +282,43 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name2)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(ip_address.dns_name, f"{name2}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_modify_name_with_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name1 = "name42"
+        name2 = "name23"
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_record")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_name": name2,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -278,6 +354,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -285,7 +362,49 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name2)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(ip_address.dns_name, f"{name2}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_modify_name_with_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name1 = "name42"
+        name2 = "name23"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Modify Test Record", actions=["change"], constraints={"name": name1}
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_name": name2,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -315,13 +434,13 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone2.id,
             }
         }
@@ -358,13 +477,13 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone2.id,
             }
         }
@@ -394,6 +513,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -401,7 +521,6 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
-                "ipaddress_dns_zone_id": zone.id,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -420,6 +539,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -446,6 +566,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -453,7 +574,6 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
-                "ipaddress_dns_zone_id": zone.id,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -472,6 +592,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -489,13 +610,13 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone2.id,
             }
         }
@@ -515,6 +636,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -541,13 +663,13 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone2.id,
             }
         }
@@ -567,6 +689,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -584,6 +707,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -591,7 +715,6 @@ class IPAMCouplingAPITest(APITestCase):
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": None,
             }
         }
@@ -612,6 +735,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -635,6 +759,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -642,7 +767,6 @@ class IPAMCouplingAPITest(APITestCase):
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": None,
             }
         }
@@ -663,6 +787,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -680,6 +805,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -688,7 +814,6 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
-                "ipaddress_dns_record_name": name,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -708,6 +833,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -731,6 +857,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -739,7 +866,6 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
-                "ipaddress_dns_record_name": name,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -759,6 +885,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -775,6 +902,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -782,7 +910,6 @@ class IPAMCouplingAPITest(APITestCase):
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": None,
             }
         }
@@ -803,6 +930,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -828,6 +956,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -835,7 +964,6 @@ class IPAMCouplingAPITest(APITestCase):
         url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": None,
             }
         }
@@ -856,6 +984,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -872,6 +1001,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -880,7 +1010,6 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
-                "ipaddress_dns_record_name": name,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -900,6 +1029,7 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -925,6 +1055,7 @@ class IPAMCouplingAPITest(APITestCase):
             custom_field_data={
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -933,7 +1064,6 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
-                "ipaddress_dns_record_name": name,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -953,5 +1083,408 @@ class IPAMCouplingAPITest(APITestCase):
             {
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_modify_ttl_with_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_record")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": 2342,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 2342)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_add_ttl_with_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_record")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": 2342,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 2342)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_remove_ttl_with_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_record")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": None,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, None)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_add_ttl_missing_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": 2342,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, None)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_add_ttl_missing_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Modify Test Record",
+            actions=["change"],
+            constraints={"name": "whatever"},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": 2342,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, None)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_modify_ttl_missing_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": 2342,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_modify_ttl_missing_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Modify Test Record",
+            actions=["change"],
+            constraints={"name": "whatever"},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": 2342,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_remove_ttl_missing_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": None,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_remove_ttl_missing_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Modify Test Record",
+            actions=["change"],
+            constraints={"name": "whatever"},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_ttl": None,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
             },
         )

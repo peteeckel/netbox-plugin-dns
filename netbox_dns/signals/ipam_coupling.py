@@ -48,7 +48,7 @@ def ip_address_check_permissions_save(instance, **kwargs):
 
             record = get_address_record(instance)
             if record is not None:
-                name, zone_id = ipaddress_cf_data(instance)
+                name, ttl, zone_id = ipaddress_cf_data(instance)
                 if zone_id is not None:
                     update_address_record(record, instance)
                     record.full_clean()
@@ -67,6 +67,10 @@ def ip_address_check_permissions_save(instance, **kwargs):
             value = exc.error_dict.pop("name", None)
             if value is not None:
                 exc.error_dict["cf_ipaddress_dns_record_name"] = value
+
+            value = exc.error_dict.pop("ttl", None)
+            if value is not None:
+                exc.error_dict["cf_ipaddress_dns_record_ttl"] = value
 
             value = exc.error_dict.pop("value", None)
             if value is not None:
@@ -108,13 +112,14 @@ def ip_address_update_dns_information(instance, **kwargs):
     if not get_plugin_config("netbox_dns", "feature_ipam_coupling"):
         return
 
-    name, zone_id = ipaddress_cf_data(instance)
+    name, ttl, zone_id = ipaddress_cf_data(instance)
 
     if zone_id is not None:
         instance.dns_name = f"{name}.{Zone.objects.get(pk=zone_id).name}"
     else:
         instance.dns_name = ""
         instance.custom_field_data["ipaddress_dns_record_name"] = None
+        instance.custom_field_data["ipaddress_dns_record_ttl"] = None
         instance.custom_field_data["ipaddress_dns_zone_id"] = None
 
 
@@ -126,7 +131,7 @@ def ip_address_update_address_record(instance, **kwargs):
     if not get_plugin_config("netbox_dns", "feature_ipam_coupling"):
         return
 
-    name, zone_id = ipaddress_cf_data(instance)
+    name, ttl, zone_id = ipaddress_cf_data(instance)
 
     if zone_id is None:
         #
