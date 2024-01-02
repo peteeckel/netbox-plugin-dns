@@ -53,9 +53,51 @@ class IPAMCouplingRecordTest(TestCase):
         record = Record.objects.get(ipam_ip_address=ip_address)
         self.assertEqual(record.name, name)
         self.assertEqual(record.zone, zone)
+        self.assertEqual(record.ttl, None)
         self.assertTrue(record.managed)
 
         self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_ttl(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = IPNetwork("10.0.0.42/24")
+
+        ip_address = IPAddress(
+            address=address,
+            custom_field_data={
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+        ip_address.save()
+
+        record = Record.objects.get(ipam_ip_address=ip_address)
+        self.assertEqual(record.name, name)
+        self.assertEqual(record.zone, zone)
+        self.assertEqual(record.ttl, 4223)
+        self.assertTrue(record.managed)
+
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_invalid_ttl(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = IPNetwork("10.0.0.42/24")
+
+        ip_address = IPAddress(
+            address=address,
+            custom_field_data={
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": 2147483648,
+            },
+        )
+        with self.assertRaises(ValidationError):
+            ip_address.save()
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_create_ip_existing_dns_record(self):
@@ -183,6 +225,35 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertEqual(ip_address.dns_name, f"{name}.{zone2.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_modify_ttl_cf(self):
+        address = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "test42"
+
+        ip_address = IPAddress.objects.create(
+            address=address,
+            custom_field_data={
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+
+        ip_address.custom_field_data = {
+            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_record_name": name,
+            "ipaddress_dns_record_ttl": 2342,
+        }
+        ip_address.save()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 2342)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_clear_name_cf(self):
         address = IPNetwork("10.0.0.27/24")
         zone = self.zones[0]
@@ -214,6 +285,7 @@ class IPAMCouplingRecordTest(TestCase):
             {
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_name": None,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -249,6 +321,44 @@ class IPAMCouplingRecordTest(TestCase):
             {
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_name": None,
+                "ipaddress_dns_record_ttl": None,
+            },
+        )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_clear_ttl_cf(self):
+        address = IPNetwork("10.0.0.27/24")
+        zone = self.zones[0]
+        name = "test42"
+
+        ip_address = IPAddress.objects.create(
+            address=address,
+            custom_field_data={
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": 4223,
+            },
+        )
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        ip_address.custom_field_data = {
+            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_record_name": name,
+            "ipaddress_dns_record_ttl": None,
+        }
+        ip_address.save()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].ttl, None)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone}")
+        self.assertEqual(
+            ip_address.custom_field_data,
+            {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": None,
             },
         )
 
@@ -297,5 +407,6 @@ class IPAMCouplingRecordTest(TestCase):
             {
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_name": None,
+                "ipaddress_dns_record_ttl": None,
             },
         )
