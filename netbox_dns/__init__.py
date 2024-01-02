@@ -9,7 +9,7 @@ except ImportError:
     # NetBox 3.5.8
     from extras.plugins.utils import get_plugin_config
 
-__version__ = "0.21.8"
+__version__ = "0.21.9"
 
 
 class DNSConfig(PluginConfig):
