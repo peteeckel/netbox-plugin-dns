@@ -80,7 +80,7 @@
                     {% endif %}
                     <tr>
                         <th scope="row">TTL</th>
-                        <td>{{ object.ttl }}</td>
+                        <td>{{ object.ttl|placeholder }}</td>
                     </tr>
                     {% if object.type == 'A' or object.type == 'AAAA' %}
                     <tr>
