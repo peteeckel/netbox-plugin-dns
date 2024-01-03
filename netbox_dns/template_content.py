@@ -1,3 +1,6 @@
+from packaging import version
+from django.conf import settings
+
 try:
     # NetBox 3.5.0 - 3.5.7, 3.5.9+
     from extras.plugins import get_plugin_config
@@ -118,7 +121,11 @@ class RelatedDNSObjects(PluginTemplateExtension):
         )
 
 
-template_extensions = [RelatedDNSObjects]
+template_extensions = list()
+
+if version.parse(settings.VERSION) < version.parse("3.7.0"):
+    template_extensions.append(RelatedDNSObjects)
+
 if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
     template_extensions.append(RelatedDNSRecords)
 elif get_plugin_config("netbox_dns", "feature_ipam_dns_info"):
