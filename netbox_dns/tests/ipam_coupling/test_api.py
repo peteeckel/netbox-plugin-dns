@@ -1531,3 +1531,349 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_set_disable_ptr_with_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_record")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": True,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertTrue(record_query[0].disable_ptr)
+        self.assertIsNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_clear_disable_ptr_with_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.change_record")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": True,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": False,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertFalse(record_query[0].disable_ptr)
+        self.assertIsNotNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_set_disable_ptr_with_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Change Test Record", actions=["change"], constraints={"name": name}
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": True,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertTrue(record_query[0].disable_ptr)
+        self.assertIsNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_clear_disable_ptr_with_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Change Test Record", actions=["change"], constraints={"name": name}
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": True,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": False,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertFalse(record_query[0].disable_ptr)
+        self.assertIsNotNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_set_disable_ptr_missing_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": True,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertFalse(record_query[0].disable_ptr)
+        self.assertIsNotNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_clear_disable_ptr_missing_dns_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": True,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": False,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertTrue(record_query[0].disable_ptr)
+        self.assertIsNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_set_disable_ptr_missing_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Change Test Record",
+            actions=["change"],
+            constraints={"name": "whatever"},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": True,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertFalse(record_query[0].disable_ptr)
+        self.assertIsNotNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_clear_disable_ptr_missing_dns_object_permission(self):
+        addr = IPNetwork("10.0.0.42/24")
+        zone = self.zones[0]
+        name = "name42"
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Change Test Record",
+            actions=["change"],
+            constraints={"name": "whatever"},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        ip_address = IPAddress.objects.create(
+            address=addr,
+            custom_field_data={
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": True,
+            },
+        )
+
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        data = {
+            "custom_fields": {
+                "ipaddress_dns_record_disable_ptr": False,
+            }
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+        ip_address.refresh_from_db()
+
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertEqual(record_query.count(), 1)
+        self.assertEqual(record_query[0].name, name)
+        self.assertEqual(record_query[0].zone, zone)
+        self.assertEqual(record_query[0].ttl, 4223)
+        self.assertTrue(record_query[0].disable_ptr)
+        self.assertIsNone(record_query[0].ptr_record)
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
