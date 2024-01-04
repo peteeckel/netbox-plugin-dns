@@ -23,6 +23,7 @@ class Command(BaseCommand):
             for cf in (
                 "ipaddress_dns_record_name",
                 "ipaddress_dns_record_ttl",
+                "ipaddress_dns_record_disable_ptr",
                 "ipaddress_dns_zone_id",
             ):
                 try:
@@ -70,6 +71,25 @@ class Command(BaseCommand):
                 cf_ttl.content_types.set([ipaddress_object_type])
                 if options.get("verbose"):
                     self.stdout.write("Created custom field 'ipaddress_dns_record_ttl'")
+
+            if not CustomField.objects.filter(
+                name="ipaddress_dns_record_disable_ptr",
+                type=CustomFieldTypeChoices.TYPE_BOOLEAN,
+                content_types=ipaddress_object_type,
+            ).exists():
+                cf_disable_ptr = CustomField.objects.create(
+                    name="ipaddress_dns_record_disable_ptr",
+                    label="Disable PTR",
+                    type=CustomFieldTypeChoices.TYPE_BOOLEAN,
+                    required=False,
+                    default=False,
+                    group_name="DNS",
+                )
+                cf_disable_ptr.content_types.set([ipaddress_object_type])
+                if options.get("verbose"):
+                    self.stdout.write(
+                        "Created custom field 'ipaddress_dns_record_disable_ptr'"
+                    )
 
             if not CustomField.objects.filter(
                 name="ipaddress_dns_zone_id",
