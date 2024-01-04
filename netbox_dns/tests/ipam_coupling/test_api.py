@@ -275,6 +275,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -312,6 +313,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -355,6 +357,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -398,6 +401,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -435,6 +439,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -478,6 +483,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -514,6 +520,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -540,6 +547,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -567,6 +575,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -593,6 +602,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name1,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -611,6 +621,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -637,6 +648,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -664,6 +676,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -690,6 +703,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone1.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -708,6 +722,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -736,6 +751,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -760,6 +776,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -788,6 +805,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -806,6 +824,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -834,6 +853,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -858,6 +878,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -886,6 +907,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -903,6 +925,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -931,6 +954,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -957,6 +981,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -985,6 +1010,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1002,6 +1028,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -1030,6 +1057,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1056,6 +1084,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
@@ -1084,6 +1113,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1102,6 +1132,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1139,6 +1170,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1176,6 +1208,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1212,6 +1245,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1239,6 +1273,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1265,6 +1300,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1292,6 +1328,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1309,6 +1346,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1336,6 +1374,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1406,6 +1445,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1433,6 +1473,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1459,6 +1500,7 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -1486,5 +1528,6 @@ class IPAMCouplingAPITest(APITestCase):
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )

@@ -286,6 +286,7 @@ class IPAMCouplingRecordTest(TestCase):
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -322,6 +323,7 @@ class IPAMCouplingRecordTest(TestCase):
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -337,6 +339,7 @@ class IPAMCouplingRecordTest(TestCase):
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
         self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
@@ -345,6 +348,7 @@ class IPAMCouplingRecordTest(TestCase):
             "ipaddress_dns_zone_id": zone.id,
             "ipaddress_dns_record_name": name,
             "ipaddress_dns_record_ttl": None,
+            "ipaddress_dns_record_disable_ptr": False,
         }
         ip_address.save()
 
@@ -359,6 +363,7 @@ class IPAMCouplingRecordTest(TestCase):
                 "ipaddress_dns_zone_id": zone.id,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
@@ -408,5 +413,6 @@ class IPAMCouplingRecordTest(TestCase):
                 "ipaddress_dns_zone_id": None,
                 "ipaddress_dns_record_name": None,
                 "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": False,
             },
         )
