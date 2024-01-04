@@ -562,11 +562,17 @@ After these steps, a restart of NetBox is required.
 
 ### Using IPAM Coupling
 
-With the new custom fields it is possible to automatically generate a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom in the DNS group. Additionally, a TTL value can be set that is to be used for the records created via IPAM coupling.
+With the new custom fields it is possible to automatically generate a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom in the DNS group. 
+
+Optionally, a TTL value can be set that is to be used for the records created via IPAM coupling, and the 'Disable PTR' option can be set as well. 'Disable PTR' defaults to 'False', resulting in pointer records being created for address records associated with IP addresses.
 
 ![Custom Fields for IPAM Coupling](images/IPAMCouplingCustomFields.png)
 
-When the IP address is saved, NetBox DNS now automatically creates a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address is set to the FQDN of the resulting address record. If the TTL field was filled in, the TTL for the created address record will be set to that value.
+When the IP address is saved, NetBox DNS now automatically creates a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address is set to the FQDN of the resulting address record. 
+
+If the TTL field was filled in, the TTL for the created address record will be set to that value.
+
+If the 'Disable PTR' checkbox is selected, the resulting address record will have that option set as well and no pointer record will be created for the address.
 
 The IP address is now linked to the address record in the following ways:
 

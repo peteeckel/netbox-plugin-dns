@@ -11,12 +11,15 @@ class DNSPermissionDenied(Exception):
 def ipaddress_cf_data(ip_address):
     name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
     ttl = ip_address.custom_field_data.get("ipaddress_dns_record_ttl")
+    disable_ptr = ip_address.custom_field_data.get(
+        "ipaddress_dns_record_disable_ptr", False
+    )
     zone_id = ip_address.custom_field_data.get("ipaddress_dns_zone_id")
 
     if name is None or zone_id is None:
-        return None, None, None
+        return None, None, False, None
 
-    return name, ttl, zone_id
+    return name, ttl, disable_ptr, zone_id
 
 
 def address_record_type(ip_address):
@@ -36,7 +39,7 @@ def get_address_record(ip_address):
 
 
 def new_address_record(instance):
-    name, ttl, zone_id = ipaddress_cf_data(instance)
+    name, ttl, disable_ptr, zone_id = ipaddress_cf_data(instance)
 
     if zone_id is None:
         return None
@@ -45,6 +48,7 @@ def new_address_record(instance):
         name=name,
         zone_id=zone_id,
         ttl=ttl,
+        disable_ptr=disable_ptr,
         status=address_record_status(instance),
         type=address_record_type(instance),
         value=str(instance.address.ip),
@@ -54,10 +58,11 @@ def new_address_record(instance):
 
 
 def update_address_record(record, ip_address):
-    name, ttl, zone_id = ipaddress_cf_data(ip_address)
+    name, ttl, disable_ptr, zone_id = ipaddress_cf_data(ip_address)
 
     record.name = name
     record.ttl = ttl
+    record.disable_ptr = disable_ptr
     record.zone_id = zone_id
     record.status = address_record_status(ip_address)
     record.value = str(ip_address.address.ip)
@@ -86,6 +91,8 @@ def dns_changed(old, new):
             != new.custom_field_data.get("ipaddress_dns_record_name"),
             old.custom_field_data.get("ipaddress_dns_record_ttl")
             != new.custom_field_data.get("ipaddress_dns_record_ttl"),
+            old.custom_field_data.get("ipaddress_dns_record_disable_ptr")
+            != new.custom_field_data.get("ipaddress_dns_record_disable_ptr"),
             old.custom_field_data.get("ipaddress_dns_zone_id")
             != new.custom_field_data.get("ipaddress_dns_zone_id"),
         )
