@@ -7,7 +7,7 @@ import utilities.json
 class Migration(migrations.Migration):
     dependencies = [
         ("netbox_dns", "0025_ipam_coupling_cf"),
-        ("extras", "0098_webhook_custom_field_data_webhook_tags"),
+        ("extras", "0092_delete_jobresult"),
     ]
 
     operations = [
