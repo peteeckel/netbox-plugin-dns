@@ -14,11 +14,11 @@
 
 ## Features
 
-* Manage DNS name servers
-* Manage DNS zone information, automatically generating SOA and NS records
-* Manage DNS records
-* Automatically create and update PTR records for A and AAAA records
-* Optionally organize DNS zones in views to cater for split horizon DNS and multi-site deployments
+* Manage name servers, zones and records
+* Automatically generate SOA and NS records for zones
+* Automatically create and update PTR records for IPv4 and IPv6 records
+* Optionally organize DNS zones in views for split horizon DNS and multi-site deployments
+* Optionally maintain domain registrar and registrant information for zones
 
 NetBox DNS is using the standardized NetBox plugin interface, so it also takes advantage of the NetBox tagging and change log features.
 
@@ -36,7 +36,7 @@ $ source /opt/netbox/venv/bin/activate
 (venv) $ pip install netbox-plugin-dns
 ```
 
-### Configuration
+### NetBox Configuration
 
 Add the plugin to the NetBox config. `~/netbox/configuration.py`
 
@@ -46,7 +46,7 @@ PLUGINS = [
 ]
 ```
 
-To permanently mount the plugin when updating NetBox:
+To permanently keep the plugin installed when updating NetBox via `update.sh`:
 
 ```
 echo netbox-plugin-dns >> ~/netbox/local_requirements.txt
@@ -58,21 +58,15 @@ To add the required netbox_dns tables to your database run the following command
 ./manage.py migrate
 ```
 
-Full reference: [Using Plugins - NetBox Documentation](https://netbox.readthedocs.io/en/stable/plugins/)
-
-## Screenshots
-
-![Zones](https://raw.githubusercontent.com/peteeckel/netbox-plugin-dns/main/docs/images/ZoneList.png)
-
-![Zone Detail](https://raw.githubusercontent.com/peteeckel/netbox-plugin-dns/main/docs/images/ZoneDetail.png)
-
-![Records](https://raw.githubusercontent.com/peteeckel/netbox-plugin-dns/main/docs/images/RecordList.png)
-
-![Record Detail](https://raw.githubusercontent.com/peteeckel/netbox-plugin-dns/main/docs/images/RecordDetail.png)
+Full documentation on using plugins with NetBox: [Using Plugins - NetBox Documentation](https://netbox.readthedocs.io/en/stable/plugins/)
 
 ## Contribute
 
 Contributions are always welcome! Please see: [contributing guide](CONTRIBUTING.md)
+
+## Documentation
+
+For further information, please refer to the full documentation: [Using NetBox DNS](docs/using_netbox_dns.md)
 
 ## License
 
