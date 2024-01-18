@@ -1,6 +1,7 @@
 import sys
 
 from extras.plugins import PluginConfig
+from django.db.utils import OperationalError
 
 try:
     # NetBox 3.5.0 - 3.5.7, 3.5.9+
@@ -50,17 +51,29 @@ class DNSConfig(PluginConfig):
             from ipam.models import IPAddress
             from django.contrib.contenttypes.models import ContentType
 
-            objtype = ContentType.objects.get_for_model(IPAddress)
-            required_cf = ("ipaddress_dns_record_name", "ipaddress_dns_zone_id")
+            try:
+                objtype = ContentType.objects.get_for_model(IPAddress)
+                required_cf = (
+                    "ipaddress_dns_record_name",
+                    "ipaddress_dns_record_ttl",
+                    "ipaddress_dns_record_disable_ptr",
+                    "ipaddress_dns_zone_id",
+                )
 
-            if CustomField.objects.filter(
-                name__in=required_cf, content_types=objtype
-            ).count() < len(required_cf):
+                if CustomField.objects.filter(
+                    name__in=required_cf, content_types=objtype
+                ).count() < len(required_cf):
+                    print(
+                        "WARNING: 'feature_ipam_coupling' is enabled, but the required"
+                        " custom fields for IPAM DNS coupling are missing. Please run"
+                        " the Django management command 'setup_coupling' to create the"
+                        " missing custom fields.",
+                        file=sys.stderr,
+                    )
+            except OperationalError as exc:
                 print(
-                    "WARNING: 'feature_ipam_coupling' is enabled, but the required"
-                    " custom fields for IPAM DNS coupling are missing. Please run"
-                    " the Django management command 'setup_coupling' to create the"
-                    " custom fields.",
+                    "WARNING: Unable to connect to PostgreSQL, cannot check custom fields"
+                    " for feature_ipam_coupling",
                     file=sys.stderr,
                 )
 
