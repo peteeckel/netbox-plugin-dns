@@ -28,6 +28,9 @@ except ImportError:
 
 @receiver(post_clean, sender=IPAddress)
 def ip_address_check_permissions_save(instance, **kwargs):
+    if not instance.address:
+        return
+
     if not get_plugin_config("netbox_dns", "feature_ipam_coupling"):
         return
 
