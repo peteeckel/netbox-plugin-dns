@@ -152,11 +152,11 @@
                         <th scope="row">Prefix</th>
                         <td>{{ object.rfc2317_prefix }}</td>
                     </tr>
-                    {% if object.rfc2317_parent_managed %}
                     <tr>
                         <th scope="row">Parent Managed</th>
-                        <td>{{ object.rfc2317_parent_managed }}</td>
+                        <td>{% checkmark object.rfc2317_parent_managed %}</td>
                     </tr>
+                    {% if object.rfc2317_parent_managed %}
                     <tr>
                         <th scope="row">Parent Zone</th>
                         <td><a href="{% url 'plugins:netbox_dns:zone' pk=object.rfc2317_parent_zone.pk %}">{{ object.rfc2317_parent_zone }}</a></td>
