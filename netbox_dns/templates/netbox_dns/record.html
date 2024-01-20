@@ -114,7 +114,7 @@
                     {% endif %}
                     <tr>
                         <th scope="row">Status</th>
-                        <td>{{ object.status }}</td>
+                        <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
                     </tr>
                     {% if object.description %}
                     <tr>
