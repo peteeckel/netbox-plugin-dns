@@ -112,11 +112,11 @@
                         <td><a href="{% url 'ipam:ipaddress' pk=object.ipam_ip_address.pk %}">{{ object.ipam_ip_address }}</td>
                     </tr>
                     {% endif %}
-                    {% if not object.managed %}
                     <tr>
                         <th scope="row">Status</th>
                         <td>{{ object.status }}</td>
                     </tr>
+                    {% if object.description %}
                     <tr>
                         <th scope="row">Description</th>
                         <td style="word-break:break-all;">{{ object.description }}</td>
