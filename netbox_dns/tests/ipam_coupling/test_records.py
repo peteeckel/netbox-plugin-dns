@@ -3,8 +3,15 @@ from django.core import management
 from django.core.exceptions import ValidationError
 
 from ipam.models import IPAddress
+from ipam.choices import IPAddressStatusChoices
 from netaddr import IPNetwork
-from netbox_dns.models import Record, Zone, NameServer, RecordTypeChoices
+from netbox_dns.models import (
+    Record,
+    Zone,
+    NameServer,
+    RecordTypeChoices,
+    RecordStatusChoices,
+)
 
 
 class IPAMCouplingRecordTest(TestCase):
@@ -178,6 +185,67 @@ class IPAMCouplingRecordTest(TestCase):
         )
         with self.assertRaises(ValidationError):
             ip_address.save()
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_inactive(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = IPNetwork("10.0.0.42/24")
+
+        ip_address = IPAddress(
+            address=address,
+            status=IPAddressStatusChoices.STATUS_RESERVED,
+            custom_field_data={
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+            },
+        )
+        ip_address.save()
+
+        record = Record.objects.get(ipam_ip_address=ip_address)
+        self.assertEqual(record.name, name)
+        self.assertEqual(record.zone, zone)
+        self.assertEqual(record.ttl, None)
+        self.assertEqual(record.status, RecordStatusChoices.STATUS_INACTIVE)
+        self.assertFalse(record.disable_ptr, 4223)
+        self.assertIsNone(record.ptr_record)
+        self.assertTrue(record.managed)
+
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "feature_ipam_coupling": True,
+                "ipam_coupling_ip_active_status_list": ["reserved"],
+            }
+        }
+    )
+    def test_create_ip_custom_status(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = IPNetwork("10.0.0.42/24")
+
+        ip_address = IPAddress(
+            address=address,
+            status=IPAddressStatusChoices.STATUS_RESERVED,
+            custom_field_data={
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+            },
+        )
+        ip_address.save()
+
+        record = Record.objects.get(ipam_ip_address=ip_address)
+        self.assertEqual(record.name, name)
+        self.assertEqual(record.zone, zone)
+        self.assertEqual(record.ttl, None)
+        self.assertEqual(record.status, RecordStatusChoices.STATUS_ACTIVE)
+        self.assertFalse(record.disable_ptr, 4223)
+        self.assertIsNotNone(record.ptr_record)
+        self.assertTrue(record.managed)
+
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_delete_ip(self):
