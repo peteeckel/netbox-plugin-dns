@@ -581,6 +581,26 @@ The IP address is now linked to the address record in the following ways:
 * When the DNS zone is renamed, the 'DNS Name' for the IP address is updated to reflect the zone's new name
 * When the DNS zone is deleted, the address record is deleted and the connection from the IP address object is cleared
 
+#### Record Status set by IPAM Coupling
+
+The status of the address record created for an IP address depends on the status of the IP address. By default, address records for IP addresses in the statuses 'Active', 'DHCP' and 'SLAAC' are set to 'Active', while the status of the address record will be 'Inactive' in all other cases.
+
+This mapping can be configured using the configuration variable `ipam_coupling_ip_active_status_list` in the plugin configuration. This variable holds an array of status names. The default setting for the status list is `None`, which is equivalent to
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'ipam_coupling_ip_address_status_list': [
+            'active',
+            'dhcp',
+            'slaac',
+        ],
+        ...
+    },
+}
+```
+
 ### Additional Information for IP Addresses and DNS Records
 
 When a link between an IP address and a DNS address record is present, there are some additional panes in the IPAM IP address and NetBox DNS record view, as well as in the detail views for NetBox DNS managed records.

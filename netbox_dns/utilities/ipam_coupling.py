@@ -3,6 +3,13 @@ from utilities.permissions import resolve_permission
 
 from netbox_dns.models import Record, RecordTypeChoices, RecordStatusChoices
 
+try:
+    # NetBox 3.5.0 - 3.5.7, 3.5.9+
+    from extras.plugins import get_plugin_config
+except ImportError:
+    # NetBox 3.5.8
+    from extras.plugins.utils import get_plugin_config
+
 
 class DNSPermissionDenied(Exception):
     pass
@@ -27,9 +34,19 @@ def address_record_type(ip_address):
 
 
 def address_record_status(ip_address):
+    ip_active_status_list = get_plugin_config(
+        "netbox_dns",
+        "ipam_coupling_ip_active_status_list",
+        (
+            IPAddressStatusChoices.STATUS_ACTIVE,
+            IPAddressStatusChoices.STATUS_DHCP,
+            IPAddressStatusChoices.STATUS_SLAAC,
+        ),
+    )
+
     return (
         RecordStatusChoices.STATUS_ACTIVE
-        if ip_address.status == IPAddressStatusChoices.STATUS_ACTIVE
+        if ip_address.status in ip_active_status_list
         else RecordStatusChoices.STATUS_INACTIVE
     )
 
