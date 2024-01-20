@@ -85,7 +85,7 @@
                     {% if object.type == 'A' or object.type == 'AAAA' %}
                     <tr>
                         <th scope="row">Disable PTR</th>
-                        <td>{{ object.disable_ptr }}</td>
+                        <td>{% checkmark object.disable_ptr %}</td>
                     </tr>
                     {% endif %}
                     {% if object.ptr_record %}
