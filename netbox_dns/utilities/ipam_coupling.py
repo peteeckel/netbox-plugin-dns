@@ -18,9 +18,9 @@ class DNSPermissionDenied(Exception):
 def ipaddress_cf_data(ip_address):
     name = ip_address.custom_field_data.get("ipaddress_dns_record_name")
     ttl = ip_address.custom_field_data.get("ipaddress_dns_record_ttl")
-    disable_ptr = ip_address.custom_field_data.get(
-        "ipaddress_dns_record_disable_ptr", False
-    )
+    disable_ptr = ip_address.custom_field_data.get("ipaddress_dns_record_disable_ptr")
+    if disable_ptr is None:
+        disable_ptr = False
     zone_id = ip_address.custom_field_data.get("ipaddress_dns_zone_id")
 
     if name is None or zone_id is None:
