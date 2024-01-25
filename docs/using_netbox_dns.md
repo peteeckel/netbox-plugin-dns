@@ -402,7 +402,7 @@ The following fields are defined for contacts:
 Field               | Required | Explanation
 -----               | -------- | -----------
 **Name**            | No       | A name for the contact. The name is not necessarily unique, because the same person might have many DNS contacts, sometimes also called 'handles'.
-**Contact ID**      | Yes      | A unique ID, usually assigned by the Registrar, that identifies the person or organisation. 
+**Contact ID**      | Yes      | A unique ID, usually assigned by the Registrar, that identifies the person or organisation.
 **Organization**    | No       | An organization the contact is associated with
 **Street**          | No       | The street of the contact's address
 **City**            | No       | The city of the contact's address
@@ -445,7 +445,7 @@ There are some special cases that need to be taken care of:
 
 To take care of these cases, there are three configuration variables for NetBox DNS that adjust the validation of record names:
 
-* `allow_underscores_in_hostnames` can be set to allow undercores being used in host names. Normally, underscores are only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
+* `tolerate_underscores_in_hostnames` can be set to allow undercores being used in host names. Normally, underscores are only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
 * `tolerate_leading_underscore_types` contains a list of RR types that allow an underscore as the first character in a label.
 * `tolerate_non_rfc1035_types` contains a list of RR types that allow characters outside the set defined in RFC1035 to be used in RR names. Record types in this list are exempt from validation altogether.
 
@@ -453,7 +453,7 @@ To take care of these cases, there are three configuration variables for NetBox 
 
 Variable                                 | Factory Default
 --------                                 | ---------------
-`allow_underscores_in_hostnames `        | False
+`tolerate_underscores_in_hostnames `     | False
 `tolerate_leading_underscore_types `     | `["TXT", "SRV"]`
 `tolerate_non_rfc1035_types `            | `[]`
 
@@ -463,7 +463,7 @@ The settings can be set or overridden in the file `/opt/netbox/netbox/netbox/con
 PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
-        'allow_underscores_in_hostnames': True,
+        'tolerate_underscores_in_hostnames': True,
         'tolerate_leading_underscore_types': ["TXT", "SRV", "CNAME"]
         'tolerate_non_rfc1035_types': ["X25"]
     },
@@ -562,13 +562,13 @@ After these steps, a restart of NetBox is required.
 
 ### Using IPAM Coupling
 
-With the new custom fields it is possible to automatically generate a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom in the DNS group. 
+With the new custom fields it is possible to automatically generate a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom in the DNS group.
 
 Optionally, a TTL value can be set that is to be used for the records created via IPAM coupling, and the 'Disable PTR' option can be set as well. 'Disable PTR' defaults to 'False', resulting in pointer records being created for address records associated with IP addresses.
 
 ![Custom Fields for IPAM Coupling](images/IPAMCouplingCustomFields.png)
 
-When the IP address is saved, NetBox DNS now automatically creates a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address is set to the FQDN of the resulting address record. 
+When the IP address is saved, NetBox DNS now automatically creates a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address is set to the FQDN of the resulting address record.
 
 If the TTL field was filled in, the TTL for the created address record will be set to that value.
 
