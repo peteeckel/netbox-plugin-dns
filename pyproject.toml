@@ -2,7 +2,7 @@
 name = "netbox-plugin-dns"
 version = "0.21.17"
 description = "NetBox DNS is a NetBox plugin for managing DNS data."
-authors = ["Peter Eckel <pe-netbox-dns@hindenburgring.com>"]
+authors = ["Peter Eckel <pete@netbox-dns.org>"]
 homepage = "https://github.com/peteeckel/netbox-plugin-dns"
 repository = "https://github.com/peteeckel/netbox-plugin-dns"
 license = "MIT"

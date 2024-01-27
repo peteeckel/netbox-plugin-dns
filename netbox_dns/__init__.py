@@ -20,7 +20,7 @@ class DNSConfig(PluginConfig):
     min_version = "3.5.0"
     version = __version__
     author = "Peter Eckel"
-    author_email = "pe-netbox-plugin-dns@hindenburgring.com"
+    author_email = "pete@netbox-dns.org"
     required_settings = []
     default_settings = {
         "zone_default_ttl": 86400,
