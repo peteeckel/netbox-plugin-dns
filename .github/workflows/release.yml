@@ -45,7 +45,7 @@ jobs:
       - name: Release Notes
         run: git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"
       - name: Create Release Draft
-        uses: softprops/action-gh-release@main
+        uses: softprops/action-gh-release@master
         with:
           body_path: ".github/RELEASE-TEMPLATE.md"
           draft: true
