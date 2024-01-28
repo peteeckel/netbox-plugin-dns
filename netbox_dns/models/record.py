@@ -399,6 +399,7 @@ class Record(NetBoxModel):
                         managed=True,
                         value=self.fqdn,
                     )
+
                 self.rfc2317_cname_record = rfc2317_cname_record
 
         else:
@@ -575,9 +576,7 @@ class Record(NetBoxModel):
         if self.is_ptr_record:
             if self.zone.is_rfc2317_zone:
                 self.ip_address = self.address_from_rfc2317_name
-
-                if self.zone.rfc2317_parent_managed:
-                    self.update_rfc2317_cname_record()
+                self.update_rfc2317_cname_record()
             else:
                 self.ip_address = self.address_from_name
 

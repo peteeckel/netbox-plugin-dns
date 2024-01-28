@@ -504,16 +504,15 @@ class Zone(NetBoxModel):
                 self.rfc2317_parent_managed = False
                 self.rfc2317_parent_zone = None
                 self.save()
-                return
 
-            if self.rfc2317_parent_zone != rfc2317_parent_zone:
+            elif self.rfc2317_parent_zone != rfc2317_parent_zone:
                 self.rfc2317_parent_zone = rfc2317_parent_zone
                 self.save()
 
         for ptr_record in self.record_set.filter(
             type=record.RecordTypeChoices.PTR,
         ):
-            ptr_record.update_rfc2317_cname_record()
+            ptr_record.save()
 
     def clean(self, *args, **kwargs):
         self.check_name_conflict()
