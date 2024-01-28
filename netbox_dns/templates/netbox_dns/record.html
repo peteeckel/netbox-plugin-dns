@@ -85,7 +85,7 @@
                     {% if object.type == 'A' or object.type == 'AAAA' %}
                     <tr>
                         <th scope="row">Disable PTR</th>
-                        <td>{{ object.disable_ptr }}</td>
+                        <td>{% checkmark object.disable_ptr %}</td>
                     </tr>
                     {% endif %}
                     {% if object.ptr_record %}
@@ -112,6 +112,12 @@
                         <td><a href="{% url 'ipam:ipaddress' pk=object.ipam_ip_address.pk %}">{{ object.ipam_ip_address }}</td>
                     </tr>
                     {% endif %}
+                    {% if object.rfc2317_cname_record %}
+                    <tr>
+                        <th scope="row">RFC2317 CNAME Record</th>
+                        <td><a href="{% url 'plugins:netbox_dns:record' pk=object.rfc2317_cname_record.pk %}">{{ object.rfc2317_cname_record }}</td>
+                    </tr>
+                    {% endif %}
                     <tr>
                         <th scope="row">Status</th>
                         <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
@@ -125,6 +131,25 @@
                 </table>
             </div>
         </div>
+        {% if object.rfc2317_ptr_records.all|length %}
+        <div class="card">
+            <h5 class="card-header">RFC2317 Targets</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th>Address Record</th>
+                        <th>PTR Record</th>
+                    </tr>
+                    {% for record in object.rfc2317_ptr_records.all %}
+                    <tr>
+                        <td><a href="{% url 'plugins:netbox_dns:record' pk=record.address_record.pk %}">{{ record.address_record }}</td>
+                        <td><a href="{% url 'plugins:netbox_dns:record' pk=record.pk %}">{{ record }}</td>
+                    </td>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
         {% if not object.managed %}
         {% include 'inc/panels/custom_fields.html' %}
         {% endif %}

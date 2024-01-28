@@ -177,6 +177,15 @@ class Record(NetBoxModel):
         blank=True,
         null=True,
     )
+    rfc2317_cname_record = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        related_name="rfc2317_ptr_records",
+        verbose_name="RFC2317 CNAME record",
+        null=True,
+        blank=True,
+    )
+
     objects = RecordManager()
     raw_objects = RestrictedQuerySet.as_manager()
 
@@ -236,6 +245,14 @@ class Record(NetBoxModel):
         return None
 
     @property
+    def address_from_rfc2317_name(self):
+        prefix = self.zone.rfc2317_prefix
+        if prefix is not None:
+            return ".".join(str(prefix.ip).split(".")[0:3] + [self.name])
+
+        return None
+
+    @property
     def is_active(self):
         return (
             self.status in Record.ACTIVE_STATUS_LIST
@@ -251,15 +268,46 @@ class Record(NetBoxModel):
         return self.type == RecordTypeChoices.PTR
 
     @property
+    def rfc2317_ptr_name(self):
+        return self.value.split(".")[-1]
+
+    @property
+    def rfc2317_ptr_cname_name(self):
+        assert self.type == RecordTypeChoices.A
+        if (
+            self.ptr_record is not None
+            and self.ptr_record.zone.rfc2317_parent_zone is not None
+        ):
+            return dns_name.from_text(
+                ipaddress.ip_address(self.value).reverse_pointer
+            ).relativize(
+                dns_name.from_text(self.ptr_record.zone.rfc2317_parent_zone.name)
+            )
+
+    @property
     def ptr_zone(self):
-        ptr_zones = zone.Zone.objects.filter(
-            self.zone.view_filter, arpa_network__net_contains=self.value
-        ).order_by(Length("name").desc())
+        if self.type == RecordTypeChoices.A:
+            ptr_zone = (
+                zone.Zone.objects.filter(
+                    self.zone.view_filter,
+                    rfc2317_prefix__net_contains=self.value,
+                )
+                .order_by("rfc2317_prefix__net_mask_length")
+                .last()
+            )
 
-        if len(ptr_zones):
-            return ptr_zones[0]
+            if ptr_zone is not None:
+                return ptr_zone
 
-        return None
+        ptr_zone = (
+            zone.Zone.objects.filter(
+                self.zone.view_filter, arpa_network__net_contains=self.value
+            )
+            .order_by("arpa_network__net_mask_length")
+            .last()
+        )
+
+        return ptr_zone
 
     def update_ptr_record(self):
         ptr_zone = self.ptr_zone
@@ -276,11 +324,22 @@ class Record(NetBoxModel):
                     self.ptr_record = None
             return
 
-        ptr_name = dns_name.from_text(
-            ipaddress.ip_address(self.value).reverse_pointer
-        ).relativize(dns_name.from_text(ptr_zone.name))
+        if ptr_zone.is_rfc2317_zone:
+            ptr_name = self.rfc2317_ptr_name
+        else:
+            ptr_name = dns_name.from_text(
+                ipaddress.ip_address(self.value).reverse_pointer
+            ).relativize(dns_name.from_text(ptr_zone.name))
+
         ptr_value = self.fqdn
         ptr_record = self.ptr_record
+
+        if ptr_record is not None:
+            if (
+                not ptr_record.zone.is_rfc2317_zone
+                and ptr_record.rfc2317_cname_record is not None
+            ):
+                ptr_record.rfc2317_cname_record.delete()
 
         with transaction.atomic():
             if ptr_record is not None:
@@ -312,6 +371,41 @@ class Record(NetBoxModel):
         self.ptr_record = ptr_record
         if self.pk:
             super().save()
+
+    def update_rfc2317_cname_record(self):
+        if self.zone.rfc2317_parent_managed:
+            cname_name = dns_name.from_text(
+                ipaddress.ip_address(self.ip_address).reverse_pointer
+            ).relativize(dns_name.from_text(self.zone.rfc2317_parent_zone.name))
+
+            if self.rfc2317_cname_record is not None:
+                self.rfc2317_cname_record.name = cname_name
+                self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
+                self.rfc2317_cname_record.value = self.fqdn
+                self.rfc2317_cname_record.save()
+            else:
+                rfc2317_cname_record = Record.objects.filter(
+                    name=cname_name,
+                    type=RecordTypeChoices.CNAME,
+                    zone=self.zone.rfc2317_parent_zone,
+                    managed=True,
+                    value=self.fqdn,
+                ).first()
+                if rfc2317_cname_record is None:
+                    rfc2317_cname_record = Record.objects.create(
+                        name=cname_name,
+                        type=RecordTypeChoices.CNAME,
+                        zone=self.zone.rfc2317_parent_zone,
+                        managed=True,
+                        value=self.fqdn,
+                    )
+
+                self.rfc2317_cname_record = rfc2317_cname_record
+
+        else:
+            if self.rfc2317_cname_record is not None:
+                self.rfc2317_cname_record.delete()
+                self.rfc2317_cname_record = None
 
     def validate_name(self):
         try:
@@ -413,11 +507,42 @@ class Record(NetBoxModel):
         if not self.is_active:
             return
 
-        records = (
-            Record.objects.filter(name=self.name, zone=self.zone)
-            .exclude(pk=self.pk)
-            .exclude(active=False)
-        )
+        records = Record.objects.filter(
+            name=self.name, zone=self.zone, active=True
+        ).exclude(pk=self.pk)
+
+        if self.type == RecordTypeChoices.A and not self.disable_ptr:
+            ptr_zone = self.ptr_zone
+
+            if (
+                ptr_zone is not None
+                and ptr_zone.is_rfc2317_zone
+                and ptr_zone.rfc2317_parent_managed
+            ):
+                ptr_cname_zone = ptr_zone.rfc2317_parent_zone
+                ptr_cname_name = self.rfc2317_ptr_cname_name
+                ptr_fqdn = dns_name.from_text(
+                    self.rfc2317_ptr_name, origin=dns_name.from_text(ptr_zone.name)
+                )
+
+                if (
+                    Record.objects.filter(
+                        zone=ptr_cname_zone,
+                        name=ptr_cname_name,
+                        active=True,
+                    )
+                    .exclude(
+                        type=RecordTypeChoices.CNAME,
+                        value=ptr_fqdn,
+                    )
+                    .exclude(type=RecordTypeChoices.NSEC)
+                    .exists()
+                ):
+                    raise ValidationError(
+                        {
+                            "value": f"There is already an active record for name {ptr_cname_name} in zone {ptr_cname_zone}, RFC2317 CNAME is not allowed."
+                        }
+                    ) from None
 
         if self.type == RecordTypeChoices.CNAME:
             if records.exclude(type=RecordTypeChoices.NSEC).exists():
@@ -449,7 +574,12 @@ class Record(NetBoxModel):
         self.full_clean()
 
         if self.is_ptr_record:
-            self.ip_address = self.address_from_name
+            if self.zone.is_rfc2317_zone:
+                self.ip_address = self.address_from_rfc2317_name
+                self.update_rfc2317_cname_record()
+            else:
+                self.ip_address = self.address_from_name
+
         elif self.is_address_record:
             self.ip_address = self.value
         else:
@@ -468,6 +598,10 @@ class Record(NetBoxModel):
             zone.update_serial()
 
     def delete(self, *args, **kwargs):
+        if self.rfc2317_cname_record:
+            if self.rfc2317_cname_record.rfc2317_ptr_records.count() == 1:
+                self.rfc2317_cname_record.delete()
+
         if self.ptr_record:
             self.ptr_record.delete()
 

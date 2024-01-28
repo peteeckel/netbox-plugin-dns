@@ -9,6 +9,7 @@ NetBox DNS is a plugin for NetBox designed to manage DNS data. In the current ve
 * Basic integrity checks of the entered data
 * Optional organisation of zones in views, i.e. to facilitate split-horizon DNS setups
 * Management of domain registration related information, such as registrars and contacts related to WHOIS information
+* Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317)
 * Support for NetBox custom fields, custom links, export templates etc.
 * Support for NetBox tenancy
 
@@ -529,6 +530,47 @@ The NetBox detail view for tenants shows a table of NetBox DNS objects assigned 
 ![NetBox Tenant Detail](images/NetBoxTenantDetail.png)
 
 The colums of the table on the left side are clickable and link to filtered lists showing the related views, nameservers, zones and records.
+
+## RFC 2317
+RFC 2317 describes a solution for the problem that the delegation of reverse zones for IPv4 subnets with a longer network mask than /24 is not possible using the classical `in-addr.arpa` zone hierarchy.
+
+The solution works by defining specific zones that hold the PTR records for such a subnet, and then insert CNAME records for these PTR records in the `in-addr.arpa` zone containing it. NetBox DNS release 0.22.0 and later support creating these RFC2317 zones and automatically inserting PTR records there and, optionally, CNAME records in the containing `in-addr.arpa` zone that point to the PTR records.
+
+### Designating a Zone as an RFC2317 Zone
+
+![RFC2317 Zone Configuration](images/RFC2317ZoneConfiguration.png)
+
+The 'RFC2317 Prefix' specifies an IPv4 prefix with a network mask length of 25 or longer. If an address record is created for an address in this prefix, the PTR record will be created in the zone the prefix has been specified for.
+
+If the checkbox 'RFC2317 Parent Managed' is selected and there is an `in-addr.arpa` zone corresponding to a subnet containing the RFC2317 Subnet, a CNAME record pointing in that zone will be created automatically when a PTR record is created in the RFC2317 zone. If the checkbox is unchecked, it is assumed that the reverse zone for the parent prefix is not managed within NetBox DNS. In this case, the CNAMEs must be created by the authority responsible for the parent zone.
+
+If the zone name is selected so that the zone is a sub-zone of the corresponding `in-addr.arpa` zone such as `32-63.0.168.192.in-addr.arpa`, the parent zone must delegate the zone to the name servers responsible for it if the authoritative name servers are not the same.
+
+### RFC2317 Zones and Managed Parent
+
+If an RFC2317 zone has a managed parent zone in NetBox DNS, the detail view of the RFC2317 zone has a link to the parent zone.
+
+![RFC2317 Child Zone](images/RFC2317ChildZoneDetail.png)
+
+The parent zone, on the other hand, has a tab showing all RFC2317 child zones.
+
+![RFC2317 Parent Zone](images/RFC2317ParentZoneDetail.png)
+
+### RFC2317 CNAME Record Detail View
+
+For CNAME records created in RFC2317 parent zones, the detail view shows the A and PTR record(s) the RFC2317 CNAME record relates to in the card 'RFC2317 Targets':
+
+![RFC2317 CNAME Record](images/RFC2317CNAMERecordDetail.png)
+
+### Limitations
+
+The following limitations exist for RFC2317 zones:
+
+* An RFC2317 prefix must have a length of 25 or longer. Shorter prefixes are not covered by RFC 2317.
+* In order to enable the 'RFC2317 Parent Managed' feature, the parent reverse zone must exist.
+* The RFC2317 PTR records always have a name corresponding with the host part of the address record's value in the RFC2317 subnet. Formatting the name (e.g with prefixes and suffixes) is currently not supported.
+* The RFC2317 CNAME records in parent zones are created on demand when a PTR in a child zone is created. Pre-creating them on creation of an RFC2317 zone is currently not supported.
+* The RFC2317 CNAME records are managed records and can not be edited manually. In normal operation this should never be necessary.
 
 ## IPAM Coupling
 

@@ -39,7 +39,16 @@ class NestedZoneSerializer(WritableNestedSerializer):
 
     class Meta:
         model = Zone
-        fields = ["id", "url", "display", "name", "view", "status", "active"]
+        fields = [
+            "id",
+            "url",
+            "display",
+            "name",
+            "view",
+            "status",
+            "active",
+            "rfc2317_prefix",
+        ]
 
 
 #

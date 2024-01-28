@@ -29,7 +29,7 @@ except ImportError:
     # NetBox 3.5.8
     from extras.plugins.utils import get_plugin_config
 
-from netbox_dns.fields import NetworkField
+from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
     arpa_to_prefix,
     name_to_unicode,
@@ -228,6 +228,26 @@ class Zone(NetBoxModel):
         blank=True,
         null=True,
     )
+    rfc2317_prefix = RFC2317NetworkField(
+        verbose_name="RCF2317 Prefix",
+        help_text="RFC2317 IPv4 prefix prefix with a length of at least 25 bits",
+        blank=True,
+        null=True,
+    )
+    rfc2317_parent_managed = models.BooleanField(
+        verbose_name="RFC2317 Parent Managed",
+        help_text="The parent zone for the RFC2317 zone is managed by NetBox DNS",
+        default=False,
+    )
+    rfc2317_parent_zone = models.ForeignKey(
+        to="self",
+        on_delete=models.SET_NULL,
+        verbose_name="RFC2317 Parent Zone",
+        related_name="rfc2317_child_zones",
+        help_text="Parent zone for RFC2317 reverse zones",
+        blank=True,
+        null=True,
+    )
 
     objects = ZoneManager()
 
@@ -293,6 +313,23 @@ class Zone(NetBoxModel):
         return self.name.endswith(".arpa") and self.network_from_name is not None
 
     @property
+    def is_rfc2317_zone(self):
+        return self.rfc2317_prefix is not None
+
+    def get_rfc2317_parent_zone(self):
+        if not self.is_rfc2317_zone:
+            return
+
+        return (
+            Zone.objects.filter(
+                self.view_filter,
+                arpa_network__net_contains=self.rfc2317_prefix,
+            )
+            .order_by("arpa_network__net_mask_length")
+            .last()
+        )
+
+    @property
     def is_registered(self):
         return any(
             field is not None
@@ -314,6 +351,9 @@ class Zone(NetBoxModel):
 
     def record_count(self, managed=False):
         return record.Record.objects.filter(zone=self, managed=managed).count()
+
+    def rfc2317_child_zone_count(self):
+        return Zone.objects.filter(rfc2317_parent_zone=self).count()
 
     def update_soa_record(self):
         soa_name = "@"
@@ -453,6 +493,27 @@ class Zone(NetBoxModel):
                     }
                 )
 
+    def update_rfc2317_parent_zone(self):
+        if not self.is_rfc2317_zone:
+            return
+
+        if self.rfc2317_parent_managed:
+            rfc2317_parent_zone = self.get_rfc2317_parent_zone()
+
+            if rfc2317_parent_zone is None:
+                self.rfc2317_parent_managed = False
+                self.rfc2317_parent_zone = None
+                self.save()
+
+            elif self.rfc2317_parent_zone != rfc2317_parent_zone:
+                self.rfc2317_parent_zone = rfc2317_parent_zone
+                self.save()
+
+        for ptr_record in self.record_set.filter(
+            type=record.RecordTypeChoices.PTR,
+        ):
+            ptr_record.save()
+
     def clean(self, *args, **kwargs):
         self.check_name_conflict()
 
@@ -491,6 +552,48 @@ class Zone(NetBoxModel):
                 }
             )
 
+        if self.is_reverse_zone:
+            self.arpa_network = self.network_from_name
+
+        if self.is_rfc2317_zone:
+            if self.arpa_network is not None:
+                raise ValidationError(
+                    {
+                        "rfc2317_prefix": f"A regular reverse zone can not be used as an RFC2317 zone."
+                    }
+                )
+
+            if self.rfc2317_parent_managed:
+                rfc2317_parent_zone = self.get_rfc2317_parent_zone()
+
+                if rfc2317_parent_zone is None:
+                    raise ValidationError(
+                        {
+                            "rfc2317_parent_managed": f"Parent zone not found in view {self.view}."
+                        }
+                    )
+
+                self.rfc2317_parent_zone = rfc2317_parent_zone
+            else:
+                self.rfc2317_parent_zone = None
+
+            overlapping_zones = Zone.objects.filter(
+                self.view_filter,
+                rfc2317_prefix__net_overlap=self.rfc2317_prefix,
+                active=True,
+            ).exclude(pk=self.pk)
+
+            if overlapping_zones.exists():
+                raise ValidationError(
+                    {
+                        "rfc2317_prefix": f"RFC2317 prefix overlaps with zone {overlapping_zones.first()}."
+                    }
+                )
+
+        else:
+            self.rfc2317_parent_managed = False
+            self.rfc2317_parent_zone = None
+
     def save(self, *args, **kwargs):
         self.full_clean()
 
@@ -501,12 +604,13 @@ class Zone(NetBoxModel):
         name_changed = not new_zone and old_zone.name != self.name
         view_changed = not new_zone and old_zone.view != self.view
         status_changed = not new_zone and old_zone.status != self.status
+        rfc2317_changed = not new_zone and (
+            old_zone.rfc2317_prefix != self.rfc2317_prefix
+            or old_zone.rfc2317_parent_managed != self.rfc2317_parent_managed
+        )
 
         if self.soa_serial_auto:
             self.soa_serial = self.get_auto_serial()
-
-        if self.is_reverse_zone:
-            self.arpa_network = self.network_from_name
 
         super().save(*args, **kwargs)
 
@@ -519,11 +623,47 @@ class Zone(NetBoxModel):
             )
             address_records = record.Record.objects.filter(
                 Q(ptr_record__isnull=True) | Q(ptr_record__zone__in=zones),
-                type__in=(record.RecordTypeChoices.A, record.RecordTypeChoices.AAAA),
+                type__in=(
+                    record.RecordTypeChoices.A,
+                    record.RecordTypeChoices.AAAA,
+                ),
                 disable_ptr=False,
             )
+
             for address_record in address_records:
                 address_record.update_ptr_record()
+
+            if self.arpa_network.version == 4:
+                rfc2317_child_zones = Zone.objects.filter(
+                    rfc2317_prefix__net_contained=self.arpa_network,
+                    rfc2317_parent_managed=True,
+                )
+                for child_zone in rfc2317_child_zones:
+                    child_zone.update_rfc2317_parent_zone()
+
+        if (
+            new_zone
+            or name_changed
+            or view_changed
+            or status_changed
+            or rfc2317_changed
+        ) and self.is_rfc2317_zone:
+            zones = Zone.objects.filter(
+                self.view_filter,
+                arpa_network__net_contains=self.rfc2317_prefix,
+            )
+            address_records = record.Record.objects.filter(
+                Q(ptr_record__isnull=True)
+                | Q(ptr_record__zone__in=zones)
+                | Q(ptr_record__zone=self),
+                type=record.RecordTypeChoices.A,
+                disable_ptr=False,
+            )
+
+            for address_record in address_records:
+                address_record.update_ptr_record()
+
+            self.update_rfc2317_parent_zone()
 
         elif name_changed or view_changed or status_changed:
             for address_record in self.record_set.filter(
@@ -558,8 +698,15 @@ class Zone(NetBoxModel):
                 )
             ]
 
+            for ptr_record in ptr_records:
+                if ptr_record.rfc2317_cname_record is not None:
+                    ptr_record.rfc2317_cname_record.delete()
+
+            rfc2317_child_zones = [
+                child_zone.pk for child_zone in self.rfc2317_child_zones.all()
+            ]
+
             if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
-                # Remove coupling from IPAddress to DNS record when zone is deleted
                 for ip in IPAddress.objects.filter(
                     custom_field_data__ipaddress_dns_zone_id=self.pk
                 ):
@@ -572,6 +719,9 @@ class Zone(NetBoxModel):
 
         for address_record in record.Record.objects.filter(pk__in=update_records):
             address_record.update_ptr_record()
+
+        for child_zone in Zone.objects.filter(pk__in=rfc2317_child_zones):
+            child_zone.update_rfc2317_parent_zone()
 
 
 @receiver(m2m_changed, sender=Zone.nameservers.through)

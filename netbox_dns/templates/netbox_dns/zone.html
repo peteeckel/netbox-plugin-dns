@@ -143,6 +143,29 @@
                 </table>
             </div>
         </div>
+        {% if object.rfc2317_prefix %}
+        <div class="card">
+            <h5 class="card-header">RFC2317</h5>
+            <div class="card-body">
+                <table class="table table-hover soa-table">
+                    <tr>
+                        <th scope="row">Prefix</th>
+                        <td>{{ object.rfc2317_prefix }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Parent Managed</th>
+                        <td>{% checkmark object.rfc2317_parent_managed %}</td>
+                    </tr>
+                    {% if object.rfc2317_parent_managed %}
+                    <tr>
+                        <th scope="row">Parent Zone</th>
+                        <td><a href="{% url 'plugins:netbox_dns:zone' pk=object.rfc2317_parent_zone.pk %}">{{ object.rfc2317_parent_zone }}</a></td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
