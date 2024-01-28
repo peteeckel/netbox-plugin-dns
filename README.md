@@ -19,6 +19,7 @@
 * Automatically create and update PTR records for IPv4 and IPv6 records
 * Optionally organize DNS zones in views for split horizon DNS and multi-site deployments
 * Optionally maintain domain registrar and registrant information for zones
+* Maintain RFC2317 reverse zones for IPv4 prefixes with a network mask length longer than 24 bits
 
 NetBox DNS is using the standardized NetBox plugin interface, so it also takes advantage of the NetBox tagging and change log features.
 
