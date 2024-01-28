@@ -1156,3 +1156,101 @@ class RFC2317RecordTest(TestCase):
                 value=record.ptr_record.fqdn,
             ).exists()
         )
+
+    def test_set_zone_parent_managed_create_cname(self):
+        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        zone2 = self.zones[2]
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=False,
+        )
+        address_record = Record.objects.create(
+            name="name1",
+            zone=zone2,
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+        )
+
+        self.assertIsNotNone(rfc2317_zone.pk)
+        self.assertFalse(rfc2317_zone.rfc2317_parent_managed)
+        self.assertNotIn(rfc2317_zone, zone1.rfc2317_child_zones.all())
+        self.assertIsNone(rfc2317_zone.rfc2317_parent_zone)
+        self.assertIsNotNone(address_record.ptr_record)
+        self.assertEqual(address_record.ptr_record.zone, rfc2317_zone)
+        self.assertIsNone(address_record.ptr_record.rfc2317_cname_record)
+
+        cname_record = Record.objects.filter(
+            zone=zone1,
+            type=RecordTypeChoices.CNAME,
+            managed=True,
+            name="1",
+        ).first()
+        self.assertIsNone(cname_record)
+
+        rfc2317_zone.rfc2317_parent_managed = True
+        rfc2317_zone.save()
+        address_record.refresh_from_db()
+
+        self.assertTrue(rfc2317_zone.rfc2317_parent_managed)
+        self.assertIn(rfc2317_zone, zone1.rfc2317_child_zones.all())
+        self.assertIsNotNone(rfc2317_zone.rfc2317_parent_zone)
+        self.assertIsNotNone(address_record.ptr_record.rfc2317_cname_record)
+
+        cname_record = Record.objects.filter(
+            zone=zone1,
+            type=RecordTypeChoices.CNAME,
+            managed=True,
+            name="1",
+        ).first()
+        self.assertEqual(address_record.ptr_record.rfc2317_cname_record, cname_record)
+
+    def test_set_zone_parent_unmanaged_delete_cname(self):
+        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        zone2 = self.zones[2]
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=True,
+        )
+        address_record = Record.objects.create(
+            name="name1",
+            zone=zone2,
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+        )
+
+        self.assertIsNotNone(rfc2317_zone.pk)
+        self.assertTrue(rfc2317_zone.rfc2317_parent_managed)
+        self.assertIn(rfc2317_zone, zone1.rfc2317_child_zones.all())
+        self.assertIsNotNone(rfc2317_zone.rfc2317_parent_zone)
+        self.assertIsNotNone(address_record.ptr_record)
+        self.assertEqual(address_record.ptr_record.zone, rfc2317_zone)
+        self.assertIsNotNone(address_record.ptr_record.rfc2317_cname_record)
+
+        cname_record = Record.objects.filter(
+            zone=zone1,
+            type=RecordTypeChoices.CNAME,
+            managed=True,
+            name="1",
+        ).first()
+        self.assertEqual(address_record.ptr_record.rfc2317_cname_record, cname_record)
+
+        rfc2317_zone.rfc2317_parent_managed = False
+        rfc2317_zone.save()
+        address_record.refresh_from_db()
+
+        self.assertFalse(rfc2317_zone.rfc2317_parent_managed)
+        self.assertNotIn(rfc2317_zone, zone1.rfc2317_child_zones.all())
+        self.assertIsNone(rfc2317_zone.rfc2317_parent_zone)
+        self.assertIsNone(address_record.ptr_record.rfc2317_cname_record)
+
+        cname_record = Record.objects.filter(
+            zone=zone1,
+            type=RecordTypeChoices.CNAME,
+            managed=True,
+            name="1",
+        ).first()
+        self.assertIsNone(cname_record)
