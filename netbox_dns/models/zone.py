@@ -448,7 +448,7 @@ class Zone(NetBoxModel):
         return ns_warnings, ns_errors
 
     def get_auto_serial(self):
-        records = record.Record.objects.filter(zone=self).exclude(
+        records = record.Record.objects.filter(zone_id=self.pk).exclude(
             type=record.RecordTypeChoices.SOA
         )
         if records:
