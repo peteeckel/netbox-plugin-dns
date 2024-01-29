@@ -22,6 +22,20 @@ class NestedViewSerializer(WritableNestedSerializer):
 # Zones
 #
 class NestedZoneSerializer(WritableNestedSerializer):
+    def to_representation(self, instance):
+        # +
+        # Workaround for the problem that the serializer does not return the
+        # annotation "active" when called with "many=False". See issue
+        # https://github.com/peteeckel/netbox-plugin-dns/issues/132
+        #
+        # TODO: Investigate root cause, probably in DRF.
+        # -
+        representation = super().to_representation(instance)
+        if representation.get("active") is None:
+            representation["active"] = instance.is_active
+
+        return representation
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"
     )
