@@ -5,7 +5,7 @@ from django.db.utils import OperationalError
 
 from netbox.plugins.utils import get_plugin_config
 
-__version__ = "0.22.0"
+__version__ = "0.23.0"
 
 
 class DNSConfig(PluginConfig):
@@ -36,43 +36,6 @@ class DNSConfig(PluginConfig):
         "enforce_unique_records": False,
     }
     base_url = "netbox-dns"
-
-    def ready(self):
-        #
-        # Check if required custom fields exist for IPAM coupling
-        #
-        if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
-            from extras.models import CustomField
-            from ipam.models import IPAddress
-            from django.contrib.contenttypes.models import ContentType
-
-            try:
-                objtype = ContentType.objects.get_for_model(IPAddress)
-                required_cf = (
-                    "ipaddress_dns_record_name",
-                    "ipaddress_dns_record_ttl",
-                    "ipaddress_dns_record_disable_ptr",
-                    "ipaddress_dns_zone_id",
-                )
-
-                if CustomField.objects.filter(
-                    name__in=required_cf, content_types=objtype
-                ).count() < len(required_cf):
-                    print(
-                        "WARNING: 'feature_ipam_coupling' is enabled, but the required"
-                        " custom fields for IPAM DNS coupling are missing. Please run"
-                        " the Django management command 'setup_coupling' to create the"
-                        " missing custom fields.",
-                        file=sys.stderr,
-                    )
-            except OperationalError as exc:
-                print(
-                    "WARNING: Unable to connect to PostgreSQL, cannot check custom fields"
-                    " for feature_ipam_coupling",
-                    file=sys.stderr,
-                )
-
-        super().ready()
 
 
 #
