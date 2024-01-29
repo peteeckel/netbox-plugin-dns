@@ -1,13 +1,8 @@
 from packaging import version
 from django.conf import settings
 
-try:
-    # NetBox 3.5.0 - 3.5.7, 3.5.9+
-    from extras.plugins import get_plugin_config
-except ImportError:
-    # NetBox 3.5.8
-    from extras.plugins.utils import get_plugin_config
-from extras.plugins import PluginTemplateExtension
+from netbox.plugins.utils import get_plugin_config
+from netbox.plugins import PluginTemplateExtension
 
 from netbox_dns.models import Record, RecordTypeChoices, Zone, View, NameServer
 from netbox_dns.tables import RelatedRecordTable

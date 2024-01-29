@@ -18,12 +18,7 @@ from netbox_dns.utilities.ipam_coupling import (
     DNSPermissionDenied,
 )
 
-try:
-    # NetBox 3.5.0 - 3.5.7, 3.5.9+
-    from extras.plugins import get_plugin_config
-except ImportError:
-    # NetBox 3.5.8
-    from extras.plugins.utils import get_plugin_config
+from netbox.plugins.utils import get_plugin_config
 
 
 @receiver(post_clean, sender=IPAddress)

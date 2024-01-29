@@ -1,5 +1,4 @@
-from extras.plugins import PluginMenuButton, PluginMenuItem
-from extras.plugins import PluginMenu
+from netbox.plugins import PluginMenuButton, PluginMenuItem, PluginMenu
 from utilities.choices import ButtonColorChoices
 
 view_menu_item = PluginMenuItem(
