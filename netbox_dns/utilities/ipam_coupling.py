@@ -3,12 +3,7 @@ from utilities.permissions import resolve_permission
 
 from netbox_dns.models import Record, RecordTypeChoices, RecordStatusChoices
 
-try:
-    # NetBox 3.5.0 - 3.5.7, 3.5.9+
-    from extras.plugins import get_plugin_config
-except ImportError:
-    # NetBox 3.5.8
-    from extras.plugins.utils import get_plugin_config
+from netbox.plugins.utils import get_plugin_config
 
 
 class DNSPermissionDenied(Exception):
