@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-plugin-dns"
-version = "0.22.0"
+version = "0.23.0"
 description = "NetBox DNS is a NetBox plugin for managing DNS data."
 authors = ["Peter Eckel <pete@netbox-dns.org>"]
 homepage = "https://github.com/peteeckel/netbox-plugin-dns"
@@ -12,7 +12,7 @@ exclude = ["netbox_dns/tests/*"]
 keywords = ["netbox", "netbox-plugin", "dns"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 dnspython = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
