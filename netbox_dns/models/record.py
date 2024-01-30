@@ -309,7 +309,7 @@ class Record(NetBoxModel):
 
         return ptr_zone
 
-    def update_ptr_record(self):
+    def update_ptr_record(self, update_rfc2317_cname=True):
         ptr_zone = self.ptr_zone
 
         if (
@@ -359,7 +359,7 @@ class Record(NetBoxModel):
                         ptr_record.save()
 
             if ptr_record is None:
-                ptr_record = Record.objects.create(
+                ptr_record = Record(
                     zone_id=ptr_zone.pk,
                     type=RecordTypeChoices.PTR,
                     name=ptr_name,
@@ -367,6 +367,7 @@ class Record(NetBoxModel):
                     value=ptr_value,
                     managed=True,
                 )
+                ptr_record.save(update_rfc2317_cname=update_rfc2317_cname)
 
         self.ptr_record = ptr_record
         if self.pk:
@@ -570,13 +571,14 @@ class Record(NetBoxModel):
                     }
                 ) from None
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, update_rfc2317_cname=True, **kwargs):
         self.full_clean()
 
         if self.is_ptr_record:
             if self.zone.is_rfc2317_zone:
                 self.ip_address = self.address_from_rfc2317_name
-                self.update_rfc2317_cname_record()
+                if update_rfc2317_cname:
+                    self.update_rfc2317_cname_record()
             else:
                 self.ip_address = self.address_from_name
 

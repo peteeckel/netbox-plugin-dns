@@ -661,7 +661,7 @@ class Zone(NetBoxModel):
             )
 
             for address_record in address_records:
-                address_record.update_ptr_record()
+                address_record.update_ptr_record(update_rfc2317_cname=False)
 
             self.update_rfc2317_parent_zone()
 
