@@ -858,26 +858,52 @@ class RFC2317RecordTest(TestCase):
             rfc2317_parent_managed=True,
         )
 
-        record = Record.objects.create(
-            name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
-        )
+        records = [
+            Record(
+                name="name1",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+            ),
+            Record(
+                name="name2",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+            ),
+            Record(
+                name="name3",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.2",
+            ),
+            Record(
+                name="name4",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.2",
+            ),
+        ]
+        for record in records:
+            record.save()
 
         self.assertIn(rfc2317_zone, zone1.rfc2317_child_zones.all())
         self.assertEqual(rfc2317_zone.rfc2317_parent_zone, zone1)
-        self.assertTrue(
-            rfc2317_zone.record_set.filter(
-                type=RecordTypeChoices.PTR,
-                name=record.rfc2317_ptr_name,
-                value=record.fqdn,
-            ).exists()
-        )
-        self.assertTrue(
-            zone1.record_set.filter(
-                type=RecordTypeChoices.CNAME,
-                name=record.rfc2317_ptr_cname_name,
-                value=record.ptr_record.fqdn,
-            ).exists()
-        )
+        for record in records:
+            self.assertTrue(
+                rfc2317_zone.record_set.filter(
+                    type=RecordTypeChoices.PTR,
+                    name=record.rfc2317_ptr_name,
+                    value=record.fqdn,
+                ).exists()
+            )
+            self.assertTrue(
+                zone1.record_set.filter(
+                    type=RecordTypeChoices.CNAME,
+                    name=record.rfc2317_ptr_cname_name,
+                    value=record.ptr_record.fqdn,
+                ).exists()
+            )
 
         rfc2317_zone.rfc2317_parent_managed = False
         rfc2317_zone.save()
@@ -886,20 +912,21 @@ class RFC2317RecordTest(TestCase):
 
         self.assertFalse(rfc2317_zone.rfc2317_parent_managed)
         self.assertFalse(zone1.rfc2317_child_zones.exists())
-        self.assertTrue(
-            rfc2317_zone.record_set.filter(
-                type=RecordTypeChoices.PTR,
-                name=record.rfc2317_ptr_name,
-                value=record.fqdn,
-            ).exists()
-        )
-        self.assertFalse(
-            zone1.record_set.filter(
-                type=RecordTypeChoices.CNAME,
-                name=record.rfc2317_ptr_cname_name,
-                value=record.ptr_record.fqdn,
-            ).exists()
-        )
+        for record in records:
+            self.assertTrue(
+                rfc2317_zone.record_set.filter(
+                    type=RecordTypeChoices.PTR,
+                    name=record.rfc2317_ptr_name,
+                    value=record.fqdn,
+                ).exists()
+            )
+            self.assertFalse(
+                zone1.record_set.filter(
+                    type=RecordTypeChoices.CNAME,
+                    name=record.rfc2317_ptr_cname_name,
+                    value=record.ptr_record.fqdn,
+                ).exists()
+            )
 
     def test_record_rfc2317_zone_set_managed(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
@@ -909,50 +936,78 @@ class RFC2317RecordTest(TestCase):
             rfc2317_prefix="10.0.0.0/28",
         )
 
-        record = Record.objects.create(
-            name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
-        )
+        records = [
+            Record(
+                name="name1",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+            ),
+            Record(
+                name="name2",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+            ),
+            Record(
+                name="name3",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.2",
+            ),
+            Record(
+                name="name4",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.2",
+            ),
+        ]
+        for record in records:
+            record.save()
 
         self.assertIsNone(rfc2317_zone.rfc2317_parent_zone)
         self.assertFalse(zone1.rfc2317_child_zones.exists())
-        self.assertTrue(
-            rfc2317_zone.record_set.filter(
-                type=RecordTypeChoices.PTR,
-                name=record.rfc2317_ptr_name,
-                value=record.fqdn,
-            ).exists()
-        )
-        self.assertFalse(
-            zone1.record_set.filter(
-                type=RecordTypeChoices.CNAME,
-                name=record.rfc2317_ptr_cname_name,
-                value=record.ptr_record.fqdn,
-            ).exists()
-        )
+        for record in records:
+            self.assertTrue(
+                rfc2317_zone.record_set.filter(
+                    type=RecordTypeChoices.PTR,
+                    name=record.rfc2317_ptr_name,
+                    value=record.fqdn,
+                ).exists()
+            )
+            self.assertFalse(
+                zone1.record_set.filter(
+                    type=RecordTypeChoices.CNAME,
+                    name=record.rfc2317_ptr_cname_name,
+                    value=record.ptr_record.fqdn,
+                ).exists()
+            )
 
         rfc2317_zone.rfc2317_parent_managed = True
         rfc2317_zone.save()
 
         rfc2317_zone.refresh_from_db()
         zone1.refresh_from_db()
-        record.refresh_from_db()
 
         self.assertIn(rfc2317_zone, zone1.rfc2317_child_zones.all())
         self.assertEqual(rfc2317_zone.rfc2317_parent_zone, zone1)
-        self.assertTrue(
-            rfc2317_zone.record_set.filter(
-                type=RecordTypeChoices.PTR,
-                name=record.rfc2317_ptr_name,
-                value=record.fqdn,
-            ).exists()
-        )
-        self.assertTrue(
-            zone1.record_set.filter(
-                type=RecordTypeChoices.CNAME,
-                name=record.rfc2317_ptr_cname_name,
-                value=record.ptr_record.fqdn,
-            ).exists()
-        )
+        for record in records:
+            record.refresh_from_db()
+
+            self.assertTrue(
+                rfc2317_zone.record_set.filter(
+                    type=RecordTypeChoices.PTR,
+                    name=record.rfc2317_ptr_name,
+                    value=record.fqdn,
+                ).exists()
+            )
+            self.assertTrue(
+                zone1.record_set.filter(
+                    type=RecordTypeChoices.CNAME,
+                    name=record.rfc2317_ptr_cname_name,
+                    value=record.ptr_record.fqdn,
+                ).exists()
+            )
 
     def test_record_delete_rfc2317_zone(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
