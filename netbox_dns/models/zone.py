@@ -698,9 +698,13 @@ class Zone(NetBoxModel):
                 )
             ]
 
-            for ptr_record in ptr_records:
-                if ptr_record.rfc2317_cname_record is not None:
-                    ptr_record.rfc2317_cname_record.delete()
+            cname_records = {
+                ptr_record.rfc2317_cname_record
+                for ptr_record in ptr_records
+                if ptr_record.rfc2317_cname_record is not None
+            }
+            for cname_record in cname_records:
+                cname_record.delete()
 
             rfc2317_child_zones = [
                 child_zone.pk for child_zone in self.rfc2317_child_zones.all()
