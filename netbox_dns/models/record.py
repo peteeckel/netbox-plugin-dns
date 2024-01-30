@@ -344,6 +344,8 @@ class Record(NetBoxModel):
         with transaction.atomic():
             if ptr_record is not None:
                 if ptr_record.zone.pk != ptr_zone.pk:
+                    if ptr_record.rfc2317_cname_record is not None:
+                        ptr_record.rfc2317_cname_record.delete()
                     ptr_record.delete()
                     ptr_record = None
 
@@ -601,7 +603,10 @@ class Record(NetBoxModel):
 
     def delete(self, *args, **kwargs):
         if self.rfc2317_cname_record:
-            if self.rfc2317_cname_record.rfc2317_ptr_records.count() == 1:
+            if (
+                self.rfc2317_cname_record.pk
+                and self.rfc2317_cname_record.rfc2317_ptr_records.count() == 1
+            ):
                 self.rfc2317_cname_record.delete()
 
         if self.ptr_record:
