@@ -547,6 +547,13 @@ class Record(NetBoxModel):
                         }
                     ) from None
 
+        if self.type == RecordTypeChoices.SOA and self.name != "@":
+            raise ValidationError(
+                {
+                    "name": f"SOA records are only allowed with name @ and are created automatically by NetBox DNS"
+                }
+            ) from None
+
         if self.type == RecordTypeChoices.CNAME:
             if records.exclude(type=RecordTypeChoices.NSEC).exists():
                 raise ValidationError(
