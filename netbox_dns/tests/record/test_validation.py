@@ -61,11 +61,6 @@ class RecordValidationTest(TestCase):
                 "value": "10 mx1.example.com.",
             },
             {
-                "name": "test7",
-                "type": RecordTypeChoices.SOA,
-                "value": "(ns1.example.com. hostmaster.example.com. 1651498477 172800 7200 2592000 3600)",
-            },
-            {
                 "name": "test8",
                 "type": RecordTypeChoices.CAA,
                 "value": "1 issue example.org",
