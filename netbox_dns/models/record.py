@@ -74,7 +74,7 @@ class RecordTypeChoices(ChoiceSet):
     CHOICES = [
         (rdtype.name, rdtype.name)
         for rdtype in sorted(rdatatype.RdataType, key=lambda a: a.name)
-        if not rdatatype.is_metatype(rdtype)
+        if not rdatatype.is_metatype(rdtype) and rdtype not in (rdatatype.SOA,)
     ]
     SINGLETONS = [
         rdtype.name for rdtype in rdatatype.RdataType if rdatatype.is_singleton(rdtype)
