@@ -2,9 +2,17 @@
 
 {% if perms.netbox_dns.view_record %}
 {% if related_address_records %}
+{% if related_address_records.rows|length == 1 %}
+{% include 'inc/panel_table.html' with table=related_address_records heading='Related DNS Address Record' %}
+{% else %}
 {% include 'inc/panel_table.html' with table=related_address_records heading='Related DNS Address Records' %}
 {% endif %}
+{% endif %}
 {% if related_pointer_records %}
+{% if related_pointer_records.rows|length == 1 %}
+{% include 'inc/panel_table.html' with table=related_pointer_records heading='Related DNS Pointer Record' %}
+{% else %}
 {% include 'inc/panel_table.html' with table=related_pointer_records heading='Related DNS Pointer Records' %}
+{% endif %}
 {% endif %}
 {% endif %}

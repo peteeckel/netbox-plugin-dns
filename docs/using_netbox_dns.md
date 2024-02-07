@@ -8,6 +8,8 @@ NetBox DNS is a plugin for NetBox designed to manage DNS data. In the current ve
 * API endpoints that can be used to export View, Name Server, Zone and Record data via the NetBox REST or GraphQL APIs
 * Basic integrity checks of the entered data
 * Optional organisation of zones in views, i.e. to facilitate split-horizon DNS setups
+* Management of domain registration related information, such as registrars and contacts related to WHOIS information
+* Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317)
 * Support for NetBox custom fields, custom links, export templates etc.
 * Support for NetBox tenancy
 
@@ -17,7 +19,7 @@ The installation of plugins in general is described in the [NetBox documentation
 ### Requirements
 The installation of NetBox DNS requires a Python interpreter and a working NetBox deployment. Supported versions are currently:
 
-* NetBox 3.5.8 or higher
+* NetBox 3.5.0 or higher
 * Python 3.8 or higher
 
 ### Installation of NetBox DNS
@@ -208,7 +210,24 @@ The zone's SOA record is assembled from these fields by contatenating them and p
 
 All SOA fields are required. Default settings can be configured in the Django configuration file, see [Zone Default Settings](#zone_defaults)).
 
-#### Automatic SOA SERIAL generation
+#### Domain Registration Fields
+For zones that are registered as public DNS domains, there is a third set of fields available that reflects the domain's registration data.
+
+Field                      | Required | Explanation
+---------                  | -------- | -----------
+**Registry**               | No       | The registry used to register the domain
+**Registry Domain ID**     | No       | The domain ID assigned by the registry on registration
+**Registrant**             | No       | The owner of the domain
+**Administrative Contact** | No       | The administrative contact for the domain
+**Technical Contact**      | No       | The technical contact for the domain
+**Billing Contact**        | No       | The billing contact for the domain
+
+All fields are optional.
+
+If there is registration information for a zone, the zone's detail view contains an additional 'Registration' tab showing that information.
+
+
+### Automatic SOA SERIAL generation
 SOA SERIAL fields are crucial for the propagation of zone data from primary name servers to secondaries, as the process involves checking the zone's serial number on the secondary against the serial number on the primary and only performing the update when the primary has a higher serial number or the interval specified in the SOA EXPIRE field has passed.
 
 This is especially important when PTR records are automatically created from A and AAAA records and an update to a forward zone thus can lead to one or several reverse zones being updated behind the scenes as well.
@@ -229,7 +248,7 @@ Another tab shows all managed records in the zone. Since at the very least there
 
 ![Zone DetailManagedRecords](images/ZoneDetailManagedRecords.png)
 
-#### <a name="zone_defaults"></a>Zone Default settings
+### <a name="zone_defaults"></a>Zone Default settings
 Zone default settings can be configured in the plugin configuration of NetBox. The following settings are available:
 
 Setting                 | Variable               | Factory Default
@@ -269,7 +288,7 @@ Record objects correspond to resource records (RR) that within zones. NetBox DNS
 There is exactly one SOA record per zone, so SOA records cannot be created manually at all. NS and PTR records do not have that kind of restriction and can be created and maintained manually if they have not been created by NetBox ("Managed Records'), although that should also be required in special cases.
 
 #### Permissions
-The following Django permissions are applicable to Name Server objects:
+The following Django permissions are applicable to NameServer objects:
 
 Permission                 | Action
 ----------                 | ------
@@ -324,6 +343,90 @@ Note that for managed records there are no buttons for deleting, editing or clon
 #### Displaying records
 Records can either be displayed by opening the record list view from the "Reocrds" or "Managed Records" navigation item on the left, or per zone via the respective tabs in the zone defail view. In any case, the tables can be filtered by name, value, zone, or tags to narrow down the set of records displayed.
 
+### Registrars
+Registrar objects relate to the DNS domain registrarion and represent the registrar information for DNS domains related to zones. A DNS zone does not necessarily need to be registered: Zones that are not available via public DNS or that are sub-zones of registered zones do not require registration. In most cases registration information is only required (and possible) for second level domains.
+
+Registrar objects relate to the registration institutions responsible for registering domains with the TLD registries. A list of accredited registrars is available on the [ICANN web site](https://www.icann.org/en/accredited-registrars).
+
+#### Permissions
+The following Django permissions are applicable to Registrar objects:
+
+Permission                    | Action
+----------                    | ------
+`netbox_dns.add_registrar`    | Create new registrar objects
+`netbox_dns.change_registrar` | Edit registrar information
+`netbox_dns.delete_registrar` | Delete a registrar object
+`netbox_dns.view_registrar`   | View registrar information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for registrars:
+
+Field             | Required | Explanation
+-----             | -------- | -----------
+**Name**          | Yes      | A unique name for the registrar
+**IANA ID**       | No       | A numeric ID assigned by the IANA on accredtiation of the registrar
+**Referral URL**  | No       | The URL of the registrar's web presence
+**WHOIS Server**  | No       | The WHOIS server for the registrar
+**Abuse Email**   | No       | The Email address used to report abuse cases for a domain
+**Abuse Phone**   | No       | The phone number used to report abuse cases for a domain
+
+The fields are closely related to the WHOIS fields for the registrar for a domain. More information can be found on the [ICANN web site](https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en)
+
+#### Displaying Registrars
+A registrar in detail view:
+
+![Registrar Detail](images/RegistrarDetail.png)
+
+If there are zones registered for the registrar, a second tab shows a list of these zones.
+
+![Registrar DetailZones](images/RegistrarDetailZones.png)
+
+### Contacts
+
+#### Permissions
+The following Django permissions are applicable to Contact objects:
+
+Permission                  | Action
+----------                  | ------
+`netbox_dns.add_contact`    | Create new contact objects
+`netbox_dns.change_contact` | Edit contact information
+`netbox_dns.delete_contact` | Delete a contact object
+`netbox_dns.view_contact`   | View contact information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for contacts:
+
+Field               | Required | Explanation
+-----               | -------- | -----------
+**Name**            | No       | A name for the contact. The name is not necessarily unique, because the same person might have many DNS contacts, sometimes also called 'handles'.
+**Contact ID**      | Yes      | A unique ID, usually assigned by the Registrar, that identifies the person or organisation.
+**Organization**    | No       | An organization the contact is associated with
+**Street**          | No       | The street of the contact's address
+**City**            | No       | The city of the contact's address
+**State/Province**  | No       | The state or province the contact is located in
+**Postal Code**     | No       | The postal code of the contact's address
+**Country**         | No       | The ISO3166 country code of the contact's address
+**Phone**           | No       | The phone number of the contact
+**Phone Extension** | No       | The phone extension of the contact
+**Fax**             | No       | The fax number of the contact
+**Fax Extension**   | No       | The fax extension of the contact
+**Email**           | No       | The Email address of the contact
+
+The fields are closely related to the WHOIS fields for the registrant, admin contact, tech contact and billing contact for a domain. More information can be found on the [ICANN web site](https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en)
+
+#### Displaying Contacts
+A contact in detail view:
+
+![Contact Detail](images/ContactDetail.png)
+
+If there are zones registered for the contact, a second tab shows a list of these zones.
+
+![Contact DetailZones](images/ContactDetailZones.png)
+
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
 
@@ -343,7 +446,7 @@ There are some special cases that need to be taken care of:
 
 To take care of these cases, there are three configuration variables for NetBox DNS that adjust the validation of record names:
 
-* `allow_underscores_in_hostnames` can be set to allow undercores being used in host names. Normally, underscores are only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
+* `tolerate_underscores_in_hostnames` can be set to allow undercores being used in host names. Normally, underscores are only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
 * `tolerate_leading_underscore_types` contains a list of RR types that allow an underscore as the first character in a label.
 * `tolerate_non_rfc1035_types` contains a list of RR types that allow characters outside the set defined in RFC1035 to be used in RR names. Record types in this list are exempt from validation altogether.
 
@@ -351,7 +454,7 @@ To take care of these cases, there are three configuration variables for NetBox 
 
 Variable                                 | Factory Default
 --------                                 | ---------------
-`allow_underscores_in_hostnames `        | False
+`tolerate_underscores_in_hostnames `     | False
 `tolerate_leading_underscore_types `     | `["TXT", "SRV"]`
 `tolerate_non_rfc1035_types `            | `[]`
 
@@ -361,7 +464,7 @@ The settings can be set or overridden in the file `/opt/netbox/netbox/netbox/con
 PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
-        'allow_underscores_in_hostnames': True,
+        'tolerate_underscores_in_hostnames': True,
         'tolerate_leading_underscore_types': ["TXT", "SRV", "CNAME"]
         'tolerate_non_rfc1035_types': ["X25"]
     },
@@ -427,3 +530,135 @@ The NetBox detail view for tenants shows a table of NetBox DNS objects assigned 
 ![NetBox Tenant Detail](images/NetBoxTenantDetail.png)
 
 The colums of the table on the left side are clickable and link to filtered lists showing the related views, nameservers, zones and records.
+
+## RFC 2317
+RFC 2317 describes a solution for the problem that the delegation of reverse zones for IPv4 subnets with a longer network mask than /24 is not possible using the classical `in-addr.arpa` zone hierarchy.
+
+The solution works by defining specific zones that hold the PTR records for such a subnet, and then insert CNAME records for these PTR records in the `in-addr.arpa` zone containing it. NetBox DNS release 0.22.0 and later support creating these RFC2317 zones and automatically inserting PTR records there and, optionally, CNAME records in the containing `in-addr.arpa` zone that point to the PTR records.
+
+### Designating a Zone as an RFC2317 Zone
+
+![RFC2317 Zone Configuration](images/RFC2317ZoneConfiguration.png)
+
+The 'RFC2317 Prefix' specifies an IPv4 prefix with a network mask length of 25 or longer. If an address record is created for an address in this prefix, the PTR record will be created in the zone the prefix has been specified for.
+
+If the checkbox 'RFC2317 Parent Managed' is selected and there is an `in-addr.arpa` zone corresponding to a subnet containing the RFC2317 Subnet, a CNAME record pointing in that zone will be created automatically when a PTR record is created in the RFC2317 zone. If the checkbox is unchecked, it is assumed that the reverse zone for the parent prefix is not managed within NetBox DNS. In this case, the CNAMEs must be created by the authority responsible for the parent zone.
+
+If the zone name is selected so that the zone is a sub-zone of the corresponding `in-addr.arpa` zone such as `32-63.0.168.192.in-addr.arpa`, the parent zone must delegate the zone to the name servers responsible for it if the authoritative name servers are not the same.
+
+### RFC2317 Zones and Managed Parent
+
+If an RFC2317 zone has a managed parent zone in NetBox DNS, the detail view of the RFC2317 zone has a link to the parent zone.
+
+![RFC2317 Child Zone](images/RFC2317ChildZoneDetail.png)
+
+The parent zone, on the other hand, has a tab showing all RFC2317 child zones.
+
+![RFC2317 Parent Zone](images/RFC2317ParentZoneDetail.png)
+
+### RFC2317 CNAME Record Detail View
+
+For CNAME records created in RFC2317 parent zones, the detail view shows the A and PTR record(s) the RFC2317 CNAME record relates to in the card 'RFC2317 Targets':
+
+![RFC2317 CNAME Record](images/RFC2317CNAMERecordDetail.png)
+
+### Limitations
+
+The following limitations exist for RFC2317 zones:
+
+* An RFC2317 prefix must have a length of 25 or longer. Shorter prefixes are not covered by RFC 2317.
+* In order to enable the 'RFC2317 Parent Managed' feature, the parent reverse zone must exist.
+* The RFC2317 PTR records always have a name corresponding with the host part of the address record's value in the RFC2317 subnet. Formatting the name (e.g with prefixes and suffixes) is currently not supported.
+* The RFC2317 CNAME records in parent zones are created on demand when a PTR in a child zone is created. Pre-creating them on creation of an RFC2317 zone is currently not supported.
+* The RFC2317 CNAME records are managed records and can not be edited manually. In normal operation this should never be necessary.
+
+## IPAM Coupling
+
+Starting with NetBox DNS 0.20.0, a new experimental feature providing coupling between NetBox DNS and NetBox IPAM data is available. This feature can be used to link IP addresses in IPAM to NetBox DNS address records. The old IPAM integration feature was dropped in favour of the new and improved functionality.
+
+Thanks to Jean Benoît for this contribution!
+
+### Enabling IPAM Coupling
+
+The new experimental feature needs to be enabled in the NetBox configuration file by setting its flag:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'feature_ipam_coupling': True,
+        ...
+    },
+}
+```
+
+In addition, two custom fields on `ipam.IPAddress` objects are required for the feature to work. These custom fields can be created using the Django management command `setup_coupling`:
+
+```
+/opt/netbox/netbox/manage.py setup_coupling
+```
+
+In order to remove the custom fields and all related data, the same command can be used with the option `--remove`.
+
+After these steps, a restart of NetBox is required.
+
+### Using IPAM Coupling
+
+With the new custom fields it is possible to automatically generate a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom in the DNS group.
+
+Optionally, a TTL value can be set that is to be used for the records created via IPAM coupling, and the 'Disable PTR' option can be set as well. 'Disable PTR' defaults to 'False', resulting in pointer records being created for address records associated with IP addresses.
+
+![Custom Fields for IPAM Coupling](images/IPAMCouplingCustomFields.png)
+
+When the IP address is saved, NetBox DNS now automatically creates a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address is set to the FQDN of the resulting address record.
+
+If the TTL field was filled in, the TTL for the created address record will be set to that value.
+
+If the 'Disable PTR' checkbox is selected, the resulting address record will have that option set as well and no pointer record will be created for the address.
+
+The IP address is now linked to the address record in the following ways:
+
+* When one of the custom fields for the IP address is updated, the DNS record is updated as well. This includes changing the name as well as moving it to a different DNS zone
+* When the IP address is deleted, the managed DNS record is deleted as well
+* When the DNS zone is renamed, the 'DNS Name' for the IP address is updated to reflect the zone's new name
+* When the DNS zone is deleted, the address record is deleted and the connection from the IP address object is cleared
+
+#### Record Status set by IPAM Coupling
+
+The status of the address record created for an IP address depends on the status of the IP address. By default, address records for IP addresses in the statuses 'Active', 'DHCP' and 'SLAAC' are set to 'Active', while the status of the address record will be 'Inactive' in all other cases.
+
+This mapping can be configured using the configuration variable `ipam_coupling_ip_active_status_list` in the plugin configuration. This variable holds an array of status names. The default setting for the status list is `None`, which is equivalent to
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'ipam_coupling_ip_address_status_list': [
+            'active',
+            'dhcp',
+            'slaac',
+        ],
+        ...
+    },
+}
+```
+
+### Additional Information for IP Addresses and DNS Records
+
+When a link between an IP address and a DNS address record is present, there are some additional panes in the IPAM IP address and NetBox DNS record view, as well as in the detail views for NetBox DNS managed records.
+
+#### IP Address Information
+
+If a DNS address record is linked to an IP address, the detail view for the IP address contains an additional pane showing that address record.
+
+![Related DNS Address Record](images/IPAMCouplingRelatedAddressRecord.png)
+
+If NetBox DNS also created a PTR record for the linked DNS address record, the detail view for the IP address contains an a second additional pane showing that pointer record.
+
+![Related DNS Address Record](images/IPAMCouplingRelatedPointerRecord.png)
+
+#### DNS Record Information
+
+The detail views for the address and pointer records created for coupled IP addresses include a link to that IP address, which can be used to navigate to the address.
+
+![Record Detail View for Coupled IP Address](images/IPAMCouplingRecordDetailView.png)

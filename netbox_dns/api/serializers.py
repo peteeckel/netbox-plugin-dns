@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
+from ipam.api.nested_serializers import NestedIPAddressSerializer
 from tenancy.api.nested_serializers import NestedTenantSerializer
 
 from netbox_dns.api.nested_serializers import (
@@ -8,8 +9,10 @@ from netbox_dns.api.nested_serializers import (
     NestedZoneSerializer,
     NestedNameServerSerializer,
     NestedRecordSerializer,
+    NestedRegistrarSerializer,
+    NestedContactSerializer,
 )
-from netbox_dns.models import View, Zone, NameServer, Record
+from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
 
 
 class ViewSerializer(NetBoxModelSerializer):
@@ -53,6 +56,48 @@ class ZoneSerializer(NetBoxModelSerializer):
         read_only=False,
         required=False,
         help_text="Primary nameserver for the zone",
+    )
+    rfc2317_parent_zone = NestedZoneSerializer(
+        many=False,
+        read_only=True,
+        required=False,
+        help_text="RFC2317 arent zone for the zone",
+    )
+    rfc2317_child_zones = NestedZoneSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        help_text="RFC2317 child zones of the zone",
+    )
+    registrar = NestedRegistrarSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The registrar the domain is registered with",
+    )
+    registrant = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The owner of the domain",
+    )
+    admin_c = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The administrative contact for the domain",
+    )
+    tech_c = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The technical contact for the domain",
+    )
+    billing_c = NestedContactSerializer(
+        many=False,
+        read_only=False,
+        required=False,
+        help_text="The billing contact for the domain",
     )
     active = serializers.BooleanField(
         required=False,
@@ -105,6 +150,16 @@ class ZoneSerializer(NetBoxModelSerializer):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "rfc2317_parent_zone",
+            "rfc2317_child_zones",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "tech_c",
+            "admin_c",
+            "billing_c",
             "active",
             "custom_fields",
             "tenant",
@@ -168,6 +223,13 @@ class RecordSerializer(NetBoxModelSerializer):
         required=False,
         read_only=True,
     )
+    ipam_ip_address = NestedIPAddressSerializer(
+        many=False,
+        read_only=True,
+        required=False,
+        allow_null=True,
+        help_text="IPAddress linked to the record",
+    )
     tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     class Meta:
@@ -193,4 +255,58 @@ class RecordSerializer(NetBoxModelSerializer):
             "active",
             "custom_fields",
             "tenant",
+            "ipam_ip_address",
+        )
+
+
+class RegistrarSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:registrar-detail"
+    )
+
+    class Meta:
+        model = Registrar
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "iana_id",
+            "referral_url",
+            "whois_server",
+            "abuse_email",
+            "abuse_phone",
+            "created",
+            "last_updated",
+            "custom_fields",
+        )
+
+
+class ContactSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:contact-detail"
+    )
+
+    class Meta:
+        model = Contact
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "contact_id",
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            "created",
+            "last_updated",
+            "custom_fields",
         )

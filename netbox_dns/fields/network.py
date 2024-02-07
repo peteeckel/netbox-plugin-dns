@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from django.db.models import Lookup
+from django.db.models import Lookup, Transform
 from django.core.exceptions import ValidationError
 
 from netaddr import AddrFormatError, IPNetwork
@@ -44,6 +44,16 @@ class NetContainedOrEqual(Lookup):
         rhs, rhs_params = self.process_rhs(qn, connection)
         params = lhs_params + rhs_params
         return "%s <<= %s" % (lhs, rhs), params
+
+
+class NetOverlap(Lookup):
+    lookup_name = "net_overlap"
+
+    def as_sql(self, qn, connection):
+        lhs, lhs_params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        params = lhs_params + rhs_params
+        return "%s && %s" % (lhs, rhs), params
 
 
 class NetworkFormField(forms.Field):
@@ -104,7 +114,18 @@ class NetworkField(models.Field):
         return "cidr"
 
 
+class NetMaskLength(Transform):
+    function = "MASKLEN"
+    lookup_name = "net_mask_length"
+
+    @property
+    def output_field(self):
+        return IntegerField()
+
+
 NetworkField.register_lookup(NetContains)
 NetworkField.register_lookup(NetContained)
 NetworkField.register_lookup(NetContainsOrEquals)
 NetworkField.register_lookup(NetContainedOrEqual)
+NetworkField.register_lookup(NetOverlap)
+NetworkField.register_lookup(NetMaskLength)

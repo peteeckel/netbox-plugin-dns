@@ -22,8 +22,17 @@ from utilities.forms import add_blank_choice
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import View, Zone, ZoneStatusChoices, NameServer
+from netbox_dns.models import (
+    View,
+    Zone,
+    ZoneStatusChoices,
+    NameServer,
+    Registrar,
+    Contact,
+)
 from netbox_dns.utilities import name_to_unicode
+from netbox_dns.fields import RFC2317NetworkFormField
+from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
 
 
 class ZoneForm(TenancyForm, NetBoxModelForm):
@@ -83,6 +92,18 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
         help_text="Minimum TTL for negative results, e.g. NXRRSET",
         validators=[MinValueValidator(1)],
     )
+    rfc2317_prefix = RFC2317NetworkFormField(
+        label="RFC2317 Prefix",
+        help_text="IPv4 network prefix with a mask length of at least 25 bits",
+        validators=[validate_ipv4, validate_prefix, validate_rfc2317],
+        required=False,
+    )
+    rfc2317_parent_managed = forms.BooleanField(
+        label="RFC2317 Parent Managed",
+        help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
+        required=False,
+    )
+
     fieldsets = (
         (
             "Zone",
@@ -107,6 +128,24 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
                 "soa_minimum",
                 "soa_serial_auto",
                 "soa_serial",
+            ),
+        ),
+        (
+            "RFC2317",
+            (
+                "rfc2317_prefix",
+                "rfc2317_parent_managed",
+            ),
+        ),
+        (
+            "Domain Registration",
+            (
+                "registrar",
+                "registry_domain_id",
+                "registrant",
+                "admin_c",
+                "tech_c",
+                "billing_c",
             ),
         ),
         ("Tags", ("tags",)),
@@ -189,6 +228,14 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
             "tenant",
         )
         help_texts = {
@@ -285,6 +332,64 @@ class ZoneImportForm(NetBoxModelImportForm):
         required=False,
         help_text="Minimum TTL for negative results, e.g. NXRRSET",
     )
+    rfc2317_prefix = RFC2317NetworkFormField(
+        required=False,
+        help_text="RFC2317 IPv4 prefix with a length of at least 25 bits",
+    )
+    rfc2317_parent_managed = forms.BooleanField(
+        required=False,
+        label="RFC2317 Parent Managed",
+        help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
+    )
+    registrar = CSVModelChoiceField(
+        queryset=Registrar.objects.all(),
+        required=False,
+        to_field_name="name",
+        help_text="Registrar the domain is registered with",
+        error_messages={
+            "invalid_choice": "Registrar not found.",
+        },
+    )
+    registry_domain_id = forms.CharField(
+        required=False,
+        help_text="Domain ID assigned by the registry",
+    )
+    registrant = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Owner of the domain",
+        error_messages={
+            "invalid_choice": "Registrant contact ID not found",
+        },
+    )
+    admin_c = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Administrative contact for the domain",
+        error_messages={
+            "invalid_choice": "Administrative contact ID not found",
+        },
+    )
+    tech_c = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Technical contact for the domain",
+        error_messages={
+            "invalid_choice": "Technical contact ID not found",
+        },
+    )
+    billing_c = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        to_field_name="contact_id",
+        help_text="Billing contact for the domain",
+        error_messages={
+            "invalid_choice": "Billing contact ID not found",
+        },
+    )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
@@ -320,7 +425,7 @@ class ZoneImportForm(NetBoxModelImportForm):
 
     def clean_soa_mname(self):
         soa_mname = self._clean_field_with_defaults("soa_mname")
-        if type(soa_mname) == str:
+        if isinstance(soa_mname, str):
             try:
                 soa_mname = NameServer.objects.get(name=soa_mname)
             except NameServer.DoesNotExist:
@@ -381,7 +486,16 @@ class ZoneImportForm(NetBoxModelImportForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
             "tenant",
+            "tags",
         )
 
 
@@ -457,6 +571,67 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         label="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
     )
+    rfc2317_prefix = RFC2317NetworkFormField(
+        required=False,
+        label="RFC2317 Prefix",
+        help_text="IPv4 network prefix with a mask length of at least 25 bits",
+        validators=[validate_ipv4, validate_prefix, validate_rfc2317],
+    )
+    rfc2317_parent_managed = forms.BooleanField(
+        required=False,
+        label="RFC2317 Parent Managed",
+        help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
+    )
+    registrar = DynamicModelChoiceField(
+        queryset=Registrar.objects.all(),
+        required=False,
+        widget=APISelect(
+            attrs={
+                "data-url": reverse_lazy("plugins-api:netbox_dns-api:registrar-list")
+            }
+        ),
+    )
+    registry_domain_id = forms.CharField(
+        required=False,
+        label="Registry Domain ID",
+    )
+    registrant = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    admin_c = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Administrative Contact",
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    tech_c = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Technical Contact",
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    billing_c = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Billing Contact",
+        widget=APISelect(
+            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
+        ),
+    )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        required=False,
+        to_field_name="name",
+        help_text="Assigned tenant",
+    )
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     model = Zone
@@ -487,8 +662,36 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
                 "soa_minimum",
             ),
         ),
+        (
+            "RFC2317",
+            (
+                "rfc2317_prefix",
+                "rfc2317_parent_managed",
+            ),
+        ),
+        (
+            "Domain Registration",
+            (
+                "registrar",
+                "registry_domain_id",
+                "registrant",
+                "admin_c",
+                "tech_c",
+                "billing_c",
+            ),
+        ),
     )
-    nullable_fields = ("view", "description")
+    nullable_fields = (
+        "view",
+        "description",
+        "rfc2317_prefix",
+        "registrar",
+        "registry_domain_id",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+    )
 
     def clean(self):
         """

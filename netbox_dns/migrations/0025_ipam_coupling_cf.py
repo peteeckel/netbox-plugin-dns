@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True,
                 null=True,
-                on_delete=django.db.models.deletion.PROTECT,
+                on_delete=django.db.models.deletion.CASCADE,
                 related_name="netbox_dns_records",
                 to="ipam.ipaddress",
             ),

@@ -1,6 +1,7 @@
 from dns import name as dns_name
 
 from netbox.views import generic
+from utilities.views import ViewTab, register_model_view
 
 from netbox_dns.filters import NameServerFilter, ZoneFilter
 from netbox_dns.forms import (
@@ -11,8 +12,6 @@ from netbox_dns.forms import (
 )
 from netbox_dns.models import Zone, NameServer
 from netbox_dns.tables import NameServerTable, ZoneTable
-
-from utilities.views import ViewTab, register_model_view
 
 
 class NameServerListView(generic.ObjectListView):

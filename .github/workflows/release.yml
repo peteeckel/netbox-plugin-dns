@@ -11,9 +11,9 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@main
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@main
         with:
           python-version: "3.8"
       - name: Install latest version of Poetry
@@ -45,7 +45,7 @@ jobs:
       - name: Release Notes
         run: git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"
       - name: Create Release Draft
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@master
         with:
           body_path: ".github/RELEASE-TEMPLATE.md"
           draft: true

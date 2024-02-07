@@ -19,6 +19,7 @@ class ZoneTest(
         "display",
         "id",
         "name",
+        "rfc2317_prefix",
         "status",
         "url",
         "view",

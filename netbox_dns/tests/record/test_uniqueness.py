@@ -74,6 +74,29 @@ class RecordValidationTest(TestCase):
             }
         }
     )
+    def test_create_different_type_records_ok(self):
+        f_zone = self.zones[0]
+
+        records = [
+            {"name": "test1", "type": RecordTypeChoices.A, "value": "10.0.1.42"},
+            {"name": "test1", "type": RecordTypeChoices.TXT, "value": "10.0.1.42"},
+        ]
+
+        for record in records:
+            f_record = Record(
+                zone=f_zone,
+                **record,
+                **self.record_data,
+            )
+            f_record.save()
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "enforce_unique_records": True,
+            }
+        }
+    )
     def test_create_duplicate_records_fail(self):
         f_zone = self.zones[0]
 

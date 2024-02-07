@@ -1,7 +1,6 @@
 {% extends 'netbox_dns/zone/base.html' %}
 {% load helpers %}
 {% load render_table from django_tables2 %}
-{% load view_helpers %}
 
 {% block content %}
 <div class="row">
@@ -43,7 +42,7 @@
                     </tr>
                     <tr>
                         <th scope="row">Status</th>
-                        <td>{{ object.status }}</td>
+                        <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
                     </tr>
                     <tr>
                         <th scope="row">Nameservers</th>
@@ -108,7 +107,7 @@
         <div class="card">
             <h5 class="card-header">Zone SOA</h5>
             <div class="card-body">
-                <table class="table table-hover soa-table">
+                <table class="table table-hover attr-table">
                     <tr>
                         <th scope="row">TTL</th>
                         <td>{{ object.soa_ttl }}</td>
@@ -144,6 +143,29 @@
                 </table>
             </div>
         </div>
+        {% if object.rfc2317_prefix %}
+        <div class="card">
+            <h5 class="card-header">RFC2317</h5>
+            <div class="card-body">
+                <table class="table table-hover soa-table">
+                    <tr>
+                        <th scope="row">Prefix</th>
+                        <td>{{ object.rfc2317_prefix }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Parent Managed</th>
+                        <td>{% checkmark object.rfc2317_parent_managed %}</td>
+                    </tr>
+                    {% if object.rfc2317_parent_managed %}
+                    <tr>
+                        <th scope="row">Parent Zone</th>
+                        <td><a href="{% url 'plugins:netbox_dns:zone' pk=object.rfc2317_parent_zone.pk %}">{{ object.rfc2317_parent_zone }}</a></td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

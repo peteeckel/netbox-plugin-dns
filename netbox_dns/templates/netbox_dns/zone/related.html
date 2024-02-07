@@ -1,7 +1,0 @@
-{% load perms %}
-
-{% if perms.netbox_dns.view_zone %}
-{% if related_pointer_zones %}
-{% include 'inc/panel_table.html' with table=related_pointer_zones heading='Related DNS Pointer Zones' %}
-{% endif %}
-{% endif %}

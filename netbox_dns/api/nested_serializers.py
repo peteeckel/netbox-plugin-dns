@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
 
-from netbox_dns.models import View, Zone, NameServer, Record
+from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
 
 
 #
@@ -22,6 +22,20 @@ class NestedViewSerializer(WritableNestedSerializer):
 # Zones
 #
 class NestedZoneSerializer(WritableNestedSerializer):
+    def to_representation(self, instance):
+        # +
+        # Workaround for the problem that the serializer does not return the
+        # annotation "active" when called with "many=False". See issue
+        # https://github.com/peteeckel/netbox-plugin-dns/issues/132
+        #
+        # TODO: Investigate root cause, probably in DRF.
+        # -
+        representation = super().to_representation(instance)
+        if representation.get("active") is None:
+            representation["active"] = instance.is_active
+
+        return representation
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"
     )
@@ -39,7 +53,16 @@ class NestedZoneSerializer(WritableNestedSerializer):
 
     class Meta:
         model = Zone
-        fields = ["id", "url", "display", "name", "view", "status", "active"]
+        fields = [
+            "id",
+            "url",
+            "display",
+            "name",
+            "view",
+            "status",
+            "active",
+            "rfc2317_prefix",
+        ]
 
 
 #
@@ -87,3 +110,29 @@ class NestedRecordSerializer(WritableNestedSerializer):
             "zone",
             "active",
         ]
+
+
+#
+# Registrars
+#
+class NestedRegistrarSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:registrar-detail"
+    )
+
+    class Meta:
+        model = Registrar
+        fields = ["display", "id", "url", "name", "iana_id"]
+
+
+#
+# Contacts
+#
+class NestedContactSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:contact-detail"
+    )
+
+    class Meta:
+        model = Contact
+        fields = ["display", "id", "url", "name", "contact_id"]

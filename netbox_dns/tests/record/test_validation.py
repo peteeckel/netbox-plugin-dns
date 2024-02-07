@@ -61,11 +61,6 @@ class RecordValidationTest(TestCase):
                 "value": "10 mx1.example.com.",
             },
             {
-                "name": "test7",
-                "type": RecordTypeChoices.SOA,
-                "value": "(ns1.example.com. hostmaster.example.com. 1651498477 172800 7200 2592000 3600)",
-            },
-            {
                 "name": "test8",
                 "type": RecordTypeChoices.CAA,
                 "value": "1 issue example.org",
@@ -203,6 +198,32 @@ class RecordValidationTest(TestCase):
         with self.assertRaises(ValidationError):
             f_record2.save()
 
+    def test_nsec_and_cname(self):
+        f_zone = self.zones[0]
+
+        name1 = "test1"
+        name2 = "test2"
+
+        f_record1 = Record(
+            zone=f_zone,
+            name=name1,
+            type=RecordTypeChoices.NSEC,
+            value="test2.zone1.example.com. A MX RRSIG NSEC",
+            **self.record_data,
+        )
+        f_record1.save()
+
+        f_record2 = Record(
+            zone=f_zone,
+            name=name1,
+            type=RecordTypeChoices.CNAME,
+            value=name2,
+            **self.record_data,
+        )
+        f_record2.save()
+
+        self.assertEqual(Record.objects.filter(name=name1, zone=f_zone).count(), 2)
+
     def test_cname_and_name(self):
         f_zone = self.zones[0]
 
@@ -229,6 +250,32 @@ class RecordValidationTest(TestCase):
 
         with self.assertRaises(ValidationError):
             f_record2.save()
+
+    def test_cname_and_nsec(self):
+        f_zone = self.zones[0]
+
+        name1 = "test1"
+        name2 = "test2"
+
+        f_record1 = Record(
+            zone=f_zone,
+            name=name1,
+            type=RecordTypeChoices.CNAME,
+            value=name2,
+            **self.record_data,
+        )
+        f_record1.save()
+
+        f_record2 = Record(
+            zone=f_zone,
+            name=name1,
+            type=RecordTypeChoices.NSEC,
+            value="test2.zone1.example.com. A MX RRSIG NSEC",
+            **self.record_data,
+        )
+        f_record2.save()
+
+        self.assertEqual(Record.objects.filter(name=name1, zone=f_zone).count(), 2)
 
     def test_double_singletons(self):
         f_zone = self.zones[1]

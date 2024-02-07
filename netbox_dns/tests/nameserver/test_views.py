@@ -43,9 +43,9 @@ class NameServerTestCase(
 
         cls.csv_update_data = (
             "id,name,description",
-            f"{cls.nameservers[0].pk},ns8.hindenburgring.com,test1",
-            f"{cls.nameservers[1].pk},ns9.hindenburgring.com,test2",
-            f"{cls.nameservers[2].pk},ns10.hindenburgring.com,test3",
+            f"{cls.nameservers[0].pk},ns8.example.com,test1",
+            f"{cls.nameservers[1].pk},ns9.example.com,test2",
+            f"{cls.nameservers[2].pk},ns10.example.com,test3",
         )
 
     maxDiff = None
