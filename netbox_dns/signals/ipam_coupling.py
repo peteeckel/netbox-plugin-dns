@@ -1,4 +1,5 @@
 from django.dispatch import receiver
+from django.db import transaction
 from django.db.models.signals import pre_save, post_save, pre_delete
 from django.core.exceptions import ValidationError, PermissionDenied
 from rest_framework.exceptions import PermissionDenied as APIPermissionDenied
@@ -38,32 +39,42 @@ def ip_address_check_permissions_save(instance, **kwargs):
     if request is None:
         return
 
+    request.post_save_ops = []
+
     try:
-        if instance.id is None:
-            record = new_address_record(instance)
-            if record is not None:
-                record.full_clean()
-                check_permission(request, "netbox_dns.add_record", record)
-
-        else:
-            if not dns_changed(IPAddress.objects.get(pk=instance.id), instance):
-                return
-
-            record = get_address_record(instance)
-            if record is not None:
-                name, ttl, disable_ptr, zone_id = ipaddress_cf_data(instance)
-                if zone_id is not None:
-                    update_address_record(record, instance)
-                    record.full_clean()
-                    check_permission(request, "netbox_dns.change_record", record)
-                else:
-                    check_permission(request, "netbox_dns.delete_record", record)
-
-            else:
+        with transaction.atomic():
+            if instance.id is None:
                 record = new_address_record(instance)
                 if record is not None:
-                    record.full_clean()
+                    record.save()
                     check_permission(request, "netbox_dns.add_record", record)
+                    request.post_save_ops.append(("link_record",record))
+
+            else:
+                if not dns_changed(IPAddress.objects.get(pk=instance.id), instance):
+                    return
+
+                record = get_address_record(instance)
+                if record is not None:
+                    name, ttl, disable_ptr, zone_id = ipaddress_cf_data(instance)
+                    if zone_id is not None:
+                        # Check if current record is accessible
+                        check_permission(request, "netbox_dns.change_record", record)
+                        update_address_record(record, instance)
+                        record.save()
+                        # Check if modified record is accessible
+                        check_permission(request, "netbox_dns.change_record", record)
+                        request.post_save_ops.append(("link_record",record))
+                    else:
+                        check_permission(request, "netbox_dns.delete_record", record)
+                        record.delete()
+
+                else:
+                    record = new_address_record(instance)
+                    if record is not None:
+                        record.save()
+                        check_permission(request, "netbox_dns.add_record", record)
+                        request.post_save_ops.append(("link_record",record))
 
     except ValidationError as exc:
         if hasattr(exc, "error_dict"):
@@ -134,6 +145,13 @@ def ip_address_update_dns_information(instance, **kwargs):
 def ip_address_update_address_record(instance, **kwargs):
     if not get_plugin_config("netbox_dns", "feature_ipam_coupling"):
         return
+
+    request = current_request.get()
+    if hasattr(request, "post_save_ops"):
+        for (op, record) in request.post_save_ops:
+            if op == "link_record":
+                record.ipam_ip_address = instance
+                record.save()
 
     name, ttl, disable_ptr, zone_id = ipaddress_cf_data(instance)
 
