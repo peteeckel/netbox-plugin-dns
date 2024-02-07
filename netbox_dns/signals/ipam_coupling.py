@@ -48,7 +48,7 @@ def ip_address_check_permissions_save(instance, **kwargs):
                 if record is not None:
                     record.save()
                     check_permission(request, "netbox_dns.add_record", record)
-                    request.post_save_ops.append(("link_record",record))
+                    request.post_save_ops.append(("link_record", record))
 
             else:
                 if not dns_changed(IPAddress.objects.get(pk=instance.id), instance):
@@ -64,7 +64,7 @@ def ip_address_check_permissions_save(instance, **kwargs):
                         record.save()
                         # Check if modified record is accessible
                         check_permission(request, "netbox_dns.change_record", record)
-                        request.post_save_ops.append(("link_record",record))
+                        request.post_save_ops.append(("link_record", record))
                     else:
                         check_permission(request, "netbox_dns.delete_record", record)
                         record.delete()
@@ -74,7 +74,7 @@ def ip_address_check_permissions_save(instance, **kwargs):
                     if record is not None:
                         record.save()
                         check_permission(request, "netbox_dns.add_record", record)
-                        request.post_save_ops.append(("link_record",record))
+                        request.post_save_ops.append(("link_record", record))
 
     except ValidationError as exc:
         if hasattr(exc, "error_dict"):
@@ -148,7 +148,7 @@ def ip_address_update_address_record(instance, **kwargs):
 
     request = current_request.get()
     if hasattr(request, "post_save_ops"):
-        for (op, record) in request.post_save_ops:
+        for op, record in request.post_save_ops:
             if op == "link_record":
                 record.ipam_ip_address = instance
                 record.save()

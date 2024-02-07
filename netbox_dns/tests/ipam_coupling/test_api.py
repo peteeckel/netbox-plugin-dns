@@ -307,7 +307,9 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record", actions=["change"], constraints=[{"name": name1}, {"name": name2}]
+            name=f"Modify Test Record",
+            actions=["change"],
+            constraints=[{"name": name1}, {"name": name2}],
         )
         object_permission.save()
         object_permission.object_types.add(ContentType.objects.get_for_model(Record))
