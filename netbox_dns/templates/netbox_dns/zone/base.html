@@ -1,13 +1,15 @@
 {% extends 'generic/object.html' %}
+{% load buttons %}
 {% load helpers %}
 {% load plugins %}
-{% load render_table from django_tables2 %}
 {% load perms %}
 
 {% block extra_controls %}
 {% if perms.netbox_dns.add_record %}
-<a href="{% url 'plugins:netbox_dns:record_add' %}?zone={{ object.id }}&return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-primary" role="button">
-    <i class="mdi mdi-plus-thick"></i> Add Record
+<a href="{% url 'plugins:netbox_dns:record_add' %}?zone={{ object.id }}&return_url={{ object.get_absolute_url }}">
+    <button type="submit" class="btn btn-primary" name="add-record">
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i>Add Record
+    </button>
 </a>
 {% endif %}
 {{ block.super }}
