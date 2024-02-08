@@ -133,6 +133,79 @@ class IPAMCouplingAPITest(APITestCase):
         self.assertFalse(Record.objects.filter(name=name, zone_id=zone.id).exists())
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_with_dns_object_permission(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = "10.0.0.42/24"
+
+        self.add_permissions("ipam.add_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Create Test Record",
+            actions=["add"],
+            constraints={"name": name},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        url = reverse("ipam-api:ipaddress-list")
+        data = {
+            "address": address,
+            "custom_fields": {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": None,
+            },
+        }
+        response = self.client.post(url, data, format="json", **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_201_CREATED)
+
+        ip_address = IPAddress.objects.get(pk=response.data["id"])
+        address_record = ip_address.netbox_dns_records.first()
+
+        self.assertEqual(address_record.name, name)
+        self.assertEqual(address_record.zone, zone)
+        self.assertTrue(address_record.managed)
+
+        self.assertEqual(ip_address.dns_name, f"{name}.{zone.name}")
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_create_ip_missing_dns_object_permission(self):
+        zone = self.zones[0]
+        name = "name42"
+        address = "10.0.0.42/24"
+
+        self.add_permissions("ipam.add_ipaddress")
+
+        object_permission = ObjectPermission(
+            name=f"Create Test Record",
+            actions=["add"],
+            constraints={"name": "invalid"},
+        )
+        object_permission.save()
+        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.users.add(self.user)
+
+        url = reverse("ipam-api:ipaddress-list")
+        data = {
+            "address": address,
+            "custom_fields": {
+                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_record_name": name,
+                "ipaddress_dns_record_ttl": None,
+            },
+        }
+        response = self.client.post(url, data, format="json", **self.header)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertFalse(IPAddress.objects.filter(address=address).exists())
+        self.assertFalse(Record.objects.filter(name=name, zone_id=zone.id).exists())
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_delete_ip_with_dns_permission(self):
         zone = self.zones[0]
         name = "name23"
