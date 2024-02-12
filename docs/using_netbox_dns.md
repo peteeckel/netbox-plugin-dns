@@ -19,8 +19,20 @@ The installation of plugins in general is described in the [NetBox documentation
 ### Requirements
 The installation of NetBox DNS requires a Python interpreter and a working NetBox deployment. Supported versions are currently:
 
-* NetBox 3.5.0 or higher
-* Python 3.8 or higher
+* NetBox 4.0.0 or higher
+* Python 3.10 or higher
+
+### Compatibility
+NetBox DNS is compatible with the following NetBox versions.
+
+NetBox Version | NetBox DNS Version | Comment
+-------------- | ------------------ | -------
+3.5.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
+3.6.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
+3.7.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
+4.0.x          | 0.23.x or later    | Only the latest NetBox DNS version is supported
+
+If you are running an earlier version of NetBox, the old version of the PyPI module `netbox-dns` can be used. That version is deprecated and will not receive any further updates of any kind, so it is strongly recommended to move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
 ### Installation of NetBox DNS
 NetBox DNS is available as a PyPi module and can be installed using pip:
@@ -66,8 +78,37 @@ systemctl restart netbox netbox-rq
 
 Now NetBox DNS should show up under "Plugins" at the bottom of the left-hand side of the NetBox web GUI.
 
+### Upgrading NetBox DNS from `netbox-dns` to `netbox-plugin-dns`
+The current Python module for NetBox DNS is named `netbox-plugin-dns`. Until March 2023, the module providing the NetBox DNS plugin was named `netbox-dns`, and this PyPI module can unfortunately still be installed. It has not received any updates since the switch to `netbox-plugin-dns` was necessary, is no longer supported and does not work with NetBox versions 3.5.0 and higher.
+
+#### `netbox-dns` versions less than 0.16.0
+If the old `netbox-dns` module is installed on the system, make sure to upgrade it to the latest version first and then run the migration:
+
+```
+/opt/netbox/venv/bin/python3 -m pip install --upgrade netbox-dns
+/opt/netbox/netbox/manage.py migrate
+```
+This will install the latest version 0.17.0 of the plugin and perform the necessary database migrations that are required for the migration to `netbox-plugin-dns`. Then proceed as described in the next section.
+
+#### `netbox-dns` version 0.16.0 and higher
+If the version of `netbox-dns` is at least 0.16.0, the system can be directly migrated to `netbox-plugin-dns`. It is vital that the old plugin is removed before the new one is installed, otherwise NetBox will fail to start.
+
+```
+/opt/netbox/venv/bin/python3 -m pip remove netbox-dns
+/opt/netbox/venv/bin/python3 -m pip install netbox-plugin-dns
+/opt/netbox/netbox/manage.py migrate
+```
+
+### NetBox 3 support
+NetBox 3.5.0 up to NetBox 3.7.x are not supported by the latest version of NetBox DNS. In order to install NetBox DNS on NetBox 3 systems, please install the latest version of `netbox-plugin-dns` 0.22:
+
+```
+/opt/netbox/venv/bin/python3 -m pip install 'netbox-plugin-dns<0.23'
+/opt/netbox/netbox/manage.py migrate
+```
+
 ## Object types
-Currently NetBox DNS can manage four different object types: Views, Name Servers, Zones, and Records.
+Currently NetBox DNS can manage six different object types: Views, Name Servers, Zones, and Records, Contacts and Registrars.
 
 ### Views
 Views are a concept to optinally partition the DNS namespace into groups of zones that are isolated from each other. They are mainly used for split horizon DNS setups, for example in cases when there is a different DNS resolution requirement for external and internal clients where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
