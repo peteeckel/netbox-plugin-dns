@@ -79,6 +79,10 @@ def ip_address_check_permissions_save(instance, **kwargs):
             if value is not None:
                 exc.error_dict["cf_ipaddress_dns_record_name"] = value
 
+            value = exc.error_dict.pop("type", None)
+            if value is not None:
+                exc.error_dict["cf_ipaddress_dns_record_name"] = value
+
         raise ValidationError(exc)
 
     except DNSPermissionDenied as exc:
