@@ -13,13 +13,13 @@ from netbox_dns.api.serializers import (
     RegistrarSerializer,
     ContactSerializer,
 )
-from netbox_dns.filters import (
-    ViewFilter,
-    ZoneFilter,
-    NameServerFilter,
-    RecordFilter,
-    RegistrarFilter,
-    ContactFilter,
+from netbox_dns.filtersets import (
+    ViewFilterSet,
+    ZoneFilterSet,
+    NameServerFilterSet,
+    RecordFilterSet,
+    RegistrarFilterSet,
+    ContactFilterSet,
 )
 from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
 
@@ -32,7 +32,7 @@ class NetBoxDNSRootView(APIRootView):
 class ViewViewSet(NetBoxModelViewSet):
     queryset = View.objects.all()
     serializer_class = ViewSerializer
-    filterset_class = ViewFilter
+    filterset_class = ViewFilterSet
 
     @action(detail=True, methods=["get"])
     def views(self, request, pk=None):
@@ -51,7 +51,7 @@ class ZoneViewSet(NetBoxModelViewSet):
         "tenant",
     )
     serializer_class = ZoneSerializer
-    filterset_class = ZoneFilter
+    filterset_class = ZoneFilterSet
 
     @action(detail=True, methods=["get"])
     def records(self, request, pk=None):
@@ -71,7 +71,7 @@ class ZoneViewSet(NetBoxModelViewSet):
 class NameServerViewSet(NetBoxModelViewSet):
     queryset = NameServer.objects.prefetch_related("zones", "tenant")
     serializer_class = NameServerSerializer
-    filterset_class = NameServerFilter
+    filterset_class = NameServerFilterSet
 
     @action(detail=True, methods=["get"])
     def zones(self, request, pk=None):
@@ -83,7 +83,7 @@ class NameServerViewSet(NetBoxModelViewSet):
 class RecordViewSet(NetBoxModelViewSet):
     queryset = Record.objects.all().prefetch_related("zone", "zone__view", "tenant")
     serializer_class = RecordSerializer
-    filterset_class = RecordFilter
+    filterset_class = RecordFilterSet
 
     def destroy(self, request, *args, **kwargs):
         v_object = self.get_object()
@@ -105,10 +105,10 @@ class RecordViewSet(NetBoxModelViewSet):
 class RegistrarViewSet(NetBoxModelViewSet):
     queryset = Registrar.objects.all()
     serializer_class = RegistrarSerializer
-    filterset_class = RegistrarFilter
+    filterset_class = RegistrarFilterSet
 
 
 class ContactViewSet(NetBoxModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
-    filterset_class = ContactFilter
+    filterset_class = ContactFilterSet

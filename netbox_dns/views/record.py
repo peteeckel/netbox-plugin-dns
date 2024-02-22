@@ -5,7 +5,7 @@ from django.db.models.functions import Length
 
 from netbox.views import generic
 
-from netbox_dns.filters import RecordFilter
+from netbox_dns.filtersets import RecordFilterSet
 from netbox_dns.forms import (
     RecordImportForm,
     RecordFilterForm,
@@ -21,7 +21,7 @@ class RecordListView(generic.ObjectListView):
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"
     )
-    filterset = RecordFilter
+    filterset = RecordFilterSet
     filterset_form = RecordFilterForm
     table = RecordTable
 
@@ -30,7 +30,7 @@ class ManagedRecordListView(generic.ObjectListView):
     queryset = Record.objects.filter(managed=True).prefetch_related(
         "zone", "address_record"
     )
-    filterset = RecordFilter
+    filterset = RecordFilterSet
     filterset_form = RecordFilterForm
     table = ManagedRecordTable
     actions = {"export": {"view"}}
@@ -149,7 +149,7 @@ class RecordBulkImportView(generic.BulkImportView):
 
 class RecordBulkEditView(generic.BulkEditView):
     queryset = Record.objects.filter(managed=False).prefetch_related("zone")
-    filterset = RecordFilter
+    filterset = RecordFilterSet
     table = RecordTable
     form = RecordBulkEditForm
 

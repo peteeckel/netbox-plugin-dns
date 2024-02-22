@@ -3,13 +3,13 @@ from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 
-from netbox_dns.models import NameServer
+from netbox_dns.models import View
 
 
-class NameServerFilter(TenancyFilterSet, NetBoxModelFilterSet):
+class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     class Meta:
-        model = NameServer
-        fields = ("id", "name", "tenant", "tag")
+        model = View
+        fields = ("id", "name", "tenant")
 
     def search(self, queryset, name, value):
         if not value.strip():
