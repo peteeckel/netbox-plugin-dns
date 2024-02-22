@@ -4,12 +4,12 @@ from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_dns.models import View
-from netbox_dns.filters import ViewFilter
+from netbox_dns.filtersets import ViewFilterSet
 
 
 class ViewFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = View.objects.all()
-    filterset = ViewFilter
+    filterset = ViewFilterSet
 
     @classmethod
     def setUpTestData(cls):

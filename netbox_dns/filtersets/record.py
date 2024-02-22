@@ -8,7 +8,7 @@ from utilities.filters import MultiValueCharFilter
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 
 
-class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
+class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     fqdn = MultiValueCharFilter(
         method="filter_fqdn",
     )
