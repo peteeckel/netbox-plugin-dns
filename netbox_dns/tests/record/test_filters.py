@@ -10,12 +10,12 @@ from netbox_dns.models import (
     Record,
     RecordTypeChoices,
 )
-from netbox_dns.filters import RecordFilter
+from netbox_dns.filtersets import RecordFilterSet
 
 
 class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Record.objects.all()
-    filterset = RecordFilter
+    filterset = RecordFilterSet
 
     zone_data = {
         "default_ttl": 86400,

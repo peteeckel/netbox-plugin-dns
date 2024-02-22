@@ -3,7 +3,7 @@ from utilities.views import ViewTab, register_model_view
 from netbox.views import generic
 
 from netbox_dns.models import View, Zone
-from netbox_dns.filters import ViewFilter, ZoneFilter
+from netbox_dns.filtersets import ViewFilterSet, ZoneFilterSet
 from netbox_dns.forms import ViewForm, ViewFilterForm, ViewImportForm, ViewBulkEditForm
 from netbox_dns.tables import ViewTable, ZoneTable
 
@@ -15,7 +15,7 @@ class ViewView(generic.ObjectView):
 class ViewListView(generic.ObjectListView):
     queryset = View.objects.all()
     table = ViewTable
-    filterset = ViewFilter
+    filterset = ViewFilterSet
     filterset_form = ViewFilterForm
 
 
@@ -39,7 +39,7 @@ class ViewBulkImportView(generic.BulkImportView):
 
 class ViewBulkEditView(generic.BulkEditView):
     queryset = View.objects.all()
-    filterset = ViewFilter
+    filterset = ViewFilterSet
     table = ViewTable
     form = ViewBulkEditForm
 
@@ -54,7 +54,7 @@ class ViewZoneListView(generic.ObjectChildrenView):
     queryset = View.objects.all().prefetch_related("zone_set")
     child_model = Zone
     table = ZoneTable
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     template_name = "netbox_dns/zone/child.html"
     hide_if_empty = True
 

@@ -3,7 +3,7 @@ from dns import name as dns_name
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 
-from netbox_dns.filters import ZoneFilter, RecordFilter
+from netbox_dns.filtersets import ZoneFilterSet, RecordFilterSet
 from netbox_dns.forms import (
     ZoneImportForm,
     ZoneForm,
@@ -20,7 +20,7 @@ from netbox_dns.tables import (
 
 class ZoneListView(generic.ObjectListView):
     queryset = Zone.objects.all().prefetch_related("view", "tags")
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     filterset_form = ZoneFilterForm
     table = ZoneTable
 
@@ -75,7 +75,7 @@ class ZoneBulkEditView(generic.BulkEditView):
     queryset = Zone.objects.all().prefetch_related(
         "view", "tags", "nameservers", "soa_mname"
     )
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     table = ZoneTable
     form = ZoneBulkEditForm
     default_return_url = "plugins:netbox_dns:zone_list"
@@ -109,7 +109,7 @@ class ZoneRecordListView(generic.ObjectChildrenView):
     queryset = Zone.objects.all()
     child_model = Record
     table = RecordTable
-    filterset = RecordFilter
+    filterset = RecordFilterSet
     template_name = "netbox_dns/zone/record.html"
     hide_if_empty = True
 
@@ -131,7 +131,7 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
     queryset = Zone.objects.all()
     child_model = Record
     table = ManagedRecordTable
-    filterset = RecordFilter
+    filterset = RecordFilterSet
     template_name = "netbox_dns/zone/managed_record.html"
     actions = {"changelog": {"view"}}
 
@@ -153,7 +153,7 @@ class ZoneRFC2317ChildZoneListView(generic.ObjectChildrenView):
     queryset = Zone.objects.all()
     child_model = Zone
     table = ZoneTable
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     template_name = "netbox_dns/zone/rfc2317_child_zone.html"
 
     tab = ViewTab(

@@ -7,7 +7,7 @@ from tenancy.filtersets import TenancyFilterSet
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 
 
-class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
+class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     """Filter capabilities for Record instances."""
 
     type = django_filters.MultipleChoiceFilter(

@@ -11,12 +11,12 @@ from netbox_dns.models import (
     Registrar,
     Contact,
 )
-from netbox_dns.filters import ZoneFilter
+from netbox_dns.filtersets import ZoneFilter
 
 
 class ZoneFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Zone.objects.all()
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
 
     zone_data = {
         "default_ttl": 86400,

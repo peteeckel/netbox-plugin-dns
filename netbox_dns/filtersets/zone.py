@@ -7,7 +7,7 @@ from tenancy.filtersets import TenancyFilterSet
 from netbox_dns.models import View, Zone, ZoneStatusChoices, Registrar, Contact
 
 
-class ZoneFilter(TenancyFilterSet, NetBoxModelFilterSet):
+class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=ZoneStatusChoices,
     )

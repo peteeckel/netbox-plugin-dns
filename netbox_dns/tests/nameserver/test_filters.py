@@ -4,12 +4,12 @@ from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_dns.models import NameServer
-from netbox_dns.filters import NameServerFilter
+from netbox_dns.filtersets import NameServerFilterSet
 
 
 class NameServerFiterTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = NameServer.objects.all()
-    filterset = NameServerFilter
+    filterset = NameServerFilterSet
 
     @classmethod
     def setUpTestData(cls):
