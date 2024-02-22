@@ -22,6 +22,7 @@ def arpa_to_prefix(arpa_name):
     if name.endswith(".in-addr.arpa"):
         address = ".".join(reversed(name.replace(".in-addr.arpa", "").split(".")))
         mask = len(address.split(".")) * 8
+        address = address + (32 - mask) // 8 * ".0"
 
         try:
             return IPNetwork(f"{address}/{mask}")
