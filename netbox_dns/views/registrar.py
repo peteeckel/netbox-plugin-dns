@@ -3,7 +3,7 @@ from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 
 from netbox_dns.models import Registrar, Zone
-from netbox_dns.filters import RegistrarFilter, ZoneFilter
+from netbox_dns.filtersets import RegistrarFilterSet, ZoneFilterSet
 from netbox_dns.forms import (
     RegistrarForm,
     RegistrarFilterForm,
@@ -20,7 +20,7 @@ class RegistrarView(generic.ObjectView):
 class RegistrarListView(generic.ObjectListView):
     queryset = Registrar.objects.all()
     table = RegistrarTable
-    filterset = RegistrarFilter
+    filterset = RegistrarFilterSet
     filterset_form = RegistrarFilterForm
 
 
@@ -44,7 +44,7 @@ class RegistrarBulkImportView(generic.BulkImportView):
 
 class RegistrarBulkEditView(generic.BulkEditView):
     queryset = Registrar.objects.all()
-    filterset = RegistrarFilter
+    filterset = RegistrarFilterSet
     table = RegistrarTable
     form = RegistrarBulkEditForm
 
@@ -59,7 +59,7 @@ class RegistrarZoneListView(generic.ObjectChildrenView):
     queryset = Registrar.objects.all().prefetch_related("zone_set")
     child_model = Zone
     table = ZoneTable
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     template_name = "netbox_dns/zone/child.html"
     hide_if_empty = True
 
