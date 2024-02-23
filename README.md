@@ -10,6 +10,9 @@
 <a href="https://github.com/peteeckel/netbox-plugin-dns/issues"><img src="https://img.shields.io/github/issues/peteeckel/netbox-plugin-dns" alt="Issues Badge"/></a>
 <a href="https://github.com/peteeckel/netbox-plugin-dns/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/peteeckel/netbox-plugin-dns?color=2b9348"></a>
 <a href="https://github.com/peteeckel/netbox-plugin-dns/blob/master/LICENSE"><img src="https://img.shields.io/github/license/peteeckel/netbox-plugin-dns?color=2b9348" alt="License Badge"/></a>
+<a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads" src="https://static.pepy.tech/badge/netbox-plugin-dns"></a>
+<a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Week" src="https://static.pepy.tech/badge/netbox-plugin-dns/month"></a>
+<a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Month" src="https://static.pepy.tech/badge/netbox-plugin-dns/week"></a>
 </div>
 
 ## Features
