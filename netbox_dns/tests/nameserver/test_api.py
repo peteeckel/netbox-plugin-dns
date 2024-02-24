@@ -13,7 +13,7 @@ class NameServerTest(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = NameServer
-    brief_fields = ["display", "id", "name", "url"]
+    brief_fields = ["description", "display", "id", "name", "url"]
     create_data = [
         {"name": "ns1.example.com"},
         {"name": "ns2.example.com"},
