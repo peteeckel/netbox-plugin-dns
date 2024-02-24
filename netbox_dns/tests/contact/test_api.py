@@ -13,7 +13,7 @@ class ContactAPITestCase(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = Contact
-    brief_fields = ["contact_id", "display", "id", "name", "url"]
+    brief_fields = ["contact_id", "description", "display", "id", "name", "url"]
 
     create_data = [
         {"name": "John Doe", "contact_id": "COM-REG-JOHNDOE-42"},

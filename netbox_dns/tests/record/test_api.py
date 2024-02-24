@@ -15,6 +15,7 @@ class RecordTest(
     model = Record
     brief_fields = [
         "active",
+        "description",
         "display",
         "id",
         "name",
