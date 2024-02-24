@@ -13,7 +13,7 @@ class RegistrarAPITestCase(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = Registrar
-    brief_fields = ["display", "iana_id", "id", "name", "url"]
+    brief_fields = ["description", "display", "iana_id", "id", "name", "url"]
 
     create_data = [
         {
