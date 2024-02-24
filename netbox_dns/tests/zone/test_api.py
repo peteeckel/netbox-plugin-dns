@@ -16,6 +16,7 @@ class ZoneTest(
 
     brief_fields = [
         "active",
+        "description",
         "display",
         "id",
         "name",

@@ -35,7 +35,7 @@ class ViewSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name")
+        brief_fields = ("id", "url", "display", "name", "description")
 
 
 class ZoneSerializer(NetBoxModelSerializer):
@@ -172,6 +172,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             "view",
             "display",
             "status",
+            "description",
             "rfc2317_prefix",
             "active",
         )
@@ -205,7 +206,7 @@ class NameServerSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name")
+        brief_fields = ("id", "url", "display", "name", "description")
 
 
 class RecordSerializer(NetBoxModelSerializer):
@@ -280,6 +281,7 @@ class RecordSerializer(NetBoxModelSerializer):
             "value",
             "status",
             "ttl",
+            "description",
             "active",
         )
 
@@ -307,7 +309,7 @@ class RegistrarSerializer(NetBoxModelSerializer):
             "last_updated",
             "custom_fields",
         )
-        brief_fields = ("id", "url", "display", "name", "iana_id")
+        brief_fields = ("id", "url", "display", "name", "description", "iana_id")
 
 
 class ContactSerializer(NetBoxModelSerializer):
@@ -339,4 +341,4 @@ class ContactSerializer(NetBoxModelSerializer):
             "last_updated",
             "custom_fields",
         )
-        brief_fields = ("id", "url", "display", "name", "contact_id")
+        brief_fields = ("id", "url", "display", "name", "description", "contact_id")
