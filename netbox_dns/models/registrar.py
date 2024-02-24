@@ -13,6 +13,10 @@ class Registrar(NetBoxModel):
         unique=True,
         max_length=255,
     )
+    description = models.CharField(
+        blank=True,
+        max_length=200,
+    )
     iana_id = models.IntegerField(
         verbose_name="IANA ID",
         null=True,

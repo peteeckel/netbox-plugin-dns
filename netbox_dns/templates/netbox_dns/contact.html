@@ -11,7 +11,13 @@
                             <th scope="row">Name</th>
                             <td>{{ object.name }}</td>
                         </tr>
+                         {% if object.description %}
                         <tr>
+                            <th scope="row">Description</th>
+                            <td style="word-break:break-all;">{{ object.description }}</td>
+                        </tr>
+                        {% endif %}
+                       <tr>
                             <th scope="row">Contact ID</th>
                             <td>{{ object.contact_id }}</td>
                         </tr>

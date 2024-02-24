@@ -17,6 +17,7 @@ class RegistrarTable(NetBoxTable):
         model = Registrar
         fields = (
             "name",
+            "description",
             "iana_id",
             "referral_url",
             "whois_server",

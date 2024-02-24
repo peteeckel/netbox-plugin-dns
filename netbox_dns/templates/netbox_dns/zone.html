@@ -31,6 +31,12 @@
                         </td>
                     </tr>
                     {% endif %}
+                    {% if object.description %}
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td style="word-break:break-all;">{{ object.description }}</td>
+                    </tr>
+                    {% endif %}
                     <tr>
                         <th scope="row">Tenant</th>
                         <td>

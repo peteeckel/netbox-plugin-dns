@@ -11,6 +11,12 @@
                             <th scope="row">Name</th>
                             <td>{{ object.name }}</td>
                         </tr>
+                        {% if object.description %}
+                        <tr>
+                            <th scope="row">Description</th>
+                            <td style="word-break:break-all;">{{ object.description }}</td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <th scope="row">Tenant</th>
                             <td>
@@ -19,10 +25,6 @@
                                 {% endif %}
                                 {{ object.tenant|linkify|placeholder }}
                             </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Description</th>
-                            <td>{{ object.description }}</td>
                         </tr>
                     </table>
                 </div>
