@@ -16,6 +16,7 @@ class ContactForm(NetBoxModelForm):
         model = Contact
         fields = (
             "name",
+            "description",
             "contact_id",
             "organization",
             "street",
@@ -35,7 +36,7 @@ class ContactForm(NetBoxModelForm):
 class ContactFilterForm(NetBoxModelFilterSetForm):
     model = Contact
     fieldsets = (
-        (None, ("q", "name", "tags", "contact_id")),
+        (None, ("q", "name", "description", "tags", "contact_id")),
         (
             "Address",
             (
@@ -51,6 +52,9 @@ class ContactFilterForm(NetBoxModelFilterSetForm):
     )
 
     name = forms.CharField(
+        required=False,
+    )
+    description = forms.CharField(
         required=False,
     )
     contact_id = forms.CharField(
@@ -102,6 +106,7 @@ class ContactImportForm(NetBoxModelImportForm):
         model = Contact
         fields = (
             "name",
+            "description",
             "contact_id",
             "organization",
             "street",
@@ -124,6 +129,10 @@ class ContactBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(
         required=False,
         label="Name",
+    )
+    description = forms.CharField(
+        required=False,
+        label="Description",
     )
     organization = forms.CharField(
         required=False,
@@ -171,7 +180,7 @@ class ContactBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     fieldsets = (
-        (None, ("name",)),
+        (None, ("name", "description")),
         (
             "Address",
             (
@@ -197,6 +206,7 @@ class ContactBulkEditForm(NetBoxModelBulkEditForm):
 
     nullable_fields = (
         "name",
+        "description",
         "organization",
         "street",
         "city",
