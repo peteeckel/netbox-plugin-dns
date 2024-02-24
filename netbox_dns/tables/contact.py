@@ -18,6 +18,7 @@ class ContactTable(NetBoxTable):
         fields = (
             "contact_id",
             "name",
+            "description",
             "organization",
             "street",
             "city",
