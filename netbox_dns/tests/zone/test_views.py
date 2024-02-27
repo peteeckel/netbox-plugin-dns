@@ -36,7 +36,14 @@ class ZoneTestCase(
 
     @classmethod
     def setUpTestData(cls):
-        ns1 = NameServer.objects.create(name="ns1.example.com")
+        cls.nameservers = (
+            NameServer(name="ns1.example.com"),
+            NameServer(name="ns2.example.com"),
+            NameServer(name="ns3.example.com"),
+        )
+        NameServer.objects.bulk_create(cls.nameservers)
+
+        ns1 = cls.nameservers[1]
 
         cls.views = (
             View(name="internal"),
@@ -63,10 +70,11 @@ class ZoneTestCase(
         }
 
         cls.csv_data = (
-            "name,status,soa_mname,soa_rname",
-            "zone4.example.com,active,ns1.example.com,hostmaster.example.com",
-            "zone5.example.com,active,ns1.example.com,hostmaster.example.com",
-            "zone6.example.com,active,ns1.example.com,hostmaster.example.com",
+            "name,status,soa_mname,soa_rname,nameservers",
+            "zone4.example.com,active,ns1.example.com,hostmaster.example.com,",
+            "zone5.example.com,active,ns1.example.com,hostmaster.example.com,",
+            "zone6.example.com,active,ns1.example.com,hostmaster.example.com,",
+            'zone7.example.com,active,ns1.example.com,hostmaster.example.com,"ns2.example.com,ns3.example.com"',
         )
 
         cls.csv_update_data = (
