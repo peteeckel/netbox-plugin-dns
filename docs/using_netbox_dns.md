@@ -259,9 +259,9 @@ Setting                 | Variable               | Factory Default
 **SOA MNAME**           | `zone_soa_mname`       |
 **SOA RNAME**           | `zone_soa_rname`       |
 **SOA SERIAL**          | `zone_soa_serial`      | 1
-**SOA REFRESH**         | `zone_soa_refresh`     | 172800
+**SOA REFRESH**         | `zone_soa_refresh`     | 43200
 **SOA RETRY**           | `zone_soa_retry`       | 7200
-**SOA EXPIRE**          | `zone_soa_expire`      | 2592000
+**SOA EXPIRE**          | `zone_soa_expire`      | 2419200
 **SOA MINIMUM**         | `zone_soa_minimum`     | 3600
 
 The settings can be set or overridden in the file `/opt/netbox/netbox/netbox/configuration.py` by defining new values in `PLUGINS_CONFIG` as follows:
