@@ -15,6 +15,7 @@ from utilities.forms.fields import (
     TagFilterField,
     CSVChoiceField,
     CSVModelChoiceField,
+    CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
@@ -287,6 +288,12 @@ class ZoneImportForm(NetBoxModelImportForm):
         required=False,
         help_text="Zone status",
     )
+    nameservers = CSVModelMultipleChoiceField(
+        queryset=NameServer.objects.all(),
+        to_field_name="name",
+        required=False,
+        help_text="Name servers for the zone",
+    )
     default_ttl = forms.IntegerField(
         required=False,
         help_text="Default TTL",
@@ -475,6 +482,7 @@ class ZoneImportForm(NetBoxModelImportForm):
             "view",
             "name",
             "status",
+            "nameservers",
             "default_ttl",
             "description",
             "soa_ttl",
