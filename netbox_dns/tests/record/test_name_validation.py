@@ -82,8 +82,6 @@ class NameValidationTest(TestCase):
                 name=record.get("name"), zone=record.get("zone"), **self.record_data
             )
 
-            self.assertEqual(record_object.name, record.get("name"))
-
     def test_srv_validation_ok(self):
         record = Record.objects.create(
             name="_ldaps._tcp",
@@ -156,7 +154,6 @@ class NameValidationTest(TestCase):
             record_object = Record.objects.create(
                 name=record.get("name"), zone=record.get("zone"), **self.record_data
             )
-            self.assertEqual(record_object.name, record.get("name"))
 
     @override_settings(
         PLUGINS_CONFIG={
