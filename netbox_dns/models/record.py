@@ -419,7 +419,7 @@ class Record(NetBoxModel):
             zone.to_unicode()
             name.to_unicode()
 
-            self.name = name.to_text()
+            self.name = name.relativize(zone).to_text()
 
         except dns.exception.DNSException as exc:
             raise ValidationError(
