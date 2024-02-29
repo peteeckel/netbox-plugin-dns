@@ -141,7 +141,7 @@ def record_update_ptr_records(verbose=False):
     for record in Record.objects.filter(
         type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA)
     ):
-        record.update_ptr_record()
+        record.save(update_fields=["ptr_record"])
 
 
 def record_update_ip_address(verbose=False):

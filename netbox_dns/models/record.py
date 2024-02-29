@@ -372,8 +372,6 @@ class Record(NetBoxModel):
                 ptr_record.save(update_rfc2317_cname=update_rfc2317_cname)
 
         self.ptr_record = ptr_record
-        if self.pk:
-            super().save()
 
     def update_rfc2317_cname_record(self):
         if self.zone.rfc2317_parent_managed:
@@ -597,7 +595,7 @@ class Record(NetBoxModel):
             self.ip_address = None
 
         if self.is_address_record:
-            self.update_ptr_record()
+            self.update_ptr_record(update_rfc2317_cname=update_rfc2317_cname)
         elif self.ptr_record is not None:
             self.ptr_record.delete()
             self.ptr_record = None

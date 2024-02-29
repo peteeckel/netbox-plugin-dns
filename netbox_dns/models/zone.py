@@ -643,7 +643,7 @@ class Zone(NetBoxModel):
             )
 
             for address_record in address_records:
-                address_record.update_ptr_record()
+                address_record.save(update_fields=["ptr_record"])
 
             if self.arpa_network.version == 4:
                 rfc2317_child_zones = Zone.objects.filter(
@@ -673,7 +673,9 @@ class Zone(NetBoxModel):
             )
 
             for address_record in address_records:
-                address_record.update_ptr_record(update_rfc2317_cname=False)
+                address_record.save(
+                    update_fields=["ptr_record"], update_rfc2317_cname=False
+                )
 
             self.update_rfc2317_parent_zone()
 
@@ -681,7 +683,7 @@ class Zone(NetBoxModel):
             for address_record in self.record_set.filter(
                 type__in=(record.RecordTypeChoices.A, record.RecordTypeChoices.AAAA)
             ):
-                address_record.update_ptr_record()
+                address_record.save(update_fields=["ptr_record"])
 
             # Fix name in IP Address when zone name is changed
             if (
@@ -734,7 +736,7 @@ class Zone(NetBoxModel):
             super().delete(*args, **kwargs)
 
         for address_record in record.Record.objects.filter(pk__in=update_records):
-            address_record.update_ptr_record()
+            address_record.save(update_fields=["ptr_record"])
 
         for child_zone in Zone.objects.filter(pk__in=rfc2317_child_zones):
             child_zone.update_rfc2317_parent_zone()
