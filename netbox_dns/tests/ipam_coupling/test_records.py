@@ -607,3 +607,22 @@ class IPAMCouplingRecordTest(TestCase):
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
+    def test_dont_clear_existing_dns_name(self):
+        address = IPNetwork("10.0.0.27/24")
+        dns_name = "test.example.com"
+
+        ip_address = IPAddress.objects.create(
+            address=address,
+            dns_name=dns_name,
+            custom_field_data={
+                "ipaddress_dns_zone_id": None,
+                "ipaddress_dns_record_name": None,
+                "ipaddress_dns_record_ttl": None,
+                "ipaddress_dns_record_disable_ptr": True,
+            },
+        )
+        record_query = Record.objects.filter(ipam_ip_address=ip_address)
+        self.assertFalse(record_query.exists())
+        self.assertEqual(ip_address.dns_name, dns_name)
