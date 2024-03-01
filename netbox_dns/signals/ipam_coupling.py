@@ -121,14 +121,26 @@ def ip_address_update_dns_information(instance, **kwargs):
 
     name, ttl, disable_ptr, zone_id = ipaddress_cf_data(instance)
 
+    previous_zone_id = None
+    if instance.pk is not None:
+        try:
+            old_instance = IPAddress.objects.get(pk=instance.pk)
+            previous_zone_id = old_instance.custom_field_data.get(
+                "ipaddress_dns_zone_id"
+            )
+        except IPAddress.DoesNotExist:
+            pass
+
     if zone_id is not None:
         instance.dns_name = f"{name}.{Zone.objects.get(pk=zone_id).name}"
     else:
-        instance.dns_name = ""
         instance.custom_field_data["ipaddress_dns_record_name"] = None
         instance.custom_field_data["ipaddress_dns_record_ttl"] = None
         instance.custom_field_data["ipaddress_dns_record_disable_ptr"] = False
         instance.custom_field_data["ipaddress_dns_zone_id"] = None
+
+        if previous_zone_id is not None:
+            instance.dns_name = ""
 
 
 #
