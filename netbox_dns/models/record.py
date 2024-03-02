@@ -309,7 +309,7 @@ class Record(NetBoxModel):
 
         return ptr_zone
 
-    def update_ptr_record(self, update_rfc2317_cname=True):
+    def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone
 
         if (
@@ -339,14 +339,16 @@ class Record(NetBoxModel):
                 not ptr_record.zone.is_rfc2317_zone
                 and ptr_record.rfc2317_cname_record is not None
             ):
-                ptr_record.rfc2317_cname_record.delete()
+                ptr_record.rfc2317_cname_record.delete(
+                    save_zone_serial=save_zone_serial
+                )
 
         with transaction.atomic():
             if ptr_record is not None:
                 if ptr_record.zone.pk != ptr_zone.pk:
                     if ptr_record.rfc2317_cname_record is not None:
                         ptr_record.rfc2317_cname_record.delete()
-                    ptr_record.delete()
+                    ptr_record.delete(save_zone_serial=save_zone_serial)
                     ptr_record = None
 
                 else:
@@ -358,7 +360,7 @@ class Record(NetBoxModel):
                         ptr_record.name = ptr_name
                         ptr_record.value = ptr_value
                         ptr_record.ttl = self.ttl
-                        ptr_record.save()
+                        ptr_record.save(save_zone_serial=save_zone_serial)
 
             if ptr_record is None:
                 ptr_record = Record(
@@ -369,11 +371,14 @@ class Record(NetBoxModel):
                     value=ptr_value,
                     managed=True,
                 )
-                ptr_record.save(update_rfc2317_cname=update_rfc2317_cname)
+                ptr_record.save(
+                    update_rfc2317_cname=update_rfc2317_cname,
+                    save_zone_serial=save_zone_serial,
+                )
 
         self.ptr_record = ptr_record
 
-    def update_rfc2317_cname_record(self):
+    def update_rfc2317_cname_record(self, save_zone_serial=True):
         if self.zone.rfc2317_parent_managed:
             cname_name = dns_name.from_text(
                 ipaddress.ip_address(self.ip_address).reverse_pointer
@@ -383,7 +388,7 @@ class Record(NetBoxModel):
                 self.rfc2317_cname_record.name = cname_name
                 self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
                 self.rfc2317_cname_record.value = self.fqdn
-                self.rfc2317_cname_record.save()
+                self.rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
             else:
                 rfc2317_cname_record = Record.objects.filter(
                     name=cname_name,
@@ -393,19 +398,20 @@ class Record(NetBoxModel):
                     value=self.fqdn,
                 ).first()
                 if rfc2317_cname_record is None:
-                    rfc2317_cname_record = Record.objects.create(
+                    rfc2317_cname_record = Record(
                         name=cname_name,
                         type=RecordTypeChoices.CNAME,
                         zone=self.zone.rfc2317_parent_zone,
                         managed=True,
                         value=self.fqdn,
                     )
+                    rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
 
                 self.rfc2317_cname_record = rfc2317_cname_record
 
         else:
             if self.rfc2317_cname_record is not None:
-                self.rfc2317_cname_record.delete()
+                self.rfc2317_cname_record.delete(save_zone_serial=save_zone_serial)
                 self.rfc2317_cname_record = None
 
     def validate_name(self):
@@ -582,14 +588,14 @@ class Record(NetBoxModel):
                     }
                 ) from None
 
-    def save(self, *args, update_rfc2317_cname=True, **kwargs):
+    def save(self, *args, update_rfc2317_cname=True, save_zone_serial=True, **kwargs):
         self.full_clean()
 
         if self.is_ptr_record:
             if self.zone.is_rfc2317_zone:
                 self.ip_address = self.address_from_rfc2317_name
                 if update_rfc2317_cname:
-                    self.update_rfc2317_cname_record()
+                    self.update_rfc2317_cname_record(save_zone_serial=save_zone_serial)
             else:
                 self.ip_address = self.address_from_name
 
@@ -599,7 +605,10 @@ class Record(NetBoxModel):
             self.ip_address = None
 
         if self.is_address_record:
-            self.update_ptr_record(update_rfc2317_cname=update_rfc2317_cname)
+            self.update_ptr_record(
+                update_rfc2317_cname=update_rfc2317_cname,
+                save_zone_serial=save_zone_serial,
+            )
         elif self.ptr_record is not None:
             self.ptr_record.delete()
             self.ptr_record = None
@@ -608,9 +617,9 @@ class Record(NetBoxModel):
 
         zone = self.zone
         if self.type != RecordTypeChoices.SOA and zone.soa_serial_auto:
-            zone.update_serial()
+            zone.update_serial(save_zone_serial=save_zone_serial)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, save_zone_serial=True, **kwargs):
         if self.rfc2317_cname_record:
             if (
                 self.rfc2317_cname_record.pk
@@ -625,7 +634,7 @@ class Record(NetBoxModel):
 
         zone = self.zone
         if zone.soa_serial_auto:
-            zone.update_serial()
+            zone.update_serial(save_zone_serial=save_zone_serial)
 
 
 @register_search

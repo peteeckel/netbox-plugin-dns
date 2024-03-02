@@ -249,6 +249,8 @@ class Zone(NetBoxModel):
         null=True,
     )
 
+    soa_serial_dirty = False
+
     objects = ZoneManager()
 
     clone_fields = [
@@ -470,11 +472,24 @@ class Zone(NetBoxModel):
 
         return soa_serial
 
-    def update_serial(self):
+    def update_serial(self, save_zone_serial=True):
+        if not self.soa_serial_auto:
+            return
+
         self.last_updated = datetime.now()
         self.soa_serial = ceil(datetime.now().timestamp())
-        self.update_soa_record()
-        super().save()
+
+        if save_zone_serial:
+            super().save(update_fields=["soa_serial", "last_updated"])
+            self.soa_serial_dirty = False
+            self.update_soa_record()
+        else:
+            self.soa_serial_dirty = True
+
+    def save_soa_serial(self):
+        if self.soa_serial_auto and self.soa_serial_dirty:
+            super().save(update_fields=["soa_serial", "last_updated"])
+            self.soa_serial_dirty = False
 
     @property
     def network_from_name(self):
@@ -503,28 +518,45 @@ class Zone(NetBoxModel):
             if rfc2317_parent_zone is None:
                 self.rfc2317_parent_managed = False
                 self.rfc2317_parent_zone = None
-                self.save()
+                self.save(
+                    update_fields=["rfc2317_parent_zone", "rfc2317_parent_managed"]
+                )
 
             elif self.rfc2317_parent_zone != rfc2317_parent_zone:
                 self.rfc2317_parent_zone = rfc2317_parent_zone
-                self.save()
+                self.save(update_fields=["rfc2317_parent_zone"])
 
-        ptr_records = self.record_set.filter(type=record.RecordTypeChoices.PTR)
+        ptr_records = self.record_set.filter(
+            type=record.RecordTypeChoices.PTR
+        ).prefetch_related("zone", "rfc2317_cname_record")
+        ptr_zones = {ptr_record.zone for ptr_record in ptr_records}
 
         if self.rfc2317_parent_managed:
             for ptr_record in ptr_records:
-                ptr_record.save()
+                ptr_record.save(save_zone_serial=False)
 
+            self.rfc2317_parent_zone.save_soa_serial()
+            self.rfc2317_parent_zone.update_soa_record()
         else:
             cname_records = {
                 ptr_record.rfc2317_cname_record
                 for ptr_record in ptr_records
                 if ptr_record.rfc2317_cname_record is not None
             }
+            cname_zones = {cname_record.zone for cname_record in cname_records}
+
             for ptr_record in ptr_records:
-                ptr_record.save(update_rfc2317_cname=False)
+                ptr_record.save(update_rfc2317_cname=False, save_zone_serial=False)
             for cname_record in cname_records:
-                cname_record.delete()
+                cname_record.delete(save_zone_serial=False)
+
+            for cname_zone in cname_zones:
+                cname_zone.save_soa_serial()
+                cname_zone.update_soa_record()
+
+        for ptr_zone in ptr_zones:
+            ptr_zone.save_soa_serial()
+            ptr_zone.update_soa_record()
 
     def clean(self, *args, **kwargs):
         self.check_name_conflict()
@@ -643,7 +675,12 @@ class Zone(NetBoxModel):
             )
 
             for address_record in address_records:
-                address_record.save(update_fields=["ptr_record"])
+                address_record.save(
+                    update_fields=["ptr_record"], save_zone_serial=False
+                )
+
+            for zone in zones:
+                zone.save_soa_serial()
 
             if self.arpa_network.version == 4:
                 rfc2317_child_zones = Zone.objects.filter(
@@ -674,8 +711,13 @@ class Zone(NetBoxModel):
 
             for address_record in address_records:
                 address_record.save(
-                    update_fields=["ptr_record"], update_rfc2317_cname=False
+                    update_fields=["ptr_record"],
+                    update_rfc2317_cname=False,
+                    save_zone_serial=False,
                 )
+
+            for zone in zones:
+                zone.save_soa_serial()
 
             self.update_rfc2317_parent_zone()
 
@@ -696,11 +738,14 @@ class Zone(NetBoxModel):
                     ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
                     ip.save(update_fields=["dns_name"])
 
+        self.save_soa_serial()
         self.update_soa_record()
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
-            address_records = self.record_set.filter(ptr_record__isnull=False)
+            address_records = self.record_set.filter(
+                ptr_record__isnull=False
+            ).prefetch_related("ptr_record")
             for address_record in address_records:
                 address_record.ptr_record.delete()
 
@@ -717,8 +762,13 @@ class Zone(NetBoxModel):
                 for ptr_record in ptr_records
                 if ptr_record.rfc2317_cname_record is not None
             }
+            cname_zones = {cname_record.zone for cname_record in cname_records}
+
             for cname_record in cname_records:
-                cname_record.delete()
+                cname_record.delete(save_zone_serial=False)
+            for cname_zone in cname_zones:
+                cname_zone.save_soa_serial()
+                cname_zone.update_soa_record()
 
             rfc2317_child_zones = [
                 child_zone.pk for child_zone in self.rfc2317_child_zones.all()
@@ -735,11 +785,25 @@ class Zone(NetBoxModel):
 
             super().delete(*args, **kwargs)
 
-        for address_record in record.Record.objects.filter(pk__in=update_records):
-            address_record.save(update_fields=["ptr_record"])
+        address_records = record.Record.objects.filter(
+            pk__in=update_records
+        ).prefetch_related("zone")
 
-        for child_zone in Zone.objects.filter(pk__in=rfc2317_child_zones):
-            child_zone.update_rfc2317_parent_zone()
+        for address_record in address_records:
+            address_record.save(save_zone_serial=False)
+        for address_zone in {address_record.zone for address_record in address_records}:
+            address_zone.save_soa_serial()
+            address_zone.update_soa_record()
+
+        rfc2317_child_zones = Zone.objects.filter(pk__in=rfc2317_child_zones)
+        if rfc2317_child_zones:
+            for child_zone in rfc2317_child_zones:
+                child_zone.update_rfc2317_parent_zone()
+
+            new_rfc2317_parent_zone = rfc2317_child_zones.first().rfc2317_parent_zone
+            if new_rfc2317_parent_zone is not None:
+                new_rfc2317_parent_zone.save_soa_serial()
+                new_rfc2317_parent_zone.update_soa_record()
 
 
 @receiver(m2m_changed, sender=Zone.nameservers.through)
