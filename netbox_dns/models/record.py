@@ -489,6 +489,10 @@ class Record(NetBoxModel):
             value=self.value,
             status__in=Record.ACTIVE_STATUS_LIST,
         )
+
+        if self.pk is not None:
+            records = records.exclude(pk=self.pk)
+
         if len(records):
             raise ValidationError(
                 {
