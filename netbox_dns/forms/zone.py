@@ -458,8 +458,8 @@ class ZoneImportForm(NetBoxModelImportForm):
     def clean(self, *args, **kwargs):
         super().clean(*args, **kwargs)
 
-        soa_serial_auto = self.cleaned_data["soa_serial_auto"]
-        soa_serial = self.cleaned_data["soa_serial"]
+        soa_serial_auto = self.cleaned_data.get("soa_serial_auto")
+        soa_serial = self.cleaned_data.get("soa_serial")
 
         if soa_serial is None:
             soa_serial = self._get_default_value("soa_serial")
@@ -476,11 +476,14 @@ class ZoneImportForm(NetBoxModelImportForm):
                     "SOA Serial Auto not set and no default value and SOA Serial available"
                 )
 
-        self.cleaned_data["soa_serial_auto"] = soa_serial_auto
-        if soa_serial_auto:
-            self.cleaned_data["soa_serial"] = None
-        else:
-            self.cleaned_data["soa_serial"] = soa_serial
+        if "soa_serial_auto" in self.cleaned_data:
+            self.cleaned_data["soa_serial_auto"] = soa_serial_auto
+
+        if "soa_serial" in self.cleaned_data:
+            if soa_serial_auto:
+                self.cleaned_data["soa_serial"] = None
+            else:
+                self.cleaned_data["soa_serial"] = soa_serial
 
     class Meta:
         model = Zone
