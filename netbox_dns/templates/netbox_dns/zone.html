@@ -120,10 +120,17 @@
                         <th scope="row">Responsible</th>
                         <td>{{ object.soa_rname }}</td>
                     </tr>
+                    {% if object.soa_serial_auto %}
+                    <tr>
+                        <th scope="row">Serial (auto-generated)</th>
+                        <td>{{ object.soa_serial }}</td>
+                    </tr>
+                    {% else %}
                     <tr>
                         <th scope="row">Serial</th>
                         <td>{{ object.soa_serial }}</td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <th scope="row">Refresh</th>
                         <td>{{ object.soa_refresh }}</td>

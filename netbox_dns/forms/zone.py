@@ -315,7 +315,7 @@ class ZoneImportForm(NetBoxModelImportForm):
         required=False,
         help_text="Mailbox of the zone's administrator",
     )
-    soa_serial_auto = forms.BooleanField(
+    soa_serial_auto = forms.NullBooleanField(
         required=False,
         help_text="Generate the SOA serial",
     )
@@ -443,26 +443,6 @@ class ZoneImportForm(NetBoxModelImportForm):
     def clean_soa_rname(self):
         return self._clean_field_with_defaults("soa_rname")
 
-    def clean_soa_serial_auto(self):
-        try:
-            return self._clean_field_with_defaults("soa_serial_auto")
-        except ValidationError:
-            if self.cleaned_data["soa_serial"] or self._get_default_value("soa_serial"):
-                return None
-
-            raise
-
-    def clean_soa_serial(self):
-        try:
-            return self._clean_field_with_defaults("soa_serial")
-        except ValidationError:
-            if self.cleaned_data["soa_serial_auto"] or self._get_default_value(
-                "soa_serial_auto"
-            ):
-                return None
-
-            raise
-
     def clean_soa_refresh(self):
         return self._clean_field_with_defaults("soa_refresh")
 
@@ -474,6 +454,36 @@ class ZoneImportForm(NetBoxModelImportForm):
 
     def clean_soa_minimum(self):
         return self._clean_field_with_defaults("soa_minimum")
+
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+
+        soa_serial_auto = self.cleaned_data.get("soa_serial_auto")
+        soa_serial = self.cleaned_data.get("soa_serial")
+
+        if soa_serial is None:
+            soa_serial = self._get_default_value("soa_serial")
+
+        if soa_serial_auto is None:
+            if self._get_default_value("soa_serial_auto") is not None:
+                soa_serial_auto = self._get_default_value("soa_serial_auto")
+
+            elif soa_serial is not None:
+                soa_serial_auto = False
+
+            else:
+                raise ValidationError(
+                    "SOA Serial Auto not set and no default value and SOA Serial available"
+                )
+
+        if "soa_serial_auto" in self.cleaned_data:
+            self.cleaned_data["soa_serial_auto"] = soa_serial_auto
+
+        if "soa_serial" in self.cleaned_data:
+            if soa_serial_auto:
+                self.cleaned_data["soa_serial"] = None
+            else:
+                self.cleaned_data["soa_serial"] = soa_serial
 
     class Meta:
         model = Zone
