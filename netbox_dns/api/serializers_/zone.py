@@ -13,6 +13,17 @@ from netbox_dns.models import Zone
 
 
 class ZoneSerializer(NetBoxModelSerializer):
+    # +
+    # This is a hack to avoid the exception raised by the UniqueTogetherValidator
+    # after NetBox commit https://github.com/netbox-community/netbox/commit/78e284c
+    #
+    # See https://github.com/netbox-community/netbox/issues/15351 for details.
+    # -
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.nested:
+            self.validators = []
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"
     )
