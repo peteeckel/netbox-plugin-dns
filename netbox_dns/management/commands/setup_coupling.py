@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from django.contrib.contenttypes.models import ContentType
+from core.models import ObjectType
 from extras.models import CustomField
 from extras.choices import CustomFieldTypeChoices
 from ipam.models import IPAddress
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         parser.add_argument("--verbose", action="store_true", help="Verbose output")
 
     def handle(self, *model_names, **options):
-        ipaddress_object_type = ContentType.objects.get_for_model(IPAddress)
+        ipaddress_object_type = ObjectType.objects.get_for_model(IPAddress)
 
         if options["remove"]:
             for cf in (
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             ):
                 try:
                     CustomField.objects.get(
-                        name=cf, content_types=ipaddress_object_type
+                        name=cf, object_types=ipaddress_object_type
                     ).delete()
                     if options.get("verbose"):
                         self.stdout.write(f"Custom field '{cf}' removed")
@@ -39,7 +39,7 @@ class Command(BaseCommand):
             if not CustomField.objects.filter(
                 name="ipaddress_dns_record_name",
                 type=CustomFieldTypeChoices.TYPE_TEXT,
-                content_types=ipaddress_object_type,
+                object_types=ipaddress_object_type,
             ).exists():
                 cf_name = CustomField.objects.create(
                     name="ipaddress_dns_record_name",
@@ -48,7 +48,7 @@ class Command(BaseCommand):
                     required=False,
                     group_name="DNS",
                 )
-                cf_name.content_types.set([ipaddress_object_type])
+                cf_name.object_types.set([ipaddress_object_type])
                 if options.get("verbose"):
                     self.stdout.write(
                         "Created custom field 'ipaddress_dns_record_name'"
@@ -57,7 +57,7 @@ class Command(BaseCommand):
             if not CustomField.objects.filter(
                 name="ipaddress_dns_record_ttl",
                 type=CustomFieldTypeChoices.TYPE_INTEGER,
-                content_types=ipaddress_object_type,
+                object_types=ipaddress_object_type,
             ).exists():
                 cf_ttl = CustomField.objects.create(
                     name="ipaddress_dns_record_ttl",
@@ -68,14 +68,14 @@ class Command(BaseCommand):
                     required=False,
                     group_name="DNS",
                 )
-                cf_ttl.content_types.set([ipaddress_object_type])
+                cf_ttl.object_types.set([ipaddress_object_type])
                 if options.get("verbose"):
                     self.stdout.write("Created custom field 'ipaddress_dns_record_ttl'")
 
             if not CustomField.objects.filter(
                 name="ipaddress_dns_record_disable_ptr",
                 type=CustomFieldTypeChoices.TYPE_BOOLEAN,
-                content_types=ipaddress_object_type,
+                object_types=ipaddress_object_type,
             ).exists():
                 cf_disable_ptr = CustomField.objects.create(
                     name="ipaddress_dns_record_disable_ptr",
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                     default=False,
                     group_name="DNS",
                 )
-                cf_disable_ptr.content_types.set([ipaddress_object_type])
+                cf_disable_ptr.object_types.set([ipaddress_object_type])
                 if options.get("verbose"):
                     self.stdout.write(
                         "Created custom field 'ipaddress_dns_record_disable_ptr'"
@@ -94,16 +94,16 @@ class Command(BaseCommand):
             if not CustomField.objects.filter(
                 name="ipaddress_dns_zone_id",
                 type=CustomFieldTypeChoices.TYPE_OBJECT,
-                content_types=ipaddress_object_type,
+                object_types=ipaddress_object_type,
             ).exists():
                 cf_zone = CustomField.objects.create(
                     name="ipaddress_dns_zone_id",
                     label="Zone",
                     type=CustomFieldTypeChoices.TYPE_OBJECT,
-                    object_type=ContentType.objects.get_for_model(Zone),
+                    object_type=ObjectType.objects.get_for_model(Zone),
                     required=False,
                     group_name="DNS",
                 )
-                cf_zone.content_types.set([ipaddress_object_type])
+                cf_zone.object_types.set([ipaddress_object_type])
                 if options.get("verbose"):
                     self.stdout.write("Created custom field 'ipaddress_dns_zone_id'")

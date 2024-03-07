@@ -5,7 +5,7 @@ from unittest import skip
 from django.urls import reverse
 from django.test import override_settings
 from django.core import management
-from django.contrib.contenttypes.models import ContentType
+from core.models import ObjectType
 
 from rest_framework import status
 from utilities.testing import APITestCase, disable_warnings
@@ -172,7 +172,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Delete Test Record", actions=["delete"], constraints={"name": name}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -237,7 +237,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -348,7 +348,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Modify Test Record", actions=["change"], constraints={"name": name1}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -392,7 +392,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Modify Test Record", actions=["change"], constraints={"name": name1}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -474,7 +474,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Modify Test Record", actions=["change"], constraints={"name": name}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -566,7 +566,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -667,7 +667,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -767,7 +767,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Delete Test Record", actions=["delete"], constraints={"name": name}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -869,7 +869,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Delete Test Record", actions=["delete"], constraints={"name": name}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -972,7 +972,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1075,7 +1075,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1291,7 +1291,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1392,7 +1392,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1491,7 +1491,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1624,7 +1624,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Change Test Record", actions=["change"], constraints={"name": name}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1670,7 +1670,7 @@ class IPAMCouplingAPITest(APITestCase):
             name=f"Change Test Record", actions=["change"], constraints={"name": name}
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1796,7 +1796,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
@@ -1844,7 +1844,7 @@ class IPAMCouplingAPITest(APITestCase):
             constraints={"name": "whatever"},
         )
         object_permission.save()
-        object_permission.object_types.add(ContentType.objects.get_for_model(Record))
+        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
         object_permission.users.add(self.user)
 
         ip_address = IPAddress.objects.create(
