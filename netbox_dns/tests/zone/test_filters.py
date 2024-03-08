@@ -3,7 +3,14 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import Zone, ZoneStatusChoices, View, NameServer
+from netbox_dns.models import (
+    Zone,
+    ZoneStatusChoices,
+    View,
+    NameServer,
+    Registrar,
+    Contact,
+)
 from netbox_dns.filters import ZoneFilter
 
 
@@ -53,49 +60,99 @@ class ZoneFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         NameServer.objects.bulk_create(cls.nameservers)
 
+        cls.registrars = (
+            Registrar(name="ACME 2 Corporation", iana_id=4242),
+            Registrar(name="ACME 2 Limited", iana_id=2323),
+            Registrar(name="ACME 2 Trust", iana_id=55),
+        )
+        Registrar.objects.bulk_create(cls.registrars)
+
+        cls.contacts = (
+            Contact(name="Paul Example", contact_id="4242"),
+            Contact(name="Fred Example", contact_id="2323"),
+            Contact(name="Jack Example", contact_id="0815"),
+        )
+        Contact.objects.bulk_create(cls.contacts)
+
         cls.zones = (
             Zone(
                 name="zone1.example.com",
                 view=cls.views[0],
                 tenant=cls.tenants[0],
                 soa_mname=cls.nameservers[0],
-                **cls.zone_data
+                registry_domain_id="acme-001-4242",
+                registrar=cls.registrars[0],
+                registrant=cls.contacts[0],
+                tech_c=cls.contacts[0],
+                admin_c=cls.contacts[0],
+                billing_c=cls.contacts[0],
+                **cls.zone_data,
             ),
             Zone(
                 name="zone2.example.com",
                 view=cls.views[0],
                 tenant=cls.tenants[1],
                 soa_mname=cls.nameservers[1],
+                status=ZoneStatusChoices.STATUS_DEPRECATED,
+                registry_domain_id="acme-001-2323",
+                registrar=cls.registrars[1],
+                registrant=cls.contacts[1],
+                tech_c=cls.contacts[1],
+                admin_c=cls.contacts[1],
+                billing_c=cls.contacts[1],
                 **cls.zone_data,
-                status=ZoneStatusChoices.STATUS_DEPRECATED
             ),
             Zone(
                 name="zone3.example.com",
                 view=cls.views[0],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data
+                registry_domain_id="acme-002-2323",
+                registrar=cls.registrars[1],
+                registrant=cls.contacts[1],
+                tech_c=cls.contacts[1],
+                admin_c=cls.contacts[1],
+                billing_c=cls.contacts[1],
+                **cls.zone_data,
             ),
             Zone(
                 name="zone1.example.com",
                 view=cls.views[1],
                 tenant=cls.tenants[0],
                 soa_mname=cls.nameservers[0],
-                **cls.zone_data
+                registry_domain_id="acme-002-4242",
+                registrar=cls.registrars[1],
+                registrant=cls.contacts[1],
+                tech_c=cls.contacts[1],
+                admin_c=cls.contacts[1],
+                billing_c=cls.contacts[1],
+                **cls.zone_data,
             ),
             Zone(
                 name="zone2.example.com",
                 view=cls.views[1],
                 tenant=cls.tenants[1],
                 soa_mname=cls.nameservers[1],
-                **cls.zone_data
+                registry_domain_id="acme-003-4223",
+                registrar=cls.registrars[2],
+                registrant=cls.contacts[2],
+                tech_c=cls.contacts[2],
+                admin_c=cls.contacts[2],
+                billing_c=cls.contacts[2],
+                **cls.zone_data,
             ),
             Zone(
                 name="zone3.example.com",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data
+                registry_domain_id="acme-003-2342",
+                registrar=cls.registrars[0],
+                registrant=cls.contacts[2],
+                tech_c=cls.contacts[2],
+                admin_c=cls.contacts[2],
+                billing_c=cls.contacts[2],
+                **cls.zone_data,
             ),
         )
         Zone.objects.bulk_create(cls.zones)
@@ -141,3 +198,39 @@ class ZoneFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
             "tenant_group": [self.tenant_groups[0].slug, self.tenant_groups[1].slug]
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_registrar(self):
+        params = {"registrar": [self.registrars[1]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"registrar": [self.registrars[2]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
+    def test_registry_domain_id(self):
+        params = {
+            "registry_domain_id": ["acme-002-2323", "acme-003-4223", "acme-002-7654"]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_registrant(self):
+        params = {"registrant": [self.contacts[1]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_admin_c(self):
+        params = {"admin_c": [self.contacts[1]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_tech_c(self):
+        params = {"tech_c": [self.contacts[2]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"tech_c": [self.contacts[0], self.contacts[1]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_billing_c(self):
+        params = {"billing_c": [self.contacts[0]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"billing_c": [self.contacts[1]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"billing_c": [self.contacts[2]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"billing_c": [self.contacts[1], self.contacts[2]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
