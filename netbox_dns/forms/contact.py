@@ -36,7 +36,8 @@ class ContactForm(NetBoxModelForm):
 class ContactFilterForm(NetBoxModelFilterSetForm):
     model = Contact
     fieldsets = (
-        (None, ("q", "name", "description", "tags", "contact_id")),
+        (None, ("q", "filter_id", "tags")),
+        ("Attributes", ("name", "contact_id", "description")),
         (
             "Address",
             (
