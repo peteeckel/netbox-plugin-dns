@@ -32,13 +32,15 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = View
     fieldsets = (
         (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("name",)),
+        ("Attributes", ("name", "description")),
         ("Tenant", ("tenant_group_id", "tenant_id")),
     )
 
     name = forms.CharField(
         required=False,
-        label="Name",
+    )
+    description = forms.CharField(
+        required=False,
     )
     tag = TagFilterField(View)
 

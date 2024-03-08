@@ -81,7 +81,16 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         (None, ("q", "filter_id", "tag")),
         (
             "Attributes",
-            ("view_id", "zone_id", "name", "fqdn", "type", "value", "status"),
+            (
+                "view_id",
+                "zone_id",
+                "name",
+                "fqdn",
+                "type",
+                "value",
+                "status",
+                "description",
+            ),
         ),
         ("Tenant", ("tenant_group_id", "tenant_id")),
     )
@@ -92,7 +101,6 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     name = forms.CharField(
         required=False,
-        label="Name",
     )
     fqdn = forms.CharField(
         required=False,
@@ -100,7 +108,6 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     value = forms.CharField(
         required=False,
-        label="Value",
     )
     status = forms.MultipleChoiceField(
         choices=RecordStatusChoices,
@@ -111,10 +118,8 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label="Zone",
     )
-    view_id = DynamicModelMultipleChoiceField(
-        queryset=View.objects.all(),
+    description = forms.CharField(
         required=False,
-        label="View",
     )
     tag = TagFilterField(Record)
 

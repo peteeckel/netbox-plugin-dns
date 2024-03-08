@@ -49,6 +49,7 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "type",
             "name",
             "fqdn",
+            "description",
             "value",
             "status",
             "zone",
