@@ -13,7 +13,7 @@ from netbox_dns.models import (
 from netbox_dns.filtersets import RecordFilterSet
 
 
-class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
+class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Record.objects.all()
     filterset = RecordFilterSet
 

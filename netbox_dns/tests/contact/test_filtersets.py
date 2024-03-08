@@ -3,12 +3,12 @@ from django.test import TestCase
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_dns.models import Contact
-from netbox_dns.filters import ContactFilter
+from netbox_dns.filtersets import ContactFilterSet
 
 
-class ContactFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
+class ContactFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Contact.objects.all()
-    filterset = ContactFilter
+    filterset = ContactFilterSet
 
     @classmethod
     def setUpTestData(cls):
