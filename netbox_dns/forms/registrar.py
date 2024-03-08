@@ -17,6 +17,7 @@ class RegistrarForm(NetBoxModelForm):
         fields = (
             "name",
             "iana_id",
+            "address",
             "referral_url",
             "whois_server",
             "abuse_email",
@@ -29,10 +30,16 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
     model = Registrar
     fieldsets = (
         (None, ("q", "name", "iana_id", "tags")),
-        ("Contact", ("referral_url", "whois_server", "abuse_email", "abuse_phone")),
+        (
+            "Contact",
+            ("address", "referral_url", "whois_server", "abuse_email", "abuse_phone"),
+        ),
     )
 
     name = forms.CharField(
+        required=False,
+    )
+    address = forms.CharField(
         required=False,
     )
     iana_id = forms.IntegerField(
@@ -64,6 +71,7 @@ class RegistrarImportForm(NetBoxModelImportForm):
         fields = (
             "name",
             "iana_id",
+            "address",
             "referral_url",
             "whois_server",
             "abuse_email",
@@ -96,6 +104,7 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
         (
             None,
             (
+                "address",
                 "referral_url",
                 "whois_server",
                 "abuse_email",
@@ -105,6 +114,7 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     nullable_fields = (
+        "address",
         "referral_url",
         "whois_server",
         "abuse_email",
