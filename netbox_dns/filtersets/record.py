@@ -42,7 +42,17 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
     class Meta:
         model = Record
-        fields = ("id", "type", "name", "value", "status", "zone", "managed", "tenant")
+        fields = (
+            "id",
+            "type",
+            "name",
+            "description",
+            "value",
+            "status",
+            "zone",
+            "managed",
+            "tenant",
+        )
 
     def search(self, queryset, name, value):
         """Perform the filtered search."""

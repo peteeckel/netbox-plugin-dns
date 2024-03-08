@@ -12,6 +12,7 @@ class RegistrarFilterSet(NetBoxModelFilterSet):
             "id",
             "name",
             "iana_id",
+            "description",
             "address",
             "referral_url",
             "whois_server",

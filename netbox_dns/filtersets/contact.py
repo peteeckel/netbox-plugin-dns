@@ -11,6 +11,7 @@ class ContactFilterSet(NetBoxModelFilterSet):
         fields = (
             "id",
             "name",
+            "description",
             "contact_id",
             "organization",
             "street",

@@ -30,7 +30,15 @@ class RegistrarForm(NetBoxModelForm):
 class RegistrarFilterForm(NetBoxModelFilterSetForm):
     model = Registrar
     fieldsets = (
-        (None, ("q", "name", "iana_id", "description", "tags")),
+        (None, ("q", "filter_id", "tags")),
+        (
+            "Attributes",
+            (
+                "name",
+                "iana_id",
+                "description",
+            ),
+        ),
         (
             "Contact",
             ("address", "referral_url", "whois_server", "abuse_email", "abuse_phone"),
