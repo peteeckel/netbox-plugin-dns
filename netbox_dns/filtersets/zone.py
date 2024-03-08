@@ -81,6 +81,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         fields = (
             "id",
             "name",
+            "description",
             "view",
             "status",
             "nameservers",

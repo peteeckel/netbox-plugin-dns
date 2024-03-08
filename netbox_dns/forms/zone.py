@@ -249,7 +249,18 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Zone
     fieldsets = (
         (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("view_id", "status", "name", "nameservers")),
+        ("Attributes", ("view_id", "status", "name", "nameservers", "description")),
+        (
+            "Registration",
+            (
+                "registrar_id",
+                "registry_domain_id",
+                "registrant_id",
+                "admin_c_id",
+                "tech_c_id",
+                "billing_c_id",
+            ),
+        ),
         ("Tenant", ("tenant_group_id", "tenant_id")),
     )
 
@@ -264,11 +275,42 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     name = forms.CharField(
         required=False,
-        label="Name",
     )
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+    )
+    description = forms.CharField(
+        required=False,
+    )
+    registrar_id = DynamicModelMultipleChoiceField(
+        queryset=Registrar.objects.all(),
+        required=False,
+        label="Registrar",
+    )
+    registry_domain_id = forms.CharField(
+        required=False,
+        label="Registry Domain ID",
+    )
+    registrant_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Registrant",
+    )
+    admin_c_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Admin-C",
+    )
+    tech_c_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Tech-C",
+    )
+    billing_c_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label="Billing-C",
     )
     tag = TagFilterField(Zone)
 

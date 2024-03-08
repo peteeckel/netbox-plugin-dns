@@ -42,13 +42,15 @@ class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
     name = forms.CharField(
         required=False,
-        label="Name",
+    )
+    description = forms.CharField(
+        required=False,
     )
     tag = TagFilterField(NameServer)
 
     fieldsets = (
         (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("name",)),
+        ("Attributes", ("name", "description")),
         ("Tenant", ("tenant_group_id", "tenant_id")),
     )
 
