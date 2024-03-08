@@ -11,10 +11,10 @@ from netbox_dns.models import (
     Registrar,
     Contact,
 )
-from netbox_dns.filtersets import ZoneFilter
+from netbox_dns.filtersets import ZoneFilterSet
 
 
-class ZoneFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
+class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Zone.objects.all()
     filterset = ZoneFilterSet
 
