@@ -3,13 +3,13 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import NameServer
-from netbox_dns.filtersets import NameServerFilterSet
+from netbox_dns.models import View
+from netbox_dns.filtersets import ViewFilterSet
 
 
-class NameServerFiterTestCase(TestCase, ChangeLoggedFilterSetTests):
-    queryset = NameServer.objects.all()
-    filterset = NameServerFilterSet
+class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
+    queryset = View.objects.all()
+    filterset = ViewFilterSet
 
     @classmethod
     def setUpTestData(cls):
@@ -28,15 +28,15 @@ class NameServerFiterTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         Tenant.objects.bulk_create(cls.tenants)
 
-        cls.nameservers = (
-            NameServer(name="ns1.example.com", tenant=cls.tenants[0]),
-            NameServer(name="ns2.example.com", tenant=cls.tenants[1]),
-            NameServer(name="ns3.example.com", tenant=cls.tenants[2]),
+        cls.views = (
+            View(name="View 1", tenant=cls.tenants[0]),
+            View(name="View 2", tenant=cls.tenants[1]),
+            View(name="View 3", tenant=cls.tenants[2]),
         )
-        NameServer.objects.bulk_create(cls.nameservers)
+        View.objects.bulk_create(cls.views)
 
     def test_name(self):
-        params = {"name": ["ns1.example.com", "ns2.example.com"]}
+        params = {"name": ["View 1", "View 2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):

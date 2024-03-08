@@ -3,12 +3,12 @@ from django.test import TestCase
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_dns.models import Registrar
-from netbox_dns.filters import RegistrarFilter
+from netbox_dns.filtersets import RegistrarFilterSet
 
 
-class RegistrarFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
+class RegistrarFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Registrar.objects.all()
-    filterset = RegistrarFilter
+    filterset = RegistrarFilterSet
 
     @classmethod
     def setUpTestData(cls):
