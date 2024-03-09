@@ -100,7 +100,7 @@ class Command(BaseCommand):
                     name="ipaddress_dns_zone_id",
                     label="Zone",
                     type=CustomFieldTypeChoices.TYPE_OBJECT,
-                    object_type=ObjectType.objects.get_for_model(Zone),
+                    related_object_type=ObjectType.objects.get_for_model(Zone),
                     required=False,
                     group_name="DNS",
                 )
