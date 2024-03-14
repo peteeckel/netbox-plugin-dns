@@ -154,8 +154,56 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 billing_c=cls.contacts[2],
                 **cls.zone_data,
             ),
+            Zone(
+                name="0.0.10.in-addr.arpa",
+                view=cls.views[1],
+                tenant=cls.tenants[2],
+                soa_mname=cls.nameservers[2],
+                **cls.zone_data,
+            ),
+            Zone(
+                name="1.0.10.in-addr.arpa",
+                view=cls.views[1],
+                tenant=cls.tenants[2],
+                soa_mname=cls.nameservers[2],
+                **cls.zone_data,
+            ),
+            Zone(
+                name="0-31.0.0.10.in-addr.arpa",
+                soa_mname=cls.nameservers[2],
+                rfc2317_prefix="10.0.0.0/27",
+                **cls.zone_data,
+            ),
+            Zone(
+                name="32-63.0.0.10.in-addr.arpa",
+                soa_mname=cls.nameservers[2],
+                rfc2317_prefix="10.0.0.32/27",
+                **cls.zone_data,
+            ),
+            Zone(
+                name="0.10.in-addr.arpa",
+                view=cls.views[1],
+                tenant=cls.tenants[2],
+                soa_mname=cls.nameservers[2],
+                **cls.zone_data,
+            ),
+            Zone(
+                name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
+                view=cls.views[1],
+                tenant=cls.tenants[2],
+                soa_mname=cls.nameservers[2],
+                **cls.zone_data,
+            ),
+            Zone(
+                name="2.4.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
+                view=cls.views[1],
+                tenant=cls.tenants[2],
+                soa_mname=cls.nameservers[2],
+                **cls.zone_data,
+            ),
         )
-        Zone.objects.bulk_create(cls.zones)
+        for zone in cls.zones:
+            zone.save()
         for i in range(3):
             cls.zones[i].nameservers.set([cls.nameservers[0].pk, cls.nameservers[1].pk])
         for i in range(3):
@@ -173,7 +221,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     def test_active(self):
         params = {"active": True}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 12)
 
     def test_nameservers(self):
         params = {"nameservers": [self.nameservers[0].pk]}
@@ -234,3 +282,15 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"billing_c": [self.contacts[1], self.contacts[2]]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+
+    def test_arpa_network(self):
+        params = {"arpa_network": ["fe80:dead:beef::/48", "10.0.0.0/24"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"arpa_network": ["fe80:dead:beef::/48", "10.0.1.0/24", "10.0.2.0/24"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_rfc2317_prefix(self):
+        params = {"rfc2317_prefix": ["10.0.0.0/27"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"rfc2317_prefix": ["10.0.0.0/27", "10.0.0.32/27", "10.0.0.64/27"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
