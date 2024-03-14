@@ -3,13 +3,25 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import NameServer
+from netbox_dns.models import NameServer, Zone
 from netbox_dns.filtersets import NameServerFilterSet
 
 
 class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = NameServer.objects.all()
     filterset = NameServerFilterSet
+
+    zone_data = {
+        "default_ttl": 86400,
+        "soa_rname": "hostmaster.example.com",
+        "soa_refresh": 172800,
+        "soa_retry": 7200,
+        "soa_expire": 2592000,
+        "soa_ttl": 86400,
+        "soa_minimum": 3600,
+        "soa_serial": 1,
+        "soa_serial_auto": False,
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -33,7 +45,33 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             NameServer(name="ns2.example.com", tenant=cls.tenants[1]),
             NameServer(name="ns3.example.com", tenant=cls.tenants[2]),
         )
-        NameServer.objects.bulk_create(cls.nameservers)
+        for nameserver in cls.nameservers:
+            nameserver.save()
+
+        cls.zones = (
+            Zone(
+                name="zone1.example.com",
+                soa_mname=cls.nameservers[0],
+                **cls.zone_data,
+            ),
+            Zone(
+                name="zone2.example.com",
+                soa_mname=cls.nameservers[0],
+                **cls.zone_data,
+            ),
+            Zone(
+                name="zone3.example.com",
+                soa_mname=cls.nameservers[1],
+                **cls.zone_data,
+            ),
+        )
+        for zone in cls.zones:
+            zone.save()
+        cls.zones[0].nameservers.add(cls.nameservers[0], cls.nameservers[1])
+        cls.zones[1].nameservers.add(cls.nameservers[1], cls.nameservers[2])
+        cls.zones[2].nameservers.add(
+            cls.nameservers[0], cls.nameservers[1], cls.nameservers[2]
+        )
 
     def test_name(self):
         params = {"name": ["ns1.example.com", "ns2.example.com"]}
@@ -53,4 +91,31 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {
             "tenant_group": [self.tenant_groups[0].slug, self.tenant_groups[1].slug]
         }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_zones(self):
+        params = {"zone_id": [self.zones[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"zone_id": [self.zones[1].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"zone_id": [self.zones[2].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_soa_zones(self):
+        params = {"soa_zone_id": [self.zones[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        self.assertEqual(
+            self.filterset(params, self.queryset).qs.first().pk, self.nameservers[0].pk
+        )
+        params = {"soa_zone_id": [self.zones[1].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        self.assertEqual(
+            self.filterset(params, self.queryset).qs.first().pk, self.nameservers[0].pk
+        )
+        params = {"soa_zone_id": [self.zones[2].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        self.assertEqual(
+            self.filterset(params, self.queryset).qs.first().pk, self.nameservers[1].pk
+        )
+        params = {"soa_zone_id": [self.zones[0].pk, self.zones[2].pk, self.zones[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
