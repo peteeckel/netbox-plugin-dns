@@ -1,9 +1,13 @@
+import netaddr
+
 import django_filters
 from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
+
+from ipam.models import IPAddress
 
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 
@@ -14,7 +18,6 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
-        null_value=None,
     )
     status = django_filters.MultipleChoiceFilter(
         choices=RecordStatusChoices,
@@ -40,21 +43,48 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label="View the Parent Zone belongs to",
     )
+    address_record_id = django_filters.ModelMultipleChoiceFilter(
+        field_name="address_record",
+        queryset=Record.objects.all(),
+        to_field_name="id",
+        label="Address Record",
+    )
+    ptr_record_id = django_filters.ModelMultipleChoiceFilter(
+        field_name="ptr_record",
+        queryset=Record.objects.all(),
+        to_field_name="id",
+        label="Pointer Record",
+    )
+    rfc2317_cname_record_id = django_filters.ModelMultipleChoiceFilter(
+        field_name="rfc2317_cname_record",
+        queryset=Record.objects.all(),
+        to_field_name="id",
+        label="Pointer Record",
+    )
+    ipam_ip_address_id = django_filters.ModelMultipleChoiceFilter(
+        field_name="ipam_ip_address",
+        queryset=IPAddress.objects.all(),
+        to_field_name="id",
+        label="IPAM IP Address",
+    )
+    ip_address = MultiValueCharFilter(
+        method="filter_ip_address",
+        label="IP Address",
+    )
+
     managed = django_filters.BooleanFilter()
 
     class Meta:
         model = Record
         fields = (
             "id",
-            "type",
             "name",
             "fqdn",
             "description",
+            "ttl",
             "value",
-            "status",
-            "zone",
+            "disable_ptr",
             "managed",
-            "tenant",
         )
 
     def filter_fqdn(self, queryset, name, value):
@@ -68,6 +98,20 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             fqdns.append(fqdn)
 
         return queryset.filter(fqdn__in=fqdns)
+
+    def filter_ip_address(self, queryset, name, value):
+        if not value:
+            return queryset
+        try:
+            ip_addresses = [
+                str(netaddr.IPAddress(item)) for item in value if item.strip()
+            ]
+            if not ip_addresses:
+                return queryset
+
+            return queryset.filter(ip_address__in=ip_addresses)
+        except (netaddr.AddrFormatError, ValueError):
+            return queryset.none()
 
     def search(self, queryset, name, value):
         if not value.strip():
