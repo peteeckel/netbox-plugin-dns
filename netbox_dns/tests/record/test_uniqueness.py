@@ -51,6 +51,13 @@ class RecordValidationTest(TestCase):
             )
             f_record.save()
 
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "enforce_unique_records": False,
+            }
+        }
+    )
     def test_create_duplicate_records_ok(self):
         f_zone = self.zones[0]
 
@@ -67,13 +74,6 @@ class RecordValidationTest(TestCase):
             )
             f_record.save()
 
-    @override_settings(
-        PLUGINS_CONFIG={
-            "netbox_dns": {
-                "enforce_unique_records": True,
-            }
-        }
-    )
     def test_create_different_type_records_ok(self):
         f_zone = self.zones[0]
 
@@ -90,13 +90,6 @@ class RecordValidationTest(TestCase):
             )
             f_record.save()
 
-    @override_settings(
-        PLUGINS_CONFIG={
-            "netbox_dns": {
-                "enforce_unique_records": True,
-            }
-        }
-    )
     def test_create_duplicate_records_fail(self):
         f_zone = self.zones[0]
 

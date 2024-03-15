@@ -499,25 +499,21 @@ This feature is disabled by default.
 
 ## Uniqueness of Records
 
-There is no standard requiring that records need to be unique within a zone, so it's perfectly legal to create records with the same name, type and value to a zone where the same record already exists. Use cases for this are, however, very rare, and on the other hand allowing duplicate records can cause problems with bulk imports and automated updates to zones.
+There is no standard requiring that records need to be unique within a zone, so it's perfectly legal to create records with the same name, type and value to a zone where the same record already exists, but in the majority of cases it does not make much sense and is generally not what is expected. Use cases for this are, very rare, and on the other hand allowing duplicate records can cause problems with bulk imports and automated updates to zones.
 
-For this reason there is a configuration setting that makes NetBox DNS enforce uniqueness of records in a way that no record can be created with a given name, type and value in a zone where an active record with the same values already exists:
+For this reason NetBox DNS enforces uniqueness of records by default in a way that no record can be created with a given name, type and value in a zone where an active record with the same values already exists. This enforcement can be disabled by setting the configuration variable `enforce_unique_records` to `False`:
 
 ```
 PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
-        'enforce_unique_records': True,
+        'enforce_unique_records': False,
         ...
     },
 }
 ```
 
-This feature is disabled by default.
-
-Note that setting this option to `True` in an existing NetBox installation does not affect duplicate records that are already present in the database, and so it might make sense to clean them up manually or by script. It won't be possible to save any changes to either of the duplicate records as long as the other one is still present and active.
-
-It can also be a useful strategy to set `enforce_unique_records` to `True` while doing bulk imports, then set it to the default value `False` after the imports are done if importing is a one-off task.
+Note that setting this option to `True` in an existing NetBox installation or updating NetBox to a later version that enforces this behaviour does not affect duplicate records that are already present in the database, and so it might make sense to clean them up manually or by script. It won't be possible to save any changes to either of the duplicate records as long as the other one is still present and active.
 
 ## Uniqueness of TTLs across RRSets
 [RFC2181, Section 5.2](https://www.rfc-editor.org/rfc/rfc2181#section-5.2) specifies that having different TTL values for resource records in RRSets, i.e. sets of records that have the same name, zone and type, is deprecated.
