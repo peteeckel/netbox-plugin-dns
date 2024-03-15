@@ -124,3 +124,124 @@ class RecordValidationTest(TestCase):
             )
             with self.assertRaises(ValidationError):
                 f_record.save()
+
+    def test_rrset_ttl_new_record_ok(self):
+        record1 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        record2 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.2",
+            ttl=86400,
+        )
+
+        self.assertEqual(record1.ttl, 86400)
+        self.assertEqual(record2.ttl, 86400)
+
+    def test_rrset_ttl_create_record_fail(self):
+        record1 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        with self.assertRaises(ValidationError):
+            record2 = Record.objects.create(
+                zone=self.zones[0],
+                name="test1",
+                type=RecordTypeChoices.A,
+                value="10.0.1.2",
+                ttl=43200,
+            )
+
+    def test_rrset_ttl_update_record(self):
+        record1 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        record2 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.2",
+            ttl=86400,
+        )
+
+        self.assertEqual(record1.ttl, 86400)
+        self.assertEqual(record2.ttl, 86400)
+
+        record2.ttl = 43200
+        record2.save()
+        record1.refresh_from_db()
+
+        self.assertEqual(record1.ttl, 43200)
+        self.assertEqual(record2.ttl, 43200)
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "enforce_unique_rrset_ttl": False,
+            }
+        }
+    )
+    def test_rrset_ttl_create_record_unenforced_ok(self):
+        record1 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        record2 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.2",
+            ttl=43200,
+        )
+
+        self.assertEqual(record1.ttl, 86400)
+        self.assertEqual(record2.ttl, 43200)
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "enforce_unique_rrset_ttl": False,
+            }
+        }
+    )
+    def test_rrset_ttl_update_record_unenforced(self):
+        record1 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        record2 = Record.objects.create(
+            zone=self.zones[0],
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.2",
+            ttl=86400,
+        )
+
+        self.assertEqual(record1.ttl, 86400)
+        self.assertEqual(record2.ttl, 86400)
+
+        record2.ttl = 43200
+        record2.save()
+        record1.refresh_from_db()
+
+        self.assertEqual(record1.ttl, 86400)
+        self.assertEqual(record2.ttl, 43200)
