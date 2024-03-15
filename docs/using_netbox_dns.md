@@ -519,6 +519,34 @@ Note that setting this option to `True` in an existing NetBox installation does 
 
 It can also be a useful strategy to set `enforce_unique_records` to `True` while doing bulk imports, then set it to the default value `False` after the imports are done if importing is a one-off task.
 
+## Uniqueness of TTLs across RRSets
+[RFC2181, Section 5.2](https://www.rfc-editor.org/rfc/rfc2181#section-5.2) specifies that having different TTL values for resource records in RRSets, i.e. sets of records that have the same name, zone and type, is deprecated.
+
+NetBox DNS by default enforces this restriction, which can be disabled by setting the configuration variable `enforce_unique_rrset_ttl` to `False`:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'enforce_unique_rrset_ttl': False,
+        ...
+    },
+}
+```
+
+If `enforce_unique_rrset_ttl` is `True`, new records with the same name, zone and type cannot be created. It is possible to change the TTL for records that are part of an RRSet, but when the TTL is changed for one record it will automatically be changed for the other records in the RRSet as well.
+
+### Updating existing RRSets
+If there are already RRSets in the NetBox DNS database that have inconsistent TTL values, the data can be cleaned up using the following management command:
+
+```
+(netbox) [root@dns netbox]# /opt/netbox/netbox/manage.py cleanup_rrset_ttl
+RRSet cleanup completed.
+```
+
+This changes the TTL value for all records that are part of an RRSet to either the minimum or the maximum TTL value for all records in the RRSet. This can be specified by using either the `--min` or the `--max` option for the command. The default is to use the minimum TTL value.
+
+
 ## Tenancy
 
 With NetBox DNS 0.19.0 support for the NetBox tenancy feature was added. It is possible to assign all NetBox DNS objects except for managed records to a tenant, making it easier to filter DNS resources by criteria like their assignment to a customer or department.
