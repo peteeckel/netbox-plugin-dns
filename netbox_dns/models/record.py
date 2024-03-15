@@ -481,7 +481,7 @@ class Record(NetBoxModel):
                 }
             ) from None
 
-    def check_unique(self):
+    def check_unique_record(self):
         if not get_plugin_config("netbox_dns", "enforce_unique_records", False):
             return
 
@@ -506,6 +506,53 @@ class Record(NetBoxModel):
                 }
             ) from None
 
+    def check_unique_rrset_ttl(self):
+        if self.pk is not None:
+            return
+
+        if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
+            return
+
+        records = Record.objects.filter(
+            zone=self.zone,
+            name=self.name,
+            type=self.type,
+        ).exclude(ttl=self.ttl)
+
+        if not records.exists():
+            return
+
+        conflicting_ttls = ", ".join(set(str(record.ttl) for record in records))
+        raise ValidationError(
+            {
+                "ttl": f"There is at least one active {self.type} record for name {self.name} in zone {self.zone} and TTL is different ({conflicting_ttls})."
+            }
+        ) from None
+
+    def update_rrset_ttl(self, ttl=None):
+        if self.pk is None:
+            return
+
+        if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
+            return
+
+        if ttl is None:
+            ttl = self.ttl
+
+        records = (
+            Record.objects.filter(
+                zone=self.zone,
+                name=self.name,
+                type=self.type,
+            )
+            .exclude(pk=self.pk)
+            .exclude(ttl=ttl)
+        )
+
+        for record in records:
+            record.ttl = ttl
+            record.save(update_fields=["ttl"], update_rrset_ttl=False)
+
     def clean_fields(self, *args, **kwargs):
         self.type = self.type.upper()
         super().clean_fields(*args, **kwargs)
@@ -513,7 +560,9 @@ class Record(NetBoxModel):
     def clean(self, *args, **kwargs):
         self.validate_name()
         self.validate_value()
-        self.check_unique()
+        self.check_unique_record()
+        if self.pk is None:
+            self.check_unique_rrset_ttl()
 
         if not self.is_active:
             return
@@ -588,8 +637,18 @@ class Record(NetBoxModel):
                     }
                 ) from None
 
-    def save(self, *args, update_rfc2317_cname=True, save_zone_serial=True, **kwargs):
+    def save(
+        self,
+        *args,
+        update_rfc2317_cname=True,
+        save_zone_serial=True,
+        update_rrset_ttl=True,
+        **kwargs,
+    ):
         self.full_clean()
+
+        if self.pk is not None and update_rrset_ttl:
+            self.update_rrset_ttl()
 
         if self.is_ptr_record:
             if self.zone.is_rfc2317_zone:
