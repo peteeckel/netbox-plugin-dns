@@ -31,15 +31,17 @@ class Command(BaseCommand):
     def cleanup_rrset_ttl(self, **options):
         verbose = options.get("verbosity") > 1
 
-        ttl_records = Record.objects.filter(ttl__isnull=False).exclude(
-            type=RecordTypeChoices.SOA
+        ttl_records = (
+            Record.objects.filter(ttl__isnull=False)
+            .exclude(type=RecordTypeChoices.SOA)
+            .exclude(type=RecordTypeChoices.PTR, maanged=True)
         )
         for record in ttl_records:
             records = Record.objects.filter(
                 name=record.name,
                 zone=record.zone,
                 type=record.type,
-            )
+            ).exclude(type=RecordTypeChoices.PTR, maanged=True)
 
             if records.count() == 1:
                 if options.get("verbosity") > 2:

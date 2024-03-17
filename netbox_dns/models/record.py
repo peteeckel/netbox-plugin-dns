@@ -513,11 +513,18 @@ class Record(NetBoxModel):
         if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
             return
 
-        records = Record.objects.filter(
-            zone=self.zone,
-            name=self.name,
-            type=self.type,
-        ).exclude(ttl=self.ttl)
+        if self.type == RecordTypeChoices.PTR and self.managed:
+            return
+
+        records = (
+            Record.objects.filter(
+                zone=self.zone,
+                name=self.name,
+                type=self.type,
+            )
+            .exclude(ttl=self.ttl)
+            .exclude(type=RecordTypeChoices.PTR, managed=True)
+        )
 
         if not records.exists():
             return
@@ -536,6 +543,9 @@ class Record(NetBoxModel):
         if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
             return
 
+        if self.type == RecordTypeChoices.PTR and self.managed:
+            return
+
         if ttl is None:
             ttl = self.ttl
 
@@ -547,6 +557,7 @@ class Record(NetBoxModel):
             )
             .exclude(pk=self.pk)
             .exclude(ttl=ttl)
+            .exclude(type=RecordTypeChoices.PTR, managed=True)
         )
 
         for record in records:

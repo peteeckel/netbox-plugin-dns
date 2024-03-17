@@ -25,8 +25,10 @@ class RecordValidationTest(TestCase):
         cls.nameserver = NameServer.objects.create(name="ns1.example.com")
         cls.zones = [
             Zone(name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameserver),
+            Zone(name="1.0.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
         ]
-        Zone.objects.bulk_create(cls.zones)
+        for zone in cls.zones:
+            zone.save()
 
     @override_settings(
         PLUGINS_CONFIG={
@@ -179,6 +181,149 @@ class RecordValidationTest(TestCase):
 
         self.assertEqual(record1.ttl, 43200)
         self.assertEqual(record2.ttl, 43200)
+
+    def test_rrset_ttl_ptr_records(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[1]
+
+        record1 = Record.objects.create(
+            zone=f_zone,
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        record2 = Record.objects.create(
+            zone=f_zone,
+            name="test2",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=43200,
+        )
+
+        self.assertEqual(record1.ttl, 86400)
+        self.assertEqual(record2.ttl, 43200)
+        self.assertEqual(record1.ptr_record.ttl, 86400)
+        self.assertEqual(record2.ptr_record.ttl, 43200)
+
+    def test_rrset_ttl_add_unmanaged_ptr_record(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[1]
+
+        f_record = Record.objects.create(
+            zone=f_zone,
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+
+        self.assertEqual(f_record.ttl, 86400)
+        self.assertEqual(f_record.ptr_record.ttl, 86400)
+
+        r_record = Record.objects.create(
+            zone=r_zone,
+            name="1",
+            type=RecordTypeChoices.PTR,
+            value="name1.zone1.example.com.",
+            ttl=43200,
+        )
+
+        self.assertEqual(f_record.ttl, 86400)
+        self.assertEqual(f_record.ptr_record.ttl, 86400)
+        self.assertEqual(r_record.ttl, 43200)
+
+    def test_rrset_ttl_add_managed_ptr_record(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[1]
+
+        r_record = Record.objects.create(
+            zone=r_zone,
+            name="1",
+            type=RecordTypeChoices.PTR,
+            value="name1.zone1.example.com.",
+            ttl=43200,
+        )
+
+        self.assertEqual(r_record.ttl, 43200)
+
+        f_record = Record.objects.create(
+            zone=f_zone,
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+
+        r_record.refresh_from_db()
+
+        self.assertEqual(f_record.ttl, 86400)
+        self.assertEqual(f_record.ptr_record.ttl, 86400)
+        self.assertEqual(r_record.ttl, 43200)
+
+    def test_rrset_ttl_update_unmanaged_ptr_record(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[1]
+
+        f_record = Record.objects.create(
+            zone=f_zone,
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=86400,
+        )
+        r_record = Record.objects.create(
+            zone=r_zone,
+            name="1",
+            type=RecordTypeChoices.PTR,
+            value="name1.zone1.example.com.",
+            ttl=86400,
+        )
+
+        self.assertEqual(r_record.ttl, 86400)
+        self.assertEqual(f_record.ttl, 86400)
+        self.assertEqual(f_record.ptr_record.ttl, 86400)
+
+        r_record.ttl = 43200
+        r_record.save()
+
+        f_record.refresh_from_db()
+
+        self.assertEqual(r_record.ttl, 43200)
+        self.assertEqual(f_record.ttl, 86400)
+        self.assertEqual(f_record.ptr_record.ttl, 86400)
+
+    def test_rrset_ttl_update_managed_ptr_record(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[1]
+
+        f_record = Record.objects.create(
+            zone=f_zone,
+            name="test1",
+            type=RecordTypeChoices.A,
+            value="10.0.1.1",
+            ttl=43200,
+        )
+        r_record = Record.objects.create(
+            zone=r_zone,
+            name="1",
+            type=RecordTypeChoices.PTR,
+            value="name1.zone1.example.com.",
+            ttl=43200,
+        )
+
+        self.assertEqual(r_record.ttl, 43200)
+        self.assertEqual(f_record.ttl, 43200)
+        self.assertEqual(f_record.ptr_record.ttl, 43200)
+
+        f_record.ttl = 86400
+        f_record.save()
+
+        r_record.refresh_from_db()
+
+        self.assertEqual(r_record.ttl, 43200)
+        self.assertEqual(f_record.ttl, 86400)
+        self.assertEqual(f_record.ptr_record.ttl, 86400)
 
     @override_settings(
         PLUGINS_CONFIG={
