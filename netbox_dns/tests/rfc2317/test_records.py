@@ -1474,3 +1474,192 @@ class RFC2317RecordTest(TestCase):
             name="1",
         ).first()
         self.assertIsNone(cname_record)
+
+    def test_cname_ttl(self):
+        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=True,
+        )
+
+        records = (
+            Record(
+                name="name1",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=86400,
+            ),
+            Record(
+                name="name2",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=43200,
+            ),
+        )
+        for record in records:
+            record.save()
+
+        self.assertEqual(
+            records[0].ptr_record.rfc2317_cname_record.pk,
+            records[1].ptr_record.rfc2317_cname_record.pk,
+        )
+
+        self.assertEqual(records[0].ttl, 86400)
+        self.assertEqual(records[0].ptr_record.ttl, 86400)
+        self.assertEqual(records[1].ttl, 43200)
+        self.assertEqual(records[1].ptr_record.ttl, 43200)
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 43200)
+
+    def test_cname_ttl_update_record_ttl(self):
+        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=True,
+        )
+
+        records = (
+            Record(
+                name="name1",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=86400,
+            ),
+            Record(
+                name="name2",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=43200,
+            ),
+        )
+        for record in records:
+            record.save()
+
+        self.assertEqual(
+            records[0].ptr_record.rfc2317_cname_record.pk,
+            records[1].ptr_record.rfc2317_cname_record.pk,
+        )
+
+        self.assertEqual(records[0].ttl, 86400)
+        self.assertEqual(records[0].ptr_record.ttl, 86400)
+        self.assertEqual(records[1].ttl, 43200)
+        self.assertEqual(records[1].ptr_record.ttl, 43200)
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 43200)
+
+        records[1].ttl = 86400
+        records[1].save()
+
+        self.assertEqual(records[1].ttl, 86400)
+        self.assertEqual(records[1].ptr_record.ttl, 86400)
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 86400)
+
+        records[0].ttl = 43200
+        records[0].save()
+
+        self.assertEqual(records[0].ttl, 43200)
+        self.assertEqual(records[0].ptr_record.ttl, 43200)
+        self.assertEqual(records[0].ptr_record.rfc2317_cname_record.ttl, 43200)
+
+    def test_cname_ttl_set_record_ttl_none(self):
+        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=True,
+        )
+
+        records = (
+            Record(
+                name="name1",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=86400,
+            ),
+            Record(
+                name="name2",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=43200,
+            ),
+        )
+        for record in records:
+            record.save()
+
+        self.assertEqual(
+            records[0].ptr_record.rfc2317_cname_record.pk,
+            records[1].ptr_record.rfc2317_cname_record.pk,
+        )
+
+        self.assertEqual(records[0].ttl, 86400)
+        self.assertEqual(records[0].ptr_record.ttl, 86400)
+        self.assertEqual(records[1].ttl, 43200)
+        self.assertEqual(records[1].ptr_record.ttl, 43200)
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 43200)
+
+        records[1].ttl = None
+        records[1].save()
+
+        self.assertEqual(records[1].ttl, None)
+        self.assertEqual(records[1].ptr_record.ttl, None)
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 86400)
+
+        records[0].ttl = None
+        records[0].save()
+
+        self.assertEqual(records[0].ttl, None)
+        self.assertEqual(records[0].ptr_record.ttl, None)
+        self.assertEqual(records[0].ptr_record.rfc2317_cname_record.ttl, None)
+
+    def test_cname_ttl_delete_record(self):
+        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=True,
+        )
+
+        records = (
+            Record(
+                name="name1",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=86400,
+            ),
+            Record(
+                name="name2",
+                zone=self.zones[0],
+                type=RecordTypeChoices.A,
+                value="10.0.0.1",
+                ttl=43200,
+            ),
+        )
+        for record in records:
+            record.save()
+
+        self.assertEqual(
+            records[0].ptr_record.rfc2317_cname_record.pk,
+            records[1].ptr_record.rfc2317_cname_record.pk,
+        )
+
+        self.assertEqual(records[0].ttl, 86400)
+        self.assertEqual(records[0].ptr_record.ttl, 86400)
+        self.assertEqual(records[1].ttl, 43200)
+        self.assertEqual(records[1].ptr_record.ttl, 43200)
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 43200)
+
+        records[1].delete()
+        records[0].ptr_record.refresh_from_db()
+
+        self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 86400)
