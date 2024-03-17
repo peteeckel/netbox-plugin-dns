@@ -6,7 +6,7 @@ from dns import name as dns_name
 
 from django.core.exceptions import ValidationError
 from django.db import transaction, models
-from django.db.models import Q, ExpressionWrapper, BooleanField
+from django.db.models import Q, ExpressionWrapper, BooleanField, Min
 from django.db.models.functions import Length
 from django.urls import reverse
 
@@ -36,6 +36,10 @@ from netbox_dns.validators import (
 # This is a hack designed to break cyclic imports between Record and Zone
 # -
 import netbox_dns.models.zone as zone
+
+
+def min_ttl(*ttl_list):
+    return min((ttl for ttl in ttl_list if ttl is not None), default=None)
 
 
 class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
@@ -207,7 +211,8 @@ class Record(NetBoxModel):
         try:
             name = (
                 dns_name.from_text(
-                    self.name, origin=dns_name.from_text(self.zone.name, origin=None)
+                    str(self.name),
+                    origin=dns_name.from_text(self.zone.name, origin=None),
                 )
                 .relativize(dns_name.root)
                 .to_unicode()
@@ -388,6 +393,12 @@ class Record(NetBoxModel):
                 self.rfc2317_cname_record.name = cname_name
                 self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
                 self.rfc2317_cname_record.value = self.fqdn
+                self.rfc2317_cname_record.ttl = min_ttl(
+                    self.rfc2317_cname_record.rfc2317_ptr_records.exclude(pk=self.pk)
+                    .aggregate(Min("ttl"))
+                    .get("ttl__min"),
+                    self.ttl,
+                )
                 self.rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
             else:
                 rfc2317_cname_record = Record.objects.filter(
@@ -397,13 +408,26 @@ class Record(NetBoxModel):
                     managed=True,
                     value=self.fqdn,
                 ).first()
-                if rfc2317_cname_record is None:
+
+                if rfc2317_cname_record is not None:
+                    rfc2317_cname_record.ttl = min_ttl(
+                        rfc2317_cname_record.rfc2317_ptr_records.exclude(pk=self.pk)
+                        .aggregate(Min("ttl"))
+                        .get("ttl__min"),
+                        self.ttl,
+                    )
+                    rfc2317_cname_record.save(
+                        update_fields=["ttl"], save_zone_serial=save_zone_serial
+                    )
+
+                else:
                     rfc2317_cname_record = Record(
                         name=cname_name,
                         type=RecordTypeChoices.CNAME,
                         zone=self.zone.rfc2317_parent_zone,
                         managed=True,
                         value=self.fqdn,
+                        ttl=self.ttl,
                     )
                     rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
 
@@ -691,11 +715,20 @@ class Record(NetBoxModel):
 
     def delete(self, *args, save_zone_serial=True, **kwargs):
         if self.rfc2317_cname_record:
-            if (
-                self.rfc2317_cname_record.pk
-                and self.rfc2317_cname_record.rfc2317_ptr_records.count() == 1
-            ):
-                self.rfc2317_cname_record.delete()
+            if self.rfc2317_cname_record.pk:
+                if self.rfc2317_cname_record.rfc2317_ptr_records.count() == 1:
+                    self.rfc2317_cname_record.delete()
+                else:
+                    self.rfc2317_cname_record.ttl = (
+                        self.rfc2317_cname_record.rfc2317_ptr_records.exclude(
+                            pk=self.pk
+                        )
+                        .aggregate(Min("ttl"))
+                        .get("ttl__min")
+                    )
+                    self.rfc2317_cname_record.save(
+                        update_fields=["ttl"], save_zone_serial=save_zone_serial
+                    )
 
         if self.ptr_record:
             self.ptr_record.delete()
