@@ -19,6 +19,7 @@ from utilities.forms.fields import (
     DynamicModelChoiceField,
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
+from utilities.forms.rendering import FieldSet
 from utilities.forms import add_blank_choice
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
@@ -106,51 +107,43 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
     )
 
     fieldsets = (
-        (
-            "Zone",
-            (
-                "view",
-                "name",
-                "status",
-                "nameservers",
-                "default_ttl",
-                "description",
-            ),
+        FieldSet(
+            "view",
+            "name",
+            "status",
+            "nameservers",
+            "default_ttl",
+            "description",
+            name="Zone",
         ),
-        (
-            "SOA",
-            (
-                "soa_ttl",
-                "soa_mname",
-                "soa_rname",
-                "soa_refresh",
-                "soa_retry",
-                "soa_expire",
-                "soa_minimum",
-                "soa_serial_auto",
-                "soa_serial",
-            ),
+        FieldSet(
+            "soa_ttl",
+            "soa_mname",
+            "soa_rname",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "soa_serial_auto",
+            "soa_serial",
+            name="SOA",
         ),
-        (
-            "RFC2317",
-            (
-                "rfc2317_prefix",
-                "rfc2317_parent_managed",
-            ),
+        FieldSet(
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            name="RFC 2317",
         ),
-        (
-            "Domain Registration",
-            (
-                "registrar",
-                "registry_domain_id",
-                "registrant",
-                "admin_c",
-                "tech_c",
-                "billing_c",
-            ),
+        FieldSet(
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            name="Domain Registration",
         ),
-        ("Tags", ("tags",)),
-        ("Tenancy", ("tenant_group", "tenant")),
+        FieldSet("tags", name="Tags"),
+        FieldSet("tenant", name="Tenancy"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -248,20 +241,21 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
 class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Zone
     fieldsets = (
-        (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("view_id", "status", "name", "nameservers", "description")),
-        (
-            "Registration",
-            (
-                "registrar_id",
-                "registry_domain_id",
-                "registrant_id",
-                "admin_c_id",
-                "tech_c_id",
-                "billing_c_id",
-            ),
+        FieldSet("q", "filter_id"),
+        FieldSet(
+            "view_id", "status", "name", "nameservers", "description", name="Attributes"
         ),
-        ("Tenant", ("tenant_group_id", "tenant_id")),
+        FieldSet(
+            "registrar_id",
+            "registry_domain_id",
+            "registrant_id",
+            "admin_c_id",
+            "tech_c_id",
+            "billing_c_id",
+            name="Registration",
+        ),
+        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
+        FieldSet("tag", name="Tags"),
     )
 
     view_id = DynamicModelMultipleChoiceField(
@@ -698,50 +692,42 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     model = Zone
 
     fieldsets = (
-        (
-            None,
-            (
-                "view",
-                "status",
-                "nameservers",
-                "default_ttl",
-                "description",
-                "tenant",
-            ),
+        FieldSet(
+            "view",
+            "status",
+            "nameservers",
+            "default_ttl",
+            "description",
         ),
-        (
-            "SOA",
-            (
-                "soa_ttl",
-                "soa_mname",
-                "soa_rname",
-                "soa_serial_auto",
-                "soa_serial",
-                "soa_refresh",
-                "soa_retry",
-                "soa_expire",
-                "soa_minimum",
-            ),
+        FieldSet(
+            "soa_ttl",
+            "soa_mname",
+            "soa_rname",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "soa_serial_auto",
+            "soa_serial",
+            name="SOA",
         ),
-        (
-            "RFC2317",
-            (
-                "rfc2317_prefix",
-                "rfc2317_parent_managed",
-            ),
+        FieldSet(
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            name="RFC 2317",
         ),
-        (
-            "Domain Registration",
-            (
-                "registrar",
-                "registry_domain_id",
-                "registrant",
-                "admin_c",
-                "tech_c",
-                "billing_c",
-            ),
+        FieldSet(
+            "registrar",
+            "registry_domain_id",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            name="Domain Registration",
         ),
+        FieldSet("tenant_group", "tenant", name="Tenancy"),
     )
+
     nullable_fields = (
         "view",
         "description",
