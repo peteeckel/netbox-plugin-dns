@@ -4,12 +4,12 @@
 {% load render_table from django_tables2 %}
 {% load perms %}
 
-{% block controls %}
+{% block control-buttons %}
 {% if object.managed %}
 {% else %}
 {{ block.super }}
 {% endif %}
-{% endblock controls %}
+{% endblock control-buttons %}
 
 {% block breadcrumbs %}
 {% if not object.managed %}
@@ -33,97 +33,95 @@
     {% endif %}
         <div class="card">
             <h5 class="card-header">Record</h5>
-            <div class="card-body">
-                <table class="table table-hover attr-table">
-                    <tr>
-                        <th scope="row">Name</th>
-                        <td style="word-break:break-all;">{{ object.name }}</td>
-                    </tr>
-                    {% if unicode_name %}
-                    <tr>
-                        <th scope="row">IDN</th>
-                        <td style="word-break:break-all;">{{ unicode_name }}</td>
-                    </tr>
+            <table class="table table-hover attr-table">
+                <tr>
+                    <th scope="row">Name</th>
+                    <td style="word-break:break-all;">{{ object.name }}</td>
+                </tr>
+                {% if unicode_name %}
+                <tr>
+                    <th scope="row">IDN</th>
+                    <td style="word-break:break-all;">{{ unicode_name }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Zone</th>
+                    {% if object.managed %}
+                    <td><a href="{% url 'plugins:netbox_dns:zone_managed_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
+                    {% else %}
+                    <td><a href="{% url 'plugins:netbox_dns:zone_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
                     {% endif %}
-                    <tr>
-                        <th scope="row">Zone</th>
-                        {% if object.managed %}
-                        <td><a href="{% url 'plugins:netbox_dns:zone_managed_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
-                        {% else %}
-                        <td><a href="{% url 'plugins:netbox_dns:zone_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
+                </tr>
+                {% if not object.managed %}
+                <tr>
+                    <th scope="row">Tenant</th>
+                    <td>
+                        {% if object.tenant.group %}
+                            {{ object.tenant.group|linkify }} /
                         {% endif %}
-                    </tr>
-                    {% if not object.managed %}
-                    <tr>
-                        <th scope="row">Tenant</th>
-                        <td>
-                            {% if object.tenant.group %}
-                                {{ object.tenant.group|linkify }} /
-                            {% endif %}
-                            {{ object.tenant|linkify|placeholder }}
-                        </td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <th scope="row">Type</th>
-                        <td>{{ object.type }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Value</th>
-                        <td style="word-break:break-all;">{{ object.value }}</td>
-                    </tr>
-                    {% if unicode_value %}
-                    <tr>
-                        <th scope="row">Unicode Value</th>
-                        <td style="word-break:break-all;">{{ unicode_value }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <th scope="row">TTL</th>
-                        <td>{{ object.ttl|placeholder }}</td>
-                    </tr>
-                    {% if object.type == 'A' or object.type == 'AAAA' %}
-                    <tr>
-                        <th scope="row">Disable PTR</th>
-                        <td>{% checkmark object.disable_ptr %}</td>
-                    </tr>
-                    {% endif %}
-                    {% if object.ptr_record %}
-                    <tr>
-                        <th scope="row">PTR Record</th>
-                        <td><a href="{% url 'plugins:netbox_dns:record' pk=object.ptr_record.pk %}">{{ object.ptr_record }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if object.address_record %}
-                    <tr>
-                        <th scope="row">Address Record</th>
-                        <td><a href="{% url 'plugins:netbox_dns:record' pk=object.address_record.pk %}">{{ object.address_record }}</td>
-                    </tr>
-                        {% if object.address_record.ipam_ip_address %}
-                        <tr>
-                            <th scope="row">IPAM IP Address</th>
-                            <td><a href="{% url 'ipam:ipaddress' pk=object.address_record.ipam_ip_address.pk %}">{{ object.address_record.ipam_ip_address }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endif %}
-                    {% if object.ipam_ip_address %}
+                        {{ object.tenant|linkify|placeholder }}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Type</th>
+                    <td>{{ object.type }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Value</th>
+                    <td style="word-break:break-all;">{{ object.value }}</td>
+                </tr>
+                {% if unicode_value %}
+                <tr>
+                    <th scope="row">Unicode Value</th>
+                    <td style="word-break:break-all;">{{ unicode_value }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">TTL</th>
+                    <td>{{ object.ttl|placeholder }}</td>
+                </tr>
+                {% if object.type == 'A' or object.type == 'AAAA' %}
+                <tr>
+                    <th scope="row">Disable PTR</th>
+                    <td>{% checkmark object.disable_ptr %}</td>
+                </tr>
+                {% endif %}
+                {% if object.ptr_record %}
+                <tr>
+                    <th scope="row">PTR Record</th>
+                    <td><a href="{% url 'plugins:netbox_dns:record' pk=object.ptr_record.pk %}">{{ object.ptr_record }}</td>
+                </tr>
+                {% endif %}
+                {% if object.address_record %}
+                <tr>
+                    <th scope="row">Address Record</th>
+                    <td><a href="{% url 'plugins:netbox_dns:record' pk=object.address_record.pk %}">{{ object.address_record }}</td>
+                </tr>
+                    {% if object.address_record.ipam_ip_address %}
                     <tr>
                         <th scope="row">IPAM IP Address</th>
-                        <td><a href="{% url 'ipam:ipaddress' pk=object.ipam_ip_address.pk %}">{{ object.ipam_ip_address }}</td>
+                        <td><a href="{% url 'ipam:ipaddress' pk=object.address_record.ipam_ip_address.pk %}">{{ object.address_record.ipam_ip_address }}</td>
                     </tr>
                     {% endif %}
-                    <tr>
-                        <th scope="row">Status</th>
-                        <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
-                    </tr>
-                    {% if object.description %}
-                    <tr>
-                        <th scope="row">Description</th>
-                        <td style="word-break:break-all;">{{ object.description }}</td>
-                    </tr>
-                    {% endif %}
-                </table>
-            </div>
+                {% endif %}
+                {% if object.ipam_ip_address %}
+                <tr>
+                    <th scope="row">IPAM IP Address</th>
+                    <td><a href="{% url 'ipam:ipaddress' pk=object.ipam_ip_address.pk %}">{{ object.ipam_ip_address }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Status</th>
+                    <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+                </tr>
+                {% if object.description %}
+                <tr>
+                    <th scope="row">Description</th>
+                    <td style="word-break:break-all;">{{ object.description }}</td>
+                </tr>
+                {% endif %}
+            </table>
         </div>
         {% if cname_target_table and cname_target_table.rows|length > 0 %}
         <div class="card">

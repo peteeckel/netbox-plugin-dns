@@ -11,7 +11,7 @@
         <input type="hidden" name="return_url" value="{% if return_url %}{{ return_url }}{% else %}{{ request.path }}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}{% endif %}" />
 
         <div class="card">
-            <div class="card-body htmx-container table-responsive" id="object_list">
+            <div class="htmx-container table-responsive" id="object_list">
                 {% include 'htmx/table.html' %}
             </div>
         </div>
@@ -22,12 +22,12 @@
                      <div class="bulk-button-group">
                          {% block bulk_buttons %}{% endblock %}
                          {% if bulk_edit_url and perms.netbox_dns.change_zone %}
-                             <button type="submit" name="_edit" formaction="{% url bulk_edit_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-warning btn-sm">
+                             <button type="submit" name="_edit" formaction="{% url bulk_edit_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-warning">
                                  <i class="mdi mdi-pencil" aria-hidden="true"></i> Edit Selected
                              </button>
                          {% endif %}
                          {% if bulk_delete_url and perms.netbox_dns.delete_zone %}
-                             <button type="submit" name="_delete" formaction="{% url bulk_delete_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-danger btn-sm">
+                             <button type="submit" name="_delete" formaction="{% url bulk_delete_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-danger">
                                  <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i> Delete Selected
                              </button>
                          {% endif %}
