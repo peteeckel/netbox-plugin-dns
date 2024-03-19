@@ -7,11 +7,33 @@ from netbox.forms import (
     NetBoxModelForm,
 )
 from utilities.forms.fields import TagFilterField
+from utilities.forms.rendering import FieldSet
 
 from netbox_dns.models import Contact
 
 
 class ContactForm(NetBoxModelForm):
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            "contact_id",
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            name="Contact",
+        ),
+        FieldSet("tags", name="Tags"),
+    )
+
     class Meta:
         model = Contact
         fields = (
@@ -35,21 +57,21 @@ class ContactForm(NetBoxModelForm):
 
 class ContactFilterForm(NetBoxModelFilterSetForm):
     model = Contact
+
     fieldsets = (
-        (None, ("q", "filter_id", "tags")),
-        ("Attributes", ("name", "contact_id", "description")),
-        (
-            "Address",
-            (
-                "organization",
-                "street",
-                "city",
-                "state_province",
-                "postal_code",
-                "country",
-            ),
+        FieldSet("q", "filter_id"),
+        FieldSet("name", "contact_id", "description", name="Attributes"),
+        FieldSet(
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            name="Address",
         ),
-        ("Communication", ("phone", "phone_ext", "fax", "fax_ext", "email")),
+        FieldSet("phone", "phone_ext", "fax", "fax_ext", "email", name="Communication"),
+        FieldSet("tag", name="Tags"),
     )
 
     name = forms.CharField(
@@ -99,7 +121,7 @@ class ContactFilterForm(NetBoxModelFilterSetForm):
     email = forms.CharField(
         required=False,
     )
-    tags = TagFilterField(Contact)
+    tag = TagFilterField(Contact)
 
 
 class ContactImportForm(NetBoxModelImportForm):
@@ -181,27 +203,23 @@ class ContactBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     fieldsets = (
-        (None, ("name", "description")),
-        (
-            "Address",
-            (
-                "organization",
-                "street",
-                "city",
-                "state_province",
-                "postal_code",
-                "country",
-            ),
+        FieldSet("name", "description"),
+        FieldSet(
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            name="Address",
         ),
-        (
-            "Communication",
-            (
-                "phone",
-                "phone_ext",
-                "fax",
-                "fax_ext",
-                "email",
-            ),
+        FieldSet(
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            name="Communication",
         ),
     )
 

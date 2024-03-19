@@ -7,6 +7,7 @@ from netbox.forms import (
     NetBoxModelForm,
 )
 from utilities.forms.fields import TagFilterField
+from utilities.forms.rendering import FieldSet
 
 from netbox_dns.models import Registrar
 
@@ -14,6 +15,20 @@ from netbox_dns.models import Registrar
 class RegistrarForm(NetBoxModelForm):
     class Meta:
         model = Registrar
+        fieldsets = (
+            FieldSet(
+                "name",
+                "iana_id",
+                "description",
+                "address",
+                "referral_url",
+                "whois_server",
+                "abuse_email",
+                "abuse_phone",
+                name="Registrar",
+            ),
+            FieldSet("tags", name="Tags"),
+        )
         fields = (
             "name",
             "iana_id",
@@ -30,19 +45,17 @@ class RegistrarForm(NetBoxModelForm):
 class RegistrarFilterForm(NetBoxModelFilterSetForm):
     model = Registrar
     fieldsets = (
-        (None, ("q", "filter_id", "tags")),
-        (
-            "Attributes",
-            (
-                "name",
-                "iana_id",
-                "description",
-            ),
+        FieldSet("q", "filter_id"),
+        FieldSet("name", "iana_id", "description", name="Attributes"),
+        FieldSet(
+            "address",
+            "referral_url",
+            "whois_server",
+            "abuse_email",
+            "abuse_phone",
+            name="Contact",
         ),
-        (
-            "Contact",
-            ("address", "referral_url", "whois_server", "abuse_email", "abuse_phone"),
-        ),
+        FieldSet("tag", name="Tags"),
     )
 
     name = forms.CharField(
@@ -74,7 +87,7 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label="Abuse Phone",
     )
-    tags = TagFilterField(Registrar)
+    tag = TagFilterField(Registrar)
 
 
 class RegistrarImportForm(NetBoxModelImportForm):
@@ -133,7 +146,6 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
                 "abuse_phone",
             ),
         ),
-    )
 
     nullable_fields = (
         "iana_id",
