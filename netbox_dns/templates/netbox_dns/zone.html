@@ -9,101 +9,99 @@
             <h5 class="card-header">
                 Zone
             </h5>
-            <div class="card-body">
-                <table class="table table-hover attr-table">
+            <table class="table table-hover attr-table">
+                <tr>
+                    <th scope="row">Name</th>
+                    <td>{{ object.name }}</td>
+                </tr>
+                {% if unicode_name %}
                     <tr>
-                        <th scope="row">Name</th>
-                        <td>{{ object.name }}</td>
+                        <th scope="row">IDN</th>
+                        <td>{{ unicode_name }}</td>
                     </tr>
-                    {% if unicode_name %}
-                        <tr>
-                            <th scope="row">IDN</th>
-                            <td>{{ unicode_name }}</td>
-                        </tr>
-                    {% endif %}
-                    {% if object.view %}
-                    <tr>
-                        <th scope="row">View</th>
-                        <td>
-                            <a href="{% url 'plugins:netbox_dns:view' pk=object.view.pk %}">
-                                {{ object.view }}
-                            </a>
-                        </td>
-                    </tr>
-                    {% endif %}
-                    {% if object.description %}
-                    <tr>
-                        <th scope="row">Description</th>
-                        <td style="word-break:break-all;">{{ object.description }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <th scope="row">Tenant</th>
-                        <td>
-                            {% if object.tenant.group %}
-                                {{ object.tenant.group|linkify }} /
-                            {% endif %}
-                            {{ object.tenant|linkify|placeholder }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Status</th>
-                        <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Nameservers</th>
-                        <td>
-                            <table>
-                                {% for nameserver in object.nameservers.all %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'plugins:netbox_dns:nameserver' pk=nameserver.pk %}">
-                                            {{ nameserver }}
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                    {% if nameserver_warnings %}
-                    <tr>
-                        <th class="text-warning" scope="row">Warnings</th>
-                        <td>
-                            <table>
-                                {% for warning in nameserver_warnings %}
-                                <tr>
-                                    <td class="text-warning">{{ warning }}</td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                    </tr>
-                    {% endif %}
-                    {% if nameserver_errors %}
-                    <tr>
-                        <th class="text-danger" scope="row">Errors</th>
-                        <td>
-                            <table>
-                                {% for error in nameserver_errors %}
-                                <tr>
-                                    <td class="text-danger">{{ error }}</td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                    </tr>
-                    {% endif %}
-                    </tr>
-                    <tr>
-                        <th scope="row">Default TTL</th>
-                        <td>{{ object.default_ttl }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Description</th>
-                        <td>{{ object.description }}</td>
-                    </tr>
-                </table>
-            </div>
+                {% endif %}
+                {% if object.view %}
+                <tr>
+                    <th scope="row">View</th>
+                    <td>
+                        <a href="{% url 'plugins:netbox_dns:view' pk=object.view.pk %}">
+                            {{ object.view }}
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if object.description %}
+                <tr>
+                    <th scope="row">Description</th>
+                    <td style="word-break:break-all;">{{ object.description }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Tenant</th>
+                    <td>
+                        {% if object.tenant.group %}
+                            {{ object.tenant.group|linkify }} /
+                        {% endif %}
+                        {{ object.tenant|linkify|placeholder }}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Status</th>
+                    <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Nameservers</th>
+                    <td>
+                        <table>
+                            {% for nameserver in object.nameservers.all %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'plugins:netbox_dns:nameserver' pk=nameserver.pk %}">
+                                        {{ nameserver }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                {% if nameserver_warnings %}
+                <tr>
+                    <th class="text-warning" scope="row">Warnings</th>
+                    <td>
+                        <table>
+                            {% for warning in nameserver_warnings %}
+                            <tr>
+                                <td class="text-warning">{{ warning }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if nameserver_errors %}
+                <tr>
+                    <th class="text-danger" scope="row">Errors</th>
+                    <td>
+                        <table>
+                            {% for error in nameserver_errors %}
+                            <tr>
+                                <td class="text-danger">{{ error }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+                </tr>
+                <tr>
+                    <th scope="row">Default TTL</th>
+                    <td>{{ object.default_ttl }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Description</th>
+                    <td>{{ object.description }}</td>
+                </tr>
+            </table>
         </div>
 
         {% include 'inc/panels/tags.html' %}
@@ -112,70 +110,67 @@
     <div class="col col-md-6">
         <div class="card">
             <h5 class="card-header">Zone SOA</h5>
-            <div class="card-body">
-                <table class="table table-hover attr-table">
-                    <tr>
-                        <th scope="row">TTL</th>
-                        <td>{{ object.soa_ttl }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Primary Nameserver</th>
-                        <td><a href="{% url 'plugins:netbox_dns:nameserver' pk=object.soa_mname.pk %}">{{ object.soa_mname }}</a></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Responsible</th>
-                        <td>{{ object.soa_rname }}</td>
-                    </tr>
-                    {% if object.soa_serial_auto %}
-                    <tr>
-                        <th scope="row">Serial (auto-generated)</th>
-                        <td>{{ object.soa_serial }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <th scope="row">Serial</th>
-                        <td>{{ object.soa_serial }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <th scope="row">Refresh</th>
-                        <td>{{ object.soa_refresh }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Retry</th>
-                        <td>{{ object.soa_retry }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Expire</th>
-                        <td>{{ object.soa_expire }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Minimum TTL</th>
-                        <td>{{ object.soa_minimum }}</td>
-                    </tr>
-                </table>
-            </div>
+            <table class="table table-hover attr-table">
+                <tr>
+                    <th scope="row">TTL</th>
+                    <td>{{ object.soa_ttl }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Primary Nameserver</th>
+                    <td><a href="{% url 'plugins:netbox_dns:nameserver' pk=object.soa_mname.pk %}">{{ object.soa_mname }}</a></td>
+                </tr>
+                <tr>
+                    <th scope="row">Responsible</th>
+                    <td>{{ object.soa_rname }}</td>
+                </tr>
+                {% if object.soa_serial_auto %}
+                <tr>
+                    <th scope="row">Serial (auto-generated)</th>
+                    <td>{{ object.soa_serial }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <th scope="row">Serial</th>
+                    <td>{{ object.soa_serial }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Refresh</th>
+                    <td>{{ object.soa_refresh }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Retry</th>
+                    <td>{{ object.soa_retry }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Expire</th>
+                    <td>{{ object.soa_expire }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Minimum TTL</th>
+                    <td>{{ object.soa_minimum }}</td>
+                </tr>
+            </table>
         </div>
         {% if object.rfc2317_prefix %}
         <div class="card">
             <h5 class="card-header">RFC2317</h5>
-            <div class="card-body">
-                <table class="table table-hover soa-table">
-                    <tr>
-                        <th scope="row">Prefix</th>
-                        <td>{{ object.rfc2317_prefix }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Parent Managed</th>
-                        <td>{% checkmark object.rfc2317_parent_managed %}</td>
-                    </tr>
-                    {% if object.rfc2317_parent_managed %}
-                    <tr>
-                        <th scope="row">Parent Zone</th>
-                        <td><a href="{% url 'plugins:netbox_dns:zone' pk=object.rfc2317_parent_zone.pk %}">{{ object.rfc2317_parent_zone }}</a></td>
-                    </tr>
-                    {% endif %}
-                </table>
+            <table class="table table-hover soa-table">
+                <tr>
+                    <th scope="row">Prefix</th>
+                    <td>{{ object.rfc2317_prefix }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Parent Managed</th>
+                    <td>{% checkmark object.rfc2317_parent_managed %}</td>
+                </tr>
+                {% if object.rfc2317_parent_managed %}
+                <tr>
+                    <th scope="row">Parent Zone</th>
+                    <td><a href="{% url 'plugins:netbox_dns:zone' pk=object.rfc2317_parent_zone.pk %}">{{ object.rfc2317_parent_zone }}</a></td>
+                </tr>
+                {% endif %}
+            </table>
             </div>
         </div>
         {% endif %}
