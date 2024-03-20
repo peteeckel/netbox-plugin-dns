@@ -13,12 +13,18 @@ class NameServerTest(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = NameServer
+
     brief_fields = ["description", "display", "id", "name", "url"]
+
     create_data = [
         {"name": "ns1.example.com"},
         {"name": "ns2.example.com"},
         {"name": "ns3.example.com"},
     ]
+
+    bulk_update_data = {
+        "description": "Test Name Server",
+    }
 
     @classmethod
     def setUpTestData(cls):
