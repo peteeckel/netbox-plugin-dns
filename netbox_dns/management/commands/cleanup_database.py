@@ -1,6 +1,3 @@
-import dns
-from dns import rdtypes, rdata, rdatatype, rdataclass
-
 from netaddr import IPAddress, IPNetwork, AddrFormatError
 
 from django.core.management.base import BaseCommand
@@ -10,7 +7,6 @@ from netbox_dns.models import (
     ZoneStatusChoices,
     Record,
     RecordTypeChoices,
-    RecordClassChoices,
 )
 
 

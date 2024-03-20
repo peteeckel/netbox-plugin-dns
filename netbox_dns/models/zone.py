@@ -598,7 +598,7 @@ class Zone(NetBoxModel):
             if self.arpa_network is not None:
                 raise ValidationError(
                     {
-                        "rfc2317_prefix": f"A regular reverse zone can not be used as an RFC2317 zone."
+                        "rfc2317_prefix": "A regular reverse zone can not be used as an RFC2317 zone."
                     }
                 )
 

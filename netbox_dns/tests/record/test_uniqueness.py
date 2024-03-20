@@ -140,7 +140,7 @@ class RecordValidationTest(TestCase):
         self.assertEqual(record2.ttl, 86400)
 
     def test_rrset_ttl_create_record_fail(self):
-        record1 = Record.objects.create(
+        Record.objects.create(
             zone=self.zones[0],
             name="test1",
             type=RecordTypeChoices.A,
@@ -148,7 +148,7 @@ class RecordValidationTest(TestCase):
             ttl=86400,
         )
         with self.assertRaises(ValidationError):
-            record2 = Record.objects.create(
+            Record.objects.create(
                 zone=self.zones[0],
                 name="test1",
                 type=RecordTypeChoices.A,
@@ -184,7 +184,6 @@ class RecordValidationTest(TestCase):
 
     def test_rrset_ttl_ptr_records(self):
         f_zone = self.zones[0]
-        r_zone = self.zones[1]
 
         record1 = Record.objects.create(
             zone=f_zone,

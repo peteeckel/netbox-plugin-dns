@@ -51,7 +51,7 @@ class RFC2317NetworkField(models.Field):
 
         try:
             ip_network = IPNetwork(value)
-        except (AddressFormatError, TypeError, ValueError) as exc:
+        except (AddrFormatError, TypeError, ValueError) as exc:
             raise ValidationError(exc)
 
         if ip_network.version != 4:

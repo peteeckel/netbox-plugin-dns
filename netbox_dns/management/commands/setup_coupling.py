@@ -1,10 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from core.models import ObjectType
 from extras.models import CustomField
 from extras.choices import CustomFieldTypeChoices
 from ipam.models import IPAddress
-from netbox_dns.models import Record, Zone
+from netbox_dns.models import Zone
 
 
 class Command(BaseCommand):
@@ -32,7 +32,7 @@ class Command(BaseCommand):
                     ).delete()
                     if options.get("verbose"):
                         self.stdout.write(f"Custom field '{cf}' removed")
-                except:
+                except CustomField.DoesNotExist:
                     pass
 
         else:

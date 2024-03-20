@@ -29,8 +29,6 @@ class Command(BaseCommand):
         self.stdout.write("RRSet cleanup completed.")
 
     def cleanup_rrset_ttl(self, **options):
-        verbose = options.get("verbosity") > 1
-
         ttl_records = (
             Record.objects.filter(ttl__isnull=False)
             .exclude(type=RecordTypeChoices.SOA)
