@@ -21,6 +21,10 @@ class ContactAPITestCase(
         {"name": "Jane Doe", "contact_id": "ORG-REG-JANEDOE-42"},
     ]
 
+    bulk_update_data = {
+        "name": "Paul Doe",
+    }
+
     @classmethod
     def setUpTestData(cls):
         contacts = (
