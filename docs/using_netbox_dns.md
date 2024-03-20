@@ -41,9 +41,9 @@ If the local requirements file does not exist, this command will create it.
 
 This will ensure that NetBox DNS will be updated every time the update script provided with NetBox is executed.
 
-### Enable the Plugin
+### Enabling the Plugin
 
-In configuration.py, add the plugin's name to the PLUGINS list:
+In configuration.py, add `netbox_dns` to the PLUGINS list:
 
 ```
 PLUGINS = [
@@ -58,10 +58,10 @@ NetBox DNS requires some tables for its data models within the NetBox database. 
 /opt/netbox/netbox/manage.py migrate
 ```
 
-### Running the Django database migration procedure
-Restart the WSGI service to load the new plugin:
+### Restarting NetBox
+Restart the WSGI service and the request queue worker to load the new plugin:
 ```
-systemctl restart netbox
+systemctl restart netbox netbox-rq
 ```
 
 Now NetBox DNS should show up under "Plugins" at the bottom of the left-hand side of the NetBox web GUI.
