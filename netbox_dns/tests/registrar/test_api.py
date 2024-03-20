@@ -13,6 +13,7 @@ class RegistrarAPITestCase(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = Registrar
+
     brief_fields = ["description", "display", "iana_id", "id", "name", "url"]
 
     create_data = [
@@ -28,6 +29,11 @@ class RegistrarAPITestCase(
         },
         {"name": "ACME Trust", "iana_id": 5, "abuse_email": "devnull@acme.example.org"},
     ]
+
+    bulk_update_data = {
+        "whois_server": "whois.example.com",
+        "address": "42 Drury Lane, Duloc 42523",
+    }
 
     @classmethod
     def setUpTestData(cls):
