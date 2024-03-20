@@ -13,6 +13,7 @@ class ViewTest(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = View
+
     brief_fields = ["description", "display", "id", "name", "url"]
 
     create_data = [
@@ -20,6 +21,10 @@ class ViewTest(
         {"name": "internal"},
         {"name": "diverse"},
     ]
+
+    bulk_update_data = {
+        "description": "Test View",
+    }
 
     @classmethod
     def setUpTestData(cls):
