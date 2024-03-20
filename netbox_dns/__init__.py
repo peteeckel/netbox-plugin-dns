@@ -1,9 +1,4 @@
-import sys
-
 from netbox.plugins import PluginConfig
-from django.db.utils import OperationalError
-
-from netbox.plugins.utils import get_plugin_config
 
 __version__ = "0.22.9"
 

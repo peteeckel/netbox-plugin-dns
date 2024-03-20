@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from django.db.models import Lookup, Transform
+from django.db.models import Lookup, Transform, IntegerField
 from django.core.exceptions import ValidationError
 
 from netaddr import AddrFormatError, IPNetwork
@@ -9,51 +9,51 @@ from netaddr import AddrFormatError, IPNetwork
 class NetContains(Lookup):
     lookup_name = "net_contains"
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        return "%s >> %s" % (lhs, rhs), params
+        return f"{lhs} >> {rhs}", params
 
 
 class NetContainsOrEquals(Lookup):
     lookup_name = "net_contains_or_equals"
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        return "%s >>= %s" % (lhs, rhs), params
+        return f"{lhs} >>= {rhs}", params
 
 
 class NetContained(Lookup):
     lookup_name = "net_contained"
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        return "%s << %s" % (lhs, rhs), params
+        return f"{lhs} << {rhs}", params
 
 
 class NetContainedOrEqual(Lookup):
     lookup_name = "net_contained_or_equal"
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        return "%s <<= %s" % (lhs, rhs), params
+        return f"{lhs} <<= {rhs}", params
 
 
 class NetOverlap(Lookup):
     lookup_name = "net_overlap"
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        return "%s && %s" % (lhs, rhs), params
+        return f"{lhs} && {rhs}", params
 
 
 class NetworkFormField(forms.Field):
@@ -118,7 +118,6 @@ class NetMaskLength(Transform):
     function = "MASKLEN"
     lookup_name = "net_mask_length"
 
-    @property
     def output_field(self):
         return IntegerField()
 

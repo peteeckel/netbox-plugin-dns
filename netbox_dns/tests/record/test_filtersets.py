@@ -1,5 +1,3 @@
-import netaddr
-
 from django.test import TestCase
 
 from tenancy.models import Tenant, TenantGroup

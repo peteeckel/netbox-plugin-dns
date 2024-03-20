@@ -1,4 +1,5 @@
 from packaging import version
+
 from django.conf import settings
 
 from netbox.plugins.utils import get_plugin_config
@@ -116,7 +117,7 @@ class RelatedDNSObjects(PluginTemplateExtension):
         )
 
 
-template_extensions = list()
+template_extensions = []
 
 if version.parse(settings.VERSION) < version.parse("3.7.0"):
     template_extensions.append(RelatedDNSObjects)

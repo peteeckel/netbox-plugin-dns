@@ -21,7 +21,7 @@ def validate_fqdn(name):
         regex = rf"^(\*|{LABEL})(\.{LABEL})+\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
-        raise ValidationError(f"Not a valid fully qualified DNS host name")
+        raise ValidationError("Not a valid fully qualified DNS host name")
 
 
 def validate_extended_hostname(name, tolerate_leading_underscores=False):
@@ -36,7 +36,7 @@ def validate_extended_hostname(name, tolerate_leading_underscores=False):
         regex = rf"^([*@]|(\*\.)?{LABEL}(\.{LABEL})*\.?)$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
-        raise ValidationError(f"Not a valid DNS host name")
+        raise ValidationError("Not a valid DNS host name")
 
 
 def validate_domain_name(name):
@@ -49,4 +49,4 @@ def validate_domain_name(name):
         regex = rf"^{LABEL}(\.{LABEL})*\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
-        raise ValidationError(f"Not a valid DNS domain name")
+        raise ValidationError("Not a valid DNS domain name")

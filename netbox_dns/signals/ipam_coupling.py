@@ -5,6 +5,7 @@ from rest_framework.exceptions import PermissionDenied as APIPermissionDenied
 
 from netbox.signals import post_clean
 from netbox.context import current_request
+from netbox.plugins.utils import get_plugin_config
 from ipam.models import IPAddress
 
 from netbox_dns.models import Zone
@@ -17,8 +18,6 @@ from netbox_dns.utilities.ipam_coupling import (
     dns_changed,
     DNSPermissionDenied,
 )
-
-from netbox.plugins.utils import get_plugin_config
 
 
 @receiver(post_clean, sender=IPAddress)
@@ -34,14 +33,14 @@ def ip_address_check_permissions_save(instance, **kwargs):
         return
 
     try:
-        if instance.id is None:
+        if instance.pk is None:
             record = new_address_record(instance)
             if record is not None:
                 record.full_clean()
                 check_permission(request, "netbox_dns.add_record", record)
 
         else:
-            if not dns_changed(IPAddress.objects.get(pk=instance.id), instance):
+            if not dns_changed(IPAddress.objects.get(pk=instance.pk), instance):
                 return
 
             record = get_address_record(instance)
