@@ -7,7 +7,6 @@ from dns import name as dns_name
 from django.core.exceptions import ValidationError
 from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
-from django.db.models.functions import Length
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
@@ -213,7 +212,7 @@ class Record(NetBoxModel):
             name = dns_name.from_text(self.fqdn).relativize(dns_name.root).to_unicode()
         except dns_name.IDNAException:
             name = self.name
-        except dns_name.LabelTooLong as exc:
+        except dns_name.LabelTooLong:
             name = f"{self.name[:59]}..."
 
         return f"{name} [{self.type}]"
@@ -664,7 +663,7 @@ class Record(NetBoxModel):
         if self.type == RecordTypeChoices.SOA and self.name != "@":
             raise ValidationError(
                 {
-                    "name": f"SOA records are only allowed with name @ and are created automatically by NetBox DNS"
+                    "name": "SOA records are only allowed with name @ and are created automatically by NetBox DNS"
                 }
             ) from None
 

@@ -1,5 +1,3 @@
-import requests
-
 from unittest import skip
 
 from django.urls import reverse
@@ -8,11 +6,11 @@ from django.core import management
 from core.models import ObjectType
 
 from rest_framework import status
-from utilities.testing import APITestCase, disable_warnings
+from utilities.testing import APITestCase
 
 from ipam.models import IPAddress
 from netaddr import IPNetwork
-from netbox_dns.models import Record, Zone, NameServer, RecordTypeChoices
+from netbox_dns.models import Record, Zone, NameServer
 from users.models import ObjectPermission
 
 
@@ -169,7 +167,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.delete_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Delete Test Record", actions=["delete"], constraints={"name": name}
+            name="Delete Test Record", actions=["delete"], constraints={"name": name}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -232,7 +230,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.delete_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Delete Test Record",
+            name="Delete Test Record",
             actions=["delete"],
             constraints={"name": "whatever"},
         )
@@ -298,44 +296,6 @@ class IPAMCouplingAPITest(APITestCase):
         self.assertEqual(ip_address.dns_name, f"{name2}.{zone.name}")
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
-    def test_modify_name_with_dns_permission(self):
-        addr = IPNetwork("10.0.0.42/24")
-        zone = self.zones[0]
-        name1 = "name42"
-        name2 = "name23"
-
-        self.add_permissions("ipam.change_ipaddress")
-        self.add_permissions("netbox_dns.change_record")
-
-        ip_address = IPAddress.objects.create(
-            address=addr,
-            custom_field_data={
-                "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
-                "ipaddress_dns_record_ttl": None,
-                "ipaddress_dns_record_disable_ptr": False,
-            },
-        )
-
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
-        data = {
-            "custom_fields": {
-                "ipaddress_dns_record_name": name2,
-            }
-        }
-        response = self.client.patch(url, data, format="json", **self.header)
-
-        self.assertHttpStatus(response, status.HTTP_200_OK)
-
-        ip_address.refresh_from_db()
-
-        record_query = Record.objects.filter(ipam_ip_address=ip_address)
-        self.assertEqual(record_query.count(), 1)
-        self.assertEqual(record_query[0].name, name2)
-        self.assertEqual(record_query[0].zone, zone)
-        self.assertEqual(ip_address.dns_name, f"{name2}.{zone.name}")
-
-    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_modify_name_with_dns_object_permission(self):
         addr = IPNetwork("10.0.0.42/24")
         zone = self.zones[0]
@@ -345,51 +305,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record", actions=["change"], constraints={"name": name1}
-        )
-        object_permission.save()
-        object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
-        object_permission.users.add(self.user)
-
-        ip_address = IPAddress.objects.create(
-            address=addr,
-            custom_field_data={
-                "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
-                "ipaddress_dns_record_ttl": None,
-                "ipaddress_dns_record_disable_ptr": False,
-            },
-        )
-
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
-        data = {
-            "custom_fields": {
-                "ipaddress_dns_record_name": name2,
-            }
-        }
-        response = self.client.patch(url, data, format="json", **self.header)
-
-        self.assertHttpStatus(response, status.HTTP_200_OK)
-
-        ip_address.refresh_from_db()
-
-        record_query = Record.objects.filter(ipam_ip_address=ip_address)
-        self.assertEqual(record_query.count(), 1)
-        self.assertEqual(record_query[0].name, name2)
-        self.assertEqual(record_query[0].zone, zone)
-        self.assertEqual(ip_address.dns_name, f"{name2}.{zone.name}")
-
-    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
-    def test_modify_name_with_dns_object_permission(self):
-        addr = IPNetwork("10.0.0.42/24")
-        zone = self.zones[0]
-        name1 = "name42"
-        name2 = "name23"
-
-        self.add_permissions("ipam.change_ipaddress")
-
-        object_permission = ObjectPermission(
-            name=f"Modify Test Record", actions=["change"], constraints={"name": name1}
+            name="Modify Test Record", actions=["change"], constraints={"name": name1}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -471,7 +387,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record", actions=["change"], constraints={"name": name}
+            name="Modify Test Record", actions=["change"], constraints={"name": name}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -561,7 +477,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record",
+            name="Modify Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )
@@ -662,7 +578,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record",
+            name="Modify Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )
@@ -764,7 +680,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Delete Test Record", actions=["delete"], constraints={"name": name}
+            name="Delete Test Record", actions=["delete"], constraints={"name": name}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -866,7 +782,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Delete Test Record", actions=["delete"], constraints={"name": name}
+            name="Delete Test Record", actions=["delete"], constraints={"name": name}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -967,7 +883,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Delete Test Record",
+            name="Delete Test Record",
             actions=["delete"],
             constraints={"name": "whatever"},
         )
@@ -1070,7 +986,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Delete Test Record",
+            name="Delete Test Record",
             actions=["delete"],
             constraints={"name": "whatever"},
         )
@@ -1286,7 +1202,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record",
+            name="Modify Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )
@@ -1387,7 +1303,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record",
+            name="Modify Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )
@@ -1486,7 +1402,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Modify Test Record",
+            name="Modify Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )
@@ -1621,7 +1537,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Change Test Record", actions=["change"], constraints={"name": name}
+            name="Change Test Record", actions=["change"], constraints={"name": name}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -1667,7 +1583,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Change Test Record", actions=["change"], constraints={"name": name}
+            name="Change Test Record", actions=["change"], constraints={"name": name}
         )
         object_permission.save()
         object_permission.object_types.add(ObjectType.objects.get_for_model(Record))
@@ -1791,7 +1707,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Change Test Record",
+            name="Change Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )
@@ -1839,7 +1755,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.add_permissions("ipam.change_ipaddress")
 
         object_permission = ObjectPermission(
-            name=f"Change Test Record",
+            name="Change Test Record",
             actions=["change"],
             constraints={"name": "whatever"},
         )

@@ -19,4 +19,4 @@ class Command(BaseCommand):
                 self.stdout.write(f"Updating the SOA record for zone {zone.name}")
             zone.update_soa_record()
 
-        self.stdout.write(f"All SOA records have been updated")
+        self.stdout.write("All SOA records have been updated")

@@ -373,7 +373,6 @@ class IPAMCouplingRecordTest(TestCase):
         }
         ip_address.save()
 
-        record_query = Record.objects.filter(ipam_ip_address=ip_address)
         self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
         self.assertFalse(
             Record.objects.filter(name=name, zone=zone, managed=True).exists()
@@ -410,7 +409,6 @@ class IPAMCouplingRecordTest(TestCase):
         }
         ip_address.save()
 
-        record_query = Record.objects.filter(ipam_ip_address=ip_address)
         self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
         self.assertFalse(
             Record.objects.filter(name=name, zone=zone, managed=True).exists()
@@ -505,7 +503,7 @@ class IPAMCouplingRecordTest(TestCase):
 
         ip_address.refresh_from_db()
         self.assertEqual(ip_address.netbox_dns_records.count(), 0)
-        self.assertEqual(ip_address.dns_name, f"")
+        self.assertEqual(ip_address.dns_name, "")
         self.assertEqual(
             ip_address.custom_field_data,
             {
