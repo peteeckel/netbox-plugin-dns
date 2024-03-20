@@ -55,7 +55,7 @@ class RecordEnforceUniqueTest(TestCase):
         }
     )
     def test_duplicate_record_fail(self):
-        record = Record.objects.create(name="name1", zone=self.zone, **self.record_data)
+        Record.objects.create(name="name1", zone=self.zone, **self.record_data)
 
         with self.assertRaises(ValidationError):
             Record.objects.create(name="name1", zone=self.zone, **self.record_data)
