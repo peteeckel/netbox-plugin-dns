@@ -104,7 +104,6 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             return queryset.none()
 
     def search(self, queryset, name, value):
-        """Perform the filtered search."""
         if not value.strip():
             return queryset
         qs_filter = (
