@@ -31,17 +31,31 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label="View",
     )
+    # DEPRECATED: Remove in 1.0
     name_server_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers",
         to_field_name="id",
         label="Nameserver IDs",
     )
+    # DEPRECATED: Remove in 1.0
     name_server = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers__name",
         to_field_name="name",
         label="Nameservers",
+    )
+    nameservers_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=NameServer.objects.all(),
+        field_name="nameservers",
+        to_field_name="id",
+        label="Nameservers ID",
+    )
+    nameservers = django_filters.ModelMultipleChoiceFilter(
+        queryset=NameServer.objects.all(),
+        field_name="nameservers__name",
+        to_field_name="name",
+        label="Nameserver",
     )
     soa_mname_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
@@ -63,12 +77,14 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
     rfc2317_parent_zone_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
-        field_name="rfc2317_parent_zone__name",
-        to_field_name="name",
+        field_name="rfc2317_parent_zone",
+        to_field_name="id",
         label="RFC2317 Parent Zone",
     )
     rfc2317_parent_zone = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
+        field_name="rfc2317_parent_zone__name",
+        to_field_name="name",
         label="RFC2317 Parent Zone",
     )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
