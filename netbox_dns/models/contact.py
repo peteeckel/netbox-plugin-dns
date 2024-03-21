@@ -99,7 +99,7 @@ class Contact(NetBoxModel):
     ]
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:contact", kwargs={"pk": self.id})
+        return reverse("plugins:netbox_dns:contact", kwargs={"pk": self.pk})
 
     def __str__(self):
         if self.name is not None:
