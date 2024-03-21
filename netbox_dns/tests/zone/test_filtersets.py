@@ -309,7 +309,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     def test_admin_c(self):
         params = {"admin_c": [self.contacts[1].contact_id]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"admin_c_id": [self.contacts[1].id]}
+        params = {"admin_c_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_tech_c(self):

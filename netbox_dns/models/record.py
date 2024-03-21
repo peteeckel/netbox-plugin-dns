@@ -225,7 +225,7 @@ class Record(NetBoxModel):
         return RecordStatusChoices.colors.get(self.status)
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:record", kwargs={"pk": self.id})
+        return reverse("plugins:netbox_dns:record", kwargs={"pk": self.pk})
 
     @property
     def value_fqdn(self):
