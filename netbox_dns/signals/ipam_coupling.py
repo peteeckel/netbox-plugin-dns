@@ -34,14 +34,14 @@ def ip_address_check_permissions_save(instance, **kwargs):
         return
 
     try:
-        if instance.id is None:
+        if instance.pk is None:
             record = new_address_record(instance)
             if record is not None:
                 record.full_clean()
                 check_permission(request, "netbox_dns.add_record", record)
 
         else:
-            if not dns_changed(IPAddress.objects.get(pk=instance.id), instance):
+            if not dns_changed(IPAddress.objects.get(pk=instance.pk), instance):
                 return
 
             record = get_address_record(instance)

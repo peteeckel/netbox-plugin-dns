@@ -64,7 +64,7 @@ def new_address_record(instance):
         status=address_record_status(instance),
         type=address_record_type(instance),
         value=str(instance.address.ip),
-        ipam_ip_address_id=instance.id,
+        ipam_ip_address_id=instance.pk,
         managed=True,
     )
 

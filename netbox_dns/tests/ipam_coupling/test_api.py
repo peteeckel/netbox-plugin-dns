@@ -55,7 +55,7 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "address": address,
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": None,
             },
@@ -87,7 +87,7 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "address": address,
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
             },
@@ -118,7 +118,7 @@ class IPAMCouplingAPITest(APITestCase):
         data = {
             "address": address,
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": None,
             },
@@ -128,7 +128,7 @@ class IPAMCouplingAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         self.assertFalse(IPAddress.objects.filter(address=address).exists())
-        self.assertFalse(Record.objects.filter(name=name, zone_id=zone.id).exists())
+        self.assertFalse(Record.objects.filter(name=name, zone_id=zone.pk).exists())
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_delete_ip_with_dns_permission(self):
@@ -143,14 +143,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=address,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
         ptr_record_id = address_record.ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         response = self.client.delete(url, **self.header)
 
         self.assertHttpStatus(response, status.HTTP_204_NO_CONTENT)
@@ -177,14 +177,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=address,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
         ptr_record_id = address_record.ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         response = self.client.delete(url, **self.header)
 
         self.assertHttpStatus(response, status.HTTP_204_NO_CONTENT)
@@ -205,14 +205,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=address,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
         ptr_record_id = address_record.ptr_record_id
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         response = self.client.delete(url, **self.header)
 
         self.assertHttpStatus(response, status.HTTP_403_FORBIDDEN)
@@ -242,14 +242,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=address,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
         ptr_record_id = address_record.ptr_record_id
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         response = self.client.delete(url, **self.header)
 
         self.assertHttpStatus(response, status.HTTP_403_FORBIDDEN)
@@ -271,13 +271,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
@@ -315,13 +315,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
@@ -353,16 +353,16 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone2.id,
+                "ipaddress_dns_zone_id": zone2.pk,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -397,16 +397,16 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone2.id,
+                "ipaddress_dns_zone_id": zone2.pk,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -434,13 +434,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
@@ -461,7 +461,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -489,13 +489,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": name2,
@@ -516,7 +516,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name1,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -535,16 +535,16 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone2.id,
+                "ipaddress_dns_zone_id": zone2.pk,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -562,7 +562,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -590,16 +590,16 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
-                "ipaddress_dns_zone_id": zone2.id,
+                "ipaddress_dns_zone_id": zone2.pk,
             }
         }
         response = self.client.patch(url, data, format="json", **self.header)
@@ -617,7 +617,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -636,14 +636,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": None,
@@ -690,14 +690,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": None,
@@ -738,14 +738,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
@@ -792,14 +792,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
@@ -839,14 +839,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": None,
@@ -868,7 +868,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -895,14 +895,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_name": None,
@@ -924,7 +924,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -942,14 +942,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
@@ -971,7 +971,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -998,14 +998,14 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
         ptr_record_id = ip_address.netbox_dns_records.first().ptr_record.pk
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_zone_id": None,
@@ -1027,7 +1027,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -1046,13 +1046,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": 2342,
@@ -1084,13 +1084,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": 2342,
@@ -1122,13 +1122,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": None,
@@ -1159,13 +1159,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": 2342,
@@ -1187,7 +1187,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -1214,13 +1214,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": 2342,
@@ -1242,7 +1242,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -1260,13 +1260,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": 2342,
@@ -1288,7 +1288,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -1315,12 +1315,12 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": 2342,
@@ -1342,7 +1342,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
             },
         )
@@ -1359,13 +1359,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": None,
@@ -1387,7 +1387,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -1414,13 +1414,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_ttl": None,
@@ -1442,7 +1442,7 @@ class IPAMCouplingAPITest(APITestCase):
             ip_address.custom_field_data,
             {
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
@@ -1461,13 +1461,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": True,
@@ -1501,13 +1501,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": True,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": False,
@@ -1547,13 +1547,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": True,
@@ -1593,13 +1593,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": True,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": False,
@@ -1632,13 +1632,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": True,
@@ -1671,13 +1671,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": True,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": False,
@@ -1719,13 +1719,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": True,
@@ -1767,13 +1767,13 @@ class IPAMCouplingAPITest(APITestCase):
             address=addr,
             custom_field_data={
                 "ipaddress_dns_record_name": name,
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": True,
             },
         )
 
-        url = reverse("ipam-api:ipaddress-list") + str(ip_address.id) + "/"
+        url = reverse("ipam-api:ipaddress-list") + str(ip_address.pk) + "/"
         data = {
             "custom_fields": {
                 "ipaddress_dns_record_disable_ptr": False,

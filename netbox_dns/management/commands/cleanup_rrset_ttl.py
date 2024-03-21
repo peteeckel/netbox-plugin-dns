@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
             if records.count() == 1:
                 if options.get("verbosity") > 2:
-                    self.stdout.write(f"Ignoring single record {record.id} ({record})")
+                    self.stdout.write(f"Ignoring single record {record.pk} ({record})")
                 continue
 
             if options.get("max"):
@@ -54,7 +54,7 @@ class Command(BaseCommand):
             for record in records.exclude(ttl=ttl):
                 if options.get("verbosity") > 1:
                     self.stdout.write(
-                        f"Updating TTL for record {record.id} ({record}) to {ttl}"
+                        f"Updating TTL for record {record.pk} ({record}) to {ttl}"
                     )
                 record.ttl = ttl
                 record.save(update_fields=["ttl"], update_rrset_ttl=False)

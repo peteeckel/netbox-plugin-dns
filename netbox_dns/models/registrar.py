@@ -47,7 +47,7 @@ class Registrar(NetBoxModel):
     )
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:registrar", kwargs={"pk": self.id})
+        return reverse("plugins:netbox_dns:registrar", kwargs={"pk": self.pk})
 
     def __str__(self):
         return str(self.name)
