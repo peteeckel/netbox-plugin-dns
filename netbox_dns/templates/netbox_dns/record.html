@@ -12,7 +12,11 @@
 {% endblock control-buttons %}
 
 {% block breadcrumbs %}
-{% if not object.managed %}
+{% if object.managed %}
+<li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_dns:managed_record_list' %}">{{ 'Managed Records' }}</a>
+</li>
+{% else %}
 {{ block.super }}
 {% endif %}
 {% endblock %}
