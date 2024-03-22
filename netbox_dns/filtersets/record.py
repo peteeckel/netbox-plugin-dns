@@ -128,3 +128,21 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             | Q(zone__name__icontains=value)
         )
         return queryset.filter(qs_filter)
+
+
+class RecordGraphQLFilterSet(RecordFilterSet):
+    class Meta:
+        model = Record
+        fields = (
+            "id",
+            "type",
+            "name",
+            "description",
+            "ttl",
+            "value",
+            "status",
+            "disable_ptr",
+            "zone",
+            "managed",
+            "tenant",
+        )
