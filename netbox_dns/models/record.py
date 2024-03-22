@@ -242,6 +242,16 @@ class Record(NetBoxModel):
         return name.to_text()
 
     @property
+    def value_fqdn(self):
+        if self.type != RecordTypeChoices.CNAME:
+            return None
+
+        zone = dns_name.from_text(self.zone.name)
+        value_fqdn = dns_name.from_text(self.value, origin=zone)
+
+        return value_fqdn.to_text()
+
+    @property
     def address_from_name(self):
         prefix = arpa_to_prefix(self.fqdn)
         if prefix is not None:
