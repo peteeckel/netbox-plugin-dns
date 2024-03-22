@@ -128,13 +128,9 @@
             </table>
         </div>
         {% if cname_target_table and cname_target_table.rows|length > 0 %}
-        <div class="card">
-            {% include 'inc/panel_table.html' with table=cname_target_table heading='CNAME Targets' %}
-        </div>
+        {% include 'inc/panel_table.html' with table=cname_target_table heading='CNAME Targets' %}
         {% elif cname_table and cname_table.rows|length > 0 %}
-        <div class="card">
-            {% include 'inc/panel_table.html' with table=cname_table heading='CNAMEs' %}
-        </div>
+        {% include 'inc/panel_table.html' with table=cname_table heading='CNAMEs' %}
         {% endif %}
         {% if not object.managed %}
         {% include 'inc/panels/custom_fields.html' %}
