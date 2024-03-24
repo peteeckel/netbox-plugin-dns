@@ -44,7 +44,7 @@ class RecordView(generic.ObjectView):
         value_fqdn = dns_name.from_text(instance.value_fqdn)
         value_zone_names = [
             value_fqdn.split(length)[1].to_text().rstrip(".")
-            for length in range(2, len(value_fqdn))
+            for length in range(2, len(value_fqdn) + 1)
         ]
 
         value_zone = (
@@ -80,7 +80,7 @@ class RecordView(generic.ObjectView):
         fqdn = dns_name.from_text(instance.fqdn)
         parent_zone_names = [
             fqdn.split(length)[1].to_text().rstrip(".")
-            for length in range(1, len(fqdn))
+            for length in range(1, len(fqdn) + 1)
         ]
 
         parent_zones = Zone.objects.filter(
