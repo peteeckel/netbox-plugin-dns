@@ -8,7 +8,7 @@ from netbox_dns.models import View, Zone, ZoneStatusChoices, Registrar, Contact
 
 
 class ZoneFilter(TenancyFilterSet, NetBoxModelFilterSet):
-    status = django_filters.ChoiceFilter(
+    status = django_filters.MultipleChoiceFilter(
         choices=ZoneStatusChoices,
     )
     view_id = django_filters.ModelMultipleChoiceFilter(

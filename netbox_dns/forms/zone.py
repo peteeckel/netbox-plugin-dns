@@ -258,8 +258,8 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label="View",
     )
-    status = forms.ChoiceField(
-        choices=add_blank_choice(ZoneStatusChoices),
+    status = forms.MultipleChoiceField(
+        choices=ZoneStatusChoices,
         required=False,
     )
     name = forms.CharField(
