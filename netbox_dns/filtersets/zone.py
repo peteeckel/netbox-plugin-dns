@@ -45,13 +45,13 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label="Nameservers",
     )
-    nameservers_id = django_filters.ModelMultipleChoiceFilter(
+    nameserver_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers",
         to_field_name="id",
         label="Nameservers ID",
     )
-    nameservers = django_filters.ModelMultipleChoiceFilter(
+    nameserver = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers__name",
         to_field_name="name",
@@ -137,7 +137,6 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="contact_id",
         label="Billing Contact",
     )
-
     active = django_filters.BooleanFilter(
         label="Zone is active",
     )
@@ -148,9 +147,6 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "id",
             "name",
             "description",
-            "view",
-            "status",
-            "nameservers",
             "default_ttl",
             "soa_ttl",
             "soa_rname",
@@ -160,17 +156,8 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "soa_expire",
             "soa_minimum",
             "soa_serial_auto",
-            "arpa_network",
-            "rfc2317_prefix",
             "rfc2317_parent_managed",
-            "registrar",
             "registry_domain_id",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            "active",
-            "tenant",
         )
 
     def filter_arpa_network(self, queryset, name, value):

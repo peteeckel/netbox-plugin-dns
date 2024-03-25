@@ -11,8 +11,8 @@ class RegistrarFilterSet(NetBoxModelFilterSet):
         fields = (
             "id",
             "name",
-            "iana_id",
             "description",
+            "iana_id",
             "address",
             "referral_url",
             "whois_server",

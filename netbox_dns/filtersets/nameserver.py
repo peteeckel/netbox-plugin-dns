@@ -22,7 +22,7 @@ class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
     class Meta:
         model = NameServer
-        fields = ("id", "name", "description", "tenant")
+        fields = ("id", "name", "description")
 
     def search(self, queryset, name, value):
         if not value.strip():
