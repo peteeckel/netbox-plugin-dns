@@ -84,7 +84,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
 
     type = forms.MultipleChoiceField(
-        choices=add_blank_choice(RecordTypeChoices),
+        choices=RecordTypeChoices,
         required=False,
     )
     name = forms.CharField(
@@ -95,8 +95,8 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label="Value",
     )
-    status = forms.ChoiceField(
-        choices=add_blank_choice(RecordStatusChoices),
+    status = forms.MultipleChoiceField(
+        choices=RecordStatusChoices,
         required=False,
     )
     zone_id = DynamicModelMultipleChoiceField(

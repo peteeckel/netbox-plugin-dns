@@ -14,6 +14,9 @@ class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
         choices=RecordTypeChoices,
         null_value=None,
     )
+    status = django_filters.MultipleChoiceFilter(
+        choices=RecordStatusChoices,
+    )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
         label="Parent Zone ID",
