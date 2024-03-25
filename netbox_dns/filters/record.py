@@ -4,7 +4,7 @@ from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 
-from netbox_dns.models import View, Zone, Record, RecordTypeChoices
+from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 
 
 class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
