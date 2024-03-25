@@ -231,31 +231,31 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     # DEPRECATED: Remove in 1.0
     def test_name_servers(self):
-        params = {"nameservers": [self.nameservers[0].name]}
+        params = {"name_server": [self.nameservers[0].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"nameservers": [self.nameservers[1].name]}
+        params = {"name_server": [self.nameservers[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"nameservers": [self.nameservers[2].name]}
+        params = {"name_server": [self.nameservers[2].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"nameservers_id": [self.nameservers[0].pk]}
+        params = {"name_server_id": [self.nameservers[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"nameservers_id": [self.nameservers[1].pk]}
+        params = {"name_server_id": [self.nameservers[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"nameservers_id": [self.nameservers[2].pk]}
+        params = {"name_server_id": [self.nameservers[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
-    def test_nameservers(self):
-        params = {"nameservers": [self.nameservers[0].name]}
+    def test_nameserver(self):
+        params = {"nameserver": [self.nameservers[0].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"nameservers": [self.nameservers[1].name]}
+        params = {"nameserver": [self.nameservers[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"nameservers": [self.nameservers[2].name]}
+        params = {"nameserver": [self.nameservers[2].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"nameservers_id": [self.nameservers[0].pk]}
+        params = {"nameserver_id": [self.nameservers[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"nameservers_id": [self.nameservers[1].pk]}
+        params = {"nameserver_id": [self.nameservers[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"nameservers_id": [self.nameservers[2].pk]}
+        params = {"nameserver_id": [self.nameservers[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_soa_mname(self):

@@ -39,6 +39,8 @@ class NameServer(NetBoxModel):
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "Nameserver"
+        verbose_name_plural = "Nameservers"
 
     def __str__(self):
         try:
