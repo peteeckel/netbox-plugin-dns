@@ -1,6 +1,6 @@
 from utilities.testing import APIViewTestCases
 
-from netbox_dns.tests.custom import APITestCase
+from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import Contact
 
 
@@ -11,6 +11,8 @@ class ContactAPITestCase(
     APIViewTestCases.CreateObjectViewTestCase,
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
+    NetBoxDNSGraphQLMixin,
+    APIViewTestCases.GraphQLTestCase,
 ):
     model = Contact
     brief_fields = ["contact_id", "description", "display", "id", "name", "url"]

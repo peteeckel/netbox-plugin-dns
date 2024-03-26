@@ -1,6 +1,6 @@
 from utilities.testing import APIViewTestCases, create_tags
 
-from netbox_dns.tests.custom import APITestCase
+from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import View, Zone, NameServer
 
 
@@ -11,6 +11,8 @@ class ZoneTest(
     APIViewTestCases.CreateObjectViewTestCase,
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
+    NetBoxDNSGraphQLMixin,
+    APIViewTestCases.GraphQLTestCase,
 ):
     model = Zone
 
@@ -61,7 +63,8 @@ class ZoneTest(
                 name="zone5.example.com", **cls.zone_data, soa_mname=ns1, view=views[2]
             ),
         )
-        Zone.objects.bulk_create(zones)
+        for zone in zones:
+            zone.save()
 
         tags = create_tags("Alpha", "Bravo", "Charlie")
 
