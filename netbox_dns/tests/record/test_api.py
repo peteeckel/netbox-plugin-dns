@@ -1,6 +1,6 @@
 from utilities.testing import APIViewTestCases
 
-from netbox_dns.tests.custom import APITestCase
+from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import View, Zone, NameServer, Record, RecordTypeChoices
 
 
@@ -11,6 +11,8 @@ class RecordTest(
     APIViewTestCases.CreateObjectViewTestCase,
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
+    NetBoxDNSGraphQLMixin,
+    APIViewTestCases.GraphQLTestCase,
 ):
     model = Record
     brief_fields = [
