@@ -938,6 +938,87 @@ class RFC2317RecordTest(TestCase):
             record1.ptr_record.fqdn, f"{record1.rfc2317_ptr_name}.{rfc2317_zone.name}."
         )
 
+    def test_modify_record_rfc2317_zone_managed_existing_value_keep_cname(self):
+        zone = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        rfc2317_zone = Zone.objects.create(
+            name="0-15.0.0.10.in-addr.arpa",
+            **self.zone_data,
+            rfc2317_prefix="10.0.0.0/28",
+            rfc2317_parent_managed=True,
+        )
+
+        record1 = Record.objects.create(
+            name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
+        )
+        record2 = Record.objects.create(
+            name="name2", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
+        )
+
+        self.assertIn(record1.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record2.ptr_record, rfc2317_zone.record_set.all())
+        self.assertEqual(record1.ptr_record.zone, rfc2317_zone)
+        self.assertEqual(record2.ptr_record.zone, rfc2317_zone)
+        self.assertTrue(
+            rfc2317_zone.record_set.filter(
+                type=RecordTypeChoices.PTR,
+                name=record1.rfc2317_ptr_name,
+                value=record1.fqdn,
+            ).exists()
+        )
+        self.assertTrue(
+            rfc2317_zone.record_set.filter(
+                type=RecordTypeChoices.PTR,
+                name=record2.rfc2317_ptr_name,
+                value=record2.fqdn,
+            ).exists()
+        )
+        cname_record1 = zone.record_set.filter(
+            type=RecordTypeChoices.CNAME,
+            name=record1.rfc2317_ptr_cname_name,
+            value=record1.ptr_record.fqdn,
+        ).first()
+        cname_record2 = zone.record_set.filter(
+            type=RecordTypeChoices.CNAME,
+            name=record2.rfc2317_ptr_cname_name,
+            value=record2.ptr_record.fqdn,
+        ).first()
+        self.assertTrue(cname_record1)
+        self.assertTrue(cname_record2)
+        self.assertEqual(cname_record1, cname_record2)
+        self.assertEqual(
+            record1.ptr_record.fqdn, f"{record1.rfc2317_ptr_name}.{rfc2317_zone.name}."
+        )
+        self.assertEqual(
+            record2.ptr_record.fqdn, f"{record2.rfc2317_ptr_name}.{rfc2317_zone.name}."
+        )
+
+        record1.value = "10.0.0.2"
+        record1.save()
+
+        record2.refresh_from_db()
+        rfc2317_zone.refresh_from_db()
+        zone.refresh_from_db()
+
+        cname_record1 = zone.record_set.filter(
+            type=RecordTypeChoices.CNAME,
+            name=record1.rfc2317_ptr_cname_name,
+            value=record1.ptr_record.fqdn,
+        ).first()
+        cname_record2 = zone.record_set.filter(
+            type=RecordTypeChoices.CNAME,
+            name=record2.rfc2317_ptr_cname_name,
+            value=record2.ptr_record.fqdn,
+        ).first()
+        self.assertIsNotNone(cname_record1)
+        self.assertIsNotNone(cname_record2)
+        self.assertNotEqual(cname_record1, cname_record2)
+        self.assertEqual(
+            record1.ptr_record.fqdn, f"{record1.rfc2317_ptr_name}.{rfc2317_zone.name}."
+        )
+        self.assertEqual(
+            record2.ptr_record.fqdn, f"{record2.rfc2317_ptr_name}.{rfc2317_zone.name}."
+        )
+
     def test_delete_record_rfc2317_zone_managed(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
         rfc2317_zone = Zone.objects.create(
