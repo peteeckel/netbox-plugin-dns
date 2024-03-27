@@ -9,35 +9,8 @@ import netbox_dns.fields.network
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("netbox_dns", "0001_initial"),
-        ("netbox_dns", "0015_add_record_status"),
-        ("netbox_dns", "0013_add_nameserver_zone_record_description"),
-        ("netbox_dns", "0011_add_view_model"),
-        ("netbox_dns", "0002_zone_default_ttl"),
-        ("netbox_dns", "0003_soa_managed_records"),
-        ("netbox_dns", "0004_create_ptr_for_a_aaaa_records"),
-        ("netbox_dns", "0006_zone_soa_serial_auto"),
-        ("netbox_dns", "0007_alter_zone_soa_serial_auto"),
-        ("netbox_dns", "0005_update_ns_records"),
-        ("netbox_dns", "0008_zone_status_names"),
-        ("netbox_dns", "0009_netbox32"),
-        ("netbox_dns", "0010_update_soa_records"),
-        ("netbox_dns", "0012_adjust_zone_and_record"),
-        ("netbox_dns", "0014_add_view_description"),
-        ("netbox_dns", "0016_cleanup_ptr_records"),
-        ("netbox_dns", "0017_alter_record_ttl"),
-        ("netbox_dns", "0018_zone_arpa_network"),
-        ("netbox_dns", "0019_update_ns_ttl"),
-    ]
-
-    initial = True
-
     dependencies = [
-        ("extras", "0072_created_datetimefield"),
-        ("extras", "0062_clear_secrets_changelog"),
         ("extras", "0073_journalentry_tags_custom_fields"),
-        ("extras", "0059_exporttemplate_as_attachment"),
     ]
 
     operations = [

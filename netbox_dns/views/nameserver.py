@@ -3,7 +3,7 @@ from dns import name as dns_name
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 
-from netbox_dns.filters import NameServerFilter, ZoneFilter
+from netbox_dns.filtersets import NameServerFilterSet, ZoneFilterSet
 from netbox_dns.forms import (
     NameServerImportForm,
     NameServerFilterForm,
@@ -16,7 +16,7 @@ from netbox_dns.tables import NameServerTable, ZoneTable
 
 class NameServerListView(generic.ObjectListView):
     queryset = NameServer.objects.all()
-    filterset = NameServerFilter
+    filterset = NameServerFilterSet
     filterset_form = NameServerFilterForm
     table = NameServerTable
 
@@ -54,7 +54,7 @@ class NameServerBulkImportView(generic.BulkImportView):
 
 class NameServerBulkEditView(generic.BulkEditView):
     queryset = NameServer.objects.all()
-    filterset = NameServerFilter
+    filterset = NameServerFilterSet
     table = NameServerTable
     form = NameServerBulkEditForm
 
@@ -69,7 +69,7 @@ class NameServerZoneListView(generic.ObjectChildrenView):
     queryset = NameServer.objects.all().prefetch_related("zones")
     child_model = Zone
     table = ZoneTable
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     template_name = "netbox_dns/zone/child.html"
     hide_if_empty = True
 
@@ -89,7 +89,7 @@ class NameServerSOAZoneListView(generic.ObjectChildrenView):
     queryset = NameServer.objects.all().prefetch_related("zones_soa")
     child_model = Zone
     table = ZoneTable
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     template_name = "netbox_dns/zone/child.html"
     hide_if_empty = True
 

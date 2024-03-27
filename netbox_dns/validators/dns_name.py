@@ -2,12 +2,7 @@ import re
 
 from django.core.exceptions import ValidationError
 
-try:
-    # NetBox 3.5.0 - 3.5.7, 3.5.9+
-    from extras.plugins import get_plugin_config
-except ImportError:
-    # NetBox 3.5.8
-    from extras.plugins.utils import get_plugin_config
+from netbox.plugins.utils import get_plugin_config
 
 LABEL = r"[a-z0-9][a-z0-9-]*(?<!-)"
 TOLERANT_LABEL = r"[a-z0-9][a-z0-9-_]*(?<![-_])"
@@ -26,7 +21,7 @@ def validate_fqdn(name):
         regex = rf"^(\*|{LABEL})(\.{LABEL})+\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
-        raise ValidationError(f"Not a valid fully qualified DNS host name")
+        raise ValidationError("Not a valid fully qualified DNS host name")
 
 
 def validate_extended_hostname(name, tolerate_leading_underscores=False):
@@ -41,7 +36,7 @@ def validate_extended_hostname(name, tolerate_leading_underscores=False):
         regex = rf"^([*@]|(\*\.)?{LABEL}(\.{LABEL})*\.?)$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
-        raise ValidationError(f"Not a valid DNS host name")
+        raise ValidationError("Not a valid DNS host name")
 
 
 def validate_domain_name(name):
@@ -54,4 +49,4 @@ def validate_domain_name(name):
         regex = rf"^{LABEL}(\.{LABEL})*\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
-        raise ValidationError(f"Not a valid DNS domain name")
+        raise ValidationError("Not a valid DNS domain name")

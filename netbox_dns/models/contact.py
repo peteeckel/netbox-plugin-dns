@@ -20,6 +20,10 @@ class Contact(NetBoxModel):
         blank=True,
         max_length=100,
     )
+    description = models.CharField(
+        blank=True,
+        max_length=200,
+    )
     organization = models.CharField(
         blank=True,
         max_length=200,
@@ -79,6 +83,7 @@ class Contact(NetBoxModel):
 
     clone_fields = [
         "name",
+        "description",
         "organization",
         "street",
         "city",
@@ -94,7 +99,7 @@ class Contact(NetBoxModel):
     ]
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:contact", kwargs={"pk": self.id})
+        return reverse("plugins:netbox_dns:contact", kwargs={"pk": self.pk})
 
     def __str__(self):
         if self.name is not None:

@@ -12,6 +12,7 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     DynamicModelChoiceField,
 )
+from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -28,8 +29,9 @@ class NameServerForm(TenancyForm, NetBoxModelForm):
             self.initial["name"] = name_to_unicode(initial_name)
 
     fieldsets = (
-        ("Nameserver", ("name", "description", "tags")),
-        ("Tenancy", ("tenant_group", "tenant")),
+        FieldSet("name", "description", name="Nameserver"),
+        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tags", name="Tags"),
     )
 
     class Meta:
@@ -42,14 +44,17 @@ class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
     name = forms.CharField(
         required=False,
-        label="Name",
+    )
+    description = forms.CharField(
+        required=False,
     )
     tag = TagFilterField(NameServer)
 
     fieldsets = (
-        (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("name",)),
-        ("Tenant", ("tenant_group_id", "tenant_id")),
+        FieldSet("q", "filter_id"),
+        FieldSet("name", "description", name="Attributes"),
+        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
+        FieldSet("tag", name="Tags"),
     )
 
 

@@ -5,12 +5,13 @@ from netbox.filtersets import NetBoxModelFilterSet
 from netbox_dns.models import Contact
 
 
-class ContactFilter(NetBoxModelFilterSet):
+class ContactFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Contact
         fields = (
             "id",
             "name",
+            "description",
             "contact_id",
             "organization",
             "street",

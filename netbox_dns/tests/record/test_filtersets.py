@@ -10,12 +10,12 @@ from netbox_dns.models import (
     Record,
     RecordTypeChoices,
 )
-from netbox_dns.filters import RecordFilter
+from netbox_dns.filtersets import RecordFilterSet
 
 
-class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
+class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Record.objects.all()
-    filterset = RecordFilter
+    filterset = RecordFilterSet
 
     zone_data = {
         "default_ttl": 86400,
@@ -60,7 +60,8 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
                 status=ZoneStatusChoices.STATUS_DEPRECATED
             ),
         )
-        Zone.objects.bulk_create(cls.zones)
+        for zone in cls.zones:
+            zone.save()
 
         cls.records = (
             Record(
@@ -108,7 +109,8 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
                 managed=True,
             ),
         )
-        Record.objects.bulk_create(cls.records)
+        for record in cls.records:
+            record.save()
 
     def test_name(self):
         params = {"name": ["name1", "name2"]}
@@ -116,7 +118,7 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     def test_zone(self):
         params = {"zone": [self.zones[0]]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_type(self):
         params = {"type": [RecordTypeChoices.A]}
@@ -136,7 +138,7 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"managed": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
         params = {"managed": True}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_tenant(self):
         params = {"tenant_id": [self.tenants[0].pk]}
@@ -149,3 +151,61 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
         params = {"tenant_group": [self.tenant_groups[1].slug]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_ip_address(self):
+        params = {"ip_address": ["fe80::dead:beef", "10.0.0.42", "1.2.3.4"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
+        params = {"ip_address": ["10.0.0.42"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"ip_address": ["fe80::dead:beef"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_ptr_record(self):
+        Zone(
+            name="1.0.10.in-addr.arpa", soa_mname=self.nameservers[0], **self.zone_data
+        ).save()
+        address_record = Record(
+            name="name4",
+            zone=self.zones[0],
+            type=RecordTypeChoices.A,
+            disable_ptr=False,
+            value="10.0.1.42",
+        )
+        address_record.save()
+
+        ptr_record = Record.objects.get(address_record=address_record)
+        params = {"ptr_record_id": [ptr_record.pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        self.assertEqual(
+            self.filterset(params, self.queryset).qs.first().pk, address_record.pk
+        )
+
+    def test_rfc2317_cname_record(self):
+        ptr_zone = Zone(
+            name="1.0.10.in-addr.arpa", soa_mname=self.nameservers[0], **self.zone_data
+        )
+        ptr_zone.save()
+        rfc2317_zone = Zone(
+            name="0-31.1.0.10.in-addr.arpa",
+            soa_mname=self.nameservers[0],
+            rfc2317_prefix="10.0.1.0/27",
+            rfc2317_parent_managed=True,
+            **self.zone_data
+        )
+        rfc2317_zone.save()
+        address_record = Record(
+            name="name4",
+            zone=self.zones[0],
+            type=RecordTypeChoices.A,
+            disable_ptr=False,
+            value="10.0.1.23",
+        )
+        address_record.save()
+
+        ptr_record = Record.objects.get(address_record=address_record)
+        cname_record = ptr_record.rfc2317_cname_record
+        params = {"rfc2317_cname_record_id": [cname_record.pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        self.assertEqual(
+            self.filterset(params, self.queryset).qs.first().pk, ptr_record.pk
+        )

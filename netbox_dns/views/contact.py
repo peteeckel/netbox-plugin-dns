@@ -5,7 +5,7 @@ from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 
 from netbox_dns.models import Contact, Zone
-from netbox_dns.filters import ContactFilter, ZoneFilter
+from netbox_dns.filtersets import ContactFilterSet, ZoneFilterSet
 from netbox_dns.forms import (
     ContactForm,
     ContactFilterForm,
@@ -22,7 +22,7 @@ class ContactView(generic.ObjectView):
 class ContactListView(generic.ObjectListView):
     queryset = Contact.objects.all()
     table = ContactTable
-    filterset = ContactFilter
+    filterset = ContactFilterSet
     filterset_form = ContactFilterForm
 
 
@@ -46,7 +46,7 @@ class ContactBulkImportView(generic.BulkImportView):
 
 class ContactBulkEditView(generic.BulkEditView):
     queryset = Contact.objects.all()
-    filterset = ContactFilter
+    filterset = ContactFilterSet
     table = ContactTable
     form = ContactBulkEditForm
 
@@ -63,7 +63,7 @@ class ContactZoneListView(generic.ObjectChildrenView):
     )
     child_model = Zone
     table = ZoneTable
-    filterset = ZoneFilter
+    filterset = ZoneFilterSet
     template_name = "netbox_dns/zone/child.html"
     hide_if_empty = True
 

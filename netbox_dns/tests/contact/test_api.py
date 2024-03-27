@@ -1,6 +1,6 @@
 from utilities.testing import APIViewTestCases
 
-from netbox_dns.tests.custom import APITestCase
+from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import Contact
 
 
@@ -11,15 +11,21 @@ class ContactAPITestCase(
     APIViewTestCases.CreateObjectViewTestCase,
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
+    NetBoxDNSGraphQLMixin,
+    APIViewTestCases.GraphQLTestCase,
 ):
     model = Contact
-    brief_fields = ["contact_id", "display", "id", "name", "url"]
+    brief_fields = ["contact_id", "description", "display", "id", "name", "url"]
 
     create_data = [
         {"name": "John Doe", "contact_id": "COM-REG-JOHNDOE-42"},
         {"name": "John Doe", "contact_id": "ORG-REG-JOHNDOE-42"},
         {"name": "Jane Doe", "contact_id": "ORG-REG-JANEDOE-42"},
     ]
+
+    bulk_update_data = {
+        "name": "Paul Doe",
+    }
 
     @classmethod
     def setUpTestData(cls):

@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from django.db.models import Lookup, Transform
+from django.db.models import Lookup, Transform, IntegerField
 from django.core.exceptions import ValidationError
 
 from netaddr import AddrFormatError, IPNetwork

@@ -78,7 +78,7 @@ class NameValidationTest(TestCase):
         )
 
         for record in records:
-            record_object = Record.objects.create(
+            Record.objects.create(
                 name=record.get("name"), zone=record.get("zone"), **self.record_data
             )
 
@@ -151,7 +151,7 @@ class NameValidationTest(TestCase):
         )
 
         for record in records:
-            record_object = Record.objects.create(
+            Record.objects.create(
                 name=record.get("name"), zone=record.get("zone"), **self.record_data
             )
 

@@ -6,7 +6,7 @@ import utilities.json
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("netbox_dns", "0019_update_ns_ttl"),
+        ("netbox_dns", "0001_squashed_netbox_dns_0_15"),
     ]
 
     operations = [

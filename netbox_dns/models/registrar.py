@@ -13,6 +13,10 @@ class Registrar(NetBoxModel):
         unique=True,
         max_length=255,
     )
+    description = models.CharField(
+        blank=True,
+        max_length=200,
+    )
     iana_id = models.IntegerField(
         verbose_name="IANA ID",
         null=True,
@@ -43,7 +47,7 @@ class Registrar(NetBoxModel):
     )
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:registrar", kwargs={"pk": self.id})
+        return reverse("plugins:netbox_dns:registrar", kwargs={"pk": self.pk})
 
     def __str__(self):
         return str(self.name)

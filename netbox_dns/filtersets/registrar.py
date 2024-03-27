@@ -5,12 +5,13 @@ from netbox.filtersets import NetBoxModelFilterSet
 from netbox_dns.models import Registrar
 
 
-class RegistrarFilter(NetBoxModelFilterSet):
+class RegistrarFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Registrar
         fields = (
             "id",
             "name",
+            "description",
             "iana_id",
             "address",
             "referral_url",

@@ -1,6 +1,6 @@
 from utilities.testing import APIViewTestCases
 
-from netbox_dns.tests.custom import APITestCase
+from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import NameServer
 
 
@@ -11,14 +11,22 @@ class NameServerTest(
     APIViewTestCases.CreateObjectViewTestCase,
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
+    NetBoxDNSGraphQLMixin,
+    APIViewTestCases.GraphQLTestCase,
 ):
     model = NameServer
-    brief_fields = ["display", "id", "name", "url"]
+
+    brief_fields = ["description", "display", "id", "name", "url"]
+
     create_data = [
         {"name": "ns1.example.com"},
         {"name": "ns2.example.com"},
         {"name": "ns3.example.com"},
     ]
+
+    bulk_update_data = {
+        "description": "Test Name Server",
+    }
 
     @classmethod
     def setUpTestData(cls):
