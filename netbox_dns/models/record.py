@@ -393,6 +393,22 @@ class Record(NetBoxModel):
 
         self.ptr_record = ptr_record
 
+    def remove_from_rfc2317_cname_record(self, save_zone_serial=True):
+        if self.rfc2317_cname_record.pk:
+            rfc2317_ptr_records = self.rfc2317_cname_record.rfc2317_ptr_records.exclude(
+                pk=self.pk
+            )
+
+            if rfc2317_ptr_records:
+                self.rfc2317_cname_record.ttl = rfc2317_ptr_records.aggregate(
+                    Min("ttl")
+                ).get("ttl__min")
+                self.rfc2317_cname_record.save(
+                    update_fields=["ttl"], save_zone_serial=save_zone_serial
+                )
+            else:
+                self.rfc2317_cname_record.delete()
+
     def update_rfc2317_cname_record(self, save_zone_serial=True):
         if self.zone.rfc2317_parent_managed:
             cname_name = dns_name.from_text(
@@ -400,48 +416,56 @@ class Record(NetBoxModel):
             ).relativize(dns_name.from_text(self.zone.rfc2317_parent_zone.name))
 
             if self.rfc2317_cname_record is not None:
-                self.rfc2317_cname_record.name = cname_name
-                self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
-                self.rfc2317_cname_record.value = self.fqdn
-                self.rfc2317_cname_record.ttl = min_ttl(
-                    self.rfc2317_cname_record.rfc2317_ptr_records.exclude(pk=self.pk)
+                if self.rfc2317_cname_record.name == cname_name.to_text():
+                    self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
+                    self.rfc2317_cname_record.value = self.fqdn
+                    self.rfc2317_cname_record.ttl = min_ttl(
+                        self.rfc2317_cname_record.rfc2317_ptr_records.exclude(
+                            pk=self.pk
+                        )
+                        .aggregate(Min("ttl"))
+                        .get("ttl__min"),
+                        self.ttl,
+                    )
+                    self.rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
+
+                    return
+                else:
+                    self.remove_from_rfc2317_cname_record(
+                        save_zone_serial=save_zone_serial
+                    )
+
+            rfc2317_cname_record = Record.objects.filter(
+                name=cname_name,
+                type=RecordTypeChoices.CNAME,
+                zone=self.zone.rfc2317_parent_zone,
+                managed=True,
+                value=self.fqdn,
+            ).first()
+
+            if rfc2317_cname_record is not None:
+                rfc2317_cname_record.ttl = min_ttl(
+                    rfc2317_cname_record.rfc2317_ptr_records.exclude(pk=self.pk)
                     .aggregate(Min("ttl"))
                     .get("ttl__min"),
                     self.ttl,
                 )
-                self.rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
+                rfc2317_cname_record.save(
+                    update_fields=["ttl"], save_zone_serial=save_zone_serial
+                )
+
             else:
-                rfc2317_cname_record = Record.objects.filter(
+                rfc2317_cname_record = Record(
                     name=cname_name,
                     type=RecordTypeChoices.CNAME,
                     zone=self.zone.rfc2317_parent_zone,
                     managed=True,
                     value=self.fqdn,
-                ).first()
+                    ttl=self.ttl,
+                )
+                rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
 
-                if rfc2317_cname_record is not None:
-                    rfc2317_cname_record.ttl = min_ttl(
-                        rfc2317_cname_record.rfc2317_ptr_records.exclude(pk=self.pk)
-                        .aggregate(Min("ttl"))
-                        .get("ttl__min"),
-                        self.ttl,
-                    )
-                    rfc2317_cname_record.save(
-                        update_fields=["ttl"], save_zone_serial=save_zone_serial
-                    )
-
-                else:
-                    rfc2317_cname_record = Record(
-                        name=cname_name,
-                        type=RecordTypeChoices.CNAME,
-                        zone=self.zone.rfc2317_parent_zone,
-                        managed=True,
-                        value=self.fqdn,
-                        ttl=self.ttl,
-                    )
-                    rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
-
-                self.rfc2317_cname_record = rfc2317_cname_record
+            self.rfc2317_cname_record = rfc2317_cname_record
 
         else:
             if self.rfc2317_cname_record is not None:
@@ -725,20 +749,7 @@ class Record(NetBoxModel):
 
     def delete(self, *args, save_zone_serial=True, **kwargs):
         if self.rfc2317_cname_record:
-            if self.rfc2317_cname_record.pk:
-                if self.rfc2317_cname_record.rfc2317_ptr_records.count() == 1:
-                    self.rfc2317_cname_record.delete()
-                else:
-                    self.rfc2317_cname_record.ttl = (
-                        self.rfc2317_cname_record.rfc2317_ptr_records.exclude(
-                            pk=self.pk
-                        )
-                        .aggregate(Min("ttl"))
-                        .get("ttl__min")
-                    )
-                    self.rfc2317_cname_record.save(
-                        update_fields=["ttl"], save_zone_serial=save_zone_serial
-                    )
+            self.remove_from_rfc2317_cname_record(save_zone_serial=save_zone_serial)
 
         if self.ptr_record:
             self.ptr_record.delete()
