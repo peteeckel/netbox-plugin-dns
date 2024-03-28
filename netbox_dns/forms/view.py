@@ -32,10 +32,9 @@ class ViewForm(TenancyForm, NetBoxModelForm):
 class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = View
     fieldsets = (
-        FieldSet("q", "filter_id"),
+        FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name="Attributes"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
-        FieldSet("tag", name="Tags"),
     )
 
     name = forms.CharField(
@@ -66,5 +65,13 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
     description = forms.CharField(max_length=200, required=False)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
-    class Meta:
-        nullable_fields = ("description", "tenant")
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            name="Attributes",
+        ),
+        FieldSet("tenant", name="Tenancy"),
+    )
+
+    nullable_fields = ("description", "tenant")

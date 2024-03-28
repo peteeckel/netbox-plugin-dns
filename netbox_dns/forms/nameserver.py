@@ -51,10 +51,9 @@ class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     tag = TagFilterField(NameServer)
 
     fieldsets = (
-        FieldSet("q", "filter_id"),
+        FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name="Attributes"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
-        FieldSet("tag", name="Tags"),
     )
 
 
@@ -83,5 +82,14 @@ class NameServerBulkEditForm(NetBoxModelBulkEditForm):
     description = forms.CharField(max_length=200, required=False)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
-    class Meta:
-        nullable_fields = ("description", "tenant")
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            "tenant",
+            "tags",
+            name="Attributes",
+        ),
+    )
+
+    nullable_fields = ("description", "tenant")
