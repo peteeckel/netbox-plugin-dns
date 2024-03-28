@@ -607,7 +607,7 @@ With NetBox DNS 0.19.0 support for the NetBox tenancy feature was added. It is p
 
 Tenancy does not have any impact on uniqueness constraints within NetBox DNS.
 
-The NetBox detail view for tenants shows a table of NetBox DNS objects assigned to a specific tenant.
+The NetBox detail view for tenants shows a tenants in the list of objects on the right hand side.
 
 ![NetBox Tenant Detail](images/NetBoxTenantDetail.png)
 
