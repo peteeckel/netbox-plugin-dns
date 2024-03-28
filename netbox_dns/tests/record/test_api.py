@@ -4,7 +4,7 @@ from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import View, Zone, NameServer, Record, RecordTypeChoices
 
 
-class RecordTest(
+class RecordAPITestCase(
     APITestCase,
     APIViewTestCases.GetObjectViewTestCase,
     APIViewTestCases.ListObjectsViewTestCase,

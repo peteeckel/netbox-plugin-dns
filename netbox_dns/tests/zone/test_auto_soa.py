@@ -17,7 +17,7 @@ def parse_soa_value(soa):
     )
 
 
-class AutoSOATest(TestCase):
+class ZoneAutoSOATestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",

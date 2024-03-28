@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from netbox_dns.models import NameServer
 
 
-class NameValidationTest(TestCase):
+class NameServerNameValidationTestCase(TestCase):
     def test_name_validation_ok(self):
         names = (
             "ns1.example.com",
