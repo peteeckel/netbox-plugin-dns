@@ -52,17 +52,12 @@ class RegistrarViewTestCase(
         }
 
         cls.bulk_edit_data = {
-            "description": "New Description",
-            "organization": "New Organization",
-            "city": "New City",
-            "state_province": "New State",
-            "postal_code": "42",
-            "country": "XX",
-            "phone": "0815-424242",
-            "phone_ext": "42",
-            "fax": "0815-232323",
-            "fax_ext": "23",
-            "email": "no-reply@example.com",
+            "iana_id": 666,
+            "address": "New Address",
+            "referral_url": "https://example.org",
+            "whois_server": "whois.example.org",
+            "abuse_phone": "0815-424242",
+            "abuse_email": "no-reply@example.com",
         }
 
         cls.csv_data = (
