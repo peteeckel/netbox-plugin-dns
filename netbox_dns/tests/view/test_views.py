@@ -1,5 +1,4 @@
-from utilities.testing import ViewTestCases
-from utilities.testing import create_tags
+from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import View
@@ -8,12 +7,13 @@ from netbox_dns.models import View
 class ViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
+    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.CreateObjectViewTestCase,
     ViewTestCases.EditObjectViewTestCase,
     ViewTestCases.DeleteObjectViewTestCase,
     ViewTestCases.ListObjectsViewTestCase,
-    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.BulkImportObjectsViewTestCase,
+    ViewTestCases.BulkEditObjectsViewTestCase,
     ViewTestCases.BulkDeleteObjectsViewTestCase,
 ):
     model = View
@@ -32,6 +32,10 @@ class ViewTestCase(
         cls.form_data = {
             "name": "test1",
             "tags": [t.pk for t in tags],
+        }
+
+        cls.bulk_edit_data = {
+            "description": "New Description",
         }
 
         cls.csv_data = (

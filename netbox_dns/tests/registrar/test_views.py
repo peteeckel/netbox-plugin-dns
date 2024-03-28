@@ -13,6 +13,7 @@ class RegistrarViewTestCase(
     ViewTestCases.ListObjectsViewTestCase,
     ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.BulkImportObjectsViewTestCase,
+    ViewTestCases.BulkEditObjectsViewTestCase,
     ViewTestCases.BulkDeleteObjectsViewTestCase,
 ):
     model = Registrar
@@ -48,6 +49,15 @@ class RegistrarViewTestCase(
             "name": "ACME 2 Corporation",
             "iana_id": 815,
             "tags": [t.pk for t in tags],
+        }
+
+        cls.bulk_edit_data = {
+            "iana_id": 666,
+            "address": "New Address",
+            "referral_url": "https://example.org",
+            "whois_server": "whois.example.org",
+            "abuse_phone": "0815-424242",
+            "abuse_email": "no-reply@example.com",
         }
 
         cls.csv_data = (
