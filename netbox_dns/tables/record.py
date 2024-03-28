@@ -61,8 +61,8 @@ class RecordTable(RecordBaseTable):
         model = Record
         fields = (
             "pk",
-            "zone",
             "name",
+            "zone",
             "ttl",
             "type",
             "value",
@@ -77,8 +77,8 @@ class RecordTable(RecordBaseTable):
             "tenant_group",
         )
         default_columns = (
-            "zone",
             "name",
+            "zone",
             "ttl",
             "type",
             "value",
@@ -101,8 +101,8 @@ class ManagedRecordTable(RecordBaseTable):
     class Meta(NetBoxTable.Meta):
         model = Record
         fields = (
-            "zone",
             "name",
+            "zone",
             "ttl",
             "type",
             "value",
@@ -112,8 +112,8 @@ class ManagedRecordTable(RecordBaseTable):
             "active",
         )
         default_columns = (
-            "zone",
             "name",
+            "zone",
             "ttl",
             "type",
             "value",
