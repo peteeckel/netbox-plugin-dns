@@ -112,8 +112,13 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label="IANA ID",
     )
+    description = forms.CharField(
+        required=False,
+        label="Description",
+    )
     address = forms.CharField(
         required=False,
+        label="Address",
     )
     referral_url = forms.CharField(
         required=False,
