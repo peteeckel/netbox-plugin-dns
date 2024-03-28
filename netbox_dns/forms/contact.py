@@ -59,7 +59,7 @@ class ContactFilterForm(NetBoxModelFilterSetForm):
     model = Contact
 
     fieldsets = (
-        FieldSet("q", "filter_id"),
+        FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "contact_id", "description", name="Attributes"),
         FieldSet(
             "organization",
@@ -71,7 +71,6 @@ class ContactFilterForm(NetBoxModelFilterSetForm):
             name="Address",
         ),
         FieldSet("phone", "phone_ext", "fax", "fax_ext", "email", name="Communication"),
-        FieldSet("tag", name="Tags"),
     )
 
     name = forms.CharField(
@@ -203,7 +202,7 @@ class ContactBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     fieldsets = (
-        FieldSet("name", "description"),
+        FieldSet("name", "description", name="Attributes"),
         FieldSet(
             "organization",
             "street",

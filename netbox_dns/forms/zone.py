@@ -241,7 +241,7 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
 class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Zone
     fieldsets = (
-        FieldSet("q", "filter_id"),
+        FieldSet("q", "filter_id", "tag"),
         FieldSet(
             "view_id", "status", "name", "nameservers", "description", name="Attributes"
         ),
@@ -255,7 +255,6 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             name="Registration",
         ),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
-        FieldSet("tag", name="Tags"),
     )
 
     view_id = DynamicModelMultipleChoiceField(
@@ -698,6 +697,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
             "nameservers",
             "default_ttl",
             "description",
+            name="Attributes",
         ),
         FieldSet(
             "soa_ttl",
