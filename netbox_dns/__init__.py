@@ -1,14 +1,13 @@
 from netbox.plugins import PluginConfig
 
-__version__ = "0.22.8"
+__version__ = "1.0.0-dev"
 
 
 class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = "NetBox DNS"
     description = "NetBox plugin for DNS data"
-    min_version = "3.5.0"
-    max_version = "3.99.0"
+    min_version = "4.0.0-dev"
     version = __version__
     author = "Peter Eckel"
     author_email = "pete@netbox-dns.org"
