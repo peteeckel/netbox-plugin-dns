@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from netbox_dns.models import NameServer, View, Zone
 
 
-class RFC2317ZoneTest(TestCase):
+class RFC2317ZoneTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.nameserver = NameServer.objects.create(name="ns1.example.com")

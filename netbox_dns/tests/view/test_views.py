@@ -4,7 +4,7 @@ from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import View
 
 
-class ViewTestCase(
+class ViewViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
     ViewTestCases.GetObjectChangelogViewTestCase,
