@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
 
 
-class NameValidationTest(TestCase):
+class RecordNameValidationTestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",

@@ -3,7 +3,7 @@ from django.test import TestCase
 from netbox_dns.models import NameServer, View, Zone, Record, RecordTypeChoices
 
 
-class RFC2317RecordTest(TestCase):
+class RFC2317RecordTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.nameserver = NameServer.objects.create(name="ns1.example.com")

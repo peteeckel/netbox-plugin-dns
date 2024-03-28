@@ -14,7 +14,7 @@ from netbox_dns.models import Record, Zone, NameServer
 from users.models import ObjectPermission
 
 
-class IPAMCouplingAPITest(APITestCase):
+class IPAMCouplingAPITestCase(APITestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",

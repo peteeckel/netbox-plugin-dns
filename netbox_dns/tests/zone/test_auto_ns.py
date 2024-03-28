@@ -6,7 +6,7 @@ from django.db.models import ProtectedError
 from netbox_dns.models import NameServer, Record, RecordTypeChoices, Zone
 
 
-class AutoNSTest(TestCase):
+class ZoneAutoNSTestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",
