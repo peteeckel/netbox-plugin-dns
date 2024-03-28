@@ -77,7 +77,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
 class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Record
     fieldsets = (
-        FieldSet("q", "filter_id"),
+        FieldSet("q", "filter_id", "tag"),
         FieldSet(
             "zone_id",
             "name",
@@ -89,7 +89,6 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             name="Attributes",
         ),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
-        FieldSet("tag", name="Tags"),
     )
 
     type = forms.MultipleChoiceField(
