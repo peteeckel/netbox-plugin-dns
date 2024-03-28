@@ -83,6 +83,13 @@ class RegistrarImportForm(NetBoxModelImportForm):
 class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
     model = Registrar
 
+    iana_id = forms.IntegerField(
+        required=False,
+        label="IANA ID",
+    )
+    address = forms.CharField(
+        required=False,
+    )
     referral_url = forms.CharField(
         required=False,
         label="Referral URL",
@@ -104,6 +111,7 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
         (
             None,
             (
+                "iana_id",
                 "address",
                 "referral_url",
                 "whois_server",
@@ -114,6 +122,7 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     nullable_fields = (
+        "iana_id",
         "address",
         "referral_url",
         "whois_server",
