@@ -7,12 +7,13 @@ from netbox_dns.models import Contact
 class ContactViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
+    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.CreateObjectViewTestCase,
     ViewTestCases.EditObjectViewTestCase,
     ViewTestCases.DeleteObjectViewTestCase,
     ViewTestCases.ListObjectsViewTestCase,
-    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.BulkImportObjectsViewTestCase,
+    ViewTestCases.BulkEditObjectsViewTestCase,
     ViewTestCases.BulkDeleteObjectsViewTestCase,
 ):
     model = Contact
@@ -35,6 +36,22 @@ class ContactViewTestCase(
             "tags": [t.pk for t in tags],
         }
 
+        cls.bulk_edit_data = {
+            "name": "New Name",
+            "description": "New Description",
+            "organization": "New Organization",
+            "street": "New Street",
+            "city": "New City",
+            "state_province": "New State",
+            "postal_code": "42",
+            "country": "XX",
+            "phone": "0815-424242",
+            "phone_ext": "42",
+            "fax": "0815-232323",
+            "fax_ext": "23",
+            "email": "no-reply@example.com",
+        }
+
         cls.csv_data = (
             "name,contact_id,country,city,postal_code,email",
             "John Doe,COM-REG-JOHNDOE-42,GB,London,NW42SE,jdoe@example.com",
@@ -50,10 +67,5 @@ class ContactViewTestCase(
             f"{cls.contacts[0].pk},John Doe,IR,Dublin,IR0815",
             f"{cls.contacts[1].pk},John Doe,IR,Dublin,IR0815",
         )
-
-        cls.bulk_edit_data = {
-            "contact": cls.contacts[1].pk,
-            "name": "John Doe III",
-        }
 
     maxDiff = None

@@ -1,10 +1,10 @@
-from utilities.testing import ViewTestCases
+from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import NameServer, View, Zone, ZoneStatusChoices
 
 
-class ZoneTestCase(
+class ZoneViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
     ViewTestCases.CreateObjectViewTestCase,
@@ -36,37 +36,51 @@ class ZoneTestCase(
 
     @classmethod
     def setUpTestData(cls):
-        cls.nameservers = (
+        nameservers = (
             NameServer(name="ns1.example.com"),
             NameServer(name="ns2.example.com"),
             NameServer(name="ns3.example.com"),
         )
-        NameServer.objects.bulk_create(cls.nameservers)
+        NameServer.objects.bulk_create(nameservers)
 
-        ns1 = cls.nameservers[1]
+        ns1 = nameservers[0]
 
-        cls.views = (
+        views = (
             View(name="internal"),
             View(name="external"),
         )
-        View.objects.bulk_create(cls.views)
+        View.objects.bulk_create(views)
 
-        cls.zones = (
+        zones = (
             Zone(name="zone1.example.com", **cls.zone_data, soa_mname=ns1),
             Zone(name="zone2.example.com", **cls.zone_data, soa_mname=ns1),
             Zone(name="zone3.example.com", **cls.zone_data, soa_mname=ns1),
         )
-        Zone.objects.bulk_create(cls.zones)
+        Zone.objects.bulk_create(zones)
 
-        cls.bulk_edit_data = {
-            "status": ZoneStatusChoices.STATUS_PARKED,
-        }
+        tags = create_tags("Alpha", "Bravo", "Charlie")
 
         cls.form_data = {
             "name": "zone7.example.com",
             "status": ZoneStatusChoices.STATUS_PARKED,
             **cls.zone_data,
             "soa_mname": ns1.pk,
+            "tags": [t.pk for t in tags],
+        }
+
+        cls.bulk_edit_data = {
+            "status": ZoneStatusChoices.STATUS_PARKED,
+            "default_ttl": 43200,
+            "soa_rname": "new-hostmaster.example.com",
+            "soa_mname": nameservers[1].pk,
+            "nameservers": [nameservers[0].pk, nameservers[2].pk],
+            "soa_serial": 2024040101,
+            "soa_refresh": 86400,
+            "soa_retry": 3600,
+            "soa_expire": 256000,
+            "soa_ttl": 43200,
+            "soa_minimum": 1800,
+            "soa_serial_auto": False,
         }
 
         cls.csv_data = (
@@ -79,6 +93,6 @@ class ZoneTestCase(
 
         cls.csv_update_data = (
             "id,status,description,view",
-            f"{cls.zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,",
-            f"{cls.zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{cls.views[0].name}",
+            f"{zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,",
+            f"{zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{views[0].name}",
         )

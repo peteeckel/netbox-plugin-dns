@@ -1,18 +1,24 @@
-from utilities.testing import ViewTestCases
-from utilities.testing import create_tags
+from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import View, Zone, NameServer, Record, RecordTypeChoices
+from netbox_dns.models import (
+    View,
+    Zone,
+    NameServer,
+    Record,
+    RecordTypeChoices,
+    RecordStatusChoices,
+)
 
 
-class RecordTestCase(
+class RecordViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
+    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.CreateObjectViewTestCase,
     ViewTestCases.EditObjectViewTestCase,
     ViewTestCases.DeleteObjectViewTestCase,
     ViewTestCases.ListObjectsViewTestCase,
-    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.BulkImportObjectsViewTestCase,
     ViewTestCases.BulkEditObjectsViewTestCase,
     ViewTestCases.BulkDeleteObjectsViewTestCase,
@@ -84,11 +90,26 @@ class RecordTestCase(
         )
         Record.objects.bulk_create(cls.records)
 
-        cls.tags = create_tags("Alpha", "Bravo", "Charlie")
+        tags = create_tags("Alpha", "Bravo", "Charlie")
+
+        cls.form_data = {
+            "zone": cls.zones[0].pk,
+            "type": RecordTypeChoices.AAAA,
+            "name": "name3",
+            "value": "fe80::dead:beef",
+            "ttl": 86230,
+            "tags": [t.pk for t in tags],
+            "status": "active",
+        }
 
         cls.bulk_edit_data = {
             "zone": cls.zones[1].pk,
+            "type": RecordTypeChoices.TXT,
+            "value": "Test",
+            "status": RecordStatusChoices.STATUS_INACTIVE,
             "ttl": 86420,
+            "disable_ptr": True,
+            "description": "New Description",
         }
 
         cls.csv_data = (
@@ -112,15 +133,5 @@ class RecordTestCase(
             f"{cls.records[0].pk},{cls.zones[0].name},{RecordTypeChoices.A},10.0.1.1,86442",
             f"{cls.records[1].pk},{cls.zones[1].name},{RecordTypeChoices.AAAA},fe80:dead:beef::23,86423",
         )
-
-        cls.form_data = {
-            "zone": cls.zones[0].pk,
-            "type": RecordTypeChoices.AAAA,
-            "name": "name3",
-            "value": "fe80::dead:beef",
-            "ttl": 86230,
-            "tags": [t.pk for t in cls.tags],
-            "status": "active",
-        }
 
     maxDiff = None

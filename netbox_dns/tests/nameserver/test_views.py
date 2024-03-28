@@ -1,19 +1,19 @@
-from utilities.testing import ViewTestCases
-from utilities.testing import create_tags
+from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import NameServer
 
 
-class NameServerTestCase(
+class NameServerViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
+    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.CreateObjectViewTestCase,
     ViewTestCases.EditObjectViewTestCase,
     ViewTestCases.DeleteObjectViewTestCase,
     ViewTestCases.ListObjectsViewTestCase,
-    ViewTestCases.GetObjectChangelogViewTestCase,
     ViewTestCases.BulkImportObjectsViewTestCase,
+    ViewTestCases.BulkEditObjectsViewTestCase,
     ViewTestCases.BulkDeleteObjectsViewTestCase,
 ):
     model = NameServer
@@ -32,6 +32,10 @@ class NameServerTestCase(
         cls.form_data = {
             "name": "ns4.example.com",
             "tags": [t.pk for t in tags],
+        }
+
+        cls.bulk_edit_data = {
+            "description": "New Description",
         }
 
         cls.csv_data = (
