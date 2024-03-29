@@ -595,8 +595,9 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         help_text="IPv4 network prefix with a mask length of at least 25 bits",
         validators=[validate_ipv4, validate_prefix, validate_rfc2317],
     )
-    rfc2317_parent_managed = forms.BooleanField(
+    rfc2317_parent_managed = forms.NullBooleanField(
         required=False,
+        widget=BulkEditNullBooleanSelect(),
         label="RFC2317 Parent Managed",
         help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
     )
