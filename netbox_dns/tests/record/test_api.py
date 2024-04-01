@@ -19,6 +19,7 @@ class RecordAPITestCase(
         "active",
         "description",
         "display",
+        "fqdn",
         "id",
         "name",
         "status",
