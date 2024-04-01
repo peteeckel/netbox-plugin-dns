@@ -43,6 +43,18 @@ def update_ip_addresses(apps, schema_editor):
         record.save()
 
 
+def update_record_fqdn(apps, schema_editor):
+    Record = apps.get_model("netbox_dns", "Record")
+
+    for record in Record.objects.filter(fqdn__isnull=True):
+        zone = dns_name.from_text(record.zone.name, origin=dns_name.root)
+        fqdn = dns_name.from_text(record.name, origin=zone)
+
+        record.fqdn = fqdn.to_text()
+
+        record.save()
+
+
 class Migration(migrations.Migration):
     replaces = [
         ("netbox_dns", "0001_squashed_netbox_dns_0_15"),
@@ -55,6 +67,7 @@ class Migration(migrations.Migration):
         ("netbox_dns", "0026_domain_registration"),
         ("netbox_dns", "0027_alter_registrar_iana_id"),
         ("netbox_dns", "0028_rfc2317_fields"),
+        ("netbox_dns", "0029_record_fqdn"),
     ]
 
     initial = True
@@ -534,4 +547,10 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(update_ip_addresses),
+        migrations.AddField(
+            model_name="record",
+            name="fqdn",
+            field=models.CharField(default=None, max_length=255, null=True, blank=True),
+        ),
+        migrations.RunPython(update_record_fqdn),
     ]
