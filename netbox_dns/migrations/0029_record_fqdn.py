@@ -17,7 +17,7 @@ def update_record_fqdn(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("netbox_dns", "0028_rfc2317_fields"),
+        ("netbox_dns", "0002_contact_description_registrar_description"),
     ]
 
     operations = [
