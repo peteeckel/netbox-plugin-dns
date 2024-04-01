@@ -10,7 +10,7 @@ except ImportError:
     # NetBox 3.5.8
     from extras.plugins.utils import get_plugin_config
 
-__version__ = "0.22.6"
+__version__ = "0.22.7"
 
 
 class DNSConfig(PluginConfig):
@@ -18,6 +18,7 @@ class DNSConfig(PluginConfig):
     verbose_name = "NetBox DNS"
     description = "NetBox plugin for DNS data"
     min_version = "3.5.0"
+    max_version = "3.99.0"
     version = __version__
     author = "Peter Eckel"
     author_email = "pete@netbox-dns.org"

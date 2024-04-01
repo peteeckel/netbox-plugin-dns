@@ -5,6 +5,7 @@
 | Version | Supported          |
 | ------- | ------------------ |
 | 0.21.x  | :white_check_mark: |
+| 0.22.x  | :white_check_mark: |
 
 ## Reporting a Vulnerability
 Please do not report security vulnerabilities publicly in GitHub.
