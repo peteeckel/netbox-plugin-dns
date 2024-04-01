@@ -3,13 +3,15 @@ from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filters import MultiValueCharFilter
 
 from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
 
 
 class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
-    """Filter capabilities for Record instances."""
-
+    fqdn = MultiValueCharFilter(
+        method="filter_fqdn",
+    )
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
         null_value=None,
@@ -42,10 +44,31 @@ class RecordFilter(TenancyFilterSet, NetBoxModelFilterSet):
 
     class Meta:
         model = Record
-        fields = ("id", "type", "name", "value", "status", "zone", "managed", "tenant")
+        fields = (
+            "id",
+            "type",
+            "name",
+            "fqdn",
+            "value",
+            "status",
+            "zone",
+            "managed",
+            "tenant",
+        )
+
+    def filter_fqdn(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        fqdns = []
+        for fqdn in value:
+            if not fqdn.endswith("."):
+                fqdn = fqdn + "."
+            fqdns.append(fqdn)
+
+        return queryset.filter(fqdn__in=fqdns)
 
     def search(self, queryset, name, value):
-        """Perform the filtered search."""
         if not value.strip():
             return queryset
         qs_filter = (

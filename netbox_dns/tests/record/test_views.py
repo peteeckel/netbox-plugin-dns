@@ -88,7 +88,8 @@ class RecordViewTestCase(
                 ttl=86400,
             ),
         )
-        Record.objects.bulk_create(cls.records)
+        for record in cls.records:
+            record.save()
 
         tags = create_tags("Alpha", "Bravo", "Charlie")
 

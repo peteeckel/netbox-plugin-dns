@@ -114,16 +114,22 @@ class Record(NetBoxModel):
         Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
     )
 
+    name = models.CharField(
+        max_length=255,
+    )
     zone = models.ForeignKey(
         "Zone",
         on_delete=models.CASCADE,
     )
+    fqdn = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
+    )
     type = models.CharField(
         choices=RecordTypeChoices,
         max_length=10,
-    )
-    name = models.CharField(
-        max_length=255,
     )
     value = models.CharField(
         max_length=65535,
@@ -209,14 +215,7 @@ class Record(NetBoxModel):
 
     def __str__(self):
         try:
-            name = (
-                dns_name.from_text(
-                    str(self.name),
-                    origin=dns_name.from_text(self.zone.name, origin=None),
-                )
-                .relativize(dns_name.root)
-                .to_unicode()
-            )
+            name = dns_name.from_text(self.fqdn).relativize(dns_name.root).to_unicode()
         except dns_name.IDNAException:
             name = self.name
         except dns_name.LabelTooLong as exc:
@@ -233,13 +232,6 @@ class Record(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:record", kwargs={"pk": self.id})
-
-    @property
-    def fqdn(self):
-        zone = dns_name.from_text(self.zone.name)
-        name = dns_name.from_text(self.name, origin=zone)
-
-        return name.to_text()
 
     @property
     def value_fqdn(self):
@@ -482,6 +474,7 @@ class Record(NetBoxModel):
             name.to_unicode()
 
             self.name = name.relativize(zone).to_text()
+            self.fqdn = fqdn.to_text()
 
         except dns.exception.DNSException as exc:
             raise ValidationError(
