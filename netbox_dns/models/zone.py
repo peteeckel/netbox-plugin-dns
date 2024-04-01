@@ -738,6 +738,15 @@ class Zone(NetBoxModel):
                     ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
                     ip.save(update_fields=["dns_name"])
 
+        if name_changed:
+            for _record in self.record_set.all():
+                _record.save(
+                    update_fields=["fqdn"],
+                    save_zone_serial=False,
+                    update_rrset_ttl=False,
+                    update_rfc2317_cname=False,
+                )
+
         self.save_soa_serial()
         self.update_soa_record()
 

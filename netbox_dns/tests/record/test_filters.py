@@ -108,7 +108,8 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
                 managed=True,
             ),
         )
-        Record.objects.bulk_create(cls.records)
+        for record in cls.records:
+            record.save()
 
     def test_name(self):
         params = {"name": ["name1", "name2"]}
@@ -117,6 +118,24 @@ class RecordFilterTestCase(TestCase, ChangeLoggedFilterSetTests):
     def test_zone(self):
         params = {"zone": [self.zones[0]]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_fqdn(self):
+        params = {
+            "fqdn": [
+                "name1.zone1.example.com",
+                "name2.zone1.example.com",
+                "name4.zone1.example.com",
+            ]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {
+            "fqdn": [
+                "name1.zone2.example.com.",
+                "name2.zone2.example.com.",
+                "name2.zone1.example",
+            ]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_type(self):
         params = {"type": [RecordTypeChoices.A]}

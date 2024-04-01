@@ -241,6 +241,7 @@ class RecordSerializer(NetBoxModelSerializer):
             "display",
             "type",
             "name",
+            "fqdn",
             "value",
             "status",
             "ttl",

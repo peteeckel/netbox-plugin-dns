@@ -129,7 +129,8 @@ class RecordTest(
                 ttl=7000,
             ),
         )
-        Record.objects.bulk_create(records)
+        for record in records:
+            record.save()
 
         cls.create_data = [
             {
