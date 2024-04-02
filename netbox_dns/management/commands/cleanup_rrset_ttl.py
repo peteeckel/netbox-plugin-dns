@@ -34,7 +34,7 @@ class Command(BaseCommand):
         ttl_records = (
             Record.objects.filter(ttl__isnull=False)
             .exclude(type=RecordTypeChoices.SOA)
-            .exclude(type=RecordTypeChoices.PTR, maanged=True)
+            .exclude(type=RecordTypeChoices.PTR, managed=True)
         )
         for record in ttl_records:
             records = Record.objects.filter(
