@@ -27,10 +27,11 @@ NetBox DNS is compatible with the following NetBox versions.
 
 NetBox Version | NetBox DNS Version | Comment
 -------------- | ------------------ | -------
+3.0.x - 3.4.x  | -                  | No support
 3.5.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
 3.6.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
 3.7.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
-4.0.x          | 0.23.x or later    | Only the latest NetBox DNS version is supported
+4.0.x          | 1.0.x or later     | Only the latest NetBox DNS version is supported
 
 If you are running an earlier version of NetBox, the old version of the PyPI module `netbox-dns` can be used. That version is deprecated and will not receive any further updates of any kind, so it is strongly recommended to move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
