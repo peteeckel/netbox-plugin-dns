@@ -7,8 +7,6 @@ from netbox_dns.models import NameServer
 
 
 class NameServerTable(TenancyColumnsMixin, NetBoxTable):
-    """Table for displaying NameServer objects."""
-
     name = tables.Column(
         linkify=True,
     )
