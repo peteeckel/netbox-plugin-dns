@@ -37,7 +37,9 @@ def min_ttl(*ttl_list):
 
 
 class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
-    """Special Manager for records providing the activity status annotation"""
+    """
+    Custom manager for records providing the activity status annotation
+    """
 
     def get_queryset(self):
         return (
