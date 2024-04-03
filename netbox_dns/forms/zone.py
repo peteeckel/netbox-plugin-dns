@@ -741,9 +741,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     def clean(self):
-        """
-        If soa_serial_auto is True, set soa_serial to None.
-        """
         cleaned_data = super().clean()
         if cleaned_data.get("soa_serial_auto"):
             cleaned_data["soa_serial"] = None

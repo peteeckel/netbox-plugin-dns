@@ -43,7 +43,9 @@ import netbox_dns.models.record as record
 
 
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
-    """Special Manager for zones providing the activity status annotation"""
+    """
+    Custom manager for zones providing the activity status annotation
+    """
 
     def get_queryset(self):
         return (
