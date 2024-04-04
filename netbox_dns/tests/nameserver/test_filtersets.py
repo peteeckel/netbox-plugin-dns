@@ -11,18 +11,6 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = NameServer.objects.all()
     filterset = NameServerFilterSet
 
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-        "soa_serial_auto": False,
-    }
-
     @classmethod
     def setUpTestData(cls):
         cls.tenant_groups = (
@@ -52,17 +40,17 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             Zone(
                 name="zone1.example.com",
                 soa_mname=cls.nameservers[0],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
             ),
             Zone(
                 name="zone2.example.com",
                 soa_mname=cls.nameservers[0],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
             ),
             Zone(
                 name="zone3.example.com",
                 soa_mname=cls.nameservers[1],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
             ),
         )
         for zone in cls.zones:

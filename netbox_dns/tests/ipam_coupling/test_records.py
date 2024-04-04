@@ -29,6 +29,19 @@ class IPAMCouplingRecordTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.nameserver = NameServer.objects.create(name="ns1.example.com")
+
+        zone_data = {
+            "default_ttl": 86400,
+            "soa_mname": nameserver,
+            "soa_rname": "hostmaster.example.com",
+            "soa_refresh": 172800,
+            "soa_retry": 7200,
+            "soa_expire": 2592000,
+            "soa_ttl": 86400,
+            "soa_minimum": 3600,
+            "soa_serial": 1,
+        }
+
         cls.zones = (
             Zone(name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameserver),
             Zone(name="zone2.example.com", **cls.zone_data, soa_mname=cls.nameserver),
