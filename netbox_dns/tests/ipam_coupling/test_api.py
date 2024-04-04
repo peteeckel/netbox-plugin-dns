@@ -15,24 +15,17 @@ from users.models import ObjectPermission
 
 
 class IPAMCouplingAPITestCase(APITestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-    }
-
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
+        zone_data = {
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
+            "soa_rname": "hostmaster.example.com",
+        }
+
         cls.zones = (
-            Zone(name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="zone2.example.com", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="0.0.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
+            Zone(name="zone1.example.com", **zone_data),
+            Zone(name="zone2.example.com", **zone_data),
+            Zone(name="0.0.10.in-addr.arpa", **zone_data),
         )
         for zone in cls.zones:
             zone.save()
