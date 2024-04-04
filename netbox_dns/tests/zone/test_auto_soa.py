@@ -18,18 +18,6 @@ def parse_soa_value(soa):
 
 
 class ZoneAutoSOATestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-        "soa_serial_auto": False,
-    }
-
     @classmethod
     def setUpTestData(cls):
         cls.nameservers = [
@@ -40,7 +28,9 @@ class ZoneAutoSOATestCase(TestCase):
         NameServer.objects.bulk_create(cls.nameservers)
 
         cls.zone = Zone.objects.create(
-            name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameservers[0]
+            name="zone1.example.com",
+            soa_mname=cls.nameservers[0],
+            soa_rname="hostmaster.example.com",
         )
 
     def test_zone_soa(self):
@@ -117,6 +107,7 @@ class ZoneAutoSOATestCase(TestCase):
         zone = self.zone
         serial = 42
 
+        zone.soa_serial_auto = False
         zone.soa_serial = serial
         zone.save()
 

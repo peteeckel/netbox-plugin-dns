@@ -7,17 +7,6 @@ from netbox_dns.models import NameServer, Record, RecordTypeChoices, Zone
 
 
 class ZoneAutoNSTestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-    }
-
     @classmethod
     def setUpTestData(cls):
         cls.nameservers = (
@@ -26,9 +15,12 @@ class ZoneAutoNSTestCase(TestCase):
         )
         NameServer.objects.bulk_create(cls.nameservers)
 
-        cls.zone = Zone.objects.create(
-            name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameservers[0]
-        )
+        cls.zone_data = {
+            "soa_mname": cls.nameservers[0],
+            "soa_rname": "hostmaster.example.com",
+        }
+
+        cls.zone = Zone.objects.create(name="zone1.example.com", **cls.zone_data)
 
     def test_zone_without_ns(self):
         zone = self.zone
@@ -68,9 +60,7 @@ class ZoneAutoNSTestCase(TestCase):
         zone = self.zone
         nameserver = self.nameservers[0]
 
-        ns_zone = Zone.objects.create(
-            name="example.com", **self.zone_data, soa_mname=nameserver
-        )
+        ns_zone = Zone.objects.create(name="example.com", **self.zone_data)
 
         zone.nameservers.add(nameserver)
         ns_warnings = zone.check_nameservers()[0]
@@ -84,7 +74,6 @@ class ZoneAutoNSTestCase(TestCase):
         ns_zone = Zone.objects.create(
             name="example.com",
             **self.zone_data,
-            soa_mname=nameserver,
             status="reserved",
         )
         ns_zone.nameservers.add(nameserver)
@@ -100,7 +89,6 @@ class ZoneAutoNSTestCase(TestCase):
         ns_zone = Zone.objects.create(
             name="example.com",
             **self.zone_data,
-            soa_mname=nameserver,
             status="reserved",
         )
         ns_zone.nameservers.add(nameserver)
@@ -122,7 +110,6 @@ class ZoneAutoNSTestCase(TestCase):
         ns_zone = Zone.objects.create(
             name="example.com",
             **self.zone_data,
-            soa_mname=nameserver,
             status="reserved",
         )
         ns_zone.nameservers.add(nameserver)
