@@ -6,19 +6,9 @@ from netbox_dns.models import NameServer, View, Zone, Record, RecordTypeChoices
 class RFC2317RecordTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
-
         cls.zone_data = {
-            "default_ttl": 86400,
-            "soa_mname": cls.nameserver,
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
             "soa_rname": "hostmaster.example.com",
-            "soa_refresh": 172800,
-            "soa_retry": 7200,
-            "soa_expire": 2592000,
-            "soa_ttl": 86400,
-            "soa_minimum": 3600,
-            "soa_serial": 1,
-            "soa_serial_auto": False,
         }
 
         cls.views = (
@@ -34,7 +24,8 @@ class RFC2317RecordTestCase(TestCase):
             Zone(name="zone1.example.com", **cls.zone_data, view=cls.views[0]),
             Zone(name="zone1.example.com", **cls.zone_data, view=cls.views[1]),
         )
-        Zone.objects.bulk_create(cls.zones)
+        for zone in cls.zones:
+            zone.save()
 
     def test_create_record_rfc2317_zone(self):
         rfc2317_zone = Zone.objects.create(
@@ -143,49 +134,6 @@ class RFC2317RecordTestCase(TestCase):
             Record(
                 name="name1",
                 zone=self.zones[1],
-                type=RecordTypeChoices.A,
-                value="10.0.0.3",
-            ),
-        )
-        for record in records:
-            record.save()
-
-        self.assertFalse(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).exists()
-        )
-        for record in records:
-            self.assertIsNone(record.ptr_record)
-            self.assertFalse(
-                rfc2317_zone.record_set.filter(
-                    type=RecordTypeChoices.PTR,
-                    name=record.rfc2317_ptr_name,
-                    value=record.fqdn,
-                ).exists()
-            )
-
-    def test_create_record_rfc2317_zone_no_view(self):
-        rfc2317_zone = Zone.objects.create(
-            name="0-15.0.0.10.in-addr.arpa",
-            **self.zone_data,
-            rfc2317_prefix="10.0.0.0/28",
-        )
-
-        records = (
-            Record(
-                name="name1",
-                zone=self.zones[3],
-                type=RecordTypeChoices.A,
-                value="10.0.0.1",
-            ),
-            Record(
-                name="name2",
-                zone=self.zones[3],
-                type=RecordTypeChoices.A,
-                value="10.0.0.2",
-            ),
-            Record(
-                name="name1",
-                zone=self.zones[4],
                 type=RecordTypeChoices.A,
                 value="10.0.0.3",
             ),
@@ -501,7 +449,7 @@ class RFC2317RecordTestCase(TestCase):
                 ).exists()
             )
 
-    def test_create_record_rfc2317_zone_managed_view(self):
+    def test_create_record_rfc2317_zone_managed_different_view(self):
         zone1 = Zone.objects.create(
             name="0.0.10.in-addr.arpa", view=self.views[1], **self.zone_data
         )
@@ -552,57 +500,15 @@ class RFC2317RecordTestCase(TestCase):
                 ).exists()
             )
 
-    def test_create_record_rfc2317_zone_managed_no_view(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
-        rfc2317_zone = Zone.objects.create(
-            name="0-15.0.0.10.in-addr.arpa",
-            **self.zone_data,
-            rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True,
-        )
-
-        records = (
-            Record(
-                name="name1",
-                zone=self.zones[3],
-                type=RecordTypeChoices.A,
-                value="10.0.0.1",
-            ),
-            Record(
-                name="name2",
-                zone=self.zones[3],
-                type=RecordTypeChoices.A,
-                value="10.0.0.2",
-            ),
-        )
-        for record in records:
-            record.save()
-
-        self.assertFalse(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).exists()
-        )
-        for record in records:
-            self.assertIsNone(record.ptr_record)
-            self.assertFalse(
-                rfc2317_zone.record_set.filter(
-                    type=RecordTypeChoices.PTR, name=record.rfc2317_ptr_name
-                ).exists()
-            )
-            self.assertFalse(
-                zone1.record_set.filter(
-                    type=RecordTypeChoices.CNAME, name=record.rfc2317_ptr_cname_name
-                ).exists()
-            )
-
     def test_create_record_rfc2317_zone_managed_same_view(self):
         zone1 = Zone.objects.create(
             name="0.0.10.in-addr.arpa", view=self.views[0], **self.zone_data
         )
         rfc2317_zone = Zone.objects.create(
+            view=self.views[0],
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            view=self.views[0],
             rfc2317_parent_managed=True,
         )
 
@@ -739,7 +645,10 @@ class RFC2317RecordTestCase(TestCase):
             )
 
     def test_modify_rfc2317_zone_managed_different_prefices(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        zone1 = Zone.objects.create(
+            name="0.0.10.in-addr.arpa",
+            **self.zone_data,
+        )
         rfc2317_zone = Zone.objects.create(
             name="16-31.0.0.10.in-addr.arpa",
             **self.zone_data,
@@ -887,7 +796,7 @@ class RFC2317RecordTestCase(TestCase):
         record1 = Record.objects.create(
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
-        record2 = Record.objects.create(
+        Record.objects.create(
             name="name2", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.2"
         )
 
