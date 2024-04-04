@@ -31,14 +31,14 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label="View",
     )
-    # DEPRECATED: Remove in 1.0
+    # DEPRECATED: Remove in 1.1
     name_server_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers",
         to_field_name="id",
         label="Nameserver IDs",
     )
-    # DEPRECATED: Remove in 1.0
+    # DEPRECATED: Remove in 1.1
     name_server = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers__name",
@@ -59,13 +59,13 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
     soa_mname_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
-        label="SOA MNname ID",
+        label="SOA MName ID",
     )
     soa_mname = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="soa_mname__name",
         to_field_name="name",
-        label="SOA MNname",
+        label="SOA MName",
     )
     arpa_network = MultiValueCharFilter(
         method="filter_arpa_network",

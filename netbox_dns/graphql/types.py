@@ -36,10 +36,7 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     name: str
     status: str
     active: bool
-    view: (
-        Annotated["NetBoxDNSViewType", strawberry.lazy("netbox_dns.graphql.types")]
-        | None
-    )
+    view: Annotated["NetBoxDNSViewType", strawberry.lazy("netbox_dns.graphql.types")]
     nameservers: (
         Annotated[
             "NetBoxDNSNameServerType", strawberry.lazy("netbox_dns.graphql.types")

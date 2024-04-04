@@ -10,6 +10,10 @@
                         <th scope="row">Name</th>
                         <td>{{ object.name }}</td>
                     </tr>
+                    <tr>
+                        <th scope="row">Default View</th>
+                        <td>{% checkmark object.default_view %}</td>
+                    </tr>
                     {% if object.description %}
                     <tr>
                         <th scope="row">Description</th>

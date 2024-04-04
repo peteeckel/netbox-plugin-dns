@@ -20,7 +20,6 @@
                         <td>{{ unicode_name }}</td>
                     </tr>
                 {% endif %}
-                {% if object.view %}
                 <tr>
                     <th scope="row">View</th>
                     <td>
@@ -29,7 +28,6 @@
                         </a>
                     </td>
                 </tr>
-                {% endif %}
                 {% if object.description %}
                 <tr>
                     <th scope="row">Description</th>
@@ -116,11 +114,11 @@
                     <td>{{ object.soa_ttl }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">Primary Nameserver</th>
+                    <th scope="row">MName</th>
                     <td><a href="{% url 'plugins:netbox_dns:nameserver' pk=object.soa_mname.pk %}">{{ object.soa_mname }}</a></td>
                 </tr>
                 <tr>
-                    <th scope="row">Responsible</th>
+                    <th scope="row">RName</th>
                     <td>{{ object.soa_rname }}</td>
                 </tr>
                 {% if object.soa_serial_auto %}

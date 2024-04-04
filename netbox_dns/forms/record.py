@@ -28,9 +28,29 @@ class RecordForm(TenancyForm, NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        initial_zone_id = self.initial.get("zone")
+        if initial_zone_id is not None:
+            self.initial["view"] = Zone.objects.get(pk=initial_zone_id).view
+        else:
+            self.initial["view"] = View.get_default_view()
+
         initial_name = self.initial.get("name")
         if initial_name:
             self.initial["name"] = name_to_unicode(initial_name)
+
+    view = DynamicModelChoiceField(
+        queryset=View.objects.all(),
+        required=False,
+        label="View",
+    )
+    zone = DynamicModelChoiceField(
+        queryset=Zone.objects.all(),
+        required=True,
+        query_params={
+            "view_id": "$view",
+        },
+        label="Zone",
+    )
 
     disable_ptr = forms.BooleanField(
         label="Disable PTR",
@@ -44,6 +64,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
     fieldsets = (
         FieldSet(
             "name",
+            "view",
             "zone",
             "type",
             "value",
@@ -84,6 +105,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "fqdn",
             "type",
             "value",
+            "disable_ptr",
             "status",
             "description",
             name="Attributes",
@@ -104,6 +126,10 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     value = forms.CharField(
         required=False,
+    )
+    disable_ptr = forms.NullBooleanField(
+        required=False,
+        label="Disable PTR",
     )
     status = forms.MultipleChoiceField(
         choices=RecordStatusChoices,
@@ -131,10 +157,12 @@ class RecordImportForm(NetBoxModelImportForm):
             except forms.ValidationError:
                 pass
 
-        if view:
+        if view is not None:
             self.fields["zone"].queryset = Zone.objects.filter(view=view)
         else:
-            self.fields["zone"].queryset = Zone.objects.filter(view__isnull=True)
+            self.fields["zone"].queryset = Zone.objects.filter(
+                view=View.get_default_view()
+            )
 
     zone = CSVModelChoiceField(
         queryset=Zone.objects.all(),

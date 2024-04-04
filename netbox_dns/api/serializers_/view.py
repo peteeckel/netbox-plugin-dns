@@ -10,6 +10,10 @@ class ViewSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:view-detail"
     )
+    default_view = serializers.BooleanField(
+        read_only=True,
+    )
+
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
     class Meta:
@@ -19,6 +23,7 @@ class ViewSerializer(NetBoxModelSerializer):
             "url",
             "display",
             "name",
+            "default_view",
             "tags",
             "description",
             "created",
@@ -26,4 +31,4 @@ class ViewSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name", "description")
+        brief_fields = ("id", "url", "display", "name", "default_view", "description")

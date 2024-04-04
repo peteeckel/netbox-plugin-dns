@@ -37,9 +37,10 @@ from netbox_dns.validators import (
 )
 
 # +
-# This is a hack designed to break cyclic imports between Record and Zone
+# This is a hack designed to break cyclic imports between View, Record and Zone
 # -
 import netbox_dns.models.record as record
+import netbox_dns.models.view as view
 
 
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
@@ -81,8 +82,7 @@ class Zone(NetBoxModel):
     view = models.ForeignKey(
         to="View",
         on_delete=models.PROTECT,
-        blank=True,
-        null=True,
+        null=False,
     )
     name = models.CharField(
         max_length=255,
@@ -285,7 +285,7 @@ class Zone(NetBoxModel):
             except dns_name.IDNAException:
                 name = self.name
 
-        if self.view:
+        if not self.view.default_view:
             return f"[{self.view}] {name}"
 
         return str(name)
@@ -321,7 +321,7 @@ class Zone(NetBoxModel):
 
         return (
             Zone.objects.filter(
-                self.view_filter,
+                view=self.view,
                 arpa_network__net_contains=self.rfc2317_prefix,
             )
             .order_by("arpa_network__net_mask_length")
@@ -341,12 +341,6 @@ class Zone(NetBoxModel):
                 self.billing_c,
             )
         )
-
-    @property
-    def view_filter(self):
-        if self.view is None:
-            return Q(view__isnull=True)
-        return Q(view=self.view)
 
     def record_count(self, managed=False):
         return record.Record.objects.filter(zone=self, managed=managed).count()
@@ -424,12 +418,8 @@ class Zone(NetBoxModel):
             if len(parent) < 2:
                 continue
 
-            view_condition = (
-                Q(view__isnull=True) if self.view is None else Q(view_id=self.view.pk)
-            )
-
             try:
-                ns_zone = Zone.objects.get(view_condition, name=parent.to_text())
+                ns_zone = Zone.objects.get(view_id=self.view.pk, name=parent.to_text())
             except ObjectDoesNotExist:
                 continue
 
@@ -492,19 +482,6 @@ class Zone(NetBoxModel):
     def network_from_name(self):
         return arpa_to_prefix(self.name)
 
-    def check_name_conflict(self):
-        if self.view is None:
-            if (
-                Zone.objects.exclude(pk=self.pk)
-                .filter(name=self.name.rstrip("."), view__isnull=True)
-                .exists()
-            ):
-                raise ValidationError(
-                    {
-                        "name": f"A zone with name {self.name} and no view already exists."
-                    }
-                )
-
     def update_rfc2317_parent_zone(self):
         if not self.is_rfc2317_zone:
             return
@@ -555,8 +532,36 @@ class Zone(NetBoxModel):
             ptr_zone.save_soa_serial()
             ptr_zone.update_soa_record()
 
+    def clean_fields(self, exclude=None):
+        defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
+
+        if self.view_id is None:
+            self.view_id = view.View.get_default_view().pk
+
+        for field, value in self.get_defaults().items():
+            if getattr(self, field) in (None, ""):
+                if value not in (None, ""):
+                    setattr(self, field, value)
+
+        super().clean_fields(exclude=exclude)
+
     def clean(self, *args, **kwargs):
-        self.check_name_conflict()
+        defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
+
+        if self.soa_ttl is None:
+            self.soa_ttl = self.default_ttl
+
+        if self.soa_mname_id is None:
+            default_soa_mname = defaults.get("zone_soa_mname")
+            if default_soa_mname is None:
+                raise ValidationError("soa_mname not set and no default value defined")
+
+            try:
+                self.soa_mname = NameServer.objects.get(name=default_soa_mname)
+            except NameServer.DoesNotExist:
+                raise ValidationError(
+                    f"Default soa_mname instance {default_soa_mname} does not exist"
+                )
 
         try:
             self.name = normalize_name(self.name)
@@ -576,6 +581,8 @@ class Zone(NetBoxModel):
                 }
             ) from None
 
+        if self.soa_rname in (None, ""):
+            raise ValidationError("soa_rname not set and no default value defined")
         try:
             dns_name.from_text(self.soa_rname, origin=dns_name.root)
             validate_fqdn(self.soa_rname)
@@ -586,7 +593,9 @@ class Zone(NetBoxModel):
                 }
             ) from None
 
-        if self.soa_serial is None and not self.soa_serial_auto:
+        if self.soa_serial_auto:
+            self.soa_serial = None
+        elif self.soa_serial is None:
             raise ValidationError(
                 {
                     "soa_serial": f"soa_serial is not defined and soa_serial_auto is disabled for zone {self.name}."
@@ -619,7 +628,7 @@ class Zone(NetBoxModel):
                 self.rfc2317_parent_zone = None
 
             overlapping_zones = Zone.objects.filter(
-                self.view_filter,
+                view=self.view,
                 rfc2317_prefix__net_overlap=self.rfc2317_prefix,
                 active=True,
             ).exclude(pk=self.pk)
@@ -634,6 +643,8 @@ class Zone(NetBoxModel):
         else:
             self.rfc2317_parent_managed = False
             self.rfc2317_parent_zone = None
+
+        super().clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -659,7 +670,7 @@ class Zone(NetBoxModel):
             new_zone or name_changed or view_changed or status_changed
         ) and self.is_reverse_zone:
             zones = Zone.objects.filter(
-                self.view_filter,
+                view=self.view,
                 arpa_network__net_contains_or_equals=self.arpa_network,
             )
             address_records = record.Record.objects.filter(
@@ -695,7 +706,7 @@ class Zone(NetBoxModel):
             or rfc2317_changed
         ) and self.is_rfc2317_zone:
             zones = Zone.objects.filter(
-                self.view_filter,
+                view=self.view,
                 arpa_network__net_contains=self.rfc2317_prefix,
             )
             address_records = record.Record.objects.filter(

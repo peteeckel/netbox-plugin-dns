@@ -9,7 +9,7 @@ from netbox_dns.models import View
 class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     class Meta:
         model = View
-        fields = ("id", "name", "description")
+        fields = ("id", "name", "default_view", "description")
 
     def search(self, queryset, name, value):
         if not value.strip():

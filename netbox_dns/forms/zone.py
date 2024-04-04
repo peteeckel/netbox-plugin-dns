@@ -56,7 +56,7 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
     )
     soa_rname = forms.CharField(
         required=True,
-        label="SOA Responsible",
+        label="SOA RName",
         help_text="Mailbox of the zone's administrator",
     )
     soa_serial_auto = forms.BooleanField(
@@ -154,11 +154,14 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
         if initial_name:
             self.initial["name"] = name_to_unicode(initial_name)
 
+        if self.initial.get("view") is None:
+            self.initial["view"] = View.get_default_view().pk
+
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
         def _initialize(initial, setting):
-            if initial.get(setting, None) in (None, ""):
-                initial[setting] = defaults.get(f"zone_{setting}", None)
+            if initial.get(setting) in (None, ""):
+                initial[setting] = defaults.get(f"zone_{setting}")
 
         for setting in (
             "default_ttl",
@@ -172,14 +175,14 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
         ):
             _initialize(self.initial, setting)
 
-        if self.initial.get("soa_ttl", None) is None:
-            self.initial["soa_ttl"] = self.initial.get("default_ttl", None)
+        if self.initial.get("soa_ttl") is None:
+            self.initial["soa_ttl"] = self.initial.get("default_ttl")
 
         if self.initial.get("soa_serial_auto"):
             self.initial["soa_serial"] = None
 
-        if self.initial.get("soa_mname", None) in (None, ""):
-            default_soa_mname = defaults.get("zone_soa_mname", None)
+        if self.initial.get("soa_mname") in (None, ""):
+            default_soa_mname = defaults.get("zone_soa_mname")
             if default_soa_mname is not None:
                 try:
                     self.initial["soa_mname"] = NameServer.objects.get(
@@ -246,6 +249,18 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "view_id", "status", "name", "nameservers", "description", name="Attributes"
         ),
         FieldSet(
+            "soa_mname_id",
+            "soa_rname",
+            "soa_serial_auto",
+            name="SOA",
+        ),
+        FieldSet(
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "rfc2317_parent_zone_id",
+            name="RFC2317",
+        ),
+        FieldSet(
             "registrar_id",
             "registry_domain_id",
             "registrant_id",
@@ -275,6 +290,32 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     description = forms.CharField(
         required=False,
+    )
+    soa_mname_id = DynamicModelMultipleChoiceField(
+        queryset=NameServer.objects.all(),
+        label="MName",
+        required=False,
+    )
+    soa_rname = forms.CharField(
+        required=False,
+        label="RName",
+    )
+    soa_serial_auto = forms.NullBooleanField(
+        required=False,
+        label="Generate Serial",
+    )
+    rfc2317_prefix = RFC2317NetworkFormField(
+        required=False,
+        label="Prefix",
+    )
+    rfc2317_parent_managed = forms.NullBooleanField(
+        required=False,
+        label="Parent Managed",
+    )
+    rfc2317_parent_zone_id = DynamicModelMultipleChoiceField(
+        queryset=Zone.objects.all(),
+        required=False,
+        label="Parent Zone",
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
@@ -441,12 +482,10 @@ class ZoneImportForm(NetBoxModelImportForm):
 
     def _get_default_value(self, field):
         _default_values = settings.PLUGINS_CONFIG.get("netbox_dns", {})
-        if _default_values.get("zone_soa_ttl", None) is None:
-            _default_values["zone_soa_ttl"] = _default_values.get(
-                "zone_default_ttl", None
-            )
+        if _default_values.get("zone_soa_ttl") is None:
+            _default_values["zone_soa_ttl"] = _default_values.get("zone_default_ttl")
 
-        return _default_values.get(f"zone_{field}", None)
+        return _default_values.get(f"zone_{field}")
 
     def _clean_field_with_defaults(self, field):
         if self.cleaned_data[field]:
@@ -458,6 +497,13 @@ class ZoneImportForm(NetBoxModelImportForm):
             raise ValidationError(f"{field} not set and no default value available")
 
         return value
+
+    def clean_view(self):
+        view = self.cleaned_data.get("view")
+        if view is None:
+            return View.get_default_view()
+
+        return view
 
     def clean_default_ttl(self):
         return self._clean_field_with_defaults("default_ttl")
@@ -551,6 +597,27 @@ class ZoneImportForm(NetBoxModelImportForm):
             "tags",
         )
 
+    def clean_view(self):
+        view = self.cleaned_data.get("view")
+        if view is None:
+            return View.get_default_view()
+
+        return view
+
+    def clean_nameservers(self):
+        nameservers = self.cleaned_data.get("nameservers")
+        zone_defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
+
+        if (
+            self.data.get("nameservers") is None
+            and zone_defaults.get("zone_nameservers") is not None
+        ):
+            nameservers = NameServer.objects.filter(
+                name__in=zone_defaults.get("zone_nameservers")
+            )
+
+        return nameservers
+
 
 class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     view = DynamicModelChoiceField(
@@ -592,7 +659,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     )
     soa_rname = forms.CharField(
         required=False,
-        label="SOA Responsible",
+        label="SOA RName",
     )
     soa_serial_auto = forms.NullBooleanField(
         required=False,
@@ -729,7 +796,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     nullable_fields = (
-        "view",
         "description",
         "rfc2317_prefix",
         "registrar",

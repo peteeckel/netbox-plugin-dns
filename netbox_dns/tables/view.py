@@ -14,5 +14,12 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = View
-        fields = ("name", "description", "tenant", "tenant_group", "tags")
-        default_columns = ("name",)
+        fields = (
+            "name",
+            "default_view",
+            "description",
+            "tenant",
+            "tenant_group",
+            "tags",
+        )
+        default_columns = ("name", "default_view")
