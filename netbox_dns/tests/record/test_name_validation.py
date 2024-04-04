@@ -5,47 +5,25 @@ from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
 
 
 class RecordNameValidationTestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-        "soa_serial_auto": False,
-    }
-
-    record_data = {
-        "type": RecordTypeChoices.AAAA,
-        "value": "fe80:dead:beef::",
-    }
-
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
+        zone_data = {
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
+            "soa_rname": "hostmaster.example.com",
+        }
+
+        cls.record_data = {
+            "type": RecordTypeChoices.AAAA,
+            "value": "fe80:dead:beef::",
+        }
 
         cls.zones = (
-            Zone(**cls.zone_data, soa_mname=cls.nameserver, name="zone1.example.com"),
-            Zone(**cls.zone_data, soa_mname=cls.nameserver, name="zone2.example.com."),
-            Zone(
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-                name="zone240" + 22 * ".123456789" + ".example.com",
-            ),
-            Zone(
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-                name="zone240" + 22 * ".987654321" + ".example.com.",
-            ),
-            Zone(
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-                name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-            ),
+            Zone(name="zone1.example.com", **zone_data),
+            Zone(name="zone2.example.com.", **zone_data),
+            Zone(name="zone240" + 22 * ".123456789" + ".example.com", **zone_data),
+            Zone(name="zone240" + 22 * ".987654321" + ".example.com.", **zone_data),
+            Zone(name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **zone_data),
         )
-        Zone.objects.bulk_create(cls.zones)
         for zone in cls.zones:
             zone.save()
 

@@ -17,56 +17,25 @@ def reverse_name(address, reverse_zone):
 
 
 class RecordAutoPTRTestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-    }
-
-    record_data = {
-        "ttl": 86400,
-    }
-
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
+        cls.zone_data = {
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
+            "soa_rname": "hostmaster.example.com",
+        }
+
         cls.zones = [
-            Zone(name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="1.0.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="2.0.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="1.1.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="0.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="2.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(
-                name="1.0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-            ),
-            Zone(
-                name="2.0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-            ),
-            Zone(
-                name="1.1.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-            ),
-            Zone(
-                name="0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-            ),
-            Zone(
-                name="2.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-            ),
+            Zone(name="zone1.example.com", **cls.zone_data),
+            Zone(name="1.0.10.in-addr.arpa", **cls.zone_data),
+            Zone(name="2.0.10.in-addr.arpa", **cls.zone_data),
+            Zone(name="1.1.10.in-addr.arpa", **cls.zone_data),
+            Zone(name="0.10.in-addr.arpa", **cls.zone_data),
+            Zone(name="2.10.in-addr.arpa", **cls.zone_data),
+            Zone(name="1.0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **cls.zone_data),
+            Zone(name="2.0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **cls.zone_data),
+            Zone(name="1.1.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **cls.zone_data),
+            Zone(name="0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **cls.zone_data),
+            Zone(name="2.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **cls.zone_data),
         ]
         for zone in cls.zones:
             zone.save()
@@ -78,14 +47,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
         )
@@ -99,14 +66,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "@"
         address = "10.0.1.42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
         )
@@ -120,14 +85,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.delete()
 
@@ -146,14 +109,12 @@ class RecordAutoPTRTestCase(TestCase):
         address = "10.0.1.42"
 
         for name in names:
-            f_record = Record(
+            Record.objects.create(
                 zone=f_zone,
                 name=name,
                 type=RecordTypeChoices.A,
                 value=address,
-                **self.record_data,
             )
-            f_record.save()
 
         r_records = Record.objects.filter(
             type=RecordTypeChoices.PTR,
@@ -173,24 +134,20 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "test2"
         address = "10.0.1.42"
 
-        f_record1 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.A,
             value=address,
             disable_ptr=True,
-            **self.record_data,
         )
-        f_record1.save()
 
-        f_record2 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name2,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record2.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -206,24 +163,20 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "test2"
         address = "10.0.1.42"
 
-        f_record1 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record1.save()
 
-        f_record2 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name2,
             type=RecordTypeChoices.A,
             value=address,
             disable_ptr=True,
-            **self.record_data,
         )
-        f_record2.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -239,14 +192,12 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "test2"
         address = "10.0.1.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.name = name2
         f_record.save()
@@ -265,14 +216,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "10.0.1.23"
         address2 = "10.0.1.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -291,14 +240,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "10.0.1.23"
         address2 = "10.0.2.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -318,14 +265,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "10.0.1.23"
         address2 = "10.0.2.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -343,14 +288,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "10.0.1.23"
         address2 = "10.3.1.23"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -367,14 +310,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.ttl = 98765
         f_record.save()
@@ -394,14 +335,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         r_zone1.delete()
 
@@ -419,19 +358,14 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.2.1.42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
-        r_zone = Zone(
-            name="1.2.10.in-addr.arpa", **self.zone_data, soa_mname=self.nameserver
-        )
-        r_zone.save()
+        r_zone = Zone.objects.create(name="1.2.10.in-addr.arpa", **self.zone_data)
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR,
@@ -447,19 +381,14 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.3.1.42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
-        r_zone = Zone(
-            name="1.3.10.in-addr.arpa", **self.zone_data, soa_mname=self.nameserver
-        )
-        r_zone.save()
+        r_zone = Zone.objects.create(name="1.3.10.in-addr.arpa", **self.zone_data)
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -474,14 +403,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
         )
@@ -495,14 +422,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "@"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
         )
@@ -516,14 +441,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.delete()
 
@@ -542,14 +465,12 @@ class RecordAutoPTRTestCase(TestCase):
         address = "fe80:dead:beef:1::42"
 
         for name in names:
-            f_record = Record(
+            Record.objects.create(
                 zone=f_zone,
                 name=name,
                 type=RecordTypeChoices.AAAA,
                 value=address,
-                **self.record_data,
             )
-            f_record.save()
 
         r_records = Record.objects.filter(
             type=RecordTypeChoices.PTR,
@@ -569,24 +490,20 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
             disable_ptr=True,
-            **self.record_data,
         )
-        f_record1.save()
 
-        f_record2 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name2,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record2.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -602,24 +519,20 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record1.save()
 
-        f_record2 = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name2,
             type=RecordTypeChoices.AAAA,
             value=address,
             disable_ptr=True,
-            **self.record_data,
         )
-        f_record2.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -635,14 +548,12 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.name = name2
         f_record.save()
@@ -661,14 +572,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "fe80:dead:beef:1::23"
         address2 = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -687,14 +596,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "fe80:dead:beef:1::23"
         address2 = "fe80:dead:beef:2::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -714,14 +621,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "fe80:dead:beef:1::23"
         address2 = "fe80:dead:beef:2::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -739,14 +644,12 @@ class RecordAutoPTRTestCase(TestCase):
         address1 = "fe80:dead:beef:1::23"
         address2 = "fe80:dead:beef:31::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address1,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.value = address2
         f_record.save()
@@ -763,14 +666,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         f_record.ttl = 98765
         f_record.save()
@@ -790,14 +691,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         r_zone1.delete()
 
@@ -815,21 +714,16 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:21::42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
-        r_zone = Zone(
-            name="1.2.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-            **self.zone_data,
-            soa_mname=self.nameserver,
+        r_zone = Zone.objects.create(
+            name="1.2.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **self.zone_data
         )
-        r_zone.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR,
@@ -845,21 +739,16 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:31::42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
-        r_zone = Zone(
-            name="1.3.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-            **self.zone_data,
-            soa_mname=self.nameserver,
+        r_zone = Zone.objects.create(
+            name="1.3.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **self.zone_data
         )
-        r_zone.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -875,14 +764,12 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "name2"
         address = "10.0.1.1"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -908,14 +795,12 @@ class RecordAutoPTRTestCase(TestCase):
         name2 = "name2"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -940,15 +825,13 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
             status="inactive",
-            **self.record_data,
         )
-        f_record.save()
 
         with self.assertRaises(Record.DoesNotExist):
             Record.objects.get(
@@ -964,14 +847,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -996,15 +877,13 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "10.0.1.42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.A,
             value=address,
             status="inactive",
-            **self.record_data,
         )
-        f_record.save()
 
         with self.assertRaises(Record.DoesNotExist):
             Record.objects.get(
@@ -1029,15 +908,13 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
             status="inactive",
-            **self.record_data,
         )
-        f_record.save()
 
         with self.assertRaises(Record.DoesNotExist):
             Record.objects.get(
@@ -1062,14 +939,12 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR, zone=r_zone, name=reverse_name(address, r_zone)
@@ -1094,15 +969,13 @@ class RecordAutoPTRTestCase(TestCase):
         name = "test1"
         address = "fe80:dead:beef:1::42"
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
             status="inactive",
-            **self.record_data,
         )
-        f_record.save()
 
         with self.assertRaises(Record.DoesNotExist):
             Record.objects.get(

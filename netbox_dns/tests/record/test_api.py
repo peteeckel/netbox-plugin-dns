@@ -35,17 +35,10 @@ class RecordAPITestCase(
 
     @classmethod
     def setUpTestData(cls):
-        ns1 = NameServer.objects.create(name="ns1.example.com")
-
         zone_data = {
-            "default_ttl": 86400,
+            **Zone.get_defaults(),
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
             "soa_rname": "hostmaster.example.com",
-            "soa_serial": 2021110401,
-            "soa_refresh": 172800,
-            "soa_retry": 7200,
-            "soa_expire": 2592000,
-            "soa_ttl": 86400,
-            "soa_minimum": 3600,
             "soa_serial_auto": False,
         }
 
@@ -55,16 +48,17 @@ class RecordAPITestCase(
         )
         View.objects.bulk_create(views)
 
+        default_view = View.get_default_view()
         zones = (
-            Zone(name="zone1.example.com", **zone_data, soa_mname=ns1, view=None),
-            Zone(name="zone2.example.com", **zone_data, soa_mname=ns1, view=None),
-            Zone(name="zone3.example.com", **zone_data, soa_mname=ns1, view=None),
-            Zone(name="zone1.example.com", **zone_data, soa_mname=ns1, view=views[0]),
-            Zone(name="zone2.example.com", **zone_data, soa_mname=ns1, view=views[0]),
-            Zone(name="zone3.example.com", **zone_data, soa_mname=ns1, view=views[0]),
-            Zone(name="zone1.example.com", **zone_data, soa_mname=ns1, view=views[1]),
-            Zone(name="zone2.example.com", **zone_data, soa_mname=ns1, view=views[1]),
-            Zone(name="zone3.example.com", **zone_data, soa_mname=ns1, view=views[1]),
+            Zone(name="zone1.example.com", **zone_data, view=default_view),
+            Zone(name="zone2.example.com", **zone_data, view=default_view),
+            Zone(name="zone3.example.com", **zone_data, view=default_view),
+            Zone(name="zone1.example.com", **zone_data, view=views[0]),
+            Zone(name="zone2.example.com", **zone_data, view=views[0]),
+            Zone(name="zone3.example.com", **zone_data, view=views[0]),
+            Zone(name="zone1.example.com", **zone_data, view=views[1]),
+            Zone(name="zone2.example.com", **zone_data, view=views[1]),
+            Zone(name="zone3.example.com", **zone_data, view=views[1]),
         )
         Zone.objects.bulk_create(zones)
 
