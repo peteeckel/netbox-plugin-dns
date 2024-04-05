@@ -758,7 +758,8 @@ class Record(NetBoxModel):
 class RecordIndex(SearchIndex):
     model = Record
     fields = (
-        ("name", 100),
+        ("fqdn", 100),
+        ("name", 120),
         ("value", 150),
         ("zone", 200),
         ("type", 200),
