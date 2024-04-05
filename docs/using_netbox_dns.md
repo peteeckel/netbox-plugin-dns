@@ -60,11 +60,19 @@ NetBox DNS requires some tables for its data models within the NetBox database. 
 
 ### Restarting NetBox
 Restart the WSGI service and the request queue worker to load the new plugin:
+
 ```
 systemctl restart netbox netbox-rq
 ```
-
 Now NetBox DNS should show up under "Plugins" at the bottom of the left-hand side of the NetBox web GUI.
+
+### Reindexing Global Search
+In order for existing NetBox DNS objects to appear in the global search after the initial installation or some upgrades of NetBox DNS, the search indices need to be rebuilt. This can be done with the command
+
+```
+/opt/netbox/netbox/manage.py reindex netbox_dns
+```
+This can be done at any time, especially when items that should show up in the global search do not.
 
 ## Object types
 Currently NetBox DNS can manage four different object types: Views, Name Servers, Zones, and Records.
