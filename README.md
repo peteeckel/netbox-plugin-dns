@@ -14,16 +14,30 @@ The NetBox DNS plugin enables NetBox to manage operational DNS data such as name
 <a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Month" src="https://static.pepy.tech/badge/netbox-plugin-dns/week"></a>
 </div>
 
-## Features
+## Objectives
+NetBox DNS is designed to be the 'DNS Source of Truth' analogous to NetBox being the 'Network Source of Truth'.
 
-* Manage name servers, zones and records
-* Automatically generate SOA and NS records for zones
-* Automatically create and update PTR records for IPv4 and IPv6 address records
-* Organize DNS zones in views for split horizon DNS and multi-site deployments
-* Manage domain registrar and registrant information for domains related to zones
-* Manage RFC2317 reverse zones for IPv4 prefixes with a network mask length longer than 24 bits
+The plugin holds information about DNS name servers, DNS Views and Zones, and DNS Records, making it a data source for automatically provisioning DNS instances. Registrarion information about DNS registrars and contacts for DNS domains can also be stored and associated with zones.
 
-NetBox DNS is using the standardized NetBox plugin interface, so it also takes advantage of the NetBox tagging and change log features.
+The main focus of the plugin is to ensure the quality of data stored in it. To achieve this, many validation and automation mechanisms are in place:
+
+* Validation of record names and values
+* Automatic maintenance of PTR records for IPv6 and IPv4 address records
+* Automatic generation of SOA records, optionally including the serial number of the zone data
+* Validation of record types such as CNAME and singletons, to ensure DNS zone validity
+* [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) support for delegation of PTR zones for IPv4 subnets longer than 24 bits
+
+Other main features are:
+
+* Support for BIND views, providing lightweight namespaces for zones
+* Support for IDN, inclucing the validation of punycode names
+* Fully supported NetBox REST and GraphQL API
+* Support for all major NetBox features like Global Search, Tenancy, Change Logs, Tagging, Journaling etc.
+
+## Non-Objectives
+In the same way in which NetBox is not a network management application, NetBox DNS does not provide functionality to manage specific name servers or DNS service providers or generate input like configuration and zone files for them. The focus is on the completeness and integrity of the data needed to run DNS zones, not on the peculiarities of a plethora of servers and services actually using the data. This functionality is left to specialized integration tools, or in many cases it can be easily implemented using Ansible or similar tools based on NetBox DNS data. Example code for some simple use cases is provided.
+
+For integration with a large number of DNS server implementations integration tools like [octodns-netbox-dns](https://pypi.org/project/octodns-netbox-dns/) are available.
 
 ## Requirements
 

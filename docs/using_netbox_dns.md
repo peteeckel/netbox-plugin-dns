@@ -1,17 +1,28 @@
 # Using NetBox DNS
-NetBox DNS is a plugin for NetBox designed to manage DNS data. In the current version it supports View, Name Server, Zone, and Record objects for simple DNS deployments. Its main features include:
+NetBox DNS is designed to be the 'DNS Source of Truth' analogous to NetBox being the 'Network Source of Truth'.
 
-* Generation of the NS records for a zone from the assigned Name Server objects as defined in [RFC 1035, Section 3.3.11](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3.11)
-* Generation of the SOA record for a zone from the component fields defined in [RFC 1035, Section 3.3.13](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3.13)
-* Optional management of PTR records for A and AAAA records if the reverse zones are also in NetBox DNS
-* Optional generation and update of the SOA serial number for a zone if zone data or data of any record within the zone is updated
-* API endpoints that can be used to export View, Name Server, Zone and Record data via the NetBox REST or GraphQL APIs
-* Basic integrity checks of the entered data
-* Optional organisation of zones in views, i.e. to facilitate split-horizon DNS setups
-* Management of domain registration related information, such as registrars and contacts related to WHOIS information
-* Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317)
-* Support for NetBox custom fields, custom links, export templates etc.
-* Support for NetBox tenancy
+## Objectives
+The plugin holds information about DNS name servers, DNS Views and Zones, and DNS Records, making it a data source for automatically provisioning DNS instances. Registration information about DNS registrars and contacts for DNS domains can also be stored and associated with zones.
+
+The main focus of the plugin is to ensure the quality of data stored in it. To achieve this, many validation and automation mechanisms are in place:
+
+* Validation of record names and values
+* Automatic maintenance of PTR records for IPv6 and IPv4 address records
+* Automatic generation of SOA records, optionally including the serial number of the zone data
+* Validation of record types such as CNAME and singletons, to ensure DNS zone validity
+* [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) support for delegation of PTR zones for IPv4 subnets longer than 24 bits
+
+Other main features are:
+
+* Support for BIND views, providing lightweight namespaces for zones
+* Support for IDN, inclucing the validation of punycode names
+* Fully supported NetBox REST and GraphQL API
+* Support for all major NetBox features like Global Search, Tenancy, Change Logs, Tagging, Journaling etc.
+
+## Non-Objectives
+In the same way in which NetBox is not a network management application, NetBox DNS does not provide functionality to manage specific name servers or DNS service providers or generate input like configuration and zone files for them. The focus is on the completeness and integrity of the data needed to run DNS zones, not on the peculiarities of a plethora of servers and services actually using the data. This functionality is left to specialized integration tools, or in many cases it can be easily implemented using Ansible or similar tools based on NetBox DNS data. Example code for some simple use cases is provided.
+
+For integration with a large number of DNS server implementations integration tools like [octodns-netbox-dns](https://pypi.org/project/octodns-netbox-dns/) are available.
 
 ## Installation and Configuration
 The installation of plugins in general is described in the [NetBox documentation](https://netbox.readthedocs.io/en/stable/plugins/).
