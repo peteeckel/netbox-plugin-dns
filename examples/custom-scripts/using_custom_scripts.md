@@ -17,27 +17,31 @@ SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'
 ```
 There is an empty file `__init__.py` located in the scripts directory, which is essential for the scripts functionality to work. Do not delete that file.
 
-NetBox needs to be restarted for this change to become active.
+Finally, make the user NetBox is running under the owner of the scripts directory:
+
+```
+# chown -R netbox: /opt/netbox/netbox/scripts
+```
+
+NetBox needs to be restarted for these changes to become effective.
 
 #### Granting Permissions to run Custom Scripts and view DNS data
 A user that is supposed to run custom scripts needs the `extras.run_scripts` permission. This permission is not defined by default, so it must be created in the NetBox Administration interface:
 
 ![Admin Create Permission](images/AdminCreateRunnerPermission.png)
 
-This new permission grants the right to view custom scripts, and the additional action `run`.
+This new permission grants the right to view custom scripts, and the additional action `run`. The assignment to the user that is to be used to run scripts (here 'ansible') can be done in the same step.
 
-Additionally, a permission to view all DNS data is needed and must be created in the same way:
+Additionally, a permission to view all DNS data is needed and must be created and assigned to the user to be allowed to run scripts in the same way:
 
 ![Admin Create Permission](images/AdminCreateViewPermission.png)
 
-The next step is to assign the permissions to all users that are supposed to be able to run scripts:
-
-![Admin Assign Permission](images/AdminAssignPermission.png)
-
 #### Installing the Exporter Script
-After these preparations, the example custom script `netbox_dns_exporters.py` must be copied to the scripts directory `/opt/netbox/netbox/scripts/'. NetBox does not need to be restarted for this to take effect.
+After these preparations, the example custom script `netbox_dns_exporters.py` can be installed using the NetBox GUI. Navigate to 'Customization/Scripts' in the sidebar, click on '+' and select the file containing the script for upload in the following dialog:
 
-After these preparations the custom script can now be used to export zone data to the file system.
+![Script Upload](images/ScriptUpload.png)
+
+After clicking on 'Create' to install the script it can now be used to export zone data to the file system.
 
 ### Running the Exporter Script
 To run the script, navigate to the 'Others' tab in the side bar and select the 'Scripts' menu entry.
@@ -72,28 +76,21 @@ After Execution, the exported zone data files should have been created in the se
 ```
 [netbox@example ~]$ tree netbox-dns-exporter/
 netbox-dns-exporter/
-├── _default
-│   └── zone1.example.com.db
-├── external
-│   ├── 0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa.db
-│   ├── 1.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa.db
-│   ├── 2.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa.db
-│   ├── 42.168.192.in-addr.arpa.db
+├── default
+│   ├── 0.0.10.in-addr.arpa.db
+│   ├── 0.10.in-addr.arpa.db
+│   ├── 0-31.0.0.10.in-addr.arpa.db
+│   ├── 32-63.0.0.10.in-addr.arpa.db
+│   ├── tzone2.example.com.db
+│   ├── zone10.example.com.db
+│   ├── zone11.example.com.db
+│   ├── zone12.example.com.db
+│   ├── zone18.example.com.db
+│   ├── zone19.example.com.db
 │   ├── zone1.example.com.db
-│   ├── zone2.example.com.db
-│   ├── zone3.example.com.db
-│   ├── zone4.example.com.db
-│   └── zone5.example.com.db
-└── internal
-    ├── 0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa.db
-    ├── 1.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa.db
-    ├── 2.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa.db
-    ├── 42.168.192.in-addr.arpa.db
-    ├── zone1.example.com.db
-    ├── zone2.example.com.db
-    ├── zone3.example.com.db
-    ├── zone4.example.com.db
-    └── zone5.example.com.db
+│   └── zone20.example.com.db
+└── external
+    └── 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa.db
 ```
 
 ### Caveats
@@ -102,8 +99,8 @@ This is a very simple exporter script that is meant to be a basis for users' own
 ### Further Considerations
 Providing a functionality like the one of this script in the plugin itself is not currently being considered. Provisioning a DNS server is not in scope of the NetBox DNS plugin, which has been designed as a source of truth, not a management interface. This is in concordance with the NetBox project itself.
 
-The way in which a plugin would interact with authoritative and slave DNS servers varies that much between platforms, implementations, server products and installations that it would mean an enormous effort to cater for all these variants. 
+The way in which a plugin would interact with authoritative and slave DNS servers varies that much between platforms, implementations, server products and installations that it would mean an enormous effort to cater for all these variants.
 
-On the other hand, there are many ways in which NetBox can be customised, so anyone with special requirements should be able to customize it to their needs. One way of doing this has been outlined in this example.
+On the other hand, there are many ways in which NetBox can be customised, so anyone with special requirements should be able to adapt it to their needs. One way of doing this has been outlined in this example.
 
 See the discussion in [NetBox DNS issue #8](https://github.com/auroraresearchlab/netbox-dns/issues/8).
