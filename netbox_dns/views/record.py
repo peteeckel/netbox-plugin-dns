@@ -41,22 +41,15 @@ class RecordView(generic.ObjectView):
     queryset = Record.objects.all().prefetch_related("zone", "ptr_record")
 
     def get_value_records(self, instance):
-        value_fqdn = dns_name.from_text(instance.value_fqdn)
-        value_zone_names = [
-            value_fqdn.split(length)[1].to_text().rstrip(".")
-            for length in range(2, len(value_fqdn) + 1)
-        ]
-
-        value_zone = (
-            Zone.objects.filter(instance.zone.view_filter, name__in=value_zone_names)
-            .order_by(Length("name").desc())
-            .first()
+        view_filter = (
+            Q(zone__view__isnull=True)
+            if instance.zone.view is None
+            else Q(zone__view=instance.zone.view)
         )
-        if not value_zone:
-            return None
 
-        value_name = value_fqdn.relativize(dns_name.from_text(value_zone.name))
-        cname_targets = Record.objects.filter(zone=value_zone, name=value_name)
+        value_fqdn = dns_name.from_text(instance.value_fqdn)
+
+        cname_targets = Record.objects.filter(view_filter, fqdn=value_fqdn)
 
         if cname_targets:
             return RelatedRecordTable(
