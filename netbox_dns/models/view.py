@@ -43,14 +43,14 @@ class View(NetBoxModel):
     class Meta:
         ordering = ("name",)
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         if self.default_view:
             if current_request.get() is not None:
                 raise AbortRequest("The default view cannot be deleted")
 
             raise ValidationError("The default view cannot be deleted")
 
-        super().delete()
+        super().delete(*args, **kwargs)
 
     def clean(self, *args, old_state=None, **kwargs):
         if self.pk is None:
@@ -69,12 +69,14 @@ class View(NetBoxModel):
                 }
             )
 
+        super().clean(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         self.clean()
 
         old_state = None if self.pk is None else View.objects.get(pk=self.pk)
 
-        super().save()
+        super().save(*args, **kwargs)
 
         if (old_state is None and self.default_view) or (
             old_state is not None and self.default_view and not old_state.default_view

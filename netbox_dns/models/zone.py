@@ -15,14 +15,14 @@ from django.db.models import Q, Max, ExpressionWrapper, BooleanField
 from django.urls import reverse
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
+from django.conf import settings
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
+from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 from utilities.choices import ChoiceSet
 from ipam.models import IPAddress
-
-from netbox.plugins.utils import get_plugin_config
 
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
@@ -41,6 +41,7 @@ from netbox_dns.validators import (
 # -
 import netbox_dns.models.record as record
 import netbox_dns.models.view as view
+import netbox_dns.models.nameserver as nameserver
 
 
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
@@ -290,6 +291,15 @@ class Zone(NetBoxModel):
 
         return str(name)
 
+    @staticmethod
+    def get_defaults():
+        return {
+            field[5:]: value
+            for field, value in settings.PLUGINS_CONFIG.get("netbox_dns").items()
+            if field.startswith("zone_")
+            and field not in ("zone_soa_mname", "zone_nameservers")
+        }
+
     @property
     def display_name(self):
         return name_to_unicode(self.name)
@@ -317,7 +327,7 @@ class Zone(NetBoxModel):
 
     def get_rfc2317_parent_zone(self):
         if not self.is_rfc2317_zone:
-            return
+            return None
 
         return (
             Zone.objects.filter(
@@ -411,8 +421,8 @@ class Zone(NetBoxModel):
         if not nameservers:
             ns_errors.append(f"No nameservers are configured for zone {self}")
 
-        for nameserver in nameservers:
-            name = dns_name.from_text(nameserver.name, origin=None)
+        for _nameserver in nameservers:
+            name = dns_name.from_text(_nameserver.name, origin=None)
             parent = name.parent()
 
             if len(parent) < 2:
@@ -427,7 +437,7 @@ class Zone(NetBoxModel):
             address_records = record.Record.objects.filter(
                 Q(zone=ns_zone),
                 Q(status__in=record.Record.ACTIVE_STATUS_LIST),
-                Q(Q(name=f"{nameserver.name}.") | Q(name=relative_name)),
+                Q(Q(name=f"{_nameserver.name}.") | Q(name=relative_name)),
                 Q(
                     Q(type=record.RecordTypeChoices.A)
                     | Q(type=record.RecordTypeChoices.AAAA)
@@ -436,7 +446,7 @@ class Zone(NetBoxModel):
 
             if not address_records:
                 ns_warnings.append(
-                    f"Nameserver {nameserver.name} does not have an active address record in zone {ns_zone}"
+                    f"Nameserver {_nameserver.name} does not have an active address record in zone {ns_zone}"
                 )
 
         return ns_warnings, ns_errors
@@ -543,25 +553,22 @@ class Zone(NetBoxModel):
                 if value not in (None, ""):
                     setattr(self, field, value)
 
-        super().clean_fields(exclude=exclude)
-
-    def clean(self, *args, **kwargs):
-        defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
-
-        if self.soa_ttl is None:
-            self.soa_ttl = self.default_ttl
-
         if self.soa_mname_id is None:
             default_soa_mname = defaults.get("zone_soa_mname")
-            if default_soa_mname is None:
-                raise ValidationError("soa_mname not set and no default value defined")
-
             try:
-                self.soa_mname = NameServer.objects.get(name=default_soa_mname)
-            except NameServer.DoesNotExist:
+                self.soa_mname = nameserver.NameServer.objects.get(
+                    name=default_soa_mname
+                )
+            except nameserver.NameServer.DoesNotExist:
                 raise ValidationError(
                     f"Default soa_mname instance {default_soa_mname} does not exist"
                 )
+
+        super().clean_fields(exclude=exclude)
+
+    def clean(self, *args, **kwargs):
+        if self.soa_ttl is None:
+            self.soa_ttl = self.default_ttl
 
         try:
             self.name = normalize_name(self.name)
@@ -593,14 +600,13 @@ class Zone(NetBoxModel):
                 }
             ) from None
 
-        if self.soa_serial_auto:
-            self.soa_serial = None
-        elif self.soa_serial is None:
-            raise ValidationError(
-                {
-                    "soa_serial": f"soa_serial is not defined and soa_serial_auto is disabled for zone {self.name}."
-                }
-            )
+        if not self.soa_serial_auto:
+            if self.soa_serial is None:
+                raise ValidationError(
+                    {
+                        "soa_serial": f"soa_serial is not defined and soa_serial_auto is disabled for zone {self.name}."
+                    }
+                )
 
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name

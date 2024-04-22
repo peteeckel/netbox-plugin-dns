@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse_lazy
 
@@ -147,7 +146,6 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """Override the __init__ method in order to provide the initial value for the default fields"""
         super().__init__(*args, **kwargs)
 
         initial_name = self.initial.get("name")
@@ -155,14 +153,9 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
             self.initial["name"] = name_to_unicode(initial_name)
 
         if self.initial.get("view") is None:
-            self.initial["view"] = View.get_default_view().pk
+            self.initial["view"] = View.get_default_view()
 
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
-
-        def _initialize(initial, setting):
-            if initial.get(setting) in (None, ""):
-                initial[setting] = defaults.get(f"zone_{setting}")
-
         for setting in (
             "default_ttl",
             "soa_ttl",
@@ -173,7 +166,8 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
             "soa_expire",
             "soa_minimum",
         ):
-            _initialize(self.initial, setting)
+            if self.initial.get(setting) in (None, ""):
+                self.initial[setting] = defaults.get(f"zone_{setting}")
 
         if self.initial.get("soa_ttl") is None:
             self.initial["soa_ttl"] = self.initial.get("default_ttl")
@@ -181,7 +175,7 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
         if self.initial.get("soa_serial_auto"):
             self.initial["soa_serial"] = None
 
-        if self.initial.get("soa_mname") in (None, ""):
+        if self.initial.get("soa_mname") is None:
             default_soa_mname = defaults.get("zone_soa_mname")
             if default_soa_mname is not None:
                 try:
@@ -480,92 +474,6 @@ class ZoneImportForm(NetBoxModelImportForm):
         help_text="Assigned tenant",
     )
 
-    def _get_default_value(self, field):
-        _default_values = settings.PLUGINS_CONFIG.get("netbox_dns", {})
-        if _default_values.get("zone_soa_ttl") is None:
-            _default_values["zone_soa_ttl"] = _default_values.get("zone_default_ttl")
-
-        return _default_values.get(f"zone_{field}")
-
-    def _clean_field_with_defaults(self, field):
-        if self.cleaned_data[field]:
-            value = self.cleaned_data[field]
-        else:
-            value = self._get_default_value(field)
-
-        if value is None:
-            raise ValidationError(f"{field} not set and no default value available")
-
-        return value
-
-    def clean_view(self):
-        view = self.cleaned_data.get("view")
-        if view is None:
-            return View.get_default_view()
-
-        return view
-
-    def clean_default_ttl(self):
-        return self._clean_field_with_defaults("default_ttl")
-
-    def clean_soa_ttl(self):
-        return self._clean_field_with_defaults("soa_ttl")
-
-    def clean_soa_mname(self):
-        soa_mname = self._clean_field_with_defaults("soa_mname")
-        if isinstance(soa_mname, str):
-            try:
-                soa_mname = NameServer.objects.get(name=soa_mname)
-            except NameServer.DoesNotExist:
-                raise ValidationError(f"Default name server {soa_mname} does not exist")
-
-        return soa_mname
-
-    def clean_soa_rname(self):
-        return self._clean_field_with_defaults("soa_rname")
-
-    def clean_soa_refresh(self):
-        return self._clean_field_with_defaults("soa_refresh")
-
-    def clean_soa_retry(self):
-        return self._clean_field_with_defaults("soa_retry")
-
-    def clean_soa_expire(self):
-        return self._clean_field_with_defaults("soa_expire")
-
-    def clean_soa_minimum(self):
-        return self._clean_field_with_defaults("soa_minimum")
-
-    def clean(self, *args, **kwargs):
-        super().clean(*args, **kwargs)
-
-        soa_serial_auto = self.cleaned_data.get("soa_serial_auto")
-        soa_serial = self.cleaned_data.get("soa_serial")
-
-        if soa_serial is None:
-            soa_serial = self._get_default_value("soa_serial")
-
-        if soa_serial_auto is None:
-            if self._get_default_value("soa_serial_auto") is not None:
-                soa_serial_auto = self._get_default_value("soa_serial_auto")
-
-            elif soa_serial is not None:
-                soa_serial_auto = False
-
-            else:
-                raise ValidationError(
-                    "SOA Serial Auto not set and no default value and SOA Serial available"
-                )
-
-        if "soa_serial_auto" in self.cleaned_data:
-            self.cleaned_data["soa_serial_auto"] = soa_serial_auto
-
-        if "soa_serial" in self.cleaned_data:
-            if soa_serial_auto:
-                self.cleaned_data["soa_serial"] = None
-            else:
-                self.cleaned_data["soa_serial"] = soa_serial
-
     class Meta:
         model = Zone
 
@@ -805,8 +713,3 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         "tech_c",
         "billing_c",
     )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get("soa_serial_auto"):
-            cleaned_data["soa_serial"] = None

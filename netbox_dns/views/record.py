@@ -1,8 +1,5 @@
 from dns import name as dns_name
 
-from django.db.models import Q
-from django.db.models.functions import Length
-
 from netbox.views import generic
 
 from netbox_dns.filtersets import RecordFilterSet

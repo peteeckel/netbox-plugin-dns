@@ -14,7 +14,7 @@ class DNSConfig(PluginConfig):
     required_settings = []
     default_settings = {
         "zone_default_ttl": 86400,
-        "zone_soa_serial_auto": True,
+        "zone_soa_ttl": 86400,
         "zone_soa_serial": 1,
         "zone_soa_refresh": 43200,
         "zone_soa_retry": 7200,
