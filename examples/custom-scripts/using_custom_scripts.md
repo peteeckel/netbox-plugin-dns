@@ -57,9 +57,6 @@ The base path within the file system on the NetBox node where the export takes p
 
 The exporter creates a sub-directory `netbox-dns-exporter` under the specified base path so that zone files can't accidentally overwrite existing files that happen to have the same name, and to make deleting existing exports less risky. Make sure that there is no subdirectory of this name that contains relevant data as they might get overwritten or deleted by the exporter.
 
-#### Default view name
-NetBox DNS supports views, but does not enforce their use. If a zone does not have a View associated with it, the view name in the export directory is set to the value in this field (`_default` by default).
-
 #### Remove existing data
 If selected, delete all data from the `netbox-dns-exporter` subdirectory before starting the export. This is a means to ensure that zone files for zones that have been deactivated or deleted are not lingering around from previous exports.
 

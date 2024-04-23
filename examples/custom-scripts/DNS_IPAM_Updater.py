@@ -26,7 +26,7 @@ class IPAMHostnameUpdater(Script):
     view = ObjectVar(
         model=View,
         label="DNS View",
-        required=False,
+        required=True,
     )
 
     overwrite = BooleanVar(
@@ -40,10 +40,7 @@ class IPAMHostnameUpdater(Script):
         else:
             ip_object_filter = {"vrf": data["vrf"]}
 
-        if data["view"] is None:
-            record_filter = {"zone__view__isnull": True}
-        else:
-            record_filter = {"zone__view": data["view"]}
+        record_filter = {"zone__view": data["view"]}
 
         ip_addresses = IPAddress.objects.filter(**ip_object_filter)
         for ip_address in ip_addresses:
@@ -94,7 +91,7 @@ class DNSRecordUpdater(Script):
     view = ObjectVar(
         model=View,
         label="DNS View",
-        required=False,
+        required=True,
     )
 
     overwrite = BooleanVar(
@@ -118,10 +115,7 @@ class DNSRecordUpdater(Script):
             zone = fqdn.parent()
 
             try:
-                if data["view"] is None:
-                    zone_object = Zone.objects.get(name=str(zone).rstrip("."), view__isnull=True)
-                else:
-                    zone_object = Zone.objects.get(name=str(zone).rstrip("."), view=data["view"])
+                zone_object = Zone.objects.get(name=str(zone).rstrip("."), view=data["view"])
             except Zone.DoesNotExist:
                 self.log_warning(f"Zone {zone} does not exist, cannot create or update record")
 
@@ -137,10 +131,7 @@ class DNSRecordUpdater(Script):
                 "type": record_type,
             }
 
-            if data["view"] is None:
-                record_filter["zone__view__isnull"] = True
-            else:
-                record_filter["zone__view"] = data["view"]
+            record_filter["zone__view"] = data["view"]
 
             try:
                 address_record = Record.objects.get(**record_filter)

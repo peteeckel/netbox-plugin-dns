@@ -33,11 +33,6 @@ class ZoneExporter(Script):
         default="/home/netbox",
     )
 
-    default_view_name = StringVar(
-        description="Default view name for zones without a view",
-        default="_default",
-    )
-
     remove_existing_data = BooleanVar(
         description="Clean up existing data before exporting",
         default=True,
@@ -81,11 +76,6 @@ $TTL {{ zone.default_ttl }}
             if len(zones):
                 self.log_info(f"Exporting zones for view '{view.name}'")
                 self.export_zones(zones, view.name, export_path)
-
-        zones = Zone.objects.filter(view__isnull=True, status__in=Zone.ACTIVE_STATUS_LIST)
-        if len(zones):
-            self.log_info("Exporting zones without a view")
-            self.export_zones(zones, data["default_view_name"], export_path)
 
     def export_zones(self, zones, view_name, export_path):
         view_path = export_path / view_name
