@@ -53,7 +53,7 @@ class NameServer(NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:nameserver", kwargs={"pk": self.pk})
 
-    def clean(self):
+    def clean(self, *args, **kwargs):
         try:
             self.name = normalize_name(self.name)
         except NameFormatError as exc:
@@ -71,6 +71,8 @@ class NameServer(NetBoxModel):
                     "name": exc,
                 }
             ) from None
+
+        super().clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         self.full_clean()
