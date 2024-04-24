@@ -699,6 +699,8 @@ class Record(NetBoxModel):
                     }
                 ) from None
 
+        super().clean(*args, **kwargs)
+
     def save(
         self,
         *args,
