@@ -1,17 +1,28 @@
 # Using NetBox DNS
-NetBox DNS is a plugin for NetBox designed to manage DNS data. In the current version it supports View, Name Server, Zone, and Record objects for simple DNS deployments. Its main features include:
+NetBox DNS is designed to be the 'DNS Source of Truth' analogous to NetBox being the 'Network Source of Truth'.
 
-* Generation of the NS records for a zone from the assigned Name Server objects as defined in [RFC 1035, Section 3.3.11](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3.11)
-* Generation of the SOA record for a zone from the component fields defined in [RFC 1035, Section 3.3.13](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3.13)
-* Optional management of PTR records for A and AAAA records if the reverse zones are also in NetBox DNS
-* Optional generation and update of the SOA serial number for a zone if zone data or data of any record within the zone is updated
-* API endpoints that can be used to export View, Name Server, Zone and Record data via the NetBox REST or GraphQL APIs
-* Basic integrity checks of the entered data
-* Optional organisation of zones in views, i.e. to facilitate split-horizon DNS setups
-* Management of domain registration related information, such as registrars and contacts related to WHOIS information
-* Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317)
-* Support for NetBox custom fields, custom links, export templates etc.
-* Support for NetBox tenancy
+## Objectives
+The plugin holds information about DNS name servers, DNS Views and Zones, and DNS Records, making it a data source for automatically provisioning DNS instances. Registration information about DNS registrars and contacts for DNS domains can also be stored and associated with zones.
+
+The main focus of the plugin is to ensure the quality of data stored in it. To achieve this, many validation and automation mechanisms are in place:
+
+* Validation of record names and values
+* Automatic maintenance of PTR records for IPv6 and IPv4 address records
+* Automatic generation of SOA records, optionally including the serial number of the zone data
+* Validation of record types such as CNAME and singletons, to ensure DNS zone validity
+* [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) support for delegation of PTR zones for IPv4 subnets longer than 24 bits
+
+Other main features are:
+
+* Support for BIND views, providing lightweight namespaces for zones
+* Support for IDN, inclucing the validation of punycode names
+* Fully supported NetBox REST and GraphQL API
+* Support for all major NetBox features like Global Search, Tenancy, Change Logs, Tagging, Journaling etc.
+
+## Non-Objectives
+In the same way in which NetBox is not a network management application, NetBox DNS does not provide functionality to manage specific name servers or DNS service providers or generate input like configuration and zone files for them. The focus is on the completeness and integrity of the data needed to run DNS zones, not on the peculiarities of a plethora of servers and services actually using the data. This functionality is left to specialized integration tools, or in many cases it can be easily implemented using Ansible or similar tools based on NetBox DNS data. Example code for some simple use cases is provided.
+
+For integration with a large number of DNS server implementations integration tools like [octodns-netbox-dns](https://pypi.org/project/octodns-netbox-dns/) are available.
 
 ## Installation and Configuration
 The installation of plugins in general is described in the [NetBox documentation](https://netbox.readthedocs.io/en/stable/plugins/).
@@ -19,8 +30,21 @@ The installation of plugins in general is described in the [NetBox documentation
 ### Requirements
 The installation of NetBox DNS requires a Python interpreter and a working NetBox deployment. Supported versions are currently:
 
-* NetBox 3.5.0 or higher
-* Python 3.8 or higher
+* NetBox 4.0.0 or higher
+* Python 3.10 or higher
+
+### Compatibility
+NetBox DNS is compatible with the following NetBox versions.
+
+NetBox Version | NetBox DNS Version | Comment
+-------------- | ------------------ | -------
+3.0.x - 3.4.x  | -                  | No support
+3.5.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
+3.6.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
+3.7.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
+4.0.x          | 1.0.x or later     | Only the latest NetBox DNS version is supported
+
+If you are running an earlier version of NetBox, the old version of the PyPI module `netbox-dns` can be used. That version is deprecated and will not receive any further updates of any kind, so it is strongly recommended to move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
 ### Installation of NetBox DNS
 NetBox DNS is available as a PyPi module and can be installed using pip:
@@ -74,8 +98,37 @@ In order for existing NetBox DNS objects to appear in the global search after th
 ```
 This can be done at any time, especially when items that should show up in the global search do not.
 
+### Upgrading NetBox DNS from `netbox-dns` to `netbox-plugin-dns`
+The current Python module for NetBox DNS is named `netbox-plugin-dns`. Until March 2023, the module providing the NetBox DNS plugin was named `netbox-dns`, and this PyPI module can unfortunately still be installed. It has not received any updates since the switch to `netbox-plugin-dns` was necessary, is no longer supported and does not work with NetBox versions 3.5.0 and higher.
+
+#### `netbox-dns` versions less than 0.16.0
+If the old `netbox-dns` module is installed on the system, make sure to upgrade it to the latest version first and then run the migration:
+
+```
+/opt/netbox/venv/bin/python3 -m pip install --upgrade netbox-dns
+/opt/netbox/netbox/manage.py migrate
+```
+This will install the latest version 0.17.0 of the plugin and perform the necessary database migrations that are required for the migration to `netbox-plugin-dns`. Then proceed as described in the next section.
+
+#### `netbox-dns` version 0.16.0 and higher
+If the version of `netbox-dns` is at least 0.16.0, the system can be directly migrated to `netbox-plugin-dns`. It is vital that the old plugin is removed before the new one is installed, otherwise NetBox will fail to start.
+
+```
+/opt/netbox/venv/bin/python3 -m pip remove netbox-dns
+/opt/netbox/venv/bin/python3 -m pip install netbox-plugin-dns
+/opt/netbox/netbox/manage.py migrate
+```
+
+### NetBox 3 support
+NetBox 3.5.0 up to NetBox 3.7.x are not supported by the latest version of NetBox DNS. In order to install NetBox DNS on NetBox 3 systems, please install the latest version of `netbox-plugin-dns` 0.22:
+
+```
+/opt/netbox/venv/bin/python3 -m pip install 'netbox-plugin-dns<0.23'
+/opt/netbox/netbox/manage.py migrate
+```
+
 ## Object types
-Currently NetBox DNS can manage four different object types: Views, Name Servers, Zones, and Records.
+Currently NetBox DNS can manage six different object types: Views, Name Servers, Zones, and Records, Contacts and Registrars.
 
 ### Views
 Views are a concept to optinally partition the DNS namespace into groups of zones that are isolated from each other. They are mainly used for split horizon DNS setups, for example in cases when there is a different DNS resolution requirement for external and internal clients where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
@@ -196,8 +249,8 @@ Field           | Required | Default  | Explanation
 **View**        | No       |          | If the zone is associated with a view, the name of that view. In this case, the zone name is also prefixed with the view name in brackets to make zones easier to distinguish in lists. If the zone is not associated with a view, this field is not displayed
 **Tenant**      | No       |          | The tenant the zone is assigned to
 **Status**      | Yes      | Active   | The zone's status. Possible values are "active", "reserved", "deprecated" or "parked". All zone status except "Active" are considered inactive, which has implications for the records in a zone as well as for PTR records in reverse zones that are automatically generated for address records in the zone
-**Nameservers** | No       | see [Default Settings](#config)) | The list of authoritative name servers for the zone
-**Default TTL** | Yes      | see [Default Settings](#config)) | The default TTL for all records in the zone if none is specified
+**Nameservers** | No       | see [Default Settings](#zone_defaults)) | The list of authoritative name servers for the zone
+**Default TTL** | Yes      | see [Default Settings](#zone_defaults)) | The default TTL for all records in the zone if none is specified
 **Description** | No       |          | A short textual description of the zone
 **Tags**        | No       |          | NetBox tags assigned to the zone. Tags can be used to categorise zones by arbitrary criteria
 
@@ -574,7 +627,7 @@ With NetBox DNS 0.19.0 support for the NetBox tenancy feature was added. It is p
 
 Tenancy does not have any impact on uniqueness constraints within NetBox DNS.
 
-The NetBox detail view for tenants shows a table of NetBox DNS objects assigned to a specific tenant.
+The NetBox detail view for tenants shows a tenants in the list of objects on the right hand side.
 
 ![NetBox Tenant Detail](images/NetBoxTenantDetail.png)
 
