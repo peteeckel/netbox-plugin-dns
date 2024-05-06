@@ -1,10 +1,9 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
 
 from netbox_dns.models import NameServer, View, Zone, Record, RecordTypeChoices
 
 
-class RFC2317RecordTest(TestCase):
+class RFC2317RecordTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.nameserver = NameServer.objects.create(name="ns1.example.com")
@@ -1604,8 +1603,8 @@ class RFC2317RecordTest(TestCase):
         self.assertIsNone(cname_record)
 
     def test_cname_ttl(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
-        rfc2317_zone = Zone.objects.create(
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
@@ -1643,8 +1642,8 @@ class RFC2317RecordTest(TestCase):
         self.assertEqual(records[1].ptr_record.rfc2317_cname_record.ttl, 43200)
 
     def test_cname_ttl_update_record_ttl(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
-        rfc2317_zone = Zone.objects.create(
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
@@ -1696,8 +1695,8 @@ class RFC2317RecordTest(TestCase):
         self.assertEqual(records[0].ptr_record.rfc2317_cname_record.ttl, 43200)
 
     def test_cname_ttl_set_record_ttl_none(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
-        rfc2317_zone = Zone.objects.create(
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
@@ -1749,8 +1748,8 @@ class RFC2317RecordTest(TestCase):
         self.assertEqual(records[0].ptr_record.rfc2317_cname_record.ttl, None)
 
     def test_cname_ttl_delete_record(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
-        rfc2317_zone = Zone.objects.create(
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",

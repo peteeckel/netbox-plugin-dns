@@ -11,6 +11,7 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     DynamicModelChoiceField,
 )
+from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -19,8 +20,8 @@ from netbox_dns.models import View
 
 class ViewForm(TenancyForm, NetBoxModelForm):
     fieldsets = (
-        ("View", ("name", "description", "tags")),
-        ("Tenancy", ("tenant_group", "tenant")),
+        FieldSet("name", "description", "tags", name="View"),
+        FieldSet("tenant_group", "tenant", name="Tenancy"),
     )
 
     class Meta:
@@ -31,14 +32,16 @@ class ViewForm(TenancyForm, NetBoxModelForm):
 class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = View
     fieldsets = (
-        (None, ("q", "filter_id", "tag")),
-        ("Attributes", ("name",)),
-        ("Tenant", ("tenant_group_id", "tenant_id")),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet("name", "description", name="Attributes"),
+        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
     name = forms.CharField(
         required=False,
-        label="Name",
+    )
+    description = forms.CharField(
+        required=False,
     )
     tag = TagFilterField(View)
 
@@ -62,5 +65,13 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
     description = forms.CharField(max_length=200, required=False)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
-    class Meta:
-        nullable_fields = ("description", "tenant")
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            name="Attributes",
+        ),
+        FieldSet("tenant", name="Tenancy"),
+    )
+
+    nullable_fields = ("description", "tenant")

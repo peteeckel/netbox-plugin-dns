@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from netbox_dns.models import NameServer, View, Zone
 
 
-class RFC2317ZoneTest(TestCase):
+class RFC2317ZoneTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.nameserver = NameServer.objects.create(name="ns1.example.com")
@@ -91,7 +91,7 @@ class RFC2317ZoneTest(TestCase):
             )
 
     def test_create_rfc2317_zone_parent_managed_arpa_zone(self):
-        zone1 = Zone.objects.create(name="0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(name="0.10.in-addr.arpa", **self.zone_data)
         with self.assertRaises(ValidationError):
             Zone.objects.create(
                 name="0.0.10.in-addr.arpa",
@@ -162,8 +162,8 @@ class RFC2317ZoneTest(TestCase):
         self.assertNotEqual(rfc2317_zone.rfc2317_parent_zone, zone2)
 
     def test_create_rfc2317_zone_parent_managed_different_no_matching_view(self):
-        zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
-        zone2 = Zone.objects.create(
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(
             name="0.0.10.in-addr.arpa", **self.zone_data, view=self.views[1]
         )
         with self.assertRaises(ValidationError):
@@ -176,10 +176,10 @@ class RFC2317ZoneTest(TestCase):
             )
 
     def test_create_rfc2317_zone_parent_managed_different_no_null_view(self):
-        zone1 = Zone.objects.create(
+        Zone.objects.create(
             name="0.0.10.in-addr.arpa", **self.zone_data, view=self.views[0]
         )
-        zone2 = Zone.objects.create(
+        Zone.objects.create(
             name="0.0.10.in-addr.arpa", **self.zone_data, view=self.views[1]
         )
         with self.assertRaises(ValidationError):

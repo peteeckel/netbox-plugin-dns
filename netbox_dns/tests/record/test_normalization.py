@@ -1,10 +1,10 @@
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from netbox_dns.models import Zone, Record, RecordTypeChoices, NameServer
 
 
-class RecordValidationTest(TestCase):
+class RecordNormalizationTestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",

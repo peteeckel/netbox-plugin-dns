@@ -2,25 +2,10 @@ from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
 
-from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
+from netbox_dns.models import Zone, Record
+from netbox_dns.api.serializers_.view import ViewSerializer
 
 
-#
-# Views
-#
-class NestedViewSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:view-detail"
-    )
-
-    class Meta:
-        model = View
-        fields = ["id", "url", "display", "name"]
-
-
-#
-# Zones
-#
 class NestedZoneSerializer(WritableNestedSerializer):
     def to_representation(self, instance):
         # +
@@ -39,7 +24,8 @@ class NestedZoneSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"
     )
-    view = NestedViewSerializer(
+    view = ViewSerializer(
+        nested=True,
         many=False,
         required=False,
         read_only=True,
@@ -65,22 +51,6 @@ class NestedZoneSerializer(WritableNestedSerializer):
         ]
 
 
-#
-# Nameservers
-#
-class NestedNameServerSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:nameserver-detail"
-    )
-
-    class Meta:
-        model = NameServer
-        fields = ["id", "url", "display", "name"]
-
-
-#
-# Records
-#
 class NestedRecordSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:record-detail"
@@ -110,29 +80,3 @@ class NestedRecordSerializer(WritableNestedSerializer):
             "zone",
             "active",
         ]
-
-
-#
-# Registrars
-#
-class NestedRegistrarSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:registrar-detail"
-    )
-
-    class Meta:
-        model = Registrar
-        fields = ["display", "id", "url", "name", "iana_id"]
-
-
-#
-# Contacts
-#
-class NestedContactSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:contact-detail"
-    )
-
-    class Meta:
-        model = Contact
-        fields = ["display", "id", "url", "name", "contact_id"]

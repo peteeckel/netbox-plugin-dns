@@ -3,8 +3,6 @@ from datetime import datetime, timedelta
 from math import ceil
 from dns import rdata
 
-from unittest import skip
-
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
@@ -30,7 +28,7 @@ def parse_soa_value(soa):
     )
 
 
-class AutoSOASerialTest(TestCase):
+class ZoneAutoSOASerialTestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",

@@ -7,7 +7,6 @@ from dns import name as dns_name
 from django.core.exceptions import ValidationError
 from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
-from django.db.models.functions import Length
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
@@ -15,12 +14,7 @@ from netbox.search import SearchIndex, register_search
 from utilities.querysets import RestrictedQuerySet
 from utilities.choices import ChoiceSet
 
-try:
-    # NetBox 3.5.0 - 3.5.7, 3.5.9+
-    from extras.plugins import get_plugin_config
-except ImportError:
-    # NetBox 3.5.8
-    from extras.plugins.utils import get_plugin_config
+from netbox.plugins.utils import get_plugin_config
 
 from netbox_dns.fields import AddressField
 from netbox_dns.utilities import (
@@ -43,7 +37,9 @@ def min_ttl(*ttl_list):
 
 
 class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
-    """Special Manager for records providing the activity status annotation"""
+    """
+    Custom manager for records providing the activity status annotation
+    """
 
     def get_queryset(self):
         return (
@@ -218,7 +214,7 @@ class Record(NetBoxModel):
             name = dns_name.from_text(self.fqdn).relativize(dns_name.root).to_unicode()
         except dns_name.IDNAException:
             name = self.name
-        except dns_name.LabelTooLong as exc:
+        except dns_name.LabelTooLong:
             name = f"{self.name[:59]}..."
 
         return f"{name} [{self.type}]"
@@ -231,7 +227,7 @@ class Record(NetBoxModel):
         return RecordStatusChoices.colors.get(self.status)
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:record", kwargs={"pk": self.id})
+        return reverse("plugins:netbox_dns:record", kwargs={"pk": self.pk})
 
     @property
     def value_fqdn(self):
@@ -669,7 +665,7 @@ class Record(NetBoxModel):
         if self.type == RecordTypeChoices.SOA and self.name != "@":
             raise ValidationError(
                 {
-                    "name": f"SOA records are only allowed with name @ and are created automatically by NetBox DNS"
+                    "name": "SOA records are only allowed with name @ and are created automatically by NetBox DNS"
                 }
             ) from None
 

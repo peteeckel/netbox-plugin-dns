@@ -1,6 +1,6 @@
 from utilities.testing import APIViewTestCases
 
-from netbox_dns.tests.custom import APITestCase
+from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import Registrar
 
 
@@ -11,9 +11,12 @@ class RegistrarAPITestCase(
     APIViewTestCases.CreateObjectViewTestCase,
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
+    NetBoxDNSGraphQLMixin,
+    APIViewTestCases.GraphQLTestCase,
 ):
     model = Registrar
-    brief_fields = ["display", "iana_id", "id", "name", "url"]
+
+    brief_fields = ["description", "display", "iana_id", "id", "name", "url"]
 
     create_data = [
         {
@@ -28,6 +31,11 @@ class RegistrarAPITestCase(
         },
         {"name": "ACME Trust", "iana_id": 5, "abuse_email": "devnull@acme.example.org"},
     ]
+
+    bulk_update_data = {
+        "whois_server": "whois.example.com",
+        "address": "42 Drury Lane, Duloc 42523",
+    }
 
     @classmethod
     def setUpTestData(cls):

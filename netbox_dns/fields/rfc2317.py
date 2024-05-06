@@ -18,8 +18,8 @@ class RFC2317NetworkFormField(forms.Field):
         if isinstance(value, IPNetwork):
             if value.version == 4 and value.prefixlen > 24:
                 return value
-            else:
-                raise ValidationError(INVALID_RFC2317)
+
+            raise ValidationError(INVALID_RFC2317)
 
         if len(value.split("/")) != 2:
             raise ValidationError("Please specify the prefix length")
@@ -51,7 +51,7 @@ class RFC2317NetworkField(models.Field):
 
         try:
             ip_network = IPNetwork(value)
-        except (AddressFormatError, TypeError, ValueError) as exc:
+        except (AddrFormatError, TypeError, ValueError) as exc:
             raise ValidationError(exc)
 
         if ip_network.version != 4:

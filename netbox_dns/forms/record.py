@@ -16,6 +16,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
 from utilities.forms import add_blank_choice
+from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -41,21 +42,19 @@ class RecordForm(TenancyForm, NetBoxModelForm):
     )
 
     fieldsets = (
-        (
-            "Record",
-            (
-                "name",
-                "zone",
-                "type",
-                "value",
-                "status",
-                "ttl",
-                "disable_ptr",
-                "description",
-                "tags",
-            ),
+        FieldSet(
+            "name",
+            "zone",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            name="Record",
         ),
-        ("Tenancy", ("tenant_group", "tenant")),
+        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tags", name="Tags"),
     )
 
     class Meta:
@@ -78,12 +77,18 @@ class RecordForm(TenancyForm, NetBoxModelForm):
 class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Record
     fieldsets = (
-        (None, ("q", "filter_id", "tag")),
-        (
-            "Attributes",
-            ("view_id", "zone_id", "name", "fqdn", "type", "value", "status"),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "zone_id",
+            "name",
+            "fqdn",
+            "type",
+            "value",
+            "status",
+            "description",
+            name="Attributes",
         ),
-        ("Tenant", ("tenant_group_id", "tenant_id")),
+        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
     type = forms.MultipleChoiceField(
@@ -92,7 +97,6 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     name = forms.CharField(
         required=False,
-        label="Name",
     )
     fqdn = forms.CharField(
         required=False,
@@ -100,7 +104,6 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     value = forms.CharField(
         required=False,
-        label="Value",
     )
     status = forms.MultipleChoiceField(
         choices=RecordStatusChoices,
@@ -111,10 +114,8 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label="Zone",
     )
-    view_id = DynamicModelMultipleChoiceField(
-        queryset=View.objects.all(),
+    description = forms.CharField(
         required=False,
-        label="View",
     )
     tag = TagFilterField(Record)
 
@@ -231,18 +232,16 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     fieldsets = (
-        (
-            None,
-            (
-                "zone",
-                "type",
-                "value",
-                "status",
-                "ttl",
-                "disable_ptr",
-                "description",
-                "tenant",
-            ),
+        FieldSet(
+            "zone",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            name="Attributes",
         ),
+        FieldSet("tenant_group", "tenant", name="Tenancy"),
     )
     nullable_fields = ("description", "ttl", "tenant")

@@ -6,69 +6,67 @@ This example uses Ansible and the `NetBox.NetBox` collection from Ansible Galaxy
 ## Preparing NetBox
 In order to use the NetBox API, a user account with an authentication token needs to be created. For the given purpose, a read-only user with access to the NetBox DNS data is sufficient.
 
-Using the Django Admin interface for the NetBox instance, a new user named "ansible" is created. The password is irrelevant and should be sufficiently secure - any random password of reasonable length will do.
+Using the NetBox Admin interface, a new user named 'ansible' is created. The password is irrelevant and should be sufficiently secure - any random password of reasonable length will do.
 
 ![Admin Create User](images/AdminCreateUser.png)
 
-In the next step, a permission needs to be created that allows its holder to view all NetBox DNS data.
+In the next step, a permission to view all NetBox DNS data must be created and assigned to the user just created.
 
 ![Admin Create Permission](images/AdminCreatePermission.png)
 
-Scrolling further down, that permission can immediately be assigned to the newly created "ansible" user.
-
-![Admin Assign Permission](images/AdminAssignPermission.png)
-
-After sending that form, the new "ansible" user can view all DNS data within NetBox. The last step within the Django administration interface is to assign that user an API authentication token. This can be done unter the "Tokens" navigation item by clicking on "Add Token", selecting the "ansible" user and unchecking "Write enabled". 
+After sending that form, the new 'ansible' user can view all DNS data within NetBox. The last step is to assign that user an API authentication token. This can be done using the GAPI Token' navigation menu item by clicking on 'Add Token', selecting the 'ansible' user and unchecking 'Write enabled'. The token is shown immediately in that view.
 
 ![Admin Create Token](images/AdminCreateToken.png)
 
-Saving the new token will then display its value. That value can now be used to access the API from Ansible.
-
-![Admin Token](images/AdminToken.png)
-
 ## Preparing Ansible
-For the `NetBox.NetBox` collection to work, a recent version of Ansible running under Python 3 is required. Python 2 is not supported anymore and the NetBox collection is known not to work properly with Python 2.
+For the `netbox.netbox` collection to work, a recent version of Ansible running under Python 3 is required. Python 2 is not supported anymore and the NetBox collection is known not to work properly with Python 2.
 
-### Installing the `NetBox.NetBox` collection for Ansible
+### Installing the `netbox.netbox` collection for Ansible
 Installing the collection is straightforward.
 
 ```
-% ansible-galaxy collection install NetBox.NetBox
+# ansible-galaxy collection install netbox.netbox
 Starting galaxy collection install process
 Process install dependency map
 Starting collection install process
-Downloading https://galaxy.ansible.com/download/NetBox-NetBox-3.4.0.tar.gz to ~/.ansible/tmp/ansible-local-84784t8afovr6/tmpox967fgb/NetBox-NetBox-3.4.0-ovt8ugjk
-Installing 'NetBox.NetBox:3.4.0' to '~/.ansible/collections/ansible_collections/NetBox/NetBox'
-NetBox.NetBox:3.4.0 was installed successfully
+Downloading https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/netbox-netbox-3.17.0.tar.gz to /root/.ansible/tmp/ansible-local-219358jiz3hc9y/tmpgngehv3q/netbox-netbox-3.17.0-ywot9syj
+Installing 'netbox.netbox:3.17.0' to '/root/.ansible/collections/ansible_collections/netbox/netbox'
+netbox.netbox:3.17.0 was installed successfully
 ```
 
-### Installing the `pyNetBox` Python 3 Module
-The `NetBox.NetBox` collection requires the `pyNetBox` module to be installed.
+### Installing the `pynetbox` Python 3 Module
+The `netbox.netbox` collection requires the `pynetbox` module to be installed.
 
 ```
-% pip3 install pyNetBox  
-Collecting pyNetBox
-  Downloading pyNetBox-6.4.0-py3-none-any.whl (31 kB)
-Requirement already satisfied: six==1.* in /usr/local/lib/python3.9/site-packages (from pyNetBox) (1.16.0)
-Requirement already satisfied: requests<3.0,>=2.20.0 in /usr/local/lib/python3.9/site-packages (from pyNetBox) (2.25.1)
-Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.9/site-packages (from requests<3.0,>=2.20.0->pyNetBox) (2.10)
-Requirement already satisfied: chardet<5,>=3.0.2 in /usr/local/lib/python3.9/site-packages (from requests<3.0,>=2.20.0->pyNetBox) (4.0.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.9/site-packages (from requests<3.0,>=2.20.0->pyNetBox) (2020.12.5)
-Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/site-packages (from requests<3.0,>=2.20.0->pyNetBox) (1.26.3)
-Installing collected packages: pyNetBox
-Successfully installed pyNetBox-6.4.0
+# pip3 install pynetbox 
+Collecting pynetbox
+  Downloading pynetbox-7.3.3-py3-none-any.whl.metadata (3.6 kB)
+Requirement already satisfied: requests<3.0,>=2.20.0 in ./lib64/python3.11/site-packages (from pynetbox) (2.31.0)
+Collecting packaging<24.0 (from pynetbox)
+  Using cached packaging-23.2-py3-none-any.whl.metadata (3.2 kB)
+Requirement already satisfied: charset-normalizer<4,>=2 in ./lib64/python3.11/site-packages (from requests<3.0,>=2.20.0->pynetbox) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in ./lib64/python3.11/site-packages (from requests<3.0,>=2.20.0->pynetbox) (3.6)
+Requirement already satisfied: urllib3<3,>=1.21.1 in ./lib64/python3.11/site-packages (from requests<3.0,>=2.20.0->pynetbox) (2.1.0)
+Requirement already satisfied: certifi>=2017.4.17 in ./lib64/python3.11/site-packages (from requests<3.0,>=2.20.0->pynetbox) (2023.11.17)
+Downloading pynetbox-7.3.3-py3-none-any.whl (34 kB)
+Using cached packaging-23.2-py3-none-any.whl (53 kB)
+Installing collected packages: packaging, pynetbox
+  Attempting uninstall: packaging
+    Found existing installation: packaging 24.0
+    Uninstalling packaging-24.0:
+      Successfully uninstalled packaging-24.0
+Successfully installed packaging-23.2 pynetbox-7.3.3
 ```
 
 ### Testing the API connection
 Now the API connection can be tested by performing a simple lookup against NetBox. For the given purpose it is sufficient to use the `nb_lookup` plugin.
 
 ```
-% ansible -m debug \
-          -a "msg={{ query('NetBox.NetBox.nb_lookup', \
-                           'nameservers', \
-                           plugin='NetBox_dns', \
-                           api_endpoint='https://192.168.106.105/', \
-                           token='b02c088f58ccf5d24d7d46509809f4ef6958143c') }}" localhost
+# ansible -m debug -a "msg={{ query('netbox.netbox.nb_lookup', \
+                                    'nameservers', \
+                                    plugin='netbox_dns', \
+                                    api_endpoint='https://netbox.example.com/', \
+                                    token='f52d8887c576df4064139e4208cca481b95110f9') }}" localhost
 ```
 The return value confirms that the user and its permissions are set up correctly and the token can be used to authenticate against NetBox and access data from NetBox DNS.
 
@@ -76,24 +74,19 @@ The return value confirms that the user and its permissions are set up correctly
 localhost | SUCCESS => {
     "msg": [
         {
-            "key": 8,
+            "key": 1,
             "value": {
-                "created": "2021-12-16",
+                "created": "2024-03-28T20:12:34.175720Z",
+                "custom_fields": {},
+                "description": "",
                 "display": "ns1.example.com",
-                "id": 8,
-                "last_updated": "2021-12-16T14:39:52.603190Z",
+                "id": 1,
+                "last_updated": "2024-03-28T20:12:34.175735Z",
                 "name": "ns1.example.com",
-                "tags": [
-                    {
-                        "color": "f44336",
-                        "display": "PROD",
-                        "id": 1,
-                        "name": "PROD",
-                        "slug": "prod",
-                        "url": "http://192.168.106.105/api/extras/tags/1/"
-                    }
-                ],
-                "url": "http://192.168.106.105/api/plugins/NetBox-dns/nameservers/8/"
+                "tags": [],
+                "tenant": null,
+                "url": "https://netbox.example.com/api/plugins/netbox-dns/nameservers/1/",
+                "zones": []
             }
         }
     ]
@@ -133,46 +126,46 @@ A minimalistic playbook to create a zone from that template and the NetBox DNS d
           src: zone.db.j2
           dest: "{{ zone.name }}.db"
       vars:
-          zone: "{{ query('NetBox.NetBox.nb_lookup', 'zones', plugin='NetBox_dns',
-                           api_endpoint='https://192.168.106.105/',
-                           api_filter='name=example.com',
-                           token='b02c088f58ccf5d24d7d46509809f4ef6958143c') 
+          zone: "{{ query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
+                           api_endpoint='https://netbox.example.com/',
+                           api_filter='name=zone1.example.com',
+                           token='f52d8887c576df4064139e4208cca481b95110f9') 
                     | map(attribute='value') 
                     | first }}"
-          records: "{{ query('NetBox.NetBox.nb_lookup', 'records', plugin='NetBox_dns',
-                             api_endpoint='https://192.168.106.105/',
+          records: "{{ query('netbox.netbox.nb_lookup', 'records', plugin='netbox_dns',
+                             api_endpoint='https://netbox.example.com/',
                              api_filter='zone='+zone.name,
-                             token='b02c088f58ccf5d24d7d46509809f4ef6958143c') 
+                             token='f52d8887c576df4064139e4208cca481b95110f9') 
                        | map(attribute='value') }}"
 ```
 
 Running that playbook creates the zone file from the data in the NetBox DNS:
 
 ```
-% ./create_zonefile.yml
-
+# ./create-zonefile.yml 
 PLAY [Create a sample zone file] ************************************************************************************
+TASK [Gathering Facts] **********************************************************************************************
+ok: [localhost]
 
-TASK [Create the zone file for zone example.com] ********************************************************************
+TASK [Create the zone file for zone zone1.example.com] **************************************************************
 changed: [localhost]
 
 PLAY RECAP **********************************************************************************************************
-localhost                  : ok=1    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
 As a result, a very minimal but valid zone file is created:
 
 ```
 ;
-; Zone file for zone example.com
+; Zone file for zone zone1.example.com
 ;
 
 $TTL 86400
 
-@                                   86400    IN NS          ns1.example.com.
-@                                   86400    IN SOA         (ns1.example.com hostmaster.example.com 1639680053 172800 7200 2592000 3600)
-ns1                                 86400    IN A           10.0.0.1
-test                                86400    IN AAAA        fe80::dead:beef
+@                                            IN NS          ns1.example.com.
+@                                            IN NS          ns2.example.com.
+@                                   86400    IN SOA         ns1.example.com. hostmaster.example.com. 1712577231 172800 7200 2592000 3600
 ```
 
 #### Updating zone data
@@ -184,18 +177,25 @@ After running the playbook again, the resulting zone file now looks like this:
 
 ```
 ;
-; Zone file for zone example.com
+; Zone file for zone zone1.example.com
 ;
 
 $TTL 86400
 
-@                                   86400    IN NS          ns1.example.com.
-@                                   86400    IN SOA         (ns1.example.com hostmaster.example.com 1639684610 172800 7200 2592000 3600)
-ns1                                 86400    IN A           10.0.0.1
-test                                86400    IN AAAA        fe80::dead:beef
-test2                               86400    IN A           10.0.0.2
-test3                               86400    IN A           10.0.0.3
-test4                               86400    IN A           10.0.0.4
+@                                            IN NS          ns1.example.com.
+@                                            IN NS          ns2.example.com.
+@                                   86400    IN SOA         ns1.example.com. hostmaster.example.com. 1712577644 172800 7200 2592000 3600
+name01                                       IN A           10.0.0.1
+name02                                       IN A           10.0.0.2
+name03                                       IN A           10.0.0.3
+name04                                       IN A           10.0.0.4
+name05                                       IN A           10.0.0.5
+name1                                        IN A           10.0.0.1
+name2                                        IN A           10.0.0.2
+name3                                        IN A           10.0.0.3
+name4                                        IN A           10.0.0.4
+name5                                        IN A           10.0.0.5
+test1                                        IN CNAME       test1.zone1.example.com.
 ```
 
 The new records have been inserted and the zone SOA SERIAL is updated in the SOA record.

@@ -22,12 +22,7 @@ from utilities.querysets import RestrictedQuerySet
 from utilities.choices import ChoiceSet
 from ipam.models import IPAddress
 
-try:
-    # NetBox 3.5.0 - 3.5.7, 3.5.9+
-    from extras.plugins import get_plugin_config
-except ImportError:
-    # NetBox 3.5.8
-    from extras.plugins.utils import get_plugin_config
+from netbox.plugins.utils import get_plugin_config
 
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
@@ -48,7 +43,9 @@ import netbox_dns.models.record as record
 
 
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
-    """Special Manager for zones providing the activity status annotation"""
+    """
+    Custom manager for zones providing the activity status annotation
+    """
 
     def get_queryset(self):
         return (
@@ -455,7 +452,7 @@ class Zone(NetBoxModel):
         return ns_warnings, ns_errors
 
     def get_auto_serial(self):
-        records = record.Record.objects.filter(zone=self).exclude(
+        records = record.Record.objects.filter(zone_id=self.pk).exclude(
             type=record.RecordTypeChoices.SOA
         )
         if records:
@@ -603,7 +600,7 @@ class Zone(NetBoxModel):
             if self.arpa_network is not None:
                 raise ValidationError(
                     {
-                        "rfc2317_prefix": f"A regular reverse zone can not be used as an RFC2317 zone."
+                        "rfc2317_prefix": "A regular reverse zone can not be used as an RFC2317 zone."
                     }
                 )
 

@@ -1,4 +1,4 @@
-# Welcome to NetBox DNS Contribution Guide
+# Welcome to NetBox DNS Contribution Guidelines
 
 Thank you for investing your time in contributing to our project!
 
@@ -51,7 +51,7 @@ $ git remote add upstream https://github.com/peteeckel/netbox-plugin-dns.git
 ```
 
 * Install NetBox. Please see the [NetBox Installation Guide](https://github.com/netbox-community/netbox/blob/develop/docs/installation/index.md). The following steps assume that you followed that documentation and installed NetBox in `/opt/netbox` and the virtual environment in `/opt/netbox/venv`.
-* Activate the NetBox virtual environment (assuming your NetBox installation resides in `/opt/netbox`): 
+* Activate the NetBox virtual environment (assuming your NetBox installation resides in `/opt/netbox`):
 
 ```bash
 $ source /opt/netbox/venv/bin/activate

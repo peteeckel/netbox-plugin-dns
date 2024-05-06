@@ -14,7 +14,7 @@ from netbox_dns.models import (
 )
 
 
-class IPAMCouplingRecordTest(TestCase):
+class IPAMCouplingRecordTestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",
@@ -51,7 +51,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -76,7 +76,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
             },
@@ -102,7 +102,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 2147483648,
             },
@@ -119,7 +119,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": True,
@@ -153,7 +153,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -179,7 +179,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -196,7 +196,7 @@ class IPAMCouplingRecordTest(TestCase):
             address=address,
             status=IPAddressStatusChoices.STATUS_RESERVED,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -230,7 +230,7 @@ class IPAMCouplingRecordTest(TestCase):
             address=address,
             status=IPAddressStatusChoices.STATUS_RESERVED,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -256,18 +256,18 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
         address_record = ip_address.netbox_dns_records.first()
-        ptr_record_id = address_record.ptr_record.id
+        ptr_record_id = address_record.ptr_record.pk
 
         ip_address.delete()
 
-        self.assertFalse(IPAddress.objects.filter(id=ip_address.id).exists())
-        self.assertFalse(Record.objects.filter(id=address_record.id).exists())
-        self.assertFalse(Record.objects.filter(id=ptr_record_id).exists())
+        self.assertFalse(IPAddress.objects.filter(pk=ip_address.pk).exists())
+        self.assertFalse(Record.objects.filter(pk=address_record.pk).exists())
+        self.assertFalse(Record.objects.filter(pk=ptr_record_id).exists())
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {"feature_ipam_coupling": True}})
     def test_modify_name_cf(self):
@@ -279,13 +279,13 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name1,
             },
         )
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_zone_id": zone.pk,
             "ipaddress_dns_record_name": name2,
         }
         ip_address.save()
@@ -306,13 +306,13 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone1.id,
+                "ipaddress_dns_zone_id": zone1.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone2.id,
+            "ipaddress_dns_zone_id": zone2.pk,
             "ipaddress_dns_record_name": name,
         }
         ip_address.save()
@@ -332,14 +332,14 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
             },
         )
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_zone_id": zone.pk,
             "ipaddress_dns_record_name": name,
             "ipaddress_dns_record_ttl": 2342,
         }
@@ -361,19 +361,18 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
         self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_zone_id": zone.pk,
             "ipaddress_dns_record_name": None,
         }
         ip_address.save()
 
-        record_query = Record.objects.filter(ipam_ip_address=ip_address)
         self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
         self.assertFalse(
             Record.objects.filter(name=name, zone=zone, managed=True).exists()
@@ -398,7 +397,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -410,7 +409,6 @@ class IPAMCouplingRecordTest(TestCase):
         }
         ip_address.save()
 
-        record_query = Record.objects.filter(ipam_ip_address=ip_address)
         self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
         self.assertFalse(
             Record.objects.filter(name=name, zone=zone, managed=True).exists()
@@ -435,7 +433,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
@@ -444,7 +442,7 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_zone_id": zone.pk,
             "ipaddress_dns_record_name": name,
             "ipaddress_dns_record_ttl": None,
             "ipaddress_dns_record_disable_ptr": False,
@@ -459,7 +457,7 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertEqual(
             ip_address.custom_field_data,
             {
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,
@@ -476,7 +474,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -496,7 +494,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
             },
         )
@@ -505,7 +503,7 @@ class IPAMCouplingRecordTest(TestCase):
 
         ip_address.refresh_from_db()
         self.assertEqual(ip_address.netbox_dns_records.count(), 0)
-        self.assertEqual(ip_address.dns_name, f"")
+        self.assertEqual(ip_address.dns_name, "")
         self.assertEqual(
             ip_address.custom_field_data,
             {
@@ -525,7 +523,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": False,
@@ -537,7 +535,7 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertIsNotNone(record_query[0].ptr_record)
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_zone_id": zone.pk,
             "ipaddress_dns_record_name": name,
             "ipaddress_dns_record_ttl": None,
             "ipaddress_dns_record_disable_ptr": True,
@@ -555,7 +553,7 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertEqual(
             ip_address.custom_field_data,
             {
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": True,
@@ -571,7 +569,7 @@ class IPAMCouplingRecordTest(TestCase):
         ip_address = IPAddress.objects.create(
             address=address,
             custom_field_data={
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": 4223,
                 "ipaddress_dns_record_disable_ptr": True,
@@ -583,7 +581,7 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertIsNone(record_query[0].ptr_record)
 
         ip_address.custom_field_data = {
-            "ipaddress_dns_zone_id": zone.id,
+            "ipaddress_dns_zone_id": zone.pk,
             "ipaddress_dns_record_name": name,
             "ipaddress_dns_record_ttl": None,
             "ipaddress_dns_record_disable_ptr": False,
@@ -601,7 +599,7 @@ class IPAMCouplingRecordTest(TestCase):
         self.assertEqual(
             ip_address.custom_field_data,
             {
-                "ipaddress_dns_zone_id": zone.id,
+                "ipaddress_dns_zone_id": zone.pk,
                 "ipaddress_dns_record_name": name,
                 "ipaddress_dns_record_ttl": None,
                 "ipaddress_dns_record_disable_ptr": False,

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
 
 
-class RecordEnforceUniqueTest(TestCase):
+class RecordEnforceUniqueTestCase(TestCase):
     zone_data = {
         "default_ttl": 86400,
         "soa_rname": "hostmaster.example.com",
@@ -55,7 +55,7 @@ class RecordEnforceUniqueTest(TestCase):
         }
     )
     def test_duplicate_record_fail(self):
-        record = Record.objects.create(name="name1", zone=self.zone, **self.record_data)
+        Record.objects.create(name="name1", zone=self.zone, **self.record_data)
 
         with self.assertRaises(ValidationError):
             Record.objects.create(name="name1", zone=self.zone, **self.record_data)
