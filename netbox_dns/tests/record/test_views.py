@@ -27,61 +27,54 @@ class RecordViewTestCase(
 
     @classmethod
     def setUpTestData(cls):
-        ns1 = NameServer.objects.create(name="ns1.example.com")
-
         cls.zone_data = {
-            "default_ttl": 86400,
-            "soa_mname": ns1,
+            **Zone.get_defaults(),
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
             "soa_rname": "hostmaster.example.com",
-            "soa_serial": 2021110401,
-            "soa_refresh": 172800,
-            "soa_retry": 7200,
-            "soa_expire": 2592000,
-            "soa_ttl": 86400,
-            "soa_minimum": 3600,
             "soa_serial_auto": False,
         }
 
-        cls.views = (
+        views = (
             View(name="view1"),
             View(name="view2"),
         )
-        View.objects.bulk_create(cls.views)
+        View.objects.bulk_create(views)
 
-        cls.zones = (
-            Zone(name="zone1.example.com", **cls.zone_data, view=None),
-            Zone(name="zone2.example.com", **cls.zone_data, view=None),
-            Zone(name="zone1.example.com", **cls.zone_data, view=cls.views[0]),
-            Zone(name="zone2.example.com", **cls.zone_data, view=cls.views[0]),
-            Zone(name="zone1.example.com", **cls.zone_data, view=cls.views[1]),
-            Zone(name="zone2.example.com", **cls.zone_data, view=cls.views[1]),
+        default_view = View.get_default_view()
+        zones = (
+            Zone(name="zone1.example.com", **cls.zone_data, view=default_view),
+            Zone(name="zone2.example.com", **cls.zone_data, view=default_view),
+            Zone(name="zone1.example.com", **cls.zone_data, view=views[0]),
+            Zone(name="zone2.example.com", **cls.zone_data, view=views[0]),
+            Zone(name="zone1.example.com", **cls.zone_data, view=views[1]),
+            Zone(name="zone2.example.com", **cls.zone_data, view=views[1]),
         )
-        Zone.objects.bulk_create(cls.zones)
+        Zone.objects.bulk_create(zones)
 
         cls.records = (
             Record(
-                zone=cls.zones[0],
+                zone=zones[0],
                 type=RecordTypeChoices.CNAME,
                 name="name1",
                 value="test1.example.com",
                 ttl=100,
             ),
             Record(
-                zone=cls.zones[1],
+                zone=zones[1],
                 type=RecordTypeChoices.A,
                 name="name2",
                 value="192.168.1.1",
                 ttl=200,
             ),
             Record(
-                zone=cls.zones[0],
+                zone=zones[0],
                 type=RecordTypeChoices.AAAA,
                 name="name2",
                 value="fe80:dead:beef::42",
                 ttl=86400,
             ),
             Record(
-                zone=cls.zones[4],
+                zone=zones[4],
                 type=RecordTypeChoices.TXT,
                 name="@",
                 value="Test Text",
@@ -94,7 +87,7 @@ class RecordViewTestCase(
         tags = create_tags("Alpha", "Bravo", "Charlie")
 
         cls.form_data = {
-            "zone": cls.zones[0].pk,
+            "zone": zones[0].pk,
             "type": RecordTypeChoices.AAAA,
             "name": "name3",
             "value": "fe80::dead:beef",
@@ -104,7 +97,7 @@ class RecordViewTestCase(
         }
 
         cls.bulk_edit_data = {
-            "zone": cls.zones[1].pk,
+            "zone": zones[1].pk,
             "type": RecordTypeChoices.TXT,
             "value": "Test",
             "status": RecordStatusChoices.STATUS_INACTIVE,
@@ -131,8 +124,8 @@ class RecordViewTestCase(
 
         cls.csv_update_data = (
             "id,zone,type,value,ttl",
-            f"{cls.records[0].pk},{cls.zones[0].name},{RecordTypeChoices.A},10.0.1.1,86442",
-            f"{cls.records[1].pk},{cls.zones[1].name},{RecordTypeChoices.AAAA},fe80:dead:beef::23,86423",
+            f"{cls.records[0].pk},{zones[0].name},{RecordTypeChoices.A},10.0.1.1,86442",
+            f"{cls.records[1].pk},{zones[1].name},{RecordTypeChoices.AAAA},fe80:dead:beef::23,86423",
         )
 
     maxDiff = None

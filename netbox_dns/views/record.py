@@ -1,8 +1,5 @@
 from dns import name as dns_name
 
-from django.db.models import Q
-from django.db.models.functions import Length
-
 from netbox.views import generic
 
 from netbox_dns.filtersets import RecordFilterSet
@@ -41,15 +38,11 @@ class RecordView(generic.ObjectView):
     queryset = Record.objects.all().prefetch_related("zone", "ptr_record")
 
     def get_value_records(self, instance):
-        view_filter = (
-            Q(zone__view__isnull=True)
-            if instance.zone.view is None
-            else Q(zone__view=instance.zone.view)
-        )
-
         value_fqdn = dns_name.from_text(instance.value_fqdn)
 
-        cname_targets = Record.objects.filter(view_filter, fqdn=value_fqdn)
+        cname_targets = Record.objects.filter(
+            zone__view=instance.zone.view, fqdn=value_fqdn
+        )
 
         if cname_targets:
             return RelatedRecordTable(
@@ -59,14 +52,11 @@ class RecordView(generic.ObjectView):
         return None
 
     def get_cname_records(self, instance):
-        view_filter = (
-            Q(zone__view__isnull=True)
-            if instance.zone.view is None
-            else Q(zone__view=instance.zone.view)
-        )
         cname_records = set(
             Record.objects.filter(
-                view_filter, value=instance.fqdn, type=RecordTypeChoices.CNAME
+                zone__view=instance.zone.view,
+                value=instance.fqdn,
+                type=RecordTypeChoices.CNAME,
             )
         )
 
@@ -77,12 +67,14 @@ class RecordView(generic.ObjectView):
         ]
 
         parent_zones = Zone.objects.filter(
-            instance.zone.view_filter, name__in=parent_zone_names
+            view=instance.zone.view, name__in=parent_zone_names
         )
 
         for parent_zone in parent_zones:
             parent_cname_records = Record.objects.filter(
-                view_filter, type=RecordTypeChoices.CNAME, zone=parent_zone
+                zone__view=instance.zone.view,
+                type=RecordTypeChoices.CNAME,
+                zone=parent_zone,
             )
             cname_records = cname_records.union(
                 set(

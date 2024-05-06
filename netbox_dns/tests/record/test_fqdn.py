@@ -6,31 +6,19 @@ from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
 class RecordFQDNTestSet(TestCase):
     @classmethod
     def setUpTestData(cls):
-        nameserver = NameServer.objects.create(name="ns1.example.com")
-
         zone_data = {
-            "default_ttl": 86400,
-            "soa_mname": nameserver,
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
             "soa_rname": "hostmaster.example.com",
-            "soa_refresh": 172800,
-            "soa_retry": 7200,
-            "soa_expire": 2592000,
-            "soa_ttl": 86400,
-            "soa_minimum": 3600,
-            "soa_serial": 1,
-            "soa_serial_auto": False,
         }
 
-        cls.record_data = {
-            "type": RecordTypeChoices.AAAA,
-            "value": "fe80:dead:beef::",
-        }
+        cls.record_data = {"type": RecordTypeChoices.AAAA, "value": "fe80:dead:beef::"}
 
         cls.zones = (
             Zone(name="zone1.example.com", **zone_data),
             Zone(name="zone2.example.com", **zone_data),
         )
-        Zone.objects.bulk_create(cls.zones)
+        for zone in cls.zones:
+            zone.save()
 
     def test_fqdn(self):
         records = (

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 
@@ -5,21 +6,14 @@ from netbox_dns.models import NameServer, Zone
 
 
 class ZoneNameValidationTestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-        "soa_serial_auto": False,
-    }
+    zone_defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
+        cls.zone_data = {
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
+            "soa_rname": "hostmaster.example.com",
+        }
 
     def test_name_validation_ok(self):
         names = (
@@ -37,9 +31,7 @@ class ZoneNameValidationTestCase(TestCase):
         )
 
         for name in names:
-            zone = Zone.objects.create(
-                name=name, **self.zone_data, soa_mname=self.nameserver
-            )
+            zone = Zone.objects.create(name=name, **self.zone_data)
             self.assertEqual(zone.name, name.rstrip("."))
 
     def test_name_validation_failure(self):
@@ -64,26 +56,24 @@ class ZoneNameValidationTestCase(TestCase):
 
         for name in names:
             with self.assertRaises(ValidationError):
-                Zone.objects.create(
-                    name=name, **self.zone_data, soa_mname=self.nameserver
-                )
+                Zone.objects.create(name=name, **self.zone_data)
 
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
+                **zone_defaults,
                 "enable_root_zones": True,
             }
         }
     )
     def test_name_validation_ok_root_zone(self):
-        zone = Zone.objects.create(
-            name=".", **self.zone_data, soa_mname=self.nameserver
-        )
+        zone = Zone.objects.create(name=".", **self.zone_data)
         self.assertEqual(zone.name, ".")
 
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
+                **zone_defaults,
                 "tolerate_underscores_in_hostnames": True,
             }
         }
@@ -95,14 +85,13 @@ class ZoneNameValidationTestCase(TestCase):
         )
 
         for name in names:
-            zone = Zone.objects.create(
-                name=name, **self.zone_data, soa_mname=self.nameserver
-            )
+            zone = Zone.objects.create(name=name, **self.zone_data)
             self.assertEqual(zone.name, name.rstrip("."))
 
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
+                **zone_defaults,
                 "tolerate_underscores_in_hostnames": True,
             }
         }
@@ -121,6 +110,4 @@ class ZoneNameValidationTestCase(TestCase):
 
         for name in names:
             with self.assertRaises(ValidationError):
-                Zone.objects.create(
-                    name=name, **self.zone_data, soa_mname=self.nameserver
-                )
+                Zone.objects.create(name=name, **self.zone_data)

@@ -18,20 +18,6 @@ class ZoneViewTestCase(
 ):
     model = Zone
 
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_serial": 2021110401,
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial_auto": False,
-    }
-    zone_value_string = ",".join(str(value) for value in zone_data.values())
-    zone_key_string = ",".join(zone_data.keys())
-
     maxDiff = None
 
     @classmethod
@@ -43,7 +29,12 @@ class ZoneViewTestCase(
         )
         NameServer.objects.bulk_create(nameservers)
 
-        ns1 = nameservers[0]
+        zone_data = {
+            **Zone.get_defaults(),
+            "soa_mname": nameservers[0],
+            "soa_rname": "hostmaster.example.com",
+            "soa_serial_auto": False,
+        }
 
         views = (
             View(name="internal"),
@@ -51,20 +42,23 @@ class ZoneViewTestCase(
         )
         View.objects.bulk_create(views)
 
+        default_view = View.get_default_view()
         zones = (
-            Zone(name="zone1.example.com", **cls.zone_data, soa_mname=ns1),
-            Zone(name="zone2.example.com", **cls.zone_data, soa_mname=ns1),
-            Zone(name="zone3.example.com", **cls.zone_data, soa_mname=ns1),
+            Zone(name="zone1.example.com", **zone_data),
+            Zone(name="zone2.example.com", **zone_data),
+            Zone(name="zone3.example.com", **zone_data),
         )
-        Zone.objects.bulk_create(zones)
+        for zone in zones:
+            zone.save()
 
         tags = create_tags("Alpha", "Bravo", "Charlie")
 
         cls.form_data = {
             "name": "zone7.example.com",
             "status": ZoneStatusChoices.STATUS_PARKED,
-            **cls.zone_data,
-            "soa_mname": ns1.pk,
+            **zone_data,
+            "view": default_view.pk,
+            "soa_mname": nameservers[0].pk,
             "tags": [t.pk for t in tags],
         }
 

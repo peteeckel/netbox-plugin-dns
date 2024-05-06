@@ -39,6 +39,12 @@ class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"name": ["View 1", "View 2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
+    def test_default_view(self):
+        params = {"default_view": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"default_view": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
     def test_tenant(self):
         params = {"tenant_id": [self.tenants[0].pk, self.tenants[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)

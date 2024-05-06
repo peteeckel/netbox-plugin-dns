@@ -11,10 +11,9 @@ from django.urls import reverse
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
+from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 from utilities.choices import ChoiceSet
-
-from netbox.plugins.utils import get_plugin_config
 
 from netbox_dns.fields import AddressField
 from netbox_dns.utilities import (
@@ -234,8 +233,8 @@ class Record(NetBoxModel):
         if self.type != RecordTypeChoices.CNAME:
             return None
 
-        zone = dns_name.from_text(self.zone.name)
-        value_fqdn = dns_name.from_text(self.value, origin=zone)
+        _zone = dns_name.from_text(self.zone.name)
+        value_fqdn = dns_name.from_text(self.value, origin=_zone)
 
         return value_fqdn.to_text()
 
@@ -287,12 +286,14 @@ class Record(NetBoxModel):
                 dns_name.from_text(self.ptr_record.zone.rfc2317_parent_zone.name)
             )
 
+        return None
+
     @property
     def ptr_zone(self):
         if self.type == RecordTypeChoices.A:
             ptr_zone = (
                 zone.Zone.objects.filter(
-                    self.zone.view_filter,
+                    view=self.zone.view,
                     rfc2317_prefix__net_contains=self.value,
                 )
                 .order_by("rfc2317_prefix__net_mask_length")
@@ -304,7 +305,7 @@ class Record(NetBoxModel):
 
         ptr_zone = (
             zone.Zone.objects.filter(
-                self.zone.view_filter, arpa_network__net_contains=self.value
+                view=self.zone.view, arpa_network__net_contains=self.value
             )
             .order_by("arpa_network__net_mask_length")
             .last()
@@ -418,10 +419,8 @@ class Record(NetBoxModel):
                     self.rfc2317_cname_record.save(save_zone_serial=save_zone_serial)
 
                     return
-                else:
-                    self.remove_from_rfc2317_cname_record(
-                        save_zone_serial=save_zone_serial
-                    )
+
+                self.remove_from_rfc2317_cname_record(save_zone_serial=save_zone_serial)
 
             rfc2317_cname_record = Record.objects.filter(
                 name=cname_name,
@@ -462,14 +461,14 @@ class Record(NetBoxModel):
 
     def validate_name(self):
         try:
-            zone = dns_name.from_text(self.zone.name, origin=dns_name.root)
+            _zone = dns_name.from_text(self.zone.name, origin=dns_name.root)
             name = dns_name.from_text(self.name, origin=None)
-            fqdn = dns_name.from_text(self.name, origin=zone)
+            fqdn = dns_name.from_text(self.name, origin=_zone)
 
-            zone.to_unicode()
+            _zone.to_unicode()
             name.to_unicode()
 
-            self.name = name.relativize(zone).to_text()
+            self.name = name.relativize(_zone).to_text()
             self.fqdn = fqdn.to_text()
 
         except dns.exception.DNSException as exc:
@@ -479,7 +478,7 @@ class Record(NetBoxModel):
                 }
             )
 
-        if not fqdn.is_subdomain(zone):
+        if not fqdn.is_subdomain(_zone):
             raise ValidationError(
                 {
                     "name": f"{self.name} is not a name in {self.zone.name}",
@@ -487,7 +486,7 @@ class Record(NetBoxModel):
             )
 
         if self.type not in get_plugin_config(
-            "netbox_dns", "tolerate_non_rfc1035_types", default=list()
+            "netbox_dns", "tolerate_non_rfc1035_types", default=[]
         ):
             try:
                 validate_extended_hostname(
@@ -497,7 +496,7 @@ class Record(NetBoxModel):
                         in get_plugin_config(
                             "netbox_dns",
                             "tolerate_leading_underscore_types",
-                            default=list(),
+                            default=[],
                         )
                     ),
                 )
@@ -734,9 +733,9 @@ class Record(NetBoxModel):
 
         super().save(*args, **kwargs)
 
-        zone = self.zone
-        if self.type != RecordTypeChoices.SOA and zone.soa_serial_auto:
-            zone.update_serial(save_zone_serial=save_zone_serial)
+        _zone = self.zone
+        if self.type != RecordTypeChoices.SOA and _zone.soa_serial_auto:
+            _zone.update_serial(save_zone_serial=save_zone_serial)
 
     def delete(self, *args, save_zone_serial=True, **kwargs):
         if self.rfc2317_cname_record:
@@ -747,9 +746,9 @@ class Record(NetBoxModel):
 
         super().delete(*args, **kwargs)
 
-        zone = self.zone
-        if zone.soa_serial_auto:
-            zone.update_serial(save_zone_serial=save_zone_serial)
+        _zone = self.zone
+        if _zone.soa_serial_auto:
+            _zone.update_serial(save_zone_serial=save_zone_serial)
 
 
 @register_search

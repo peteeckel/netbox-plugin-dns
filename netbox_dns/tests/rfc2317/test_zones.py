@@ -7,19 +7,9 @@ from netbox_dns.models import NameServer, View, Zone
 class RFC2317ZoneTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
-
         cls.zone_data = {
-            "default_ttl": 86400,
-            "soa_mname": cls.nameserver,
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
             "soa_rname": "hostmaster.example.com",
-            "soa_refresh": 172800,
-            "soa_retry": 7200,
-            "soa_expire": 2592000,
-            "soa_ttl": 86400,
-            "soa_minimum": 3600,
-            "soa_serial": 1,
-            "soa_serial_auto": False,
         }
 
         cls.views = (

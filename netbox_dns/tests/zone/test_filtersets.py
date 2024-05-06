@@ -18,18 +18,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = Zone.objects.all()
     filterset = ZoneFilterSet
 
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-        "soa_serial_auto": False,
-    }
-
     @classmethod
     def setUpTestData(cls):
         cls.tenant_groups = (
@@ -80,19 +68,22 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 view=cls.views[0],
                 tenant=cls.tenants[0],
                 soa_mname=cls.nameservers[0],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=True,
                 registry_domain_id="acme-001-4242",
                 registrar=cls.registrars[0],
                 registrant=cls.contacts[0],
                 tech_c=cls.contacts[0],
                 admin_c=cls.contacts[0],
                 billing_c=cls.contacts[0],
-                **cls.zone_data,
             ),
             Zone(
                 name="zone2.example.com",
                 view=cls.views[0],
                 tenant=cls.tenants[1],
                 soa_mname=cls.nameservers[1],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=True,
                 status=ZoneStatusChoices.STATUS_DEPRECATED,
                 registry_domain_id="acme-001-2323",
                 registrar=cls.registrars[1],
@@ -100,108 +91,118 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
-                **cls.zone_data,
             ),
             Zone(
                 name="zone3.example.com",
                 view=cls.views[0],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=True,
                 registry_domain_id="acme-002-2323",
                 registrar=cls.registrars[1],
                 registrant=cls.contacts[1],
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
-                **cls.zone_data,
             ),
             Zone(
                 name="zone1.example.com",
                 view=cls.views[1],
                 tenant=cls.tenants[0],
                 soa_mname=cls.nameservers[0],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
                 registry_domain_id="acme-002-4242",
                 registrar=cls.registrars[1],
                 registrant=cls.contacts[1],
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
-                **cls.zone_data,
             ),
             Zone(
                 name="zone2.example.com",
                 view=cls.views[1],
                 tenant=cls.tenants[1],
                 soa_mname=cls.nameservers[1],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
                 registry_domain_id="acme-003-4223",
                 registrar=cls.registrars[2],
                 registrant=cls.contacts[2],
                 tech_c=cls.contacts[2],
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
-                **cls.zone_data,
             ),
             Zone(
                 name="zone3.example.com",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
                 registry_domain_id="acme-003-2342",
                 registrar=cls.registrars[0],
                 registrant=cls.contacts[2],
                 tech_c=cls.contacts[2],
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
-                **cls.zone_data,
             ),
             Zone(
                 name="0.0.10.in-addr.arpa",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=True,
             ),
             Zone(
                 name="1.0.10.in-addr.arpa",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=True,
             ),
             Zone(
                 name="0-31.0.0.10.in-addr.arpa",
                 view=cls.views[1],
                 soa_mname=cls.nameservers[2],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
                 rfc2317_prefix="10.0.0.0/27",
                 rfc2317_parent_managed=True,
-                **cls.zone_data,
             ),
             Zone(
                 name="32-63.0.0.10.in-addr.arpa",
                 soa_mname=cls.nameservers[2],
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
                 rfc2317_prefix="10.0.0.32/27",
-                **cls.zone_data,
             ),
             Zone(
                 name="0.10.in-addr.arpa",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
             ),
             Zone(
                 name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
             ),
             Zone(
                 name="2.4.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                **cls.zone_data,
+                soa_rname="hostmaster.example.com",
+                soa_serial_auto=False,
             ),
         )
         for zone in cls.zones:
@@ -284,6 +285,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"rfc2317_parent_zone_id": [self.zones[6].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
+    def test_rfc2317_parent_managed(self):
+        params = {"rfc2317_parent_managed": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 12)
+        params = {"rfc2317_parent_managed": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
     def test_registrar(self):
         params = {"registrar": [self.registrars[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
@@ -353,3 +360,9 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             "tenant_group": [self.tenant_groups[0].slug, self.tenant_groups[1].slug]
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_soa_serial_auto(self):
+        params = {"soa_serial_auto": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+        params = {"soa_serial_auto": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 8)

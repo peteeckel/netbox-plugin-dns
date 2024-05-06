@@ -18,6 +18,9 @@ class ViewViewTestCase(
 ):
     model = View
 
+    def _get_queryset(self):
+        return self.model.objects.filter(default_view=False)
+
     @classmethod
     def setUpTestData(cls):
         cls.views = [

@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 from math import ceil
 from dns import rdata
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 from netbox_dns.models import (
     NameServer,
@@ -29,19 +30,10 @@ def parse_soa_value(soa):
 
 
 class ZoneAutoSOASerialTestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-    }
-
     @classmethod
     def setUpTestData(cls):
+        cls.defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
+
         cls.start_time = int(time())
 
         cls.nameservers = (
@@ -49,29 +41,30 @@ class ZoneAutoSOASerialTestCase(TestCase):
             NameServer.objects.create(name="ns2.example.com"),
         )
 
+        cls.zone_data = {
+            "soa_mname": cls.nameservers[0],
+            "soa_rname": "hostmaster.example.com",
+        }
+
         cls.zones = (
             Zone(
                 name="zone1.example.com",
                 **cls.zone_data,
-                soa_mname=cls.nameservers[0],
                 soa_serial_auto=True,
             ),
             Zone(
                 name="zone2.example.com",
                 **cls.zone_data,
-                soa_mname=cls.nameservers[0],
                 soa_serial_auto=False,
             ),
             Zone(
                 name="1.0.10.in-addr.arpa",
                 **cls.zone_data,
-                soa_mname=cls.nameservers[0],
                 soa_serial_auto=True,
             ),
             Zone(
                 name="2.0.10.in-addr.arpa",
                 **cls.zone_data,
-                soa_mname=cls.nameservers[0],
                 soa_serial_auto=False,
             ),
         )
@@ -122,6 +115,16 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(zone.soa_serial) >= self.start_time)
 
     def test_missing_soa_serial(self):
+        zone = self.zones[0]
+        zone.soa_serial = None
+        zone.soa_serial_auto = False
+
+        zone.save()
+
+        self.assertEqual(zone.soa_serial, self.defaults.get("zone_soa_serial"))
+
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {}})
+    def test_missing_soa_serial_no_default(self):
         zone = self.zones[0]
         zone.soa_serial = None
         zone.soa_serial_auto = False
@@ -390,7 +393,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-31.1.0.10.in-addr.arpa",
             **self.zone_data,
-            soa_mname=self.nameservers[0],
             soa_serial_auto=True,
             rfc2317_prefix="10.0.1.0/26",
             rfc2317_parent_managed=True,
@@ -440,7 +442,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-31.1.0.10.in-addr.arpa",
             **self.zone_data,
-            soa_mname=self.nameservers[0],
             soa_serial_auto=True,
             rfc2317_prefix="10.0.1.0/26",
             rfc2317_parent_managed=False,
@@ -490,7 +491,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-31.1.0.10.in-addr.arpa",
             **self.zone_data,
-            soa_mname=self.nameservers[0],
             soa_serial_auto=True,
             rfc2317_prefix="10.0.1.0/26",
             rfc2317_parent_managed=False,
@@ -543,7 +543,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-31.1.0.10.in-addr.arpa",
             **self.zone_data,
-            soa_mname=self.nameservers[0],
             soa_serial_auto=True,
             rfc2317_prefix="10.0.1.0/26",
             rfc2317_parent_managed=True,
@@ -596,7 +595,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-31.1.0.10.in-addr.arpa",
             **self.zone_data,
-            soa_mname=self.nameservers[0],
             soa_serial_auto=True,
             rfc2317_prefix="10.0.1.0/26",
             rfc2317_parent_managed=False,

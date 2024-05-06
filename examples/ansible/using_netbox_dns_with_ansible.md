@@ -1,12 +1,12 @@
 # Using NetBox DNS with Ansible
-NetBox DNS aims to offer an easy to use and comfortable way of managing DNS data within NetBox. This document gives a brief introduction of how the data from NetBox DNS can be used to actually populate DNS servers with configuration and zones. This is not meant to be an exhaustive documentation of a DNS provisioning system ready for production, more to give an idea what can be done with NetBox DNS and the NetBox API.
+NetBox DNS has been designed to provide an intuitive and user-friendly solution for managing DNS data within NetBox. This document provides an overview of how NetBox DNS data can be used to populate DNS servers with configuration and zones. It is not intended to be a comprehensive guide to a DNS provisioning system suitable for production, but rather to illustrate the capabilities of NetBox DNS and the NetBox API.
 
 This example uses Ansible and the `NetBox.NetBox` collection from Ansible Galaxy to show how a very simple integration can be implemented.
 
 ## Preparing NetBox
-In order to use the NetBox API, a user account with an authentication token needs to be created. For the given purpose, a read-only user with access to the NetBox DNS data is sufficient.
+In order to utilise the NetBox API, a user account with an authentication token must be created. For the specified purpose, a read-only user with access to the NetBox DNS data is sufficient.
 
-Using the NetBox Admin interface, a new user named 'ansible' is created. The password is irrelevant and should be sufficiently secure - any random password of reasonable length will do.
+A new user, named 'ansible', is created using the NetBox Admin interface. The password is not required and should be sufficiently secure. Any random password of a reasonable length will suffice.
 
 ![Admin Create User](images/AdminCreateUser.png)
 
@@ -14,12 +14,12 @@ In the next step, a permission to view all NetBox DNS data must be created and a
 
 ![Admin Create Permission](images/AdminCreatePermission.png)
 
-After sending that form, the new 'ansible' user can view all DNS data within NetBox. The last step is to assign that user an API authentication token. This can be done using the GAPI Token' navigation menu item by clicking on 'Add Token', selecting the 'ansible' user and unchecking 'Write enabled'. The token is shown immediately in that view.
+Once the form has been submitted, the new 'ansible' user will be able to view all DNS data within NetBox. The final step is to assign that user an API authentication token. This can be done by selecting the 'API Token' navigation menu item and clicking on 'Add Token'. Select the 'ansible' user and uncheck 'Write enabled'. The token will be displayed immediately in that view.
 
 ![Admin Create Token](images/AdminCreateToken.png)
 
 ## Preparing Ansible
-For the `netbox.netbox` collection to work, a recent version of Ansible running under Python 3 is required. Python 2 is not supported anymore and the NetBox collection is known not to work properly with Python 2.
+For the `netbox.netbox` collection to function correctly, a recent version of Ansible running under Python 3 is required. Python 2 is no longer supported and the NetBox collection is known not to work properly with Python 2.
 
 ### Installing the `netbox.netbox` collection for Ansible
 Installing the collection is straightforward.
@@ -38,7 +38,7 @@ netbox.netbox:3.17.0 was installed successfully
 The `netbox.netbox` collection requires the `pynetbox` module to be installed.
 
 ```
-# pip3 install pynetbox 
+# pip3 install pynetbox
 Collecting pynetbox
   Downloading pynetbox-7.3.3-py3-none-any.whl.metadata (3.6 kB)
 Requirement already satisfied: requests<3.0,>=2.20.0 in ./lib64/python3.11/site-packages (from pynetbox) (2.31.0)
@@ -68,7 +68,7 @@ Now the API connection can be tested by performing a simple lookup against NetBo
                                     api_endpoint='https://netbox.example.com/', \
                                     token='f52d8887c576df4064139e4208cca481b95110f9') }}" localhost
 ```
-The return value confirms that the user and its permissions are set up correctly and the token can be used to authenticate against NetBox and access data from NetBox DNS.
+The return value confirms that the user and its permissions have been correctly set up and that the token can be used to authenticate against NetBox and access data from NetBox DNS.
 
 ```
 localhost | SUCCESS => {
@@ -94,7 +94,7 @@ localhost | SUCCESS => {
 ```
 
 ### Generating a zone file from NetBox DNS data
-In the last step of this example, NetBox DNS data is used to create a zone file for e.g. a BIND nameserver.
+In the final step of this example, NetBox DNS data is used to create a zone file for e.g. a BIND nameserver.
 
 #### Zone file template
 A simple Jinja2 template to create a zone file is stored as `zone.db.j2`:
@@ -129,20 +129,20 @@ A minimalistic playbook to create a zone from that template and the NetBox DNS d
           zone: "{{ query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
                            api_endpoint='https://netbox.example.com/',
                            api_filter='name=zone1.example.com',
-                           token='f52d8887c576df4064139e4208cca481b95110f9') 
-                    | map(attribute='value') 
+                           token='f52d8887c576df4064139e4208cca481b95110f9')
+                    | map(attribute='value')
                     | first }}"
           records: "{{ query('netbox.netbox.nb_lookup', 'records', plugin='netbox_dns',
                              api_endpoint='https://netbox.example.com/',
                              api_filter='zone='+zone.name,
-                             token='f52d8887c576df4064139e4208cca481b95110f9') 
+                             token='f52d8887c576df4064139e4208cca481b95110f9')
                        | map(attribute='value') }}"
 ```
 
 Running that playbook creates the zone file from the data in the NetBox DNS:
 
 ```
-# ./create-zonefile.yml 
+# ./create-zonefile.yml
 PLAY [Create a sample zone file] ************************************************************************************
 TASK [Gathering Facts] **********************************************************************************************
 ok: [localhost]
@@ -151,7 +151,7 @@ TASK [Create the zone file for zone zone1.example.com] *************************
 changed: [localhost]
 
 PLAY RECAP **********************************************************************************************************
-localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 As a result, a very minimal but valid zone file is created:

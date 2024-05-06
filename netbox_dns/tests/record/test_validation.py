@@ -5,37 +5,23 @@ from netbox_dns.models import Zone, Record, RecordTypeChoices, NameServer
 
 
 class RecordValidationTestCase(TestCase):
-    zone_data = {
-        "default_ttl": 86400,
-        "soa_rname": "hostmaster.example.com",
-        "soa_refresh": 172800,
-        "soa_retry": 7200,
-        "soa_expire": 2592000,
-        "soa_ttl": 86400,
-        "soa_minimum": 3600,
-        "soa_serial": 1,
-    }
-
-    record_data = {
-        "ttl": 86400,
-    }
-
     @classmethod
     def setUpTestData(cls):
-        cls.nameserver = NameServer.objects.create(name="ns1.example.com")
+        zone_data = {
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
+            "soa_rname": "hostmaster.example.com",
+        }
+
         cls.zones = [
-            Zone(name="zone1.example.com", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(name="1.0.10.in-addr.arpa", **cls.zone_data, soa_mname=cls.nameserver),
-            Zone(
-                name="1.0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa",
-                **cls.zone_data,
-                soa_mname=cls.nameserver,
-            ),
+            Zone(name="zone1.example.com", **zone_data),
+            Zone(name="1.0.10.in-addr.arpa", **zone_data),
+            Zone(name="1.0.0.0.f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **zone_data),
         ]
-        Zone.objects.bulk_create(cls.zones)
+        for zone in cls.zones:
+            zone.save()
 
     def test_create_record_validation_ok(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         ok_records = [
             {"name": "test1", "type": RecordTypeChoices.A, "value": "10.0.1.42"},
@@ -69,15 +55,10 @@ class RecordValidationTestCase(TestCase):
         ]
 
         for record in ok_records:
-            f_record = Record(
-                zone=f_zone,
-                **record,
-                **self.record_data,
-            )
-            f_record.save()
+            Record.objects.create(zone=zone, **record)
 
     def test_create_record_validation_fail(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         broken_records = [
             {"name": "test1", "type": RecordTypeChoices.A, "value": "1.1.1.1.1"},
@@ -162,303 +143,233 @@ class RecordValidationTestCase(TestCase):
         ]
 
         for record in broken_records:
-            f_record = Record(
-                zone=f_zone,
-                **record,
-                **self.record_data,
-            )
-
             with self.assertRaises(ValidationError):
-                f_record.save()
+                Record.objects.create(zone=zone, **record)
 
     def test_name_and_cname(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
-        )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
-            name=name1,
-            type=RecordTypeChoices.CNAME,
-            value=name2,
-            **self.record_data,
         )
 
         with self.assertRaises(ValidationError):
-            f_record2.save()
+            Record.objects.create(
+                zone=zone,
+                name=name1,
+                type=RecordTypeChoices.CNAME,
+                value=name2,
+            )
 
     def test_nsec_and_cname(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.NSEC,
             value="test2.zone1.example.com. A MX RRSIG NSEC",
-            **self.record_data,
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            **self.record_data,
         )
-        f_record2.save()
 
-        self.assertEqual(Record.objects.filter(name=name1, zone=f_zone).count(), 2)
+        self.assertEqual(Record.objects.filter(name=name1, zone=zone).count(), 2)
 
     def test_cname_and_name(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
-            zone=f_zone,
-            name=name1,
-            type=RecordTypeChoices.CNAME,
-            value=name2,
-            **self.record_data,
-        )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
-            name=name1,
-            type=RecordTypeChoices.AAAA,
-            value=address,
-            **self.record_data,
+        Record.objects.create(
+            zone=zone, name=name1, type=RecordTypeChoices.CNAME, value=name2
         )
 
         with self.assertRaises(ValidationError):
-            f_record2.save()
+            Record.objects.create(
+                zone=zone, name=name1, type=RecordTypeChoices.AAAA, value=address
+            )
 
     def test_cname_and_nsec(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
 
-        f_record1 = Record(
-            zone=f_zone,
-            name=name1,
-            type=RecordTypeChoices.CNAME,
-            value=name2,
-            **self.record_data,
+        Record.objects.create(
+            zone=zone, name=name1, type=RecordTypeChoices.CNAME, value=name2
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.NSEC,
             value="test2.zone1.example.com. A MX RRSIG NSEC",
-            **self.record_data,
         )
-        f_record2.save()
 
-        self.assertEqual(Record.objects.filter(name=name1, zone=f_zone).count(), 2)
+        self.assertEqual(Record.objects.filter(name=name1, zone=zone).count(), 2)
 
     def test_double_singletons(self):
-        f_zone = self.zones[1]
+        zone = self.zones[1]
 
         name1 = "test1"
         name2 = "test2"
         name3 = "test3"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name2,
-            **self.record_data,
-        )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
-            name=name1,
-            type=RecordTypeChoices.DNAME,
-            value=name3,
-            **self.record_data,
         )
 
         with self.assertRaises(ValidationError):
-            f_record2.save()
+            Record.objects.create(
+                zone=zone,
+                name=name1,
+                type=RecordTypeChoices.DNAME,
+                value=name3,
+            )
 
     def test_inactive_name_and_active_cname(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
             status="inactive",
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            **self.record_data,
         )
-        f_record2.save()
 
     def test_inactive_cname_and_active_name(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            **self.record_data,
             status="inactive",
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record2.save()
 
     def test_double_singletons_inactive_active(self):
-        f_zone = self.zones[1]
+        zone = self.zones[1]
 
         name1 = "test1"
         name2 = "test2"
         name3 = "test3"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name2,
-            **self.record_data,
             status="inactive",
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name3,
-            **self.record_data,
         )
-        f_record2.save()
 
     def test_active_name_and_inactive_cname(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            **self.record_data,
             status="inactive",
         )
-        f_record2.save()
 
     def test_active_cname_and_inactive_name(self):
-        f_zone = self.zones[0]
+        zone = self.zones[0]
 
         name1 = "test1"
         name2 = "test2"
         address = "fe80:dead:beef:1::42"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            **self.record_data,
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            **self.record_data,
             status="inactive",
         )
-        f_record2.save()
 
     def test_double_singletons_active_inactive(self):
-        f_zone = self.zones[1]
+        zone = self.zones[1]
 
         name1 = "test1"
         name2 = "test2"
         name3 = "test3"
 
-        f_record1 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name2,
-            **self.record_data,
         )
-        f_record1.save()
-
-        f_record2 = Record(
-            zone=f_zone,
+        Record.objects.create(
+            zone=zone,
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name3,
-            **self.record_data,
             status="inactive",
         )
-        f_record2.save()
 
     def test_lowercase_type(self):
         f_zone1 = self.zones[0]
@@ -495,11 +406,7 @@ class RecordValidationTestCase(TestCase):
         ]
 
         for record in records:
-            f_record = Record(
-                **record,
-                **self.record_data,
-            )
-            f_record.save()
+            Record.objects.create(**record)
 
             test_record = Record.objects.get(zone=record["zone"], name=record["name"])
             self.assertEqual(test_record.type, record["type"].upper())

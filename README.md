@@ -1,5 +1,5 @@
 # NetBox DNS
-The NetBox DNS plugin enables NetBox to manage operational DNS data such as name servers, zones, records and views, as well as registration data for domains. It can automate tasks like creating PTR records, generating zone serial numbers, NS and SOA records, as well as validate names and values values for resource records to ensure zone data is consistent, current and conforming to the relevant RFCs.
+The NetBox DNS plugin enables NetBox to manage operational DNS data such as name servers, zones, records and views, as well as registration data for domains. It can automate tasks like creating PTR records, generating zone serial numbers, NS and SOA records, as well as validate names and values values for resource records to ensure zone data is consistent, up-to-date and compliant with to the relevant RFCs.
 
 <div align="center">
 <a href="https://pypi.org/project/netbox-plugin-dns/"><img src="https://img.shields.io/pypi/v/netbox-plugin-dns" alt="PyPi"/></a>
@@ -17,25 +17,25 @@ The NetBox DNS plugin enables NetBox to manage operational DNS data such as name
 ## Objectives
 NetBox DNS is designed to be the 'DNS Source of Truth' analogous to NetBox being the 'Network Source of Truth'.
 
-The plugin holds information about DNS name servers, DNS Views and Zones, and DNS Records, making it a data source for automatically provisioning DNS instances. Registrarion information about DNS registrars and contacts for DNS domains can also be stored and associated with zones.
+The plugin stores information about DNS name servers, DNS views and zones, and DNS records, making it a data source for automatic provisioning of DNS instances. Registration information about DNS registrars and contacts for DNS domains can also be stored and associated with zones.
 
-The main focus of the plugin is to ensure the quality of data stored in it. To achieve this, many validation and automation mechanisms are in place:
+The main focus of the plugin is to ensure the quality of the data stored in it. To achieve this, there are many validation and automation mechanisms in place:
 
 * Validation of record names and values
 * Automatic maintenance of PTR records for IPv6 and IPv4 address records
 * Automatic generation of SOA records, optionally including the serial number of the zone data
 * Validation of record types such as CNAME and singletons, to ensure DNS zone validity
-* [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) support for delegation of PTR zones for IPv4 subnets longer than 24 bits
+* Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
 
-Other main features are:
+Other main features include:
 
 * Support for BIND views, providing lightweight namespaces for zones
-* Support for IDN, inclucing the validation of punycode names
-* Fully supported NetBox REST and GraphQL API
-* Support for all major NetBox features like Global Search, Tenancy, Change Logs, Tagging, Journaling etc.
+* Support for IDN, including the validation of punycode names
+* Full support for the NetBox REST and GraphQL APIs
+* Support for all major NetBox features such as global search, tenancy, change logs, tagging, journaling etc.
 
-## Non-Objectives
-In the same way in which NetBox is not a network management application, NetBox DNS does not provide functionality to manage specific name servers or DNS service providers or generate input like configuration and zone files for them. The focus is on the completeness and integrity of the data needed to run DNS zones, not on the peculiarities of a plethora of servers and services actually using the data. This functionality is left to specialized integration tools, or in many cases it can be easily implemented using Ansible or similar tools based on NetBox DNS data. Example code for some simple use cases is provided.
+## Non-objectives
+In the same way as NetBox is not a network management application, NetBox DNS does not provide any functionality to manage specific name servers or DNS service providers or to generate input such as configuration and zone files for them. The focus is on the completeness and integrity of the data needed to run DNS zones, not on the peculiarities of a plethora of servers and services that actually use the data. This functionality is left to specialized integration tools, or in many cases it can be easily implemented using Ansible or similar tools based on NetBox DNS data. Example code for some simple use cases is provided.
 
 For integration with a large number of DNS server implementations integration tools like [octodns-netbox-dns](https://pypi.org/project/octodns-netbox-dns/) are available.
 

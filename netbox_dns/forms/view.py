@@ -20,24 +20,27 @@ from netbox_dns.models import View
 
 class ViewForm(TenancyForm, NetBoxModelForm):
     fieldsets = (
-        FieldSet("name", "description", "tags", name="View"),
+        FieldSet("name", "default_view", "description", "tags", name="View"),
         FieldSet("tenant_group", "tenant", name="Tenancy"),
     )
 
     class Meta:
         model = View
-        fields = ("name", "description", "tags", "tenant")
+        fields = ("name", "default_view", "description", "tags", "tenant")
 
 
 class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = View
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "description", name="Attributes"),
+        FieldSet("name", "default_view", "description", name="Attributes"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
     name = forms.CharField(
+        required=False,
+    )
+    default_view = forms.NullBooleanField(
         required=False,
     )
     description = forms.CharField(
