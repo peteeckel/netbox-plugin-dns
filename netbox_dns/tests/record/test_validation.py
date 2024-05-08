@@ -410,3 +410,222 @@ class RecordValidationTestCase(TestCase):
 
             test_record = Record.objects.get(zone=record["zone"], name=record["name"])
             self.assertEqual(test_record.type, record["type"].upper())
+
+    def test_valid_name_in_value(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[2]
+
+        records = (
+            Record(
+                name="name1",
+                zone=f_zone,
+                type=RecordTypeChoices.CNAME,
+                value="name2.zone1.example.com.",
+            ),
+            Record(
+                name="name2", zone=f_zone, type=RecordTypeChoices.CNAME, value="name2"
+            ),
+            Record(
+                name="name3",
+                zone=f_zone,
+                type=RecordTypeChoices.DNAME,
+                value="zone2.example.com.",
+            ),
+            Record(
+                name="name4",
+                zone=f_zone,
+                type=RecordTypeChoices.HTTPS,
+                value="0 www.example.com.",
+            ),
+            Record(
+                name="name5",
+                zone=f_zone,
+                type=RecordTypeChoices.KX,
+                value="10 name1.example.com.",
+            ),
+            Record(
+                name="name6",
+                zone=f_zone,
+                type=RecordTypeChoices.MX,
+                value="10 mx1.example.com.",
+            ),
+            Record(
+                name="name7",
+                zone=f_zone,
+                type=RecordTypeChoices.NS,
+                value="ns1.example.com.",
+            ),
+            Record(
+                name="name8",
+                zone=f_zone,
+                type=RecordTypeChoices.NAPTR,
+                value='100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.example.com.',
+            ),
+            Record(
+                name="67894444333322220000",
+                zone=f_zone,
+                type=RecordTypeChoices.NSAP_PTR,
+                value="name1.example.com.",
+            ),
+            Record(
+                name="name10",
+                zone=f_zone,
+                type=RecordTypeChoices.NSEC,
+                value="name11.zone_1.example.com.",
+            ),
+            Record(
+                name="1",
+                zone=r_zone,
+                type=RecordTypeChoices.PTR,
+                value="name11.example.com.",
+            ),
+            Record(
+                name="name12",
+                zone=f_zone,
+                type=RecordTypeChoices.RP,
+                value="admin.zone1.example.com. info.zone1.example.com.",
+            ),
+            Record(
+                name="name13",
+                zone=f_zone,
+                type=RecordTypeChoices.RT,
+                value="10 name99.zone1.example.com.",
+            ),
+            Record(
+                name="name14",
+                zone=f_zone,
+                type=RecordTypeChoices.PX,
+                value="10 name10.zone1.example.com. name_11.zone1.example.com.",
+            ),
+            Record(
+                name="name15",
+                zone=f_zone,
+                type=RecordTypeChoices.SRV,
+                value="10 60 443 name2.zone1.example.com.",
+            ),
+            Record(
+                name="name16",
+                zone=f_zone,
+                type=RecordTypeChoices.SVCB,
+                value="1 svc.example.com.",
+            ),
+        )
+
+        for record in records:
+            record.save()
+
+    def test_invalid_name_in_value(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[2]
+
+        records = (
+            Record(
+                name="name1",
+                zone=f_zone,
+                type=RecordTypeChoices.CNAME,
+                value="xn--bb.zone1.example.com.",
+            ),
+            Record(
+                name="name2", zone=f_zone, type=RecordTypeChoices.CNAME, value="aa--bb"
+            ),
+            Record(
+                name="name3",
+                zone=f_zone,
+                type=RecordTypeChoices.DNAME,
+                value="f#ck&&%%.example.com.",
+            ),
+            Record(
+                name="name4",
+                zone=f_zone,
+                type=RecordTypeChoices.HTTPS,
+                value="0 [].example.com.",
+            ),
+            Record(
+                name="name5",
+                zone=f_zone,
+                type=RecordTypeChoices.KX,
+                value="10 xn--bb.example.com.",
+            ),
+            Record(
+                name="name6",
+                zone=f_zone,
+                type=RecordTypeChoices.MX,
+                value="10 bla*.example.com.",
+            ),
+            Record(
+                name="name7",
+                zone=f_zone,
+                type=RecordTypeChoices.NS,
+                value="[#^$[¨}!;--_?:.@/\ˇ´%].example.com.",
+            ),
+            Record(
+                name="name8",
+                zone=f_zone,
+                type=RecordTypeChoices.NAPTR,
+                value='100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.xn--bb.com.',
+            ),
+            Record(
+                name="67894444333322220000",
+                zone=f_zone,
+                type=RecordTypeChoices.NSAP_PTR,
+                value="name1.xn--bb.com.",
+            ),
+            Record(
+                name="name10",
+                zone=f_zone,
+                type=RecordTypeChoices.NSEC,
+                value="name11.[#^$[¨}!;--_?:.@/\ˇ´%].example.com.",
+            ),
+            Record(
+                name="1",
+                zone=r_zone,
+                type=RecordTypeChoices.PTR,
+                value="name11.[#^$[¨}!;--_?:.@/\ˇ´%].com.",
+            ),
+            Record(
+                name="name12",
+                zone=f_zone,
+                type=RecordTypeChoices.RP,
+                value="admin.aa--bb.example.com. info.zone1.example.com.",
+            ),
+            Record(
+                name="name13",
+                zone=f_zone,
+                type=RecordTypeChoices.RP,
+                value="admin.example.com. xn--bb.zone1.example.com.",
+            ),
+            Record(
+                name="name14",
+                zone=f_zone,
+                type=RecordTypeChoices.RT,
+                value="10 name99.[#^$[¨}!;--_?:.@/\ˇ´%].example.com.",
+            ),
+            Record(
+                name="name15",
+                zone=f_zone,
+                type=RecordTypeChoices.PX,
+                value="10 name10.zo--ne1.example.com. name11.zone1.example.com.",
+            ),
+            Record(
+                name="name16",
+                zone=f_zone,
+                type=RecordTypeChoices.PX,
+                value="10 name10.zone1.example.com. na--me11.zone1.example.com.",
+            ),
+            Record(
+                name="name17",
+                zone=f_zone,
+                type=RecordTypeChoices.SRV,
+                value="10 60 443 [#^$[¨}!;--_?:.@/\ˇ´%].zone1.example.com.",
+            ),
+            Record(
+                name="name18",
+                zone=f_zone,
+                type=RecordTypeChoices.SVCB,
+                value="1 svc.[#^$[¨}!;--_?:.@/\ˇ´%].com.",
+            ),
+        )
+
+        for record in records:
+            with self.assertRaises(ValidationError):
+                record.save()

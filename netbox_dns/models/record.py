@@ -23,6 +23,7 @@ from netbox_dns.utilities import (
 from netbox_dns.validators import (
     validate_fqdn,
     validate_extended_hostname,
+    validate_domain_name,
 )
 
 # +
@@ -320,7 +321,7 @@ class Record(NetBoxModel):
             ptr_zone is None
             or self.disable_ptr
             or not self.is_active
-            or self.name == "*"
+            or self.name.startswith("*")
         ):
             if self.ptr_record is not None:
                 with transaction.atomic():
@@ -508,24 +509,68 @@ class Record(NetBoxModel):
                 ) from None
 
     def validate_value(self):
-        if self.type in (RecordTypeChoices.PTR):
+        def _validate_idn(name):
             try:
-                validate_fqdn(self.value)
-            except ValidationError as exc:
+                name.to_unicode()
+            except dns_name.IDNAException as exc:
                 raise ValidationError(
-                    {
-                        "value": exc,
-                    }
+                    f"{name.to_text()} is not a valid IDN: {exc}."
                 ) from None
 
         try:
-            rdata.from_text(RecordClassChoices.IN, self.type, self.value)
+            rr = rdata.from_text(RecordClassChoices.IN, self.type, self.value)
         except dns.exception.SyntaxError as exc:
             raise ValidationError(
                 {
                     "value": f"Record value {self.value} is not a valid value for a {self.type} record: {exc}."
                 }
             ) from None
+
+        try:
+            match self.type:
+                case (
+                    RecordTypeChoices.CNAME
+                    | RecordTypeChoices.DNAME
+                    | RecordTypeChoices.NS
+                    | RecordTypeChoices.HTTPS
+                    | RecordTypeChoices.SRV
+                    | RecordTypeChoices.SVCB
+                ):
+                    _validate_idn(rr.target)
+                    validate_domain_name(rr.target.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.PTR | RecordTypeChoices.NSAP_PTR:
+                    _validate_idn(rr.target)
+                    validate_fqdn(rr.target.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.MX | RecordTypeChoices.RT | RecordTypeChoices.KX:
+                    _validate_idn(rr.exchange)
+                    validate_domain_name(rr.exchange.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.NSEC:
+                    _validate_idn(rr.next)
+                    validate_domain_name(rr.next.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.RP:
+                    _validate_idn(rr.mbox)
+                    validate_domain_name(rr.mbox.to_text(), always_tolerant=True)
+                    _validate_idn(rr.txt)
+                    validate_domain_name(rr.txt.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.NAPTR:
+                    _validate_idn(rr.replacement)
+                    validate_extended_hostname(
+                        rr.replacement.to_text(), always_tolerant=True
+                    )
+
+                case RecordTypeChoices.PX:
+                    _validate_idn(rr.map822)
+                    validate_domain_name(rr.map822.to_text(), always_tolerant=True)
+                    _validate_idn(rr.mapx400)
+                    validate_domain_name(rr.mapx400.to_text(), always_tolerant=True)
+
+        except ValidationError as exc:
+            raise ValidationError({"value": exc}) from None
 
     def check_unique_record(self):
         if not get_plugin_config("netbox_dns", "enforce_unique_records", False):
