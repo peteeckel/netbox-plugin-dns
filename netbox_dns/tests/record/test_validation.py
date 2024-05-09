@@ -52,6 +52,7 @@ class RecordValidationTestCase(TestCase):
                 "value": "1 issue example.org",
             },
             {"name": "test9", "type": RecordTypeChoices.CNAME, "value": "test1"},
+            {"name": "test10", "type": RecordTypeChoices.CNAME, "value": "@"},
         ]
 
         for record in ok_records:
@@ -140,6 +141,7 @@ class RecordValidationTestCase(TestCase):
                 "type": RecordTypeChoices.CNAME,
                 "value": "test1 claptrap",
             },
+            {"name": "test10", "type": RecordTypeChoices.CNAME, "value": "@.sub"},
         ]
 
         for record in broken_records:

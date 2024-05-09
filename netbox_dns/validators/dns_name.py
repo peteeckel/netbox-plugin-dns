@@ -45,7 +45,10 @@ def validate_extended_hostname(
         raise ValidationError(f"{name} is not a valid DNS host name")
 
 
-def validate_domain_name(name, always_tolerant=False):
+def validate_domain_name(name, always_tolerant=False, allow_empty_label=False):
+    if name == "@" and allow_empty_label:
+        return
+
     if name == "." and (
         always_tolerant or get_plugin_config("netbox_dns", "enable_root_zones")
     ):

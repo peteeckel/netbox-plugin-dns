@@ -528,9 +528,16 @@ class Record(NetBoxModel):
 
         try:
             match self.type:
+                case RecordTypeChoices.CNAME:
+                    _validate_idn(rr.target)
+                    validate_domain_name(
+                        rr.target.to_text(),
+                        always_tolerant=True,
+                        allow_empty_label=True,
+                    )
+
                 case (
-                    RecordTypeChoices.CNAME
-                    | RecordTypeChoices.DNAME
+                    RecordTypeChoices.DNAME
                     | RecordTypeChoices.NS
                     | RecordTypeChoices.HTTPS
                     | RecordTypeChoices.SRV
