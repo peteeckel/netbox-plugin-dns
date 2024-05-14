@@ -142,7 +142,7 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
             name="Domain Registration",
         ),
         FieldSet("tags", name="Tags"),
-        FieldSet("tenant", name="Tenancy"),
+        FieldSet("tenant_group", "tenant", name="Tenancy"),
     )
 
     def __init__(self, *args, **kwargs):
