@@ -56,7 +56,7 @@
                     <td><a href="{% url 'plugins:netbox_dns:zone_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
                     {% endif %}
                 </tr>
-                {% if object.tenant %}
+                {% if not object.managed or object.tenant %}
                 <tr>
                     <th scope="row">Tenant</th>
                     <td>
