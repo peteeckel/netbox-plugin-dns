@@ -11,6 +11,7 @@ The main focus of the plugin is to ensure the quality of the data stored in it. 
 * Validation of record names and values
 * Automatic maintenance of PTR records for IPv6 and IPv4 address records
 * Automatic generation of SOA records, optionally including the serial number of the zone data
+* Validation of changs to the SOA SERIAL number, whether they are done automatically or manually
 * Validation of record types such as CNAME and singletons, to ensure DNS zone validity
 * Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
 
@@ -552,6 +553,22 @@ PLUGINS_CONFIG = {
     },
 }
 ```
+
+## SOA SERIAL validation
+The SOA SERIAL field contains a serial number of a zone that is used to control if and when DNS slave servers load zone updates from their master servers. Basically, a slave server checks for the SOA SERIAL of a zone on the master server and only transfers the zone if that number is higher than the one it has in its own cached data. This does not depend on whether the transfer has been triggered by the upstream server via `NOTIFY` or whether it is scheduled by the slave because the SOA REFRESH time has elapsed.
+
+SOA SERIAL numbers use integer arithmetic modulo 2^32, i.e. they wrap back to zero at 4.294.967.296. As a general rule, a serial number must never decrease (as this would keep the slaves from updating the zone). Any advancement by less than 2**31 (2.147.483.648) is considered an increase, 2.147.483.648 or more would mean a decrease in that logic and hence it is not a permitted change.
+
+Starting from version 1.0.1, NetBox DNS does not allow the serial number to decrease and presents an error message if the user tries to perform an action that would lead to a lower than before serial number:
+
+![Serial Number Decrease Error](images/SerialNumberDecrease.png)
+
+A special case occurs when a zone is switched from static serial numbers to automatically generated serial numbers. As one of the common schemes for manually generated serial numbers is to use a date-based numbeing like `YYYYMMDDxx`, which results in integer values above 2000000000, and automatic SOA SERIAL generation uses the epoch, which currently results in values below that, switching to automatic generation is not trivially possible:
+
+![Auto Serial Number Decrease Error](images/AutoSerialNumberDecrease.png)
+
+In this case, the serial number must first be adjusted manually so that the automatically generated serials are higher than the last value present on the slaves. See [RFC 2182, Section 7](https://datatracker.ietf.org/doc/html/rfc2182#section-7) for details on how to proceed.
+
 
 ## International Domain Names (IDNs)
 
