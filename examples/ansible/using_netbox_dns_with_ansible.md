@@ -199,3 +199,9 @@ test1                                        IN CNAME       test1.zone1.example.
 ```
 
 The new records have been inserted and the zone SOA SERIAL is updated in the SOA record.
+
+#### Creating all zones organized in NetBox DNS that are active
+To create all the files for use with BIND DNS, you can use the example in Synchronize_DNS_Zones. With this playbook
+Ansible reads each zone that is active and writes it to a folder for BIND to read. Then the BIND service is restarted.
+
+At the moment the zones also need to be entered manually into named.conf.local.
