@@ -1,0 +1,8 @@
+- name: delete unwanted zone files
+  ansible.builtin.file:
+    path: "{{zone_file_path}}{{ item.0 }}/{{ to_be_deleted }}.zone"
+    state: absent
+  loop: "{{ item.1 }}"
+  loop_control:
+    loop_var: to_be_deleted
+  notify: restart bind9
