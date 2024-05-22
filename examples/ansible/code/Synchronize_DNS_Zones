@@ -1,0 +1,112 @@
+- name: Synchronize DNS
+  hosts: 24-bind-01
+  vars:
+    netbox_url: 'https://<netbox-url>/'
+    netbox_token: '<redacted>'
+    zone_file_path: '/path_to_your_zone_files/'
+  tasks:
+
+#set Variables
+    - name: get active Zone Names
+      ansible.builtin.set_fact:
+        zone_names: "{{ query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
+                           api_endpoint=netbox_url,
+                           api_filter='active=true',
+                           token=netbox_token)
+                    | map(attribute='value') | map(attribute='name') }}"
+
+    - name: get used Views
+      ansible.builtin.set_fact:
+        used_views: "{{ query('netbox.netbox.nb_lookup', 'views', plugin='netbox_dns',
+                           api_endpoint=netbox_url,
+                           token=netbox_token)
+                    | map(attribute='value')| map(attribute='name') }}"
+
+#Create View-Folder and remove unwanted Files
+    - name: Create View-Directory
+      ansible.builtin.file:
+        path: "{{zone_file_path}}{{ item }}"
+        state: directory
+        mode: '755'
+      loop: "{{ used_views }}"
+
+    - name: Collect Directory contents
+      ansible.builtin.find:
+        path: "{{zone_file_path}}"
+        file_type: directory
+      register: directories
+      changed_when: False
+
+    - name: Remove unwanted Directories
+      ansible.builtin.file:
+        path: "{{item.path}}"
+        state: absent
+      with_items: "{{ directories.files }}"
+      when: >
+        (item.path | regex_replace('^' + zone_file_path, '')).split('/')[0] not in used_views
+
+#Generate Zones for Views
+    - name: Generate Zone Files
+      ansible.builtin.template:
+          src: zone.db.j2
+          dest: "{{zone_file_path}}{{ current_view }}/{{ item }}.zone"
+      vars:
+          zonename: "{{ item }}"
+          zone: "{{ query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
+                           api_endpoint=netbox_url,
+                           api_filter='name='+zonename,
+                           token=netbox_token)
+                    | map(attribute='value')
+                    | first }}"
+          records: "{{ query('netbox.netbox.nb_lookup', 'records', plugin='netbox_dns',
+                             api_endpoint=netbox_url,
+                             api_filter='view='+current_view+' zone='+zone.name,
+                             token=netbox_token)
+                       | map(attribute='value') }}"
+          current_view: "{{ zone.view.name }}"
+      loop: "{{ zone_names }}"
+      notify: restart bind9
+
+#Delete not needed Zones per View
+    - name: Initialize lists for later use
+      ansible.builtin.set_fact:
+        present_files: []
+        expected_files: []
+        delete_files_list: []
+
+    - name: Collect Directory contents
+      ansible.builtin.find:
+        path: "{{zone_file_path}}{{item}}"
+        patterns: '*.zone'
+      register: files
+      changed_when: False
+      loop: "{{ used_views }}"
+
+    - name: extract Present Files and Views from Server
+      ansible.builtin.set_fact:
+        present_files: "{{ present_files + [item.files | map(attribute='path') | map('basename') | map('regex_replace', '\\.[^.]*$', '') | list] }}"
+      loop: "{{ files.results }}"
+
+    - name: get expected Zones per View
+      ansible.builtin.set_fact:
+        expected_files: "{{ expected_files + [query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
+                           api_endpoint=netbox_url,api_filter='view='+current_view,
+                           token=netbox_token) | map(attribute='value') | map(attribute='name')] }}"
+      vars:
+        current_view: "{{item}}"
+      loop: "{{ used_views }}"
+
+    - name: Compare the present and expected zones per view and generate Files to delete per View
+      ansible.builtin.set_fact:
+        delete_files_list: "{{delete_files_list + [item.0 | difference(item.1)] }}"
+      loop: "{{ present_files | zip(expected_files) | list }}"
+
+    - name: Remove unwanted Files
+      include_tasks: delete_dns_files.yaml
+      loop: "{{ used_views | zip(delete_files_list) | list }}"
+
+  handlers:
+   - name: restart bind9
+     ansible.builtin.service:
+       name: bind9
+       state: restarted
