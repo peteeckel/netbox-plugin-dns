@@ -451,6 +451,18 @@ class Zone(NetBoxModel):
 
         return ns_warnings, ns_errors
 
+    def check_soa_serial_increment(self, old_serial, new_serial):
+        MAX_SOA_SERIAL_INCREMENT = 2**31 - 1
+        SOA_SERIAL_WRAP = 2**32
+
+        if old_serial is None:
+            return
+
+        if (new_serial - old_serial) % SOA_SERIAL_WRAP > MAX_SOA_SERIAL_INCREMENT:
+            raise ValidationError(
+                {"soa_serial": f"soa_serial must not decrease for zone {self.name}."}
+            )
+
     def get_auto_serial(self):
         records = record.Record.objects.filter(zone_id=self.pk).exclude(
             type=record.RecordTypeChoices.SOA
@@ -607,6 +619,22 @@ class Zone(NetBoxModel):
                         "soa_serial": f"soa_serial is not defined and soa_serial_auto is disabled for zone {self.name}."
                     }
                 )
+
+        if self.pk is not None:
+            old_zone = Zone.objects.get(pk=self.pk)
+            if not self.soa_serial_auto:
+                self.check_soa_serial_increment(old_zone.soa_serial, self.soa_serial)
+            else:
+                try:
+                    self.check_soa_serial_increment(
+                        old_zone.soa_serial, self.get_auto_serial()
+                    )
+                except ValidationError:
+                    raise ValidationError(
+                        {
+                            "soa_serial_auto": f"Enabling soa_serial_auto would decrease soa_serial for zone {self.name}."
+                        }
+                    )
 
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name

@@ -105,7 +105,7 @@ class ZoneAutoSOATestCase(TestCase):
 
     def test_zone_soa_change_serial(self):
         zone = self.zone
-        serial = 42
+        serial = 2100000000
 
         zone.soa_serial_auto = False
         zone.soa_serial = serial

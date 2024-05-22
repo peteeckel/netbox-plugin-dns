@@ -73,34 +73,108 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
     def test_soa_serial_auto(self):
         zone = self.zones[0]
-        zone.save()
 
         self.assertTrue(int(zone.soa_serial) >= self.start_time)
 
     def test_soa_serial_fixed(self):
         zone = self.zones[1]
-        zone.save()
 
         self.assertEqual(zone.soa_serial, 1)
 
-    def test_change_to_soa_serial_auto(self):
+    def test_increase_soa_serial(self):
         zone = self.zones[1]
+
+        zone.soa_serial = 2100000000
         zone.save()
+
+        self.assertEqual(zone.soa_serial, 2100000000)
+
+    def test_decrease_soa_serial(self):
+        zone = self.zones[1]
+        zone.soa_serial = 2100000000
+        zone.save()
+
+        zone.soa_serial = 42
+        with self.assertRaises(ValidationError):
+            zone.save()
+
+    def test_increase_soa_serial_excessive_increment(self):
+        zone = self.zones[1]
+
+        zone.soa_serial = 4200000000
+        with self.assertRaises(ValidationError):
+            zone.save()
+
+    def test_increase_soa_serial_wrap(self):
+        zone = self.zones[1]
+
+        zone.soa_serial = 2100000000
+        zone.save()
+
+        zone.soa_serial = 4200000000
+        zone.save()
+
+        zone.soa_serial = 42
+        zone.save()
+
+        self.assertEqual(zone.soa_serial, 42)
+
+    def test_increase_soa_serial_wrap_excessive_increment(self):
+        zone = self.zones[1]
+
+        zone.soa_serial = 2100000000
+        zone.save()
+
+        zone.soa_serial = 4200000000
+        zone.save()
+
+        zone.soa_serial = 2100000000
+        with self.assertRaises(ValidationError):
+            zone.save()
+
+    def test_change_to_soa_serial_auto_low_serial(self):
+        zone = self.zones[1]
 
         zone.soa_serial_auto = True
         zone.save()
 
         self.assertTrue(int(zone.soa_serial) >= self.start_time)
 
-    def test_change_to_soa_serial_fixed(self):
-        zone = self.zones[0]
+    def test_change_to_soa_serial_auto_low_serial(self):
+        zone = self.zones[1]
+
+        zone.soa_serial_auto = True
         zone.save()
+
+        self.assertTrue(int(zone.soa_serial) >= self.start_time)
+
+    def test_change_to_soa_serial_auto_high_serial(self):
+        zone = self.zones[1]
+        zone.soa_serial = 2100000000
+        zone.save()
+
+        zone.soa_serial_auto = True
+        with self.assertRaises(ValidationError):
+            zone.save()
+
+    def test_change_to_soa_serial_fixed_low_serial(self):
+        zone = self.zones[0]
 
         zone.soa_serial_auto = False
         zone.soa_serial = 42
+
+        with self.assertRaises(ValidationError):
+            zone.save()
+
+    def test_change_to_soa_serial_fixed_high_serial(self):
+        zone = self.zones[0]
+
+        zone.soa_serial_auto = False
+        zone.soa_serial = 2100000000
+
         zone.save()
 
-        self.assertEqual(zone.soa_serial, 42)
+        self.assertEqual(zone.soa_serial, 2100000000)
 
     def modify_zone_soa_serial_auto(self):
         zone = self.zones[0]
@@ -114,6 +188,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
         self.assertTrue(int(zone.soa_serial) >= self.start_time)
 
+    @override_settings(PLUGINS_CONFIG={"netbox_dns": {"zone_soa_serial": 2100000000}})
     def test_missing_soa_serial(self):
         zone = self.zones[0]
         zone.soa_serial = None
@@ -121,7 +196,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
         zone.save()
 
-        self.assertEqual(zone.soa_serial, self.defaults.get("zone_soa_serial"))
+        self.assertEqual(zone.soa_serial, 2100000000)
 
     @override_settings(PLUGINS_CONFIG={"netbox_dns": {}})
     def test_missing_soa_serial_no_default(self):
@@ -168,14 +243,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
         self.assertTrue(int(zone.soa_serial) < self.start_time)
 
-        record = Record(
+        record = Record.objects.create(
             zone=zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        record.save()
 
         zone.refresh_from_db()
 
@@ -184,14 +258,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
     def test_update_record_soa_serial_auto(self):
         zone = self.zones[0]
 
-        record = Record(
+        record = Record.objects.create(
             zone=zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        record.save()
 
         self.assertTrue(int(zone.soa_serial) >= self.start_time)
 
@@ -223,14 +296,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
         f_zone = self.zones[0]
         r_zone = self.zones[3]
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.2.42",
             ttl=86400,
         )
-        f_record.save()
 
         r_record = Record.objects.get(
             type=RecordTypeChoices.PTR,
@@ -251,14 +323,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(f_zone.soa_serial) < self.start_time)
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         f_zone.refresh_from_db()
         r_zone.refresh_from_db()
@@ -276,14 +347,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
         f_zone = self.zones[0]
         r_zone = self.zones[2]
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         set_soa_serial_back(f_zone)
         set_soa_serial_back(r_zone)
@@ -309,14 +379,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
         f_zone = self.zones[0]
         r_zone = self.zones[2]
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         set_soa_serial_back(f_zone)
         set_soa_serial_back(r_zone)
@@ -349,7 +418,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(f_zone.soa_serial) < self.start_time)
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -357,7 +426,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
             ttl=86400,
             disable_ptr=True,
         )
-        f_record.save()
 
         f_zone.refresh_from_db()
         r_zone.refresh_from_db()
@@ -406,14 +474,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
         self.assertTrue(int(rfc2317_zone.soa_serial) < self.start_time)
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         f_zone.refresh_from_db()
         r_zone.refresh_from_db()
@@ -455,14 +522,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
         self.assertTrue(int(rfc2317_zone.soa_serial) < self.start_time)
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         f_zone.refresh_from_db()
         r_zone.refresh_from_db()
@@ -496,14 +562,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
             rfc2317_parent_managed=False,
         )
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         set_soa_serial_back(f_zone)
         set_soa_serial_back(r_zone)
@@ -548,14 +613,13 @@ class ZoneAutoSOASerialTestCase(TestCase):
             rfc2317_parent_managed=True,
         )
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
             value="10.0.1.42",
             ttl=86400,
         )
-        f_record.save()
 
         set_soa_serial_back(f_zone)
         set_soa_serial_back(r_zone)
@@ -608,7 +672,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
         self.assertTrue(int(rfc2317_zone.soa_serial) < self.start_time)
 
-        f_record = Record(
+        f_record = Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -616,7 +680,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
             ttl=86400,
             disable_ptr=True,
         )
-        f_record.save()
 
         f_zone.refresh_from_db()
         r_zone.refresh_from_db()
