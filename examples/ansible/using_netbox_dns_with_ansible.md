@@ -93,8 +93,8 @@ localhost | SUCCESS => {
 }
 ```
 
-### Generating a zone file from NetBox DNS data
-In the final step of this example, NetBox DNS data is used to create a zone file for e.g. a BIND nameserver.
+### Generating zone files from NetBox DNS data
+In the final step of this example, NetBox DNS data is used to create zone files for e.g. a BIND nameserver.
 
 #### Zone file template
 A simple Jinja2 template to create a zone file is stored as `zone.db.j2`:
@@ -111,97 +111,9 @@ $TTL {{ zone.default_ttl }}
 {% endfor %}
 ```
 
-#### Ansible playbook for creating a zone
-A minimalistic playbook to create a zone from that template and the NetBox DNS data for the zone "example.com" used for the screenshots of this document can now be created as `create_zonefile.yml`:
+#### Ansible playbook for creating zone files
+To create all the files for use with BIND DNS, you can use the example in `synchronize_dns_zones.yml`.
+With this playbook Ansible reads lists of all views and active zones creates the zone files in a folder
+for BIND to read. Then the BIND service is restarted.
 
-```
-#!/usr/bin/env ansible-playbook
-
-- name: Create a sample zone file
-  hosts: localhost
-  tasks:
-
-    - name: Create the zone file for zone {{ zone.name }}
-      template:
-          src: zone.db.j2
-          dest: "{{ zone.name }}.db"
-      vars:
-          zone: "{{ query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
-                           api_endpoint='https://netbox.example.com/',
-                           api_filter='name=zone1.example.com',
-                           token='f52d8887c576df4064139e4208cca481b95110f9')
-                    | map(attribute='value')
-                    | first }}"
-          records: "{{ query('netbox.netbox.nb_lookup', 'records', plugin='netbox_dns',
-                             api_endpoint='https://netbox.example.com/',
-                             api_filter='zone='+zone.name,
-                             token='f52d8887c576df4064139e4208cca481b95110f9')
-                       | map(attribute='value') }}"
-```
-
-Running that playbook creates the zone file from the data in the NetBox DNS:
-
-```
-# ./create-zonefile.yml
-PLAY [Create a sample zone file] ************************************************************************************
-TASK [Gathering Facts] **********************************************************************************************
-ok: [localhost]
-
-TASK [Create the zone file for zone zone1.example.com] **************************************************************
-changed: [localhost]
-
-PLAY RECAP **********************************************************************************************************
-localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-```
-
-As a result, a very minimal but valid zone file is created:
-
-```
-;
-; Zone file for zone zone1.example.com
-;
-
-$TTL 86400
-
-@                                            IN NS          ns1.example.com.
-@                                            IN NS          ns2.example.com.
-@                                   86400    IN SOA         ns1.example.com. hostmaster.example.com. 1712577231 172800 7200 2592000 3600
-```
-
-#### Updating zone data
-Now some data can be added and the playbook run again to see what changes will be observed.
-
-![Updated Records per Zone](images/ZoneRecordsUpdated.png)
-
-After running the playbook again, the resulting zone file now looks like this:
-
-```
-;
-; Zone file for zone zone1.example.com
-;
-
-$TTL 86400
-
-@                                            IN NS          ns1.example.com.
-@                                            IN NS          ns2.example.com.
-@                                   86400    IN SOA         ns1.example.com. hostmaster.example.com. 1712577644 172800 7200 2592000 3600
-name01                                       IN A           10.0.0.1
-name02                                       IN A           10.0.0.2
-name03                                       IN A           10.0.0.3
-name04                                       IN A           10.0.0.4
-name05                                       IN A           10.0.0.5
-name1                                        IN A           10.0.0.1
-name2                                        IN A           10.0.0.2
-name3                                        IN A           10.0.0.3
-name4                                        IN A           10.0.0.4
-name5                                        IN A           10.0.0.5
-test1                                        IN CNAME       test1.zone1.example.com.
-```
-
-The new records have been inserted and the zone SOA SERIAL is updated in the SOA record.
-
-#### Creating all zones organized in NetBox DNS that are active
-To create all the files for use with BIND DNS, you can use the example in Synchronize_DNS_Zones. With this playbook
-Ansible reads each zone that is active and writes it to a folder for BIND to read. Then the BIND service is restarted.
-
-At the moment the zones also need to be entered manually into named.conf.local.
+At the moment the BIND configuration files for the tones zones also need to be entered manually.
