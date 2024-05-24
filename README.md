@@ -24,6 +24,7 @@ The main focus of the plugin is to ensure the quality of the data stored in it. 
 * Validation of record names and values
 * Automatic maintenance of PTR records for IPv6 and IPv4 address records
 * Automatic generation of SOA records, optionally including the serial number of the zone data
+* Validation of changes to the SOA SERIAL number, whether they are done automatically or manually
 * Validation of record types such as CNAME and singletons, to ensure DNS zone validity
 * Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
 
