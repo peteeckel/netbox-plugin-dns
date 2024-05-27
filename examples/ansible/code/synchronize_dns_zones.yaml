@@ -27,7 +27,7 @@
                         | map(attribute='name') }}"
 
 #
-# Create view folder and remove obsolete files
+# Create view folder and remove obsolete folders
 #
     - name: Create view directory
       ansible.builtin.file:
