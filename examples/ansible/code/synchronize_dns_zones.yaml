@@ -1,5 +1,5 @@
 - name: Synchronize DNS
-  hosts: 24-bind-01
+  hosts: <your_Bind_Server>
   vars:
     netbox_url: 'https://<netbox-url>/'
     netbox_token: '<redacted>'

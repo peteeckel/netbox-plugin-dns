@@ -1,0 +1,13 @@
+//
+// {{ ansible_managed }}
+//
+// place to enter custom Zones (e.g. transfered once)
+
+{% for zone in used_zones -%}
+zone "{{ zone.name }}" {
+        type master;
+        file "/etc/bind/zones/{{ zone.view.name }}/{{ zone.name }}.zone";
+	allow-update { none; };
+};
+
+{% endfor %}
