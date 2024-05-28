@@ -113,17 +113,20 @@ $TTL {{ zone.default_ttl }}
 
 ### Generate All Views and Zones from NetBox Using Ansible
 
-The example playbook `synchronize_dns_zones.yaml` can be used to generate all views, zones, and corresponding records from NetBox using Ansible. These zone files are compatible with Bind9. Required parameters include:
+Required parameters include:
 
 - `netbox_url`: The URL of the NetBox instance, e.g., `https://netbox.example.com/`
 - `netbox_token`: previously generated token
 - `zone_file_path`: Folder for the zones on the bind server
 
+The example playbook `generate_bind_config.yaml` generates a `named.conf.local` file, which creates all zones from Netbox on the BIND server.
+
+**Note: Without additional configurations, an incorrect file will be generated if multiple views with the same zone names are used. In this case, the parameters must be manually provided to specify when each zone should be addressed in each view. This example is only intended to provide a general starting point.**
+
+The example playbook `synchronize_dns_zones.yaml` can be used to generate all views, zones, and corresponding records from NetBox using Ansible. These zone files are compatible with BIND 9.
+
 This Ansible playbook will create a directory for each view within the specified folder (`zone_file_path: '/path_to_your_zone_files/'`) and generate the corresponding zone files for each view within these directories.
 
-If views or zones are deleted in NetBox, they will also be removed from the directories. This deletion occurs after creating the legitimate folders and files to prevent a change event with each execution of the playbook. If changes are detected, the Bind9 service on the server will be restarted.
+If views or zones are deleted in NetBox, they will also be removed from the directories. This deletion occurs after creating the legitimate folders and files to prevent a change event with each execution of the playbook. If changes are detected, the BIND 9 service on the server will be restarted.
 
 The playbook `delete_dns_files.yaml` must be in the same directory as the `synchronize_dns_zones.yaml` playbook, or the path in the `include_task` must be adjusted accordingly.
-
-**CAUTION! Currently, the generated zones must be manually added to the `named.conf.local` file.**
-

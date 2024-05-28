@@ -1,0 +1,29 @@
+- name: Setup BIND config
+  hosts: <your_Bind_Server>
+  vars:
+    netbox_url: 'https://<netbox-url>/'
+    netbox_token: '<redacted>'
+    config_file_path: '/path_to_your_bind_config/'
+  tasks:
+
+#Generate named.conf.local
+    - name: Generate named.conf.local for {{ inventory_hostname }}
+      ansible.builtin.template:
+        src: named.conf.local.j2
+        dest: "{{ config_file_path }}named.conf.local"
+        owner: root
+        group: bind
+        mode: '0644'
+      vars:
+        used_zones: "{{ query('netbox.netbox.nb_lookup', 'zones', plugin='netbox_dns',
+                           api_endpoint=netbox_url,
+                           api_filter='active=true',
+                           token=netbox_token)
+                    | map(attribute='value') }}"
+      notify: restart bind9
+
+  handlers:
+   - name: restart bind9
+     ansible.builtin.service:
+       name: bind9
+       state: restarted
