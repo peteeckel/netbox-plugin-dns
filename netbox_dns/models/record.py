@@ -206,7 +206,6 @@ class Record(ObjectModificationMixin, NetBoxModel):
         "disable_ptr",
         "description",
     ]
-    check_fields = clone_fields + ["ptr_record", "rfc2317_cname_record", "fqdn"]
 
     class Meta:
         ordering = ("zone", "name", "type", "value", "status")
