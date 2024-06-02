@@ -25,6 +25,7 @@ from netbox_dns.validators import (
     validate_extended_hostname,
     validate_domain_name,
 )
+from netbox_dns.mixins import ObjectModificationMixin
 
 # +
 # This is a hack designed to break cyclic imports between Record and Zone
@@ -102,7 +103,7 @@ class RecordStatusChoices(ChoiceSet):
     ]
 
 
-class Record(NetBoxModel):
+class Record(ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (RecordStatusChoices.STATUS_ACTIVE,)
 
     unique_ptr_qs = Q(
@@ -205,6 +206,7 @@ class Record(NetBoxModel):
         "disable_ptr",
         "description",
     ]
+    check_fields = clone_fields + ["ptr_record", "rfc2317_cname_record", "fqdn"]
 
     class Meta:
         ordering = ("zone", "name", "type", "value", "status")
@@ -783,7 +785,9 @@ class Record(NetBoxModel):
             self.ptr_record.delete()
             self.ptr_record = None
 
-        super().save(*args, **kwargs)
+        changed_fields = self.changed_fields
+        if changed_fields is None or changed_fields:
+            super().save(*args, **kwargs)
 
         _zone = self.zone
         if self.type != RecordTypeChoices.SOA and _zone.soa_serial_auto:
