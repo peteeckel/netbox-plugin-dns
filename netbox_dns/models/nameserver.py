@@ -14,11 +14,12 @@ from netbox_dns.utilities import (
     NameFormatError,
 )
 from netbox_dns.validators import validate_fqdn
+from netbox_dns.mixins import ObjectModificationMixin
 
 from .record import Record, RecordTypeChoices
 
 
-class NameServer(NetBoxModel):
+class NameServer(ObjectModificationMixin, NetBoxModel):
     name = models.CharField(
         unique=True,
         max_length=255,

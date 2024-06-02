@@ -35,6 +35,7 @@ from netbox_dns.validators import (
     validate_fqdn,
     validate_domain_name,
 )
+from netbox_dns.mixins import ObjectModificationMixin
 
 # +
 # This is a hack designed to break cyclic imports between View, Record and Zone
@@ -77,7 +78,7 @@ class ZoneStatusChoices(ChoiceSet):
     ]
 
 
-class Zone(NetBoxModel):
+class Zone(ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (ZoneStatusChoices.STATUS_ACTIVE,)
 
     view = models.ForeignKey(

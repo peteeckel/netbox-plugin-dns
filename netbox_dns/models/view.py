@@ -7,8 +7,10 @@ from netbox.search import SearchIndex, register_search
 from netbox.context import current_request
 from utilities.exceptions import AbortRequest
 
+from netbox_dns.mixins import ObjectModificationMixin
 
-class View(NetBoxModel):
+
+class View(ObjectModificationMixin, NetBoxModel):
     name = models.CharField(
         unique=True,
         max_length=255,
