@@ -10,7 +10,7 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
-    default_view = tables.Column(
+    default_view = tables.BooleanColumn(
         verbose_name="Default View",
     )
     tags = TagColumn(url_name="plugins:netbox_dns:view_list")
