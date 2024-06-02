@@ -35,6 +35,7 @@ from netbox_dns.validators import (
     validate_fqdn,
     validate_domain_name,
 )
+from netbox_dns.mixins import ObjectModificationMixin
 
 # +
 # This is a hack designed to break cyclic imports between View, Record and Zone
@@ -77,7 +78,7 @@ class ZoneStatusChoices(ChoiceSet):
     ]
 
 
-class Zone(NetBoxModel):
+class Zone(ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (ZoneStatusChoices.STATUS_ACTIVE,)
 
     view = models.ForeignKey(
@@ -683,17 +684,7 @@ class Zone(NetBoxModel):
     def save(self, *args, **kwargs):
         self.full_clean()
 
-        new_zone = self.pk is None
-        if not new_zone:
-            old_zone = Zone.objects.get(pk=self.pk)
-
-        name_changed = not new_zone and old_zone.name != self.name
-        view_changed = not new_zone and old_zone.view != self.view
-        status_changed = not new_zone and old_zone.status != self.status
-        rfc2317_changed = not new_zone and (
-            old_zone.rfc2317_prefix != self.rfc2317_prefix
-            or old_zone.rfc2317_parent_managed != self.rfc2317_parent_managed
-        )
+        changed_fields = self.changed_fields
 
         if self.soa_serial_auto:
             self.soa_serial = self.get_auto_serial()
@@ -701,7 +692,7 @@ class Zone(NetBoxModel):
         super().save(*args, **kwargs)
 
         if (
-            new_zone or name_changed or view_changed or status_changed
+            changed_fields is None or {"name", "view", "status"} & changed_fields
         ) and self.is_reverse_zone:
             zones = Zone.objects.filter(
                 view=self.view,
@@ -733,11 +724,9 @@ class Zone(NetBoxModel):
                     child_zone.update_rfc2317_parent_zone()
 
         if (
-            new_zone
-            or name_changed
-            or view_changed
-            or status_changed
-            or rfc2317_changed
+            changed_fields is None
+            or {"name", "view", "status", "rfc2317_prefix", "rfc2317_parent_managed"}
+            & changed_fields
         ) and self.is_rfc2317_zone:
             zones = Zone.objects.filter(
                 view=self.view,
@@ -763,7 +752,7 @@ class Zone(NetBoxModel):
 
             self.update_rfc2317_parent_zone()
 
-        elif name_changed or view_changed or status_changed:
+        elif changed_fields is not None and {"name", "view", "status"} & changed_fields:
             for address_record in self.record_set.filter(
                 type__in=(record.RecordTypeChoices.A, record.RecordTypeChoices.AAAA)
             ):
@@ -772,7 +761,7 @@ class Zone(NetBoxModel):
             # Fix name in IP Address when zone name is changed
             if (
                 get_plugin_config("netbox_dns", "feature_ipam_coupling")
-                and name_changed
+                and "name" in changed_fields
             ):
                 for ip in IPAddress.objects.filter(
                     custom_field_data__ipaddress_dns_zone_id=self.pk
@@ -780,7 +769,7 @@ class Zone(NetBoxModel):
                     ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
                     ip.save(update_fields=["dns_name"])
 
-        if name_changed:
+        if changed_fields is not None and "name" in changed_fields:
             for _record in self.record_set.all():
                 _record.save(
                     update_fields=["fqdn"],

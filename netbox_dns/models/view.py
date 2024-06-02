@@ -7,8 +7,10 @@ from netbox.search import SearchIndex, register_search
 from netbox.context import current_request
 from utilities.exceptions import AbortRequest
 
+from netbox_dns.mixins import ObjectModificationMixin
 
-class View(NetBoxModel):
+
+class View(ObjectModificationMixin, NetBoxModel):
     name = models.CharField(
         unique=True,
         max_length=255,
@@ -53,13 +55,11 @@ class View(NetBoxModel):
         super().delete(*args, **kwargs)
 
     def clean(self, *args, old_state=None, **kwargs):
-        if self.pk is None:
+        if (changed_fields := self.changed_fields) is None:
             return
 
-        old_state = View.objects.get(pk=self.pk)
-
         if (
-            old_state.default_view
+            "default_view" in changed_fields
             and not self.default_view
             and not View.objects.filter(default_view=True).exclude(pk=self.pk).exists()
         ):
@@ -74,12 +74,14 @@ class View(NetBoxModel):
     def save(self, *args, **kwargs):
         self.clean()
 
-        old_state = None if self.pk is None else View.objects.get(pk=self.pk)
+        changed_fields = self.changed_fields
 
         super().save(*args, **kwargs)
 
-        if (old_state is None and self.default_view) or (
-            old_state is not None and self.default_view and not old_state.default_view
+        if (changed_fields is None and self.default_view) or (
+            changed_fields is not None
+            and self.default_view
+            and "default_view" in changed_fields
         ):
             other_views = View.objects.filter(default_view=True).exclude(pk=self.pk)
             for view in other_views:
