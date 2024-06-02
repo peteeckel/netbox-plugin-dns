@@ -80,14 +80,12 @@ class NameServer(ObjectModificationMixin, NetBoxModel):
     def save(self, *args, **kwargs):
         self.full_clean()
 
-        name_changed = (
-            self.pk is not None and self.name != NameServer.objects.get(pk=self.pk).name
-        )
+        changed_fields = self.changed_fields
 
         with transaction.atomic():
             super().save(*args, **kwargs)
 
-            if name_changed:
+            if changed_fields is not None and "name" in changed_fields:
                 soa_zones = self.zones_soa.all()
                 for soa_zone in soa_zones:
                     soa_zone.update_soa_record()
