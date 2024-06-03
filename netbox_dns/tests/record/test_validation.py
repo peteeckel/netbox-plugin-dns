@@ -53,6 +53,11 @@ class RecordValidationTestCase(TestCase):
             },
             {"name": "test9", "type": RecordTypeChoices.CNAME, "value": "test1"},
             {"name": "test10", "type": RecordTypeChoices.CNAME, "value": "@"},
+            {
+                "name": "test11",
+                "type": RecordTypeChoices.CNAME,
+                "value": "selector1-example-com._domainkey._somedomain.onmicrosoft.com.",
+            },
         ]
 
         for record in ok_records:
