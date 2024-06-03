@@ -54,9 +54,9 @@ def validate_domain_name(name, always_tolerant=False, allow_empty_label=False):
     ):
         return
 
-    if always_tolerant or get_plugin_config(
-        "netbox_dns", "tolerate_underscores_in_hostnames"
-    ):
+    if always_tolerant:
+        regex = rf"^{TOLERANT_LEADING_UNDERSCORE_LABEL}(\.{TOLERANT_LEADING_UNDERSCORE_LABEL})*\.?$"
+    elif get_plugin_config("netbox_dns", "tolerate_underscores_in_hostnames"):
         regex = rf"^{TOLERANT_LABEL}(\.{TOLERANT_LABEL})*\.?$"
     else:
         regex = rf"^{LABEL}(\.{LABEL})*\.?$"
