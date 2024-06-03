@@ -212,9 +212,12 @@ class Record(ObjectModificationMixin, NetBoxModel):
 
     def __str__(self):
         try:
-            name = dns_name.from_text(self.fqdn).relativize(dns_name.root).to_unicode()
+            fqdn = dns_name.from_text(
+                self.name, origin=dns_name.from_text(self.zone.name)
+            ).relativize(dns_name.root)
+            name = fqdn.to_unicode()
         except dns_name.IDNAException:
-            name = self.name
+            name = fqdn.to_text()
         except dns_name.LabelTooLong:
             name = f"{self.name[:59]}..."
 

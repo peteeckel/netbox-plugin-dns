@@ -74,3 +74,12 @@ class RecordFQDNTestSet(TestCase):
         record.save()
 
         self.assertEqual(record.fqdn, "name1.zone2.example.com.")
+
+    def test_record_str(self):
+        zone = self.zones[0]
+
+        record = Record(name="name1", zone=zone, **self.record_data)
+
+        self.assertEqual(
+            str(record), f"name1.{zone.name} [{self.record_data.get('type')}]"
+        )
