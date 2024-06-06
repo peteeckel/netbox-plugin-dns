@@ -19,7 +19,7 @@ from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
 
 
 class RecordEventRuleTest(APITestCase):
-    MIN_VERSION = "4.0.4"
+    MIN_VERSION = "4.0.5"
 
     def setUp(self):
         super().setUp()
