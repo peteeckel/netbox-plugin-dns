@@ -15,6 +15,7 @@ from netbox_dns.views import (
     ZoneManagedRecordListView,
     ZoneRegistrationView,
     ZoneRFC2317ChildZoneListView,
+    ZoneChildZoneListView,
 )
 
 zone_urlpatterns = [
@@ -36,6 +37,11 @@ zone_urlpatterns = [
         "zones/<int:pk>/rfc2317childzones/",
         ZoneRFC2317ChildZoneListView.as_view(),
         name="zone_rfc2317_child_zones",
+    ),
+    path(
+        "zones/<int:pk>/childzones/",
+        ZoneChildZoneListView.as_view(),
+        name="zone_child_zones",
     ),
     path(
         "zones/<int:pk>/registration/",

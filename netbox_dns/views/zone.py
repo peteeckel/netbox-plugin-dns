@@ -40,6 +40,7 @@ class ZoneView(generic.ObjectView):
         context = {
             "nameserver_warnings": ns_warnings,
             "nameserver_errors": ns_errors,
+            "parent_zone": instance.parent_zone,
         }
 
         name = dns_name.from_text(instance.name)
@@ -165,3 +166,22 @@ class ZoneRFC2317ChildZoneListView(generic.ObjectChildrenView):
 
     def get_children(self, request, parent):
         return parent.rfc2317_child_zones.all()
+
+
+@register_model_view(Zone, "child_zones")
+class ZoneChildZoneListView(generic.ObjectChildrenView):
+    queryset = Zone.objects.all()
+    child_model = Zone
+    table = ZoneTable
+    filterset = ZoneFilterSet
+    template_name = "netbox_dns/zone/child_zone.html"
+
+    tab = ViewTab(
+        label="Child Zones",
+        permission="netbox_dns.view_zone",
+        badge=lambda obj: obj.child_zones.count(),
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        return parent.child_zones
