@@ -20,6 +20,12 @@
                         <td>{{ unicode_name }}</td>
                     </tr>
                 {% endif %}
+                {% if parent_zone %}
+                    <tr>
+                        <th scope="row">Parent Zone</th>
+                        <td>{{ parent_zone|linkify }}</td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <th scope="row">View</th>
                     <td>

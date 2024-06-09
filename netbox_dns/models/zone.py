@@ -1,3 +1,4 @@
+import re
 from math import ceil
 from datetime import datetime
 
@@ -352,6 +353,22 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 self.billing_c,
             )
         )
+
+    @property
+    def child_zones(self):
+        return Zone.objects.filter(
+            name__iregex=rf"^[^.]+\.{re.escape(self.name)}$", view=self.view
+        )
+
+    @property
+    def parent_zone(self):
+        parent_name = (
+            dns_name.from_text(self.name).parent().relativize(dns_name.root).to_text()
+        )
+        try:
+            return Zone.objects.get(name=parent_name, view=self.view)
+        except Zone.DoesNotExist:
+            return None
 
     def record_count(self, managed=False):
         return record.Record.objects.filter(zone=self, managed=managed).count()
