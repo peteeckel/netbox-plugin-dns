@@ -6,13 +6,24 @@ from packaging.version import Version
 import django_rq
 from django.urls import reverse
 from django.test import RequestFactory
-from django.conf import settings
 from rest_framework import status
 
 from core.models import ObjectType
 from extras.models import EventRule, Tag, Webhook
 from extras.choices import EventRuleActionChoices
-from extras.context_managers import event_tracking
+
+# Backward compatibility for NetBox 4.0.x
+try:
+    from netbox.context_managers import event_tracking
+    from utilities.release import load_release_data
+    from core.events import OBJECT_CREATED, OBJECT_UPDATED, OBJECT_DELETED
+
+    NETBOX_VERSION = Version(load_release_data().version)
+except ImportError:
+    from extras.context_managers import event_tracking
+    from django.conf import settings
+
+    NETBOX_VERSION = Version(settings.VERSION)
 from utilities.testing import APITestCase
 
 from netbox_dns.models import NameServer, Zone, Record
@@ -41,24 +52,41 @@ class RecordEventRuleTest(APITestCase):
         )
         Webhook.objects.bulk_create(webhooks)
 
+        # Backward compatibility for NetBox 4.0.x
+        CREATE_OBJECT_SELECTOR = (
+            {"event_types": [OBJECT_CREATED]}
+            if NETBOX_VERSION >= Version("4.1.0")
+            else {"type_create": "True"}
+        )
+        UPDATE_OBJECT_SELECTOR = (
+            {"event_types": [OBJECT_UPDATED]}
+            if NETBOX_VERSION >= Version("4.1.0")
+            else {"type_update": "True"}
+        )
+        DELETE_OBJECT_SELECTOR = (
+            {"event_types": [OBJECT_DELETED]}
+            if NETBOX_VERSION >= Version("4.1.0")
+            else {"type_delete": "True"}
+        )
+
         event_rules = (
             EventRule(
                 name="Record Create",
-                type_create=True,
+                **CREATE_OBJECT_SELECTOR,
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
             ),
             EventRule(
                 name="Record Update",
-                type_update=True,
+                **UPDATE_OBJECT_SELECTOR,
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
             ),
             EventRule(
                 name="Record Delete",
-                type_delete=True,
+                **DELETE_OBJECT_SELECTOR,
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
@@ -92,7 +120,7 @@ class RecordEventRuleTest(APITestCase):
             zone.save()
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        NETBOX_VERSION < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_create_record(self):
