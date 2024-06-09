@@ -6,7 +6,6 @@ from packaging.version import Version
 import django_rq
 from django.urls import reverse
 from django.test import RequestFactory
-from django.conf import settings
 from rest_framework import status
 
 from core.models import ObjectType
@@ -14,6 +13,7 @@ from core.choices import ObjectChangeActionChoices
 from extras.models import EventRule, Tag, Webhook
 from extras.choices import EventRuleActionChoices
 from netbox.context_managers import event_tracking
+from utilities.release import load_release_data
 from utilities.testing import APITestCase
 
 from netbox_dns.models import NameServer, Zone
@@ -81,7 +81,7 @@ class ZoneEventRuleTest(APITestCase):
         }
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        Version(load_release_data().version) < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_create_zone(self):
@@ -139,7 +139,7 @@ class ZoneEventRuleTest(APITestCase):
         self.assertEqual(job.kwargs["snapshots"]["postchange"]["soa_refresh"], 86400)
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        Version(load_release_data().version) < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_update_zone_add_nameservers(self):
@@ -171,7 +171,7 @@ class ZoneEventRuleTest(APITestCase):
         )
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        Version(load_release_data().version) < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_update_zone_remove_nameservers(self):
@@ -201,7 +201,7 @@ class ZoneEventRuleTest(APITestCase):
         self.assertEqual(len(job.kwargs["snapshots"]["postchange"]["nameservers"]), 0)
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        Version(load_release_data().version) < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_update_zone_add_tags(self):
@@ -232,7 +232,7 @@ class ZoneEventRuleTest(APITestCase):
         )
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        Version(load_release_data().version) < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_update_zone_remove_tags(self):
