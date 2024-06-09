@@ -6,7 +6,6 @@ from packaging.version import Version
 import django_rq
 from django.urls import reverse
 from django.test import RequestFactory
-from django.conf import settings
 from rest_framework import status
 
 from core.models import ObjectType
@@ -14,7 +13,7 @@ from core.choices import ObjectChangeActionChoices
 from extras.models import EventRule, Tag, Webhook
 from extras.choices import EventRuleActionChoices
 from netbox.context_managers import event_tracking
-
+from utilities.release import load_release_data
 from utilities.testing import APITestCase
 
 from netbox_dns.models import NameServer, Zone, Record
@@ -94,7 +93,7 @@ class RecordEventRuleTest(APITestCase):
             zone.save()
 
     @skipIf(
-        Version(settings.VERSION) < Version(MIN_VERSION),
+        Version(load_release_data().version) < Version(MIN_VERSION),
         f"Event rule processing is broken in NetBox < {MIN_VERSION}",
     )
     def test_create_record(self):
