@@ -28,11 +28,7 @@
                 {% endif %}
                 <tr>
                     <th scope="row">View</th>
-                    <td>
-                        <a href="{% url 'plugins:netbox_dns:view' pk=object.view.pk %}">
-                            {{ object.view }}
-                        </a>
-                    </td>
+                    <td>{{ object.view|linkify }}</td>
                 </tr>
                 {% if object.description %}
                 <tr>
