@@ -54,13 +54,7 @@
                     <td>
                         <table>
                             {% for nameserver in object.nameservers.all %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'plugins:netbox_dns:nameserver' pk=nameserver.pk %}">
-                                        {{ nameserver }}
-                                    </a>
-                                </td>
-                            </tr>
+                            <tr><td>{{ nameserver|linkify }}</td></tr>
                             {% endfor %}
                         </table>
                     </td>
@@ -117,7 +111,7 @@
                 </tr>
                 <tr>
                     <th scope="row">MName</th>
-                    <td><a href="{% url 'plugins:netbox_dns:nameserver' pk=object.soa_mname.pk %}">{{ object.soa_mname }}</a></td>
+                    <td>{{ object.soa_mname|linkify }}</td>
                 </tr>
                 <tr>
                     <th scope="row">RName</th>
@@ -167,7 +161,7 @@
                 {% if object.rfc2317_parent_managed %}
                 <tr>
                     <th scope="row">Parent Zone</th>
-                    <td><a href="{% url 'plugins:netbox_dns:zone' pk=object.rfc2317_parent_zone.pk %}">{{ object.rfc2317_parent_zone }}</a></td>
+                    <td>{{ object.rfc2317_parent_zone|linkify }}</td>
                 </tr>
                 {% endif %}
             </table>

@@ -94,25 +94,25 @@
                 {% if object.ptr_record %}
                 <tr>
                     <th scope="row">PTR Record</th>
-                    <td><a href="{% url 'plugins:netbox_dns:record' pk=object.ptr_record.pk %}">{{ object.ptr_record }}</td>
+                    <td>{{ object.ptr_record|linkify }}</td>
                 </tr>
                 {% endif %}
                 {% if object.address_record %}
                 <tr>
                     <th scope="row">Address Record</th>
-                    <td><a href="{% url 'plugins:netbox_dns:record' pk=object.address_record.pk %}">{{ object.address_record }}</td>
+                    <td>{{ object.address_record|linkify }}</td>
                 </tr>
                     {% if object.address_record.ipam_ip_address %}
                     <tr>
                         <th scope="row">IPAM IP Address</th>
-                        <td><a href="{% url 'ipam:ipaddress' pk=object.address_record.ipam_ip_address.pk %}">{{ object.address_record.ipam_ip_address }}</td>
+                        <td>{{ object.address_record.ipam_ip_address|linkify }}</td>
                     </tr>
                     {% endif %}
                 {% endif %}
                 {% if object.ipam_ip_address %}
                 <tr>
                     <th scope="row">IPAM IP Address</th>
-                    <td><a href="{% url 'ipam:ipaddress' pk=object.ipam_ip_address.pk %}">{{ object.ipam_ip_address }}</td>
+                    <td>{{ object.ipam_ip_address|linkify }}</td>
                 </tr>
                 {% endif %}
                 <tr>
