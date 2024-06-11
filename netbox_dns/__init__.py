@@ -30,6 +30,8 @@ class DNSConfig(PluginConfig):
         "enable_root_zones": False,
         "enforce_unique_records": True,
         "enforce_unique_rrset_ttl": True,
+        "menu_name": "NetBox DNS",
+        "top_level_menu": True,
     }
     base_url = "netbox-dns"
 
