@@ -1,4 +1,8 @@
 from netbox.plugins import PluginMenuButton, PluginMenuItem, PluginMenu
+from netbox.plugins.utils import get_plugin_config
+
+menu_name = get_plugin_config("netbox_dns", "menu_name")
+top_level_menu = get_plugin_config("netbox_dns", "top_level_menu")
 
 view_menu_item = PluginMenuItem(
     link="plugins:netbox_dns:view_list",
@@ -126,26 +130,38 @@ contact_menu_item = PluginMenuItem(
     ),
 )
 
-menu = PluginMenu(
-    label="NetBox DNS",
-    groups=(
-        (
-            "DNS Configuration",
+
+if top_level_menu:
+    menu = PluginMenu(
+        label=menu_name,
+        groups=(
             (
-                view_menu_item,
-                zone_menu_item,
-                nameserver_menu_item,
-                record_menu_item,
-                managed_record_menu_item,
+                "DNS Configuration",
+                (
+                    view_menu_item,
+                    zone_menu_item,
+                    nameserver_menu_item,
+                    record_menu_item,
+                    managed_record_menu_item,
+                ),
+            ),
+            (
+                "Domain Registration",
+                (
+                    registrar_menu_item,
+                    contact_menu_item,
+                ),
             ),
         ),
-        (
-            "Domain Registration",
-            (
-                registrar_menu_item,
-                contact_menu_item,
-            ),
-        ),
-    ),
-    icon_class="mdi mdi-dns",
-)
+        icon_class="mdi mdi-dns",
+    )
+else:
+    menu_items = (
+        view_menu_item,
+        zone_menu_item,
+        nameserver_menu_item,
+        record_menu_item,
+        managed_record_menu_item,
+        registrar_menu_item,
+        contact_menu_item,
+    )
