@@ -1,6 +1,6 @@
 from netbox.plugins import PluginConfig
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 
 class DNSConfig(PluginConfig):
