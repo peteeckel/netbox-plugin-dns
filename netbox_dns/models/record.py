@@ -541,14 +541,19 @@ class Record(ObjectModificationMixin, NetBoxModel):
                     )
 
                 case (
-                    RecordTypeChoices.DNAME
-                    | RecordTypeChoices.NS
+                    RecordTypeChoices.NS
                     | RecordTypeChoices.HTTPS
                     | RecordTypeChoices.SRV
                     | RecordTypeChoices.SVCB
                 ):
                     _validate_idn(rr.target)
                     validate_domain_name(rr.target.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.DNAME:
+                    _validate_idn(rr.target)
+                    validate_domain_name(
+                        rr.target.to_text(), always_tolerant=True, zone_name=True
+                    )
 
                 case RecordTypeChoices.PTR | RecordTypeChoices.NSAP_PTR:
                     _validate_idn(rr.target)

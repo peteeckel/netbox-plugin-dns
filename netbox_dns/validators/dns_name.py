@@ -4,10 +4,40 @@ from django.core.exceptions import ValidationError
 
 from netbox.plugins.utils import get_plugin_config
 
-LABEL = r"[a-z0-9][a-z0-9-]*(?<!-)"
-TOLERANT_LABEL = r"[a-z0-9][a-z0-9-_]*(?<![-_])"
-LEADING_UNDERSCORE_LABEL = r"[a-z0-9_][a-z0-9-]*(?<!-)"
-TOLERANT_LEADING_UNDERSCORE_LABEL = r"[a-z0-9_][a-z0-9-_]*(?<![-_])"
+import logging
+
+
+def _get_label(tolerate_leading_underscores=False, always_tolerant=False):
+    tolerate_characters = re.escape(
+        get_plugin_config("netbox_dns", "tolerate_characters_in_zone_labels", "")
+    )
+    label_characters = rf"a-z0-9{tolerate_characters}"
+
+    if always_tolerant:
+        label = rf"[a-z0-9_][a-z0-9_-]*(?<![-_])"
+        zone_label = rf"[{label_characters}_][{label_characters}_-]*(?<![-_])"
+
+        return label, zone_label
+
+    tolerate_underscores = get_plugin_config(
+        "netbox_dns", "tolerate_underscores_in_labels"
+    ) or get_plugin_config("netbox_dns", "tolerate_underscores_in_hostnames")
+
+    if tolerate_leading_underscores:
+        if tolerate_underscores:
+            label = r"[a-z0-9_][a-z0-9_-]*(?<![-_])"
+            zone_label = rf"[{label_characters}_][{label_characters}_-]*(?<![-_])"
+        else:
+            label = rf"[a-z0-9_][a-z0-9-]*(?<!-)"
+            zone_label = rf"[{label_characters}_][{label_characters}-]*(?<!-)"
+    elif tolerate_underscores:
+        label = rf"[a-z0-9][a-z0-9_-]*(?<![-_])"
+        zone_label = rf"[{label_characters}][{label_characters}_-]*(?<![-_])"
+    else:
+        label = rf"[a-z0-9][a-z0-9-]*(?<!-)"
+        zone_label = rf"[{label_characters}][{label_characters}-]*(?<!-)"
+
+    return label, zone_label
 
 
 def has_invalid_double_dash(name):
@@ -15,12 +45,8 @@ def has_invalid_double_dash(name):
 
 
 def validate_fqdn(name, always_tolerant=False):
-    if always_tolerant or get_plugin_config(
-        "netbox_dns", "tolerate_underscores_in_hostnames"
-    ):
-        regex = rf"^(\*|{TOLERANT_LABEL})(\.{TOLERANT_LABEL})+\.?$"
-    else:
-        regex = rf"^(\*|{LABEL})(\.{LABEL})+\.?$"
+    label, zone_label = _get_label(always_tolerant=always_tolerant)
+    regex = rf"^(\*|{label})(\.{zone_label})+\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
         raise ValidationError(f"{name} is not a valid fully qualified DNS host name")
@@ -29,23 +55,19 @@ def validate_fqdn(name, always_tolerant=False):
 def validate_extended_hostname(
     name, tolerate_leading_underscores=False, always_tolerant=False
 ):
-    if always_tolerant or tolerate_leading_underscores:
-        if always_tolerant or get_plugin_config(
-            "netbox_dns", "tolerate_underscores_in_hostnames"
-        ):
-            regex = rf"^([*@]|(\*\.)?{TOLERANT_LEADING_UNDERSCORE_LABEL}(\.{TOLERANT_LEADING_UNDERSCORE_LABEL})*\.?)$"
-        else:
-            regex = rf"^([*@]|(\*\.)?{LEADING_UNDERSCORE_LABEL}(\.{LEADING_UNDERSCORE_LABEL})*\.?)$"
-    elif get_plugin_config("netbox_dns", "tolerate_underscores_in_hostnames"):
-        regex = rf"^([*@]|(\*\.)?{TOLERANT_LABEL}(\.{TOLERANT_LABEL})*\.?)$"
-    else:
-        regex = rf"^([*@]|(\*\.)?{LABEL}(\.{LABEL})*\.?)$"
+    label, zone_label = _get_label(
+        tolerate_leading_underscores=tolerate_leading_underscores,
+        always_tolerant=always_tolerant,
+    )
+    regex = rf"^([*@]|(\*\.)?{label}(\.{zone_label})*\.?)$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
         raise ValidationError(f"{name} is not a valid DNS host name")
 
 
-def validate_domain_name(name, always_tolerant=False, allow_empty_label=False):
+def validate_domain_name(
+    name, always_tolerant=False, allow_empty_label=False, zone_name=False
+):
     if name == "@" and allow_empty_label:
         return
 
@@ -54,12 +76,11 @@ def validate_domain_name(name, always_tolerant=False, allow_empty_label=False):
     ):
         return
 
-    if always_tolerant:
-        regex = rf"^{TOLERANT_LEADING_UNDERSCORE_LABEL}(\.{TOLERANT_LEADING_UNDERSCORE_LABEL})*\.?$"
-    elif get_plugin_config("netbox_dns", "tolerate_underscores_in_hostnames"):
-        regex = rf"^{TOLERANT_LABEL}(\.{TOLERANT_LABEL})*\.?$"
+    label, zone_label = _get_label(always_tolerant=always_tolerant)
+    if zone_name:
+        regex = rf"^{zone_label}(\.{zone_label})*\.?$"
     else:
-        regex = rf"^{LABEL}(\.{LABEL})*\.?$"
+        regex = rf"^{label}(\.{zone_label})*\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or has_invalid_double_dash(name):
         raise ValidationError(f"{name} is not a valid DNS domain name")
