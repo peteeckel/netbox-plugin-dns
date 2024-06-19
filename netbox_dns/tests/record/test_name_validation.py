@@ -105,6 +105,7 @@ class RecordNameValidationTestCase(TestCase):
             {"name": "x" * 64 + f".{self.zones[1].name}", "zone": self.zones[1]},
             {"name": "xn--n", "zone": self.zones[0]},
             {"name": "xn--n.zone1.example.com.", "zone": self.zones[0]},
+            {"name": "na/me1.zone1.example.com.", "zone": self.zones[0]},
         )
 
         for record in records:
@@ -116,7 +117,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -136,7 +137,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -154,7 +155,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -182,7 +183,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -201,3 +202,30 @@ class RecordNameValidationTestCase(TestCase):
                 Record.objects.create(
                     name=record.get("name"), zone=record.get("zone"), **self.record_data
                 )
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "tolerate_characters_in_zone_labels": "/",
+            }
+        }
+    )
+    def test_name_validation_allow_special_character_ok(self):
+        zone = self.zones[0]
+        zone.name = "zo/ne1.example.com"
+        zone.save()
+
+        record = Record.objects.create(name="name1", zone=zone, **self.record_data)
+
+        self.assertEqual(record.fqdn, "name1.zo/ne1.example.com.")
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "tolerate_characters_in_zone_labels": "/",
+            }
+        }
+    )
+    def test_name_validation_allow_special_character_failure(self):
+        with self.assertRaises(ValidationError):
+            Record.objects.create(name="na/me1", zone=self.zones[0], **self.record_data)

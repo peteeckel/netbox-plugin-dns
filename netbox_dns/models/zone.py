@@ -610,7 +610,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             ) from None
 
         try:
-            validate_domain_name(self.name)
+            validate_domain_name(self.name, zone_name=True)
         except ValidationError as exc:
             raise ValidationError(
                 {

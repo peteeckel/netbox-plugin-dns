@@ -21,7 +21,7 @@ def arpa_to_prefix(arpa_name):
 
         try:
             return IPNetwork(f"{address}/{mask}")
-        except AddrFormatError:
+        except (AddrFormatError, ValueError):
             return None
 
     elif name.endswith("ip6.arpa"):

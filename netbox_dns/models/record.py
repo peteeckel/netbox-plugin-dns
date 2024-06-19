@@ -22,7 +22,7 @@ from netbox_dns.utilities import (
 )
 from netbox_dns.validators import (
     validate_fqdn,
-    validate_extended_hostname,
+    validate_generic_name,
     validate_domain_name,
 )
 from netbox_dns.mixins import ObjectModificationMixin
@@ -494,7 +494,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
             "netbox_dns", "tolerate_non_rfc1035_types", default=[]
         ):
             try:
-                validate_extended_hostname(
+                validate_generic_name(
                     self.name,
                     (
                         self.type
@@ -541,14 +541,19 @@ class Record(ObjectModificationMixin, NetBoxModel):
                     )
 
                 case (
-                    RecordTypeChoices.DNAME
-                    | RecordTypeChoices.NS
+                    RecordTypeChoices.NS
                     | RecordTypeChoices.HTTPS
                     | RecordTypeChoices.SRV
                     | RecordTypeChoices.SVCB
                 ):
                     _validate_idn(rr.target)
                     validate_domain_name(rr.target.to_text(), always_tolerant=True)
+
+                case RecordTypeChoices.DNAME:
+                    _validate_idn(rr.target)
+                    validate_domain_name(
+                        rr.target.to_text(), always_tolerant=True, zone_name=True
+                    )
 
                 case RecordTypeChoices.PTR | RecordTypeChoices.NSAP_PTR:
                     _validate_idn(rr.target)
@@ -570,7 +575,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
 
                 case RecordTypeChoices.NAPTR:
                     _validate_idn(rr.replacement)
-                    validate_extended_hostname(
+                    validate_generic_name(
                         rr.replacement.to_text(), always_tolerant=True
                     )
 
