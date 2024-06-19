@@ -530,6 +530,7 @@ There are some special cases that need to be taken care of:
 To take care of these cases, there are three configuration variables for NetBox DNS that adjust the validation of record names:
 
 * `tolerate_underscores_in_labels` can be set to allow the use of undercores in host names. Underscores are normally only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
+* `tolerate_characters_in_zone_labels` is a string consisting of characters that are to be allowed in zone labels in addition to the standard characters. This can be used to allow zone names like `0/25.2.0.192.in-addr.arpa` from the RFC2317 examples. Allowing special characters can lead to unexpected results with zone provisioning tools and to zones not loadable by some or all DNS server implementations, so use this option with extreme caution.
 * `tolerate_leading_underscore_types` contains a list of RR types that allow an underscore as the first character in a label.
 * `tolerate_non_rfc1035_types` contains a list of record types that allow characters outside the set defined in RFC1035 to be used in RR names. Record types in this list are exempt from validation.
 
@@ -537,7 +538,8 @@ To take care of these cases, there are three configuration variables for NetBox 
 
 Variable                            | Factory Default
 --------                            | ---------------
-`tolerate_underscores_in_labels`    | False
+`tolerate_underscores_in_labels`    | `False`
+`tolerate_characters_in_zone_labels`| `''`
 `tolerate_leading_underscore_types` | `["TXT", "SRV"]`
 `tolerate_non_rfc1035_types`        | `[]`
 
@@ -548,6 +550,7 @@ PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
         'tolerate_underscores_in_labels': True,
+        'tolerate_characters_in_zone_labels': "/",
         'tolerate_leading_underscore_types': ["TXT", "SRV", "CNAME"]
         'tolerate_non_rfc1035_types': ["X25"]
     },
