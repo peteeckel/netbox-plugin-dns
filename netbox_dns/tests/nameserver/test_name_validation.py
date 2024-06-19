@@ -26,6 +26,8 @@ class NameServerNameValidationTestCase(TestCase):
             "-ns1.example.com",  # leading dash in first label
             "ns1.-example.com",  # leading dash in second label
             "ns1..example.com",  # empty label
+            "n/s1.example.com",  # illegal character in host name
+            "ns.ex/ample.com",  # illegal character in domain name
             "x" * 64 + ".example.com",  # label too long
             "12345678" + ".12345678" * 26 + ".example.com",  # 255 octets
             "123456789" + ".12345678" * 26 + ".example.com",  # 256 octets, trailing dot
@@ -68,3 +70,24 @@ class NameServerNameValidationTestCase(TestCase):
         for name in names:
             with self.assertRaises(ValidationError):
                 NameServer.objects.create(name=name)
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "tolerate_characters_in_zone_labels": "/",
+            }
+        }
+    )
+    def test_name_validation_allow_special_character_ok(self):
+        NameServer.objects.create(name="ns1.ex/ample.com")
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "tolerate_characters_in_zone_labels": "/",
+            }
+        }
+    )
+    def test_name_validation_allow_special_character_failure(self):
+        with self.assertRaises(ValidationError):
+            NameServer.objects.create(name="n/s1.example.com")

@@ -52,6 +52,7 @@ class ZoneNameValidationTestCase(TestCase):
             + ".12345678" * 26
             + ".example.com.",  # 256 octets, trailing dot
             ".",  # root zone
+            "0/25.2.0.192.in-addr.arpa",  # RFC 2317 sample zone including "/"
         )
 
         for name in names:
@@ -111,3 +112,18 @@ class ZoneNameValidationTestCase(TestCase):
         for name in names:
             with self.assertRaises(ValidationError):
                 Zone.objects.create(name=name, **self.zone_data)
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                **zone_defaults,
+                "tolerate_characters_in_zone_labels": "/",
+            }
+        }
+    )
+    def test_name_validation_allow_special_character_ok(self):
+        names = ("0/25.2.0.192.in-addr.arpa",)  # RFC 2317 sample zone including "/"
+
+        zone = Zone.objects.create(name="0/25.2.0.192.in-addr.arpa", **self.zone_data)
+
+        self.assertEqual(zone.name, "0/25.2.0.192.in-addr.arpa")
