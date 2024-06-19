@@ -787,3 +787,37 @@ If NetBox DNS also created a PTR record for the linked DNS address record, the d
 The detail views for the address and pointer records created for a coupled IP address include a link to that IP address, which can be used to navigate to the address.
 
 ![Record Detail View for Coupled IP Address](images/IPAMCouplingRecordDetailView.png)
+
+## UI Customization
+
+There are limited options to customize the appearance of the NetBox DNS plugin.
+
+### Name of the Main Menu Item
+
+The default name of the submenu NetBox DNS uses in the NetBox sidebar is 'NetBox DNS'. Using the configuration variable `menu_name` in the plugin configuration this can be changed to a different value, e.g. 'DNS':
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        menu_name: "DNS",
+        ...
+    },
+}
+```
+
+### Use a Submenu of the 'Plugins' Menu
+
+In some cases it might be desired not to provide a main menu item for NetBox DNS but use a submenu of NetBox' standard 'Plugins' menu instead. This can be achieved by setting the configuration variable `top_level_menu` to `False` (the default value is `True`):
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        top_level_menu: False``,
+        ...
+    },
+}
+```
+
+The name of the submenu is always 'NETBOX DNS' and cannot be changed by setting `menu_name `. This is hard-coded in NetBox.
