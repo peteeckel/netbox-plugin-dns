@@ -52,7 +52,7 @@ def validate_fqdn(name, always_tolerant=False):
         raise ValidationError(f"{name} is not a valid fully qualified DNS host name")
 
 
-def validate_extended_hostname(
+def validate_generic_name(
     name, tolerate_leading_underscores=False, always_tolerant=False
 ):
     label, zone_label = _get_label(

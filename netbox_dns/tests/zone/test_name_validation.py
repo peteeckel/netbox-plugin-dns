@@ -74,7 +74,7 @@ class ZoneNameValidationTestCase(TestCase):
         PLUGINS_CONFIG={
             "netbox_dns": {
                 **zone_defaults,
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
             }
         }
     )
@@ -92,7 +92,7 @@ class ZoneNameValidationTestCase(TestCase):
         PLUGINS_CONFIG={
             "netbox_dns": {
                 **zone_defaults,
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
             }
         }
     )

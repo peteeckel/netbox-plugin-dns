@@ -116,7 +116,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -136,7 +136,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -154,7 +154,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }
@@ -182,7 +182,7 @@ class RecordNameValidationTestCase(TestCase):
     @override_settings(
         PLUGINS_CONFIG={
             "netbox_dns": {
-                "tolerate_underscores_in_hostnames": True,
+                "tolerate_underscores_in_labels": True,
                 "tolerate_leading_underscore_types": ["TXT", "SRV"],
                 "tolerate_non_rfc1035_types": [],
             }

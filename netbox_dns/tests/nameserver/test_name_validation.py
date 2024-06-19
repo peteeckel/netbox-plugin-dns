@@ -36,7 +36,7 @@ class NameServerNameValidationTestCase(TestCase):
                 NameServer.objects.create(name=name)
 
     @override_settings(
-        PLUGINS_CONFIG={"netbox_dns": {"tolerate_underscores_in_hostnames": True}}
+        PLUGINS_CONFIG={"netbox_dns": {"tolerate_underscores_in_labels": True}}
     )
     def test_name_validation_tolerant_ok(self):
         names = (
