@@ -10,9 +10,10 @@ from django.conf import settings
 from rest_framework import status
 
 from core.models import ObjectType
+from core.choices import ObjectChangeActionChoices
 from extras.models import EventRule, Tag, Webhook
 from extras.choices import EventRuleActionChoices
-from extras.context_managers import event_tracking
+from netbox.context_managers import event_tracking
 from utilities.testing import APITestCase
 
 from netbox_dns.models import NameServer, Zone
