@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 import strawberry
 import strawberry_django
@@ -37,12 +37,11 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     status: str
     active: bool
     view: Annotated["NetBoxDNSViewType", strawberry.lazy("netbox_dns.graphql.types")]
-    nameservers: (
+    nameservers: List[
         Annotated[
             "NetBoxDNSNameServerType", strawberry.lazy("netbox_dns.graphql.types")
         ]
-        | None
-    )
+    ]
     default_ttl: BigInt
     soa_ttl: BigInt
     soa_mname: Annotated[
