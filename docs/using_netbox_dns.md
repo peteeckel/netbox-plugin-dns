@@ -632,7 +632,7 @@ PLUGINS_CONFIG = {
 }
 ```
 
-If `enforce_unique_rrset_ttl` is set to `True`, new records with the same name, zone and type cannot be created. It is possible to change the TTL for records that are part of an RRSet, but when the TTL is changed for one record, it will automatically be changed for the other records in the RRSet as well.
+If `enforce_unique_rrset_ttl` is set to `True`, new records with the same name, zone and type but a different TTL value cannot be created. It is possible to change the TTL for records that are part of an RRSet, but when the TTL is changed for one record, it will automatically be changed for the other records in the RRSet as well.
 
 ### Updating existing RRSets
 In the event that there are already RRSets in the NetBox DNS database with inconsistent TTL values, these can be cleaned up using the following management command:
