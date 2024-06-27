@@ -97,7 +97,7 @@ Now NetBox DNS should show up under "Plugins" at the bottom of the left-hand sid
 In order for existing NetBox DNS objects to appear in the global search after the initial installation or some upgrades of NetBox DNS, the search indices need to be rebuilt. This can be done with the command
 
 ```
-/opt/netbox/netbox/manage.py reindex netbox_dns
+/opt/netbox/netbox/manage.py reindex --lazy netbox_dns
 ```
 This can be done at any time, especially when items that should show up in the global search do not.
 
