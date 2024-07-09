@@ -1,3 +1,7 @@
+from django.urls import reverse
+from rest_framework import status
+
+
 from utilities.testing import APIViewTestCases
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
@@ -49,7 +53,7 @@ class RecordAPITestCase(
         View.objects.bulk_create(views)
 
         default_view = View.get_default_view()
-        zones = (
+        cls.zones = (
             Zone(name="zone1.example.com", **zone_data, view=default_view),
             Zone(name="zone2.example.com", **zone_data, view=default_view),
             Zone(name="zone3.example.com", **zone_data, view=default_view),
@@ -60,67 +64,67 @@ class RecordAPITestCase(
             Zone(name="zone2.example.com", **zone_data, view=views[1]),
             Zone(name="zone3.example.com", **zone_data, view=views[1]),
         )
-        Zone.objects.bulk_create(zones)
+        Zone.objects.bulk_create(cls.zones)
 
         records = (
             Record(
-                zone=zones[0],
+                zone=cls.zones[0],
                 type=RecordTypeChoices.A,
                 name="example1",
                 value="192.168.1.1",
                 ttl=5000,
             ),
             Record(
-                zone=zones[1],
+                zone=cls.zones[1],
                 type=RecordTypeChoices.AAAA,
                 name="example2",
                 value="fe80::dead:beef",
                 ttl=6000,
             ),
             Record(
-                zone=zones[2],
+                zone=cls.zones[2],
                 type=RecordTypeChoices.TXT,
                 name="example3",
                 value="TXT Record",
                 ttl=7000,
             ),
             Record(
-                zone=zones[3],
+                zone=cls.zones[3],
                 type=RecordTypeChoices.A,
                 name="example1",
                 value="192.168.1.1",
                 ttl=5000,
             ),
             Record(
-                zone=zones[4],
+                zone=cls.zones[4],
                 type=RecordTypeChoices.AAAA,
                 name="example2",
                 value="fe80::dead:beef",
                 ttl=6000,
             ),
             Record(
-                zone=zones[5],
+                zone=cls.zones[5],
                 type=RecordTypeChoices.TXT,
                 name="example3",
                 value="TXT Record",
                 ttl=7000,
             ),
             Record(
-                zone=zones[6],
+                zone=cls.zones[6],
                 type=RecordTypeChoices.A,
                 name="example1",
                 value="192.168.1.1",
                 ttl=5000,
             ),
             Record(
-                zone=zones[7],
+                zone=cls.zones[7],
                 type=RecordTypeChoices.AAAA,
                 name="example2",
                 value="fe80::dead:beef",
                 ttl=6000,
             ),
             Record(
-                zone=zones[8],
+                zone=cls.zones[8],
                 type=RecordTypeChoices.TXT,
                 name="example3",
                 value="TXT Record",
@@ -132,14 +136,14 @@ class RecordAPITestCase(
 
         cls.create_data = [
             {
-                "zone": zones[0].pk,
+                "zone": cls.zones[0].pk,
                 "type": RecordTypeChoices.A,
                 "name": "example4",
                 "value": "1.1.1.1",
                 "ttl": 9600,
             },
             {
-                "zone": zones[1].pk,
+                "zone": cls.zones[1].pk,
                 "type": RecordTypeChoices.AAAA,
                 "name": "example5",
                 "value": "fe80::dead:beef",
@@ -147,21 +151,21 @@ class RecordAPITestCase(
                 "ttl": 9600,
             },
             {
-                "zone": zones[2].pk,
+                "zone": cls.zones[2].pk,
                 "type": RecordTypeChoices.TXT,
                 "name": "example6",
                 "value": "TXT Record",
                 "ttl": 9600,
             },
             {
-                "zone": zones[3].pk,
+                "zone": cls.zones[3].pk,
                 "type": RecordTypeChoices.A,
                 "name": "example4",
                 "value": "1.1.1.1",
                 "ttl": 9600,
             },
             {
-                "zone": zones[4].pk,
+                "zone": cls.zones[4].pk,
                 "type": RecordTypeChoices.AAAA,
                 "name": "example5",
                 "value": "fe80::dead:beef",
@@ -169,21 +173,21 @@ class RecordAPITestCase(
                 "ttl": 9600,
             },
             {
-                "zone": zones[5].pk,
+                "zone": cls.zones[5].pk,
                 "type": RecordTypeChoices.TXT,
                 "name": "example6",
                 "value": "TXT Record",
                 "ttl": 9600,
             },
             {
-                "zone": zones[6].pk,
+                "zone": cls.zones[6].pk,
                 "type": RecordTypeChoices.A,
                 "name": "example4",
                 "value": "1.1.1.1",
                 "ttl": 9600,
             },
             {
-                "zone": zones[7].pk,
+                "zone": cls.zones[7].pk,
                 "type": RecordTypeChoices.AAAA,
                 "name": "example5",
                 "value": "fe80::dead:beef",
@@ -191,10 +195,76 @@ class RecordAPITestCase(
                 "ttl": 9600,
             },
             {
-                "zone": zones[8].pk,
+                "zone": cls.zones[8].pk,
                 "type": RecordTypeChoices.TXT,
                 "name": "example6",
                 "value": "TXT Record",
                 "ttl": 9600,
             },
         ]
+
+    def test_create_managed_record(self):
+        self.add_permissions("netbox_dns.add_record")
+
+        url = reverse("plugins-api:netbox_dns-api:record-list")
+        data = {
+            "name": "name42",
+            "zone": self.zones[0].pk,
+            "type": RecordTypeChoices.AAAA,
+            "value": "fe80::dead:beef",
+            "managed": True,
+        }
+
+        response = self.client.post(url, data, format="json", **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_managed_record(self):
+        record = Record.objects.create(
+            name="name1",
+            zone=self.zones[0],
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+            managed=True,
+        )
+
+        url = reverse(
+            "plugins-api:netbox_dns-api:record-detail", kwargs={"pk": record.pk}
+        )
+        self.add_permissions("netbox_dns.change_record")
+        data = {
+            "value": "10.0.0.2",
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_record_set_managed(self):
+        record = Record.objects.create(
+            name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
+        )
+
+        url = reverse(
+            "plugins-api:netbox_dns-api:record-detail", kwargs={"pk": record.pk}
+        )
+        self.add_permissions("netbox_dns.change_record")
+        data = {
+            "managed": True,
+        }
+        response = self.client.patch(url, data, format="json", **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_managed_record(self):
+        record = Record.objects.create(
+            name="name1",
+            zone=self.zones[0],
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+            managed=True,
+        )
+
+        url = reverse(
+            "plugins-api:netbox_dns-api:record-detail", kwargs={"pk": record.pk}
+        )
+        self.add_permissions("netbox_dns.delete_record")
+
+        response = self.client.delete(url, **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)

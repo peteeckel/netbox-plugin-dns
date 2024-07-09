@@ -85,6 +85,16 @@ class RecordViewSet(NetBoxModelViewSet):
     serializer_class = RecordSerializer
     filterset_class = RecordFilterSet
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        if not isinstance(data, list):
+            data = [data]
+
+        if any(record.get("managed") for record in data):
+            raise serializers.ValidationError("'managed' is True, refusing create")
+
+        return super().create(request, *args, **kwargs)
+
     def destroy(self, request, *args, **kwargs):
         v_object = self.get_object()
         if v_object.managed:
@@ -98,6 +108,11 @@ class RecordViewSet(NetBoxModelViewSet):
         v_object = self.get_object()
         if v_object.managed:
             raise serializers.ValidationError(f"{v_object} is managed, refusing update")
+
+        if request.data.get("managed"):
+            raise serializers.ValidationError(
+                f"{v_object} is unmanaged, refusing update to managed"
+            )
 
         return super().update(request, *args, **kwargs)
 
