@@ -44,7 +44,6 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
 
 
 class RecordTable(RecordBaseTable):
-    pk = ToggleColumn()
     status = ChoiceFieldColumn()
     disable_ptr = tables.BooleanColumn(
         verbose_name="Disable PTR",
@@ -60,7 +59,6 @@ class RecordTable(RecordBaseTable):
     class Meta(NetBoxTable.Meta):
         model = Record
         fields = (
-            "pk",
             "name",
             "zone",
             "ttl",

@@ -20,7 +20,6 @@ class NameServerTable(TenancyColumnsMixin, NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = NameServer
         fields = (
-            "pk",
             "name",
             "description",
             "tags",
@@ -28,7 +27,6 @@ class NameServerTable(TenancyColumnsMixin, NetBoxTable):
             "tenant_group",
         )
         default_columns = (
-            "pk",
             "name",
             "tags",
         )

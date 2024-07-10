@@ -55,7 +55,6 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Zone
         fields = (
-            "pk",
             "name",
             "view",
             "status",
@@ -78,7 +77,6 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "tenant_group",
         )
         default_columns = (
-            "pk",
             "name",
             "view",
             "status",

@@ -119,9 +119,6 @@ class RelatedDNSObjects(PluginTemplateExtension):
 
 template_extensions = []
 
-if version.parse(settings.VERSION) < version.parse("3.7.0"):
-    template_extensions.append(RelatedDNSObjects)
-
 if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
     template_extensions.append(RelatedDNSRecords)
 elif get_plugin_config("netbox_dns", "feature_ipam_dns_info"):
