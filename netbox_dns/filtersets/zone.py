@@ -7,14 +7,8 @@ from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
-from netbox_dns.models import (
-    View,
-    Zone,
-    ZoneStatusChoices,
-    Registrar,
-    Contact,
-    NameServer,
-)
+from netbox_dns.models import View, Zone, Registrar, Contact, NameServer
+from netbox_dns.choices import ZoneStatusChoices
 
 
 class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

@@ -15,7 +15,8 @@ from extras.choices import EventRuleActionChoices, ObjectChangeActionChoices
 from extras.context_managers import event_tracking
 from utilities.testing import APITestCase
 
-from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
+from netbox_dns.models import NameServer, Zone, Record
+from netbox_dns.choices import RecordTypeChoices
 
 
 class RecordEventRuleTest(APITestCase):

@@ -25,6 +25,7 @@ from utilities.querysets import RestrictedQuerySet
 from utilities.choices import ChoiceSet
 from ipam.models import IPAddress
 
+from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
     arpa_to_prefix,
@@ -38,12 +39,9 @@ from netbox_dns.validators import (
 )
 from netbox_dns.mixins import ObjectModificationMixin
 
-# +
-# This is a hack designed to break cyclic imports between View, Record and Zone
-# -
-import netbox_dns.models.record as record
-import netbox_dns.models.view as view
-import netbox_dns.models.nameserver as nameserver
+from .record import Record
+from .view import View
+from .nameserver import NameServer
 
 
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
@@ -61,22 +59,6 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
                 )
             )
         )
-
-
-class ZoneStatusChoices(ChoiceSet):
-    key = "Zone.status"
-
-    STATUS_ACTIVE = "active"
-    STATUS_RESERVED = "reserved"
-    STATUS_DEPRECATED = "deprecated"
-    STATUS_PARKED = "parked"
-
-    CHOICES = [
-        (STATUS_ACTIVE, "Active", "blue"),
-        (STATUS_RESERVED, "Reserved", "cyan"),
-        (STATUS_DEPRECATED, "Deprecated", "red"),
-        (STATUS_PARKED, "Parked", "gray"),
-    ]
 
 
 class Zone(ObjectModificationMixin, NetBoxModel):
@@ -371,7 +353,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             return None
 
     def record_count(self, managed=False):
-        return record.Record.objects.filter(zone=self, managed=managed).count()
+        return Record.objects.filter(zone=self, managed=managed).count()
 
     def rfc2317_child_zone_count(self):
         return Zone.objects.filter(rfc2317_parent_zone=self).count()
@@ -380,8 +362,8 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         soa_name = "@"
         soa_ttl = self.soa_ttl
         soa_rdata = SOA.SOA(
-            rdclass=record.RecordClassChoices.IN,
-            rdtype=record.RecordTypeChoices.SOA,
+            rdclass=RecordClassChoices.IN,
+            rdtype=RecordTypeChoices.SOA,
             mname=self.soa_mname.name,
             rname=self.soa_rname,
             serial=self.soa_serial,
@@ -392,9 +374,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         )
 
         try:
-            soa_record = self.record_set.get(
-                type=record.RecordTypeChoices.SOA, name=soa_name
-            )
+            soa_record = self.record_set.get(type=RecordTypeChoices.SOA, name=soa_name)
 
             if soa_record.ttl != soa_ttl or soa_record.value != soa_rdata.to_text():
                 soa_record.ttl = soa_ttl
@@ -402,10 +382,10 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 soa_record.managed = True
                 soa_record.save()
 
-        except record.Record.DoesNotExist:
-            record.Record.objects.create(
+        except Record.DoesNotExist:
+            Record.objects.create(
                 zone_id=self.pk,
-                type=record.RecordTypeChoices.SOA,
+                type=RecordTypeChoices.SOA,
                 name=soa_name,
                 ttl=soa_ttl,
                 value=soa_rdata.to_text(),
@@ -417,14 +397,14 @@ class Zone(ObjectModificationMixin, NetBoxModel):
 
         nameservers = [f"{nameserver.name}." for nameserver in self.nameservers.all()]
 
-        self.record_set.filter(type=record.RecordTypeChoices.NS, managed=True).exclude(
+        self.record_set.filter(type=RecordTypeChoices.NS, managed=True).exclude(
             value__in=nameservers
         ).delete()
 
         for ns in nameservers:
-            record.Record.raw_objects.update_or_create(
+            Record.raw_objects.update_or_create(
                 zone_id=self.pk,
-                type=record.RecordTypeChoices.NS,
+                type=RecordTypeChoices.NS,
                 name=ns_name,
                 value=ns,
                 managed=True,
@@ -452,14 +432,11 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 continue
 
             relative_name = name.relativize(parent).to_text()
-            address_records = record.Record.objects.filter(
+            address_records = Record.objects.filter(
                 Q(zone=ns_zone),
-                Q(status__in=record.Record.ACTIVE_STATUS_LIST),
+                Q(status__in=Record.ACTIVE_STATUS_LIST),
                 Q(Q(name=f"{_nameserver.name}.") | Q(name=relative_name)),
-                Q(
-                    Q(type=record.RecordTypeChoices.A)
-                    | Q(type=record.RecordTypeChoices.AAAA)
-                ),
+                Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
             )
 
             if not address_records:
@@ -482,8 +459,8 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             )
 
     def get_auto_serial(self):
-        records = record.Record.objects.filter(zone_id=self.pk).exclude(
-            type=record.RecordTypeChoices.SOA
+        records = Record.objects.filter(zone_id=self.pk).exclude(
+            type=RecordTypeChoices.SOA
         )
         if records:
             soa_serial = (
@@ -541,7 +518,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 self.save(update_fields=["rfc2317_parent_zone"])
 
         ptr_records = self.record_set.filter(
-            type=record.RecordTypeChoices.PTR
+            type=RecordTypeChoices.PTR
         ).prefetch_related("zone", "rfc2317_cname_record")
         ptr_zones = {ptr_record.zone for ptr_record in ptr_records}
 
@@ -576,7 +553,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
         if self.view_id is None:
-            self.view_id = view.View.get_default_view().pk
+            self.view_id = View.get_default_view().pk
 
         for field, value in self.get_defaults().items():
             if getattr(self, field) in (None, ""):
@@ -586,10 +563,8 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         if self.soa_mname_id is None:
             default_soa_mname = defaults.get("zone_soa_mname")
             try:
-                self.soa_mname = nameserver.NameServer.objects.get(
-                    name=default_soa_mname
-                )
-            except nameserver.NameServer.DoesNotExist:
+                self.soa_mname = NameServer.objects.get(name=default_soa_mname)
+            except NameServer.DoesNotExist:
                 raise ValidationError(
                     f"Default soa_mname instance {default_soa_mname} does not exist"
                 )
@@ -715,12 +690,9 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 view=self.view,
                 arpa_network__net_contains_or_equals=self.arpa_network,
             )
-            address_records = record.Record.objects.filter(
+            address_records = Record.objects.filter(
                 Q(ptr_record__isnull=True) | Q(ptr_record__zone__in=zones),
-                type__in=(
-                    record.RecordTypeChoices.A,
-                    record.RecordTypeChoices.AAAA,
-                ),
+                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
                 disable_ptr=False,
             )
 
@@ -749,11 +721,11 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 view=self.view,
                 arpa_network__net_contains=self.rfc2317_prefix,
             )
-            address_records = record.Record.objects.filter(
+            address_records = Record.objects.filter(
                 Q(ptr_record__isnull=True)
                 | Q(ptr_record__zone__in=zones)
                 | Q(ptr_record__zone=self),
-                type=record.RecordTypeChoices.A,
+                type=RecordTypeChoices.A,
                 disable_ptr=False,
             )
 
@@ -771,7 +743,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
 
         elif changed_fields is not None and {"name", "view", "status"} & changed_fields:
             for address_record in self.record_set.filter(
-                type__in=(record.RecordTypeChoices.A, record.RecordTypeChoices.AAAA)
+                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA)
             ):
                 address_record.save(update_fields=["ptr_record"])
 
@@ -809,9 +781,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             ptr_records = self.record_set.filter(address_record__isnull=False)
             update_records = [
                 address_record.pk
-                for address_record in record.Record.objects.filter(
-                    ptr_record__in=ptr_records
-                )
+                for address_record in Record.objects.filter(ptr_record__in=ptr_records)
             ]
 
             cname_records = {
@@ -842,9 +812,9 @@ class Zone(ObjectModificationMixin, NetBoxModel):
 
             super().delete(*args, **kwargs)
 
-        address_records = record.Record.objects.filter(
-            pk__in=update_records
-        ).prefetch_related("zone")
+        address_records = Record.objects.filter(pk__in=update_records).prefetch_related(
+            "zone"
+        )
 
         for address_record in address_records:
             address_record.save(save_zone_serial=False)

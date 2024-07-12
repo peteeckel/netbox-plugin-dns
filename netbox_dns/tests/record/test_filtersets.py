@@ -3,13 +3,8 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import (
-    Zone,
-    ZoneStatusChoices,
-    NameServer,
-    Record,
-    RecordTypeChoices,
-)
+from netbox_dns.models import Zone, NameServer, Record
+from netbox_dns.choices import ZoneStatusChoices, RecordTypeChoices
 from netbox_dns.filtersets import RecordFilterSet
 
 

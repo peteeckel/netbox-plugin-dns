@@ -26,11 +26,11 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from netbox_dns.models import (
     View,
     Zone,
-    ZoneStatusChoices,
     NameServer,
     Registrar,
     Contact,
 )
+from netbox_dns.choices import ZoneStatusChoices
 from netbox_dns.utilities import name_to_unicode
 from netbox_dns.fields import RFC2317NetworkFormField
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317

@@ -11,8 +11,7 @@ import taggit.managers
 import utilities.json
 from django.db import migrations, models
 
-
-from netbox_dns.models import RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.utilities import arpa_to_prefix
 
 

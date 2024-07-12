@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from netbox_dns.models import NameServer, Zone, Record, RecordTypeChoices
+from netbox_dns.models import NameServer, Zone, Record
+from netbox_dns.choices import RecordTypeChoices
 
 
 class RecordFQDNTestSet(TestCase):

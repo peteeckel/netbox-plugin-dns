@@ -5,7 +5,7 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 import netbox_dns.fields.address
-from netbox_dns.models import RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.utilities import arpa_to_prefix
 
 
