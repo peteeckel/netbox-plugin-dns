@@ -4,3 +4,5 @@ from .nameserver import *
 from .record import *
 from .contact import *
 from .registrar import *
+from .zone_template import *
+from .record_template import *
