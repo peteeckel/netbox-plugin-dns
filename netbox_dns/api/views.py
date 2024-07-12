@@ -12,6 +12,8 @@ from netbox_dns.api.serializers import (
     RecordSerializer,
     RegistrarSerializer,
     ContactSerializer,
+    ZoneTemplateSerializer,
+    RecordTemplateSerializer,
 )
 from netbox_dns.filtersets import (
     ViewFilterSet,
@@ -20,8 +22,19 @@ from netbox_dns.filtersets import (
     RecordFilterSet,
     RegistrarFilterSet,
     ContactFilterSet,
+    ZoneTemplateFilterSet,
+    RecordTemplateFilterSet,
 )
-from netbox_dns.models import View, Zone, NameServer, Record, Registrar, Contact
+from netbox_dns.models import (
+    View,
+    Zone,
+    NameServer,
+    Record,
+    Registrar,
+    Contact,
+    ZoneTemplate,
+    RecordTemplate,
+)
 
 
 class NetBoxDNSRootView(APIRootView):
@@ -127,3 +140,15 @@ class ContactViewSet(NetBoxModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     filterset_class = ContactFilterSet
+
+
+class ZoneTemplateViewSet(NetBoxModelViewSet):
+    queryset = ZoneTemplate.objects.all()
+    serializer_class = ZoneTemplateSerializer
+    filterset_class = ZoneTemplateFilterSet
+
+
+class RecordTemplateViewSet(NetBoxModelViewSet):
+    queryset = RecordTemplate.objects.all()
+    serializer_class = RecordTemplateSerializer
+    filterset_class = RecordTemplateFilterSet
