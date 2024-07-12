@@ -58,24 +58,28 @@ class ZoneSerializer(NetBoxModelSerializer):
         help_text="The registrar the domain is registered with",
     )
     registrant = ContactSerializer(
+        nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The owner of the domain",
     )
     admin_c = ContactSerializer(
+        nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The administrative contact for the domain",
     )
     tech_c = ContactSerializer(
+        nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The technical contact for the domain",
     )
     billing_c = ContactSerializer(
+        nested=True,
         many=False,
         read_only=False,
         required=False,
