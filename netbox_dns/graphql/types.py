@@ -6,7 +6,16 @@ import strawberry_django
 from netbox.graphql.types import NetBoxObjectType
 from netbox.graphql.scalars import BigInt
 
-from netbox_dns.models import NameServer, View, Zone, Record, Contact, Registrar
+from netbox_dns.models import (
+    NameServer,
+    View,
+    Zone,
+    Record,
+    Contact,
+    Registrar,
+    ZoneTemplate,
+    RecordTemplate,
+)
 from .filters import (
     NetBoxDNSNameServerFilter,
     NetBoxDNSViewFilter,
@@ -14,6 +23,8 @@ from .filters import (
     NetBoxDNSRecordFilter,
     NetBoxDNSContactFilter,
     NetBoxDNSRegistrarFilter,
+    NetBoxDNSZoneTemplateFilter,
+    NetBoxDNSRecordTemplateFilter,
 )
 
 
@@ -140,3 +151,51 @@ class NetBoxDNSRegistrarType(NetBoxObjectType):
     address: str
     abuse_email: str
     abuse_phone: str
+
+
+@strawberry_django.type(
+    ZoneTemplate, fields="__all__", filters=NetBoxDNSZoneTemplateFilter
+)
+class NetBoxDNSZoneTemplateType(NetBoxObjectType):
+    name: str
+    nameservers: List[
+        Annotated[
+            "NetBoxDNSNameServerType", strawberry.lazy("netbox_dns.graphql.types")
+        ]
+    ]
+    description: str | None
+    tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    registrar: (
+        Annotated["NetBoxDNSRegistrarType", strawberry.lazy("netbox_dns.graphql.types")]
+        | None
+    )
+    registrant: (
+        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        | None
+    )
+    admin_c: (
+        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        | None
+    )
+    tech_c: (
+        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        | None
+    )
+    billing_c: (
+        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        | None
+    )
+
+
+@strawberry_django.type(
+    RecordTemplate, fields="__all__", filters=NetBoxDNSRecordTemplateFilter
+)
+class NetBoxDNSRecordTemplateType(NetBoxObjectType):
+    name: str
+    record_name: str
+    type: str
+    value: str
+    ttl: BigInt | None
+    disable_ptr: bool
+    description: str | None
+    tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None

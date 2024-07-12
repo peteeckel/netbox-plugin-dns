@@ -3,7 +3,16 @@ from typing import List
 import strawberry
 import strawberry_django
 
-from netbox_dns.models import NameServer, View, Zone, Record, Contact, Registrar
+from netbox_dns.models import (
+    NameServer,
+    View,
+    Zone,
+    Record,
+    Contact,
+    Registrar,
+    ZoneTemplate,
+    RecordTemplate,
+)
 from .types import (
     NetBoxDNSNameServerType,
     NetBoxDNSViewType,
@@ -11,6 +20,8 @@ from .types import (
     NetBoxDNSRecordType,
     NetBoxDNSContactType,
     NetBoxDNSRegistrarType,
+    NetBoxDNSZoneTemplateType,
+    NetBoxDNSRecordTemplateType,
 )
 
 
@@ -68,3 +79,25 @@ class NetBoxDNSRegistrarQuery:
         return Registrar.objects.get(pk=id)
 
     netbox_dns_registrar_list: List[NetBoxDNSRegistrarType] = strawberry_django.field()
+
+
+@strawberry.type
+class NetBoxDNSZoneTemplateQuery:
+    @strawberry.field
+    def netbox_dns_zone_template(self, id: int) -> NetBoxDNSZoneTemplateType:
+        return ZoneTemplate.objects.get(pk=id)
+
+    netbox_dns_zone_template_list: List[NetBoxDNSZoneTemplateType] = (
+        strawberry_django.field()
+    )
+
+
+@strawberry.type
+class NetBoxDNSRecordTemplateQuery:
+    @strawberry.field
+    def netbox_dns_record_template(self, id: int) -> NetBoxDNSRecordTemplateType:
+        return RecordTemplate.objects.get(pk=id)
+
+    netbox_dns_record_template_list: List[NetBoxDNSRecordTemplateType] = (
+        strawberry_django.field()
+    )
