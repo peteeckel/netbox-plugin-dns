@@ -3,7 +3,8 @@ import ipaddress
 from django.test import TestCase
 
 
-from netbox_dns.models import NameServer, Record, RecordTypeChoices, Zone
+from netbox_dns.models import NameServer, Record, Zone
+from netbox_dns.choices import RecordTypeChoices
 
 
 def reverse_name(address, reverse_zone):

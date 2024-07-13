@@ -20,7 +20,8 @@ from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
+from netbox_dns.models import View, Zone, Record
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
 

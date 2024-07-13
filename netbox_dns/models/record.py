@@ -1,7 +1,7 @@
 import ipaddress
 
 import dns
-from dns import rdata, rdatatype, rdataclass
+from dns import rdata
 from dns import name as dns_name
 
 from django.core.exceptions import ValidationError
@@ -13,19 +13,20 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
-from utilities.choices import ChoiceSet
 
 from netbox_dns.fields import AddressField
-from netbox_dns.utilities import (
-    arpa_to_prefix,
-    name_to_unicode,
-)
+from netbox_dns.utilities import arpa_to_prefix, name_to_unicode
 from netbox_dns.validators import (
     validate_fqdn,
     validate_generic_name,
     validate_domain_name,
 )
 from netbox_dns.mixins import ObjectModificationMixin
+from netbox_dns.choices import (
+    RecordClassChoices,
+    RecordTypeChoices,
+    RecordStatusChoices,
+)
 
 # +
 # This is a hack designed to break cyclic imports between Record and Zone
@@ -62,45 +63,6 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
                 )
             )
         )
-
-
-def initialize_choice_names(cls):
-    for choice in cls.CHOICES:
-        setattr(cls, choice[0], choice[0])
-    return cls
-
-
-@initialize_choice_names
-class RecordTypeChoices(ChoiceSet):
-    CHOICES = [
-        (rdtype.name, rdtype.name)
-        for rdtype in sorted(rdatatype.RdataType, key=lambda a: a.name)
-        if not rdatatype.is_metatype(rdtype)
-    ]
-    SINGLETONS = [
-        rdtype.name for rdtype in rdatatype.RdataType if rdatatype.is_singleton(rdtype)
-    ]
-
-
-@initialize_choice_names
-class RecordClassChoices(ChoiceSet):
-    CHOICES = [
-        (rdclass.name, rdclass.name)
-        for rdclass in sorted(rdataclass.RdataClass)
-        if not rdataclass.is_metaclass(rdclass)
-    ]
-
-
-class RecordStatusChoices(ChoiceSet):
-    key = "Record.status"
-
-    STATUS_ACTIVE = "active"
-    STATUS_INACTIVE = "inactive"
-
-    CHOICES = [
-        (STATUS_ACTIVE, "Active", "blue"),
-        (STATUS_INACTIVE, "Inactive", "red"),
-    ]
 
 
 class Record(ObjectModificationMixin, NetBoxModel):

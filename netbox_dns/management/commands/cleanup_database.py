@@ -2,12 +2,8 @@ from netaddr import IPAddress, IPNetwork, AddrFormatError
 
 from django.core.management.base import BaseCommand
 
-from netbox_dns.models import (
-    Zone,
-    ZoneStatusChoices,
-    Record,
-    RecordTypeChoices,
-)
+from netbox_dns.models import Zone, Record
+from netbox_dns.choices import ZoneStatusChoices, RecordTypeChoices
 
 
 def zone_rename_passive_status_to_parked(verbose=False):

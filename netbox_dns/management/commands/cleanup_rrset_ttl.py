@@ -1,10 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Max, Min
 
-from netbox_dns.models import (
-    Record,
-    RecordTypeChoices,
-)
+from netbox_dns.models import Record
+from netbox_dns.choices import RecordTypeChoices
 
 
 class Command(BaseCommand):

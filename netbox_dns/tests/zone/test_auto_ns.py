@@ -3,7 +3,8 @@ from dns import rdata
 from django.test import TestCase
 from django.db.models import ProtectedError
 
-from netbox_dns.models import NameServer, Record, RecordTypeChoices, Zone
+from netbox_dns.models import NameServer, Record, Zone
+from netbox_dns.choices import RecordTypeChoices
 
 
 class ZoneAutoNSTestCase(TestCase):

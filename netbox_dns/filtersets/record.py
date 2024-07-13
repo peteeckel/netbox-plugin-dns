@@ -9,7 +9,8 @@ from utilities.filters import MultiValueCharFilter
 
 from ipam.models import IPAddress
 
-from netbox_dns.models import View, Zone, Record, RecordTypeChoices, RecordStatusChoices
+from netbox_dns.models import View, Zone, Record
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
 class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

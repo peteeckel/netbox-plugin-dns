@@ -5,7 +5,8 @@ from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 
 
-from netbox_dns.models import View, Zone, NameServer, Record, RecordTypeChoices
+from netbox_dns.models import View, Zone, NameServer, Record
+from netbox_dns.choices import RecordTypeChoices
 
 
 def reverse_name(address, reverse_zone):

@@ -1,7 +1,8 @@
 from ipam.choices import IPAddressStatusChoices
 from utilities.permissions import resolve_permission
 
-from netbox_dns.models import Record, RecordTypeChoices, RecordStatusChoices
+from netbox_dns.models import Record
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 from netbox.plugins.utils import get_plugin_config
 

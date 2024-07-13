@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from netbox_dns.models import NameServer, View, Zone, Record, RecordTypeChoices
+from netbox_dns.models import NameServer, View, Zone, Record
+from netbox_dns.choices import RecordTypeChoices
 
 
 class RFC2317RecordTestCase(TestCase):

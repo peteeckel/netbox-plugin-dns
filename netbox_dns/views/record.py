@@ -9,7 +9,8 @@ from netbox_dns.forms import (
     RecordForm,
     RecordBulkEditForm,
 )
-from netbox_dns.models import Record, RecordTypeChoices, Zone
+from netbox_dns.models import Record, Zone
+from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.tables import RecordTable, ManagedRecordTable, RelatedRecordTable
 from netbox_dns.utilities import value_to_unicode
 

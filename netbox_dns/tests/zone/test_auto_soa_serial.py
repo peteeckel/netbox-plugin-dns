@@ -7,13 +7,8 @@ from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
-from netbox_dns.models import (
-    NameServer,
-    Record,
-    RecordTypeChoices,
-    RecordClassChoices,
-    Zone,
-)
+from netbox_dns.models import NameServer, Record, Zone
+from netbox_dns.choices import RecordClassChoices, RecordTypeChoices
 
 
 def set_soa_serial_back(zone):

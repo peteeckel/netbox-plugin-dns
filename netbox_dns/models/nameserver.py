@@ -13,10 +13,11 @@ from netbox_dns.utilities import (
     normalize_name,
     NameFormatError,
 )
+from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.validators import validate_fqdn
 from netbox_dns.mixins import ObjectModificationMixin
 
-from .record import Record, RecordTypeChoices
+from .record import Record
 
 
 class NameServer(ObjectModificationMixin, NetBoxModel):

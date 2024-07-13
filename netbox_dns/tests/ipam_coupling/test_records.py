@@ -5,13 +5,8 @@ from django.core.exceptions import ValidationError
 from ipam.models import IPAddress
 from ipam.choices import IPAddressStatusChoices
 from netaddr import IPNetwork
-from netbox_dns.models import (
-    Record,
-    Zone,
-    NameServer,
-    RecordTypeChoices,
-    RecordStatusChoices,
-)
+from netbox_dns.models import Record, Zone, NameServer
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
 class IPAMCouplingRecordTestCase(TestCase):
