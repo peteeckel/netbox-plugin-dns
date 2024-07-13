@@ -6,6 +6,9 @@ from tenancy.tables import TenancyColumnsMixin
 from netbox_dns.models import View
 
 
+__ALL__ = ("ViewTable",)
+
+
 class ViewTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,

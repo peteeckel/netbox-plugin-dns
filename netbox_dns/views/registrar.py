@@ -13,6 +13,18 @@ from netbox_dns.forms import (
 from netbox_dns.tables import RegistrarTable, ZoneTable
 
 
+__ALL__ = (
+    "RegistrarView",
+    "RegistrarListView",
+    "RegistrarEditView",
+    "RegistrarDeleteView",
+    "RegistrarBulkImportView",
+    "RegistrarBulkEditView",
+    "RegistrarBulkDeleteView",
+    "RegistrarZoneListView",
+)
+
+
 class RegistrarView(generic.ObjectView):
     queryset = Registrar.objects.all()
 

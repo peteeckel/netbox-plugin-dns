@@ -1,6 +1,9 @@
 from utilities.choices import ChoiceSet
 
 
+__ALL__ = ("ZoneStatusChoices",)
+
+
 class ZoneStatusChoices(ChoiceSet):
     key = "Zone.status"
 

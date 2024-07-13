@@ -13,6 +13,9 @@ from netbox_dns.models import View, Zone, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
+__ALL__ = ("RecordFilterSet",)
+
+
 class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     fqdn = MultiValueCharFilter(
         method="filter_fqdn",

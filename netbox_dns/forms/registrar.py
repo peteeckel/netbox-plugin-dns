@@ -12,6 +12,14 @@ from utilities.forms.rendering import FieldSet
 from netbox_dns.models import Registrar
 
 
+__ALL__ = (
+    "RegistrarForm",
+    "RegistrarFilterForm",
+    "RegistrarImportForm",
+    "RegistrarBulkEditForm",
+)
+
+
 class RegistrarForm(NetBoxModelForm):
     class Meta:
         model = Registrar

@@ -6,6 +6,9 @@ from tenancy.filtersets import TenancyFilterSet
 from netbox_dns.models import View
 
 
+__ALL__ = ("ViewFilterSet",)
+
+
 class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     class Meta:
         model = View

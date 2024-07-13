@@ -6,6 +6,12 @@ from netbox_dns.models import Zone, Record
 from netbox_dns.api.serializers_.view import ViewSerializer
 
 
+__ALL__ = (
+    "NestedZoneSerializer",
+    "NestedRecordSerializer",
+)
+
+
 class NestedZoneSerializer(WritableNestedSerializer):
     def to_representation(self, instance):
         # +

@@ -5,6 +5,9 @@ from netbox.filtersets import NetBoxModelFilterSet
 from netbox_dns.models import Registrar
 
 
+__ALL__ = ("RegistrarFilterSet",)
+
+
 class RegistrarFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Registrar

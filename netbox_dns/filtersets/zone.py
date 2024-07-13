@@ -11,6 +11,9 @@ from netbox_dns.models import View, Zone, Registrar, Contact, NameServer
 from netbox_dns.choices import ZoneStatusChoices
 
 
+__ALL__ = ("ZoneFilterSet",)
+
+
 class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=ZoneStatusChoices,

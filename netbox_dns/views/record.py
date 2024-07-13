@@ -15,6 +15,18 @@ from netbox_dns.tables import RecordTable, ManagedRecordTable, RelatedRecordTabl
 from netbox_dns.utilities import value_to_unicode
 
 
+__ALL__ = (
+    "RecordListView",
+    "ManagedRecordListView",
+    "RecordView",
+    "RecordEditView",
+    "RecordDeleteView",
+    "RecordBulkImportView",
+    "RecordBulkEditView",
+    "RecordBulkDeleteView",
+)
+
+
 class RecordListView(generic.ObjectListView):
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"

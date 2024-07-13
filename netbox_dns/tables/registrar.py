@@ -5,6 +5,9 @@ from netbox.tables import NetBoxTable, TagColumn
 from netbox_dns.models import Registrar
 
 
+__ALL__ = ("RegistrarTable",)
+
+
 class RegistrarTable(NetBoxTable):
     name = tables.Column(
         linkify=True,

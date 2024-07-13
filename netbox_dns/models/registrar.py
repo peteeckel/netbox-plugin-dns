@@ -5,6 +5,12 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 
 
+__ALL__ = (
+    "Registrar",
+    "RegistrarIndex",
+)
+
+
 class Registrar(NetBoxModel):
     # +
     # Data fields according to https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en

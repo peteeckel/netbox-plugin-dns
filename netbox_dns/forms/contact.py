@@ -12,6 +12,14 @@ from utilities.forms.rendering import FieldSet
 from netbox_dns.models import Contact
 
 
+__ALL__ = (
+    "ContactForm",
+    "ContactFilterForm",
+    "ContactImportForm",
+    "ContactBulkEditForm",
+)
+
+
 class ContactForm(NetBoxModelForm):
     fieldsets = (
         FieldSet(

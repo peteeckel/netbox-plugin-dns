@@ -6,6 +6,9 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 from netbox_dns.models import View
 
 
+__ALL__ = ("ViewSerializer",)
+
+
 class ViewSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:view-detail"

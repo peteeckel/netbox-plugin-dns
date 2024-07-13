@@ -10,6 +10,12 @@ from utilities.exceptions import AbortRequest
 from netbox_dns.mixins import ObjectModificationMixin
 
 
+__ALL__ = (
+    "View",
+    "ViewIndex",
+)
+
+
 class View(ObjectModificationMixin, NetBoxModel):
     name = models.CharField(
         unique=True,

@@ -11,6 +11,9 @@ from netbox_dns.api.nested_serializers import (
 )
 
 
+__ALL__ = ("RecordSerializer",)
+
+
 class RecordSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:record-detail"

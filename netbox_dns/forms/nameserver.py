@@ -20,6 +20,14 @@ from netbox_dns.models import NameServer
 from netbox_dns.utilities import name_to_unicode
 
 
+__ALL__ = (
+    "NameServerForm",
+    "NameServerFilterForm",
+    "NameServerImportForm",
+    "NameServerBulkEditForm",
+)
+
+
 class NameServerForm(TenancyForm, NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

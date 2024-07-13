@@ -18,6 +18,22 @@ from netbox_dns.tables import (
 )
 
 
+__ALL__ = (
+    "ZoneListView",
+    "ZoneView",
+    "ZoneEditView",
+    "ZoneDeleteView",
+    "ZoneBulkImportView",
+    "ZoneBulkEditView",
+    "ZoneBulkDeleteView",
+    "ZoneRegistrationView",
+    "ZoneRecordListView",
+    "ZoneManagedRecordListView",
+    "ZoneRFC2317ChildZoneListView",
+    "ZoneChildZoneListView",
+)
+
+
 class ZoneListView(generic.ObjectListView):
     queryset = Zone.objects.all().prefetch_related("view", "tags")
     filterset = ZoneFilterSet

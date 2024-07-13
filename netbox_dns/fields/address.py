@@ -5,6 +5,12 @@ from django.core.exceptions import ValidationError
 from netaddr import AddrFormatError, IPAddress
 
 
+__ALL__ = (
+    "AddressFormField",
+    "AddressField",
+)
+
+
 class AddressFormField(forms.Field):
     def to_python(self, value):
         if not value:
