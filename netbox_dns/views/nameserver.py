@@ -14,6 +14,18 @@ from netbox_dns.models import Zone, NameServer
 from netbox_dns.tables import NameServerTable, ZoneTable
 
 
+__ALL__ = (
+    "NameServerListView",
+    "NameServerView",
+    "NameServerEditView",
+    "NameServerDeleteView",
+    "NameServerBulkEditView",
+    "NameServerBulkDeleteView",
+    "NameServerZoneListView",
+    "NameServerSOAZoneListView",
+)
+
+
 class NameServerListView(generic.ObjectListView):
     queryset = NameServer.objects.all()
     filterset = NameServerFilterSet

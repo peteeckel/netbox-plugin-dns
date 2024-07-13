@@ -5,6 +5,9 @@ from netbox.filtersets import NetBoxModelFilterSet
 from netbox_dns.models import Contact
 
 
+__ALL__ = ("ContactFilterSet",)
+
+
 class ContactFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Contact

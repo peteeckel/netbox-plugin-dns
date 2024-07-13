@@ -15,6 +15,17 @@ from netbox_dns.forms import (
 from netbox_dns.tables import ContactTable, ZoneTable
 
 
+__ALL__ = (
+    "ContactView",
+    "ContactListView",
+    "ContactDeleteView",
+    "ContactBulkImportView",
+    "ContactBulkEditView",
+    "ContactBulkDeleteView",
+    "ContactZoneListView",
+)
+
+
 class ContactView(generic.ObjectView):
     queryset = Contact.objects.all()
 

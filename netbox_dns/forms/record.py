@@ -25,6 +25,14 @@ from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
 
+__ALL__ = (
+    "RecordForm",
+    "RecordFilterForm",
+    "RecordImportForm",
+    "RecordBulkEditForm",
+)
+
+
 class RecordForm(TenancyForm, NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

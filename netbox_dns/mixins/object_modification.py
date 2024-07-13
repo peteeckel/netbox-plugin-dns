@@ -1,6 +1,9 @@
 from netbox.models import NetBoxModel
 
 
+__ALL__ = ("ObjectModificationMixin",)
+
+
 class ObjectModificationMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -8,6 +8,9 @@ from netbox_dns.models import NameServer
 from netbox_dns.api.nested_serializers import NestedZoneSerializer
 
 
+__ALL__ = ("NameServerSerializer",)
+
+
 class NameServerSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:nameserver-detail"

@@ -44,6 +44,12 @@ from .view import View
 from .nameserver import NameServer
 
 
+__ALL__ = (
+    "Zone",
+    "ZoneIndex",
+)
+
+
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
     """
     Custom manager for zones providing the activity status annotation

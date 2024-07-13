@@ -5,6 +5,9 @@ from netbox.api.serializers import NetBoxModelSerializer
 from netbox_dns.models import Registrar
 
 
+__ALL__ = ("RegistrarSerializer",)
+
+
 class RegistrarSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:registrar-detail"

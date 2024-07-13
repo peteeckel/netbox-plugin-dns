@@ -5,6 +5,9 @@ from netbox.tables import NetBoxTable, TagColumn
 from netbox_dns.models import Contact
 
 
+__ALL__ = ("ContactTable",)
+
+
 class ContactTable(NetBoxTable):
     contact_id = tables.Column(
         linkify=True,

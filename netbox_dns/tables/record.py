@@ -13,6 +13,13 @@ from netbox_dns.models import Record
 from netbox_dns.utilities import value_to_unicode
 
 
+__ALL__ = (
+    "RecordTable",
+    "ManagedRecordTable",
+    "RelatedRecordTable",
+)
+
+
 class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     zone = tables.Column(
         linkify=True,

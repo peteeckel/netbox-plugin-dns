@@ -9,6 +9,13 @@ def initialize_choice_names(cls):
     return cls
 
 
+__ALL__ = (
+    "RecordTypeChoices",
+    "RecordClassChoices",
+    "RecordStatusChoices",
+)
+
+
 @initialize_choice_names
 class RecordTypeChoices(ChoiceSet):
     CHOICES = [

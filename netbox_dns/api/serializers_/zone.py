@@ -12,6 +12,9 @@ from netbox_dns.api.nested_serializers import NestedZoneSerializer
 from netbox_dns.models import Zone
 
 
+__ALL__ = ("NameServerSerializer",)
+
+
 class ZoneSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"

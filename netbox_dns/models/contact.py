@@ -7,6 +7,12 @@ from netbox.search import SearchIndex, register_search
 from taggit.managers import TaggableManager
 
 
+__ALL__ = (
+    "Contact",
+    "ContactIndex",
+)
+
+
 class Contact(NetBoxModel):
     # +
     # Data fields according to https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en

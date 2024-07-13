@@ -34,6 +34,12 @@ from netbox_dns.choices import (
 import netbox_dns.models.zone as zone
 
 
+__ALL__ = (
+    "Record",
+    "RecordIndex",
+)
+
+
 def min_ttl(*ttl_list):
     return min((ttl for ttl in ttl_list if ttl is not None), default=None)
 

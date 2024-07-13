@@ -20,6 +20,12 @@ from netbox_dns.mixins import ObjectModificationMixin
 from .record import Record
 
 
+__ALL__ = (
+    "NameServer",
+    "NameServerIndex",
+)
+
+
 class NameServer(ObjectModificationMixin, NetBoxModel):
     name = models.CharField(
         unique=True,

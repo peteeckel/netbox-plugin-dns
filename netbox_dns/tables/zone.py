@@ -10,6 +10,9 @@ from tenancy.tables import TenancyColumnsMixin
 from netbox_dns.models import Zone
 
 
+__ALL__ = ("ZoneTable",)
+
+
 class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,

@@ -6,6 +6,9 @@ from django.core.exceptions import ValidationError
 from netaddr import AddrFormatError, IPNetwork
 
 
+__ALL__ = ()
+
+
 class NetContains(Lookup):
     lookup_name = "net_contains"
 

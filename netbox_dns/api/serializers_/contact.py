@@ -5,6 +5,9 @@ from netbox.api.serializers import NetBoxModelSerializer
 from netbox_dns.models import Contact
 
 
+__ALL__ = ("ContactSerializer",)
+
+
 class ContactSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:contact-detail"

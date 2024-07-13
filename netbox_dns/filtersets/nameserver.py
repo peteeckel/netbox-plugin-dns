@@ -7,6 +7,9 @@ from tenancy.filtersets import TenancyFilterSet
 from netbox_dns.models import NameServer, Zone
 
 
+__ALL__ = ("NameServerFilterSet",)
+
+
 class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",

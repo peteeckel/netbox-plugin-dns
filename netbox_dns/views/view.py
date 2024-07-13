@@ -8,6 +8,18 @@ from netbox_dns.forms import ViewForm, ViewFilterForm, ViewImportForm, ViewBulkE
 from netbox_dns.tables import ViewTable, ZoneTable
 
 
+__ALL__ = (
+    "ViewView",
+    "ViewListView",
+    "ViewEditView",
+    "ViewDeleteView",
+    "ViewBulkImportView",
+    "ViewBulkEditView",
+    "ViewBulkDeleteView",
+    "ViewZoneListView",
+)
+
+
 class ViewView(generic.ObjectView):
     queryset = View.objects.all().prefetch_related("zone_set")
 
