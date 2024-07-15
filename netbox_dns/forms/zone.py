@@ -17,9 +17,9 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
 )
-from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
+from utilities.forms.widgets import BulkEditNullBooleanSelect
 from utilities.forms.rendering import FieldSet
-from utilities.forms import add_blank_choice
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -305,6 +305,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     soa_serial_auto = forms.NullBooleanField(
         required=False,
         label="Generate Serial",
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     rfc2317_prefix = RFC2317NetworkFormField(
         required=False,
@@ -313,6 +314,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     rfc2317_parent_managed = forms.NullBooleanField(
         required=False,
         label="Parent Managed",
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     rfc2317_parent_zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
@@ -393,7 +395,7 @@ class ZoneImportForm(NetBoxModelImportForm):
         required=False,
         help_text="Mailbox of the zone's administrator",
     )
-    soa_serial_auto = forms.NullBooleanField(
+    soa_serial_auto = forms.BooleanField(
         required=False,
         help_text="Generate the SOA serial",
     )
@@ -540,9 +542,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         queryset=View.objects.all(),
         required=False,
         label="View",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:view-list")}
-        ),
     )
     status = forms.ChoiceField(
         choices=add_blank_choice(ZoneStatusChoices),
@@ -567,11 +566,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         queryset=NameServer.objects.all(),
         required=False,
         label="SOA Primary Nameserver",
-        widget=APISelect(
-            attrs={
-                "data-url": reverse_lazy("plugins-api:netbox_dns-api:nameserver-list")
-            }
-        ),
     )
     soa_rname = forms.CharField(
         required=False,
@@ -622,11 +616,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
-        widget=APISelect(
-            attrs={
-                "data-url": reverse_lazy("plugins-api:netbox_dns-api:registrar-list")
-            }
-        ),
     )
     registry_domain_id = forms.CharField(
         required=False,
@@ -635,41 +624,26 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     registrant = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     admin_c = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label="Administrative Contact",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     tech_c = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label="Technical Contact",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     billing_c = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label="Billing Contact",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
-    tenant = CSVModelChoiceField(
+    tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
-        to_field_name="name",
-        help_text="Assigned tenant",
     )
-    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     model = Zone
 
