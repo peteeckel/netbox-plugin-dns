@@ -60,7 +60,7 @@ class View(ObjectModificationMixin, NetBoxModel):
 
         super().delete(*args, **kwargs)
 
-    def clean(self, *args, old_state=None, **kwargs):
+    def clean(self, *args, **kwargs):
         if (changed_fields := self.changed_fields) is None:
             return
 

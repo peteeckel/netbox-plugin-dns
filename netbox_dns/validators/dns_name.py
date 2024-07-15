@@ -19,7 +19,7 @@ def _get_label(tolerate_leading_underscores=False, always_tolerant=False):
     label_characters = rf"a-z0-9{tolerate_characters}"
 
     if always_tolerant:
-        label = rf"[a-z0-9_][a-z0-9_-]*(?<![-_])"
+        label = r"[a-z0-9_][a-z0-9_-]*(?<![-_])"
         zone_label = rf"[{label_characters}_][{label_characters}_-]*(?<![-_])"
 
         return label, zone_label
@@ -33,13 +33,13 @@ def _get_label(tolerate_leading_underscores=False, always_tolerant=False):
             label = r"[a-z0-9_][a-z0-9_-]*(?<![-_])"
             zone_label = rf"[{label_characters}_][{label_characters}_-]*(?<![-_])"
         else:
-            label = rf"[a-z0-9_][a-z0-9-]*(?<!-)"
+            label = r"[a-z0-9_][a-z0-9-]*(?<!-)"
             zone_label = rf"[{label_characters}_][{label_characters}-]*(?<!-)"
     elif tolerate_underscores:
-        label = rf"[a-z0-9][a-z0-9_-]*(?<![-_])"
+        label = r"[a-z0-9][a-z0-9_-]*(?<![-_])"
         zone_label = rf"[{label_characters}][{label_characters}_-]*(?<![-_])"
     else:
-        label = rf"[a-z0-9][a-z0-9-]*(?<!-)"
+        label = r"[a-z0-9][a-z0-9-]*(?<!-)"
         zone_label = rf"[{label_characters}][{label_characters}-]*(?<!-)"
 
     return label, zone_label

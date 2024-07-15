@@ -122,8 +122,6 @@ class ZoneNameValidationTestCase(TestCase):
         }
     )
     def test_name_validation_allow_special_character_ok(self):
-        names = ("0/25.2.0.192.in-addr.arpa",)  # RFC 2317 sample zone including "/"
-
         zone = Zone.objects.create(name="0/25.2.0.192.in-addr.arpa", **self.zone_data)
 
         self.assertEqual(zone.name, "0/25.2.0.192.in-addr.arpa")

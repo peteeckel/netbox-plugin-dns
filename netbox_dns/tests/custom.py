@@ -11,7 +11,6 @@ from strawberry.lazy_type import LazyType
 
 from ipam.graphql.types import IPAddressFamilyType
 from utilities.testing.api import APITestCase as NetBoxAPITestCase
-from utilities.testing.api import APIViewTestCases as NetBoxAPIViewTestCases
 from utilities.testing.views import ModelViewTestCase as NetBoxModelViewTestCase
 from netbox.api.exceptions import GraphQLTypeNotFound
 
@@ -49,29 +48,26 @@ class NetBoxDNSGraphQLMixin:
         )
         for field in type_class.__strawberry_definition__.fields:
             if field.type in file_fields or (
-                type(field.type) is StrawberryOptional
+                isinstance(field.type, StrawberryOptional)
                 and field.type.of_type in file_fields
             ):
                 # image / file fields nullable or not...
                 fields_string += f"{field.name} {{ name }}\n"
-            elif (
-                type(field.type) is StrawberryList
-                and type(field.type.of_type) is LazyType
+            elif isinstance(field.type, StrawberryList) and isinstance(
+                field.type.of_type, LazyType
             ):
                 # List of related objects (queryset)
                 fields_string += f"{field.name} {{ id }}\n"
-            elif (
-                type(field.type) is StrawberryList
-                and type(field.type.of_type) is StrawberryUnion
+            elif isinstance(field.type, StrawberryList) and isinstance(
+                field.type.of_type, StrawberryUnion
             ):
                 # this would require a fragment query
                 continue
-            elif type(field.type) is StrawberryUnion:
+            elif isinstance(field.type, StrawberryUnion):
                 # this would require a fragment query
                 continue
-            elif (
-                type(field.type) is StrawberryOptional
-                and type(field.type.of_type) is LazyType
+            elif isinstance(field.type, StrawberryOptional) and isinstance(
+                field.type.of_type, LazyType
             ):
                 fields_string += f"{field.name} {{ id }}\n"
             elif hasattr(field, "is_relation") and field.is_relation:

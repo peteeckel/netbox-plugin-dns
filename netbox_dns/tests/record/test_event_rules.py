@@ -11,7 +11,7 @@ from rest_framework import status
 
 from core.models import ObjectType
 from extras.models import EventRule, Tag, Webhook
-from extras.choices import EventRuleActionChoices, ObjectChangeActionChoices
+from extras.choices import EventRuleActionChoices
 from extras.context_managers import event_tracking
 from utilities.testing import APITestCase
 
