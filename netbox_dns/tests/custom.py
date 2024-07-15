@@ -11,7 +11,6 @@ from strawberry.lazy_type import LazyType
 
 from ipam.graphql.types import IPAddressFamilyType
 from utilities.testing.api import APITestCase as NetBoxAPITestCase
-from utilities.testing.api import APIViewTestCases as NetBoxAPIViewTestCases
 from utilities.testing.views import ModelViewTestCase as NetBoxModelViewTestCase
 from netbox.api.exceptions import GraphQLTypeNotFound
 

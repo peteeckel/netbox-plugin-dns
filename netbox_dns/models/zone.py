@@ -22,7 +22,6 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
-from utilities.choices import ChoiceSet
 from ipam.models import IPAddress
 
 from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices

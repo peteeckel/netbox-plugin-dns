@@ -1,5 +1,3 @@
-from dns import rdata
-
 from django.test import TestCase
 
 from netbox_dns.models import View, NameServer, Zone

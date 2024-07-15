@@ -1,7 +1,6 @@
 from django import forms
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.urls import reverse_lazy
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,

@@ -1,7 +1,4 @@
-from dns import rdata
-
 from django.test import TestCase
-from django.db.models import ProtectedError
 
 from netbox_dns.models import View, NameServer, Zone
 
