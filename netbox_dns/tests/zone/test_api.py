@@ -30,11 +30,15 @@ class ZoneAPITestCase(
 
     @classmethod
     def setUpTestData(cls):
-        nameserver = NameServer.objects.create(name="ns1.example.com")
+        nameservers = (
+            NameServer.objects.create(name="ns1.example.com"),
+            NameServer.objects.create(name="ns2.example.com"),
+            NameServer.objects.create(name="ns3.example.com"),
+        )
 
         zone_data = {
             **Zone.get_defaults(),
-            "soa_mname": nameserver,
+            "soa_mname": nameservers[0],
             "soa_rname": "hostmaster.example.com",
             "soa_serial_auto": False,
         }
@@ -98,8 +102,9 @@ class ZoneAPITestCase(
             {
                 "name": "zone6.example.com",
                 "status": "reserved",
+                "nameservers": [nameserver.pk for nameserver in nameservers[0:2]],
                 **zone_data,
-                "soa_mname": nameserver.pk,
+                "soa_mname": nameservers[0].pk,
                 "registrar": registrars[0].pk,
                 "registrant": contacts[0].pk,
                 "admin_c": contacts[1].pk,
@@ -109,14 +114,16 @@ class ZoneAPITestCase(
             {
                 "name": "zone7.example.com",
                 "status": "reserved",
+                "nameservers": [nameserver.pk for nameserver in nameservers[1:3]],
                 **zone_data,
-                "soa_mname": nameserver.pk,
+                "soa_mname": nameservers[0].pk,
             },
             {
                 "name": "zone8.example.com",
                 "status": "reserved",
+                "nameservers": [nameserver.pk for nameserver in nameservers[0:3]],
                 **zone_data,
-                "soa_mname": nameserver.pk,
+                "soa_mname": nameservers[0].pk,
                 "registrar": registrars[0].pk,
                 "registrant": contacts[0].pk,
                 "admin_c": contacts[1].pk,
@@ -125,26 +132,29 @@ class ZoneAPITestCase(
             },
             {
                 "name": "zone9.example.com",
+                "nameservers": [nameservers[0].pk],
                 **zone_data,
                 "view": views[0].pk,
-                "soa_mname": nameserver.pk,
+                "soa_mname": nameservers[0].pk,
             },
             {
                 "name": "zone9.example.com",
+                "nameservers": [nameservers[0].pk, nameservers[1].pk],
                 **zone_data,
                 "view": views[1].pk,
-                "soa_mname": nameserver.pk,
+                "soa_mname": nameservers[0].pk,
             },
             {
                 "name": "zone9.example.com",
                 **zone_data,
-                "soa_mname": nameserver.pk,
+                "soa_mname": nameservers[0].pk,
             },
         ]
 
         cls.bulk_update_data = {
             "view": views[2].pk,
             "tags": [t.pk for t in tags],
+            "nameservers": [nameserver.pk for nameserver in nameservers],
             "registrar": registrars[1].pk,
             "registrant": contacts[3].pk,
             "admin_c": contacts[2].pk,
