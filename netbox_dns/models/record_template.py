@@ -9,9 +9,9 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 
-from netbox_dns.validators import validate_generic_name, validate_record_value
-
+from netbox_dns.models import Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+from netbox_dns.validators import validate_generic_name, validate_record_value
 
 
 __ALL__ = (
@@ -63,7 +63,7 @@ class RecordTemplate(NetBoxModel):
         null=True,
     )
 
-    clone_fields = [
+    clone_fields = (
         "record_name",
         "description",
         "type",
@@ -72,7 +72,16 @@ class RecordTemplate(NetBoxModel):
         "ttl",
         "disable_ptr",
         "tenant",
-    ]
+    )
+
+    template_fields = (
+        "type",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "tenant",
+    )
 
     class Meta:
         ordering = ["name"]
@@ -121,6 +130,32 @@ class RecordTemplate(NetBoxModel):
             validate_record_value(self.type, self.value)
         except ValidationError as exc:
             raise ValidationError({"value": exc}) from None
+
+    def matching_records(self, zone):
+        return Record.objects.filter(
+            zone=zone, name=self.record_name, type=self.type, value=self.value
+        )
+
+    def create_record(self, zone):
+        if self.matching_records(zone).exists():
+            return
+
+        record_data = {
+            "zone": zone,
+            "name": self.record_name,
+        }
+        for field in self.template_fields:
+            record_data[field] = getattr(self, field)
+
+        try:
+            record = Record.objects.create(**record_data)
+        except ValidationError as exc:
+            raise ValidationError(
+                f"Error while processing record template {self}: {exc.messages[0]}"
+            )
+
+        if tags := self.tags.all():
+            record.tags.set(tags)
 
     def clean_fields(self, *args, **kwargs):
         self.type = self.type.upper()

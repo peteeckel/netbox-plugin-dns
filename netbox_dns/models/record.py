@@ -1,7 +1,6 @@
 import ipaddress
 
 import dns
-from dns import rdata
 from dns import name as dns_name
 
 from django.core.exceptions import ValidationError
@@ -16,18 +15,9 @@ from utilities.querysets import RestrictedQuerySet
 
 from netbox_dns.fields import AddressField
 from netbox_dns.utilities import arpa_to_prefix, name_to_unicode
-from netbox_dns.validators import (
-    validate_fqdn,
-    validate_generic_name,
-    validate_domain_name,
-    validate_record_value,
-)
+from netbox_dns.validators import validate_generic_name, validate_record_value
 from netbox_dns.mixins import ObjectModificationMixin
-from netbox_dns.choices import (
-    RecordClassChoices,
-    RecordTypeChoices,
-    RecordStatusChoices,
-)
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 # +
 # This is a hack designed to break cyclic imports between Record and Zone

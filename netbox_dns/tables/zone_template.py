@@ -1,11 +1,6 @@
 import django_tables2 as tables
 
-from netbox.tables import (
-    ChoiceFieldColumn,
-    NetBoxTable,
-    TagColumn,
-    ActionsColumn,
-)
+from netbox.tables import NetBoxTable, TagColumn, ActionsColumn
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import ZoneTemplate

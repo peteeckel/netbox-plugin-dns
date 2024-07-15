@@ -1,5 +1,3 @@
-from dns import name as dns_name
-
 from netbox.views import generic
 
 from netbox_dns.filtersets import ZoneTemplateFilterSet

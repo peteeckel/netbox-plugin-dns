@@ -93,6 +93,15 @@ class ZoneTemplate(NetBoxModel):
         "billing_c",
     ]
 
+    template_fields = [
+        "tenant",
+        "registrar",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+    ]
+
     class Meta:
         ordering = ["name"]
 
@@ -101,6 +110,28 @@ class ZoneTemplate(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:zonetemplate", kwargs={"pk": self.pk})
+
+    def apply_to_zone(self, zone):
+        if not zone.nameservers.all() and self.nameservers.all():
+            zone.nameservers.set(self.nameservers.all())
+
+        if not zone.tags.all() and self.tags.all():
+            zone.tags.set(self.tags.all())
+
+        fields_changed = True
+        for field in self.template_fields:
+            if getattr(zone, field) is None and getattr(self, field) is not None:
+                fields_changed = True
+                setattr(zone, field, getattr(self, field))
+
+        if fields_changed:
+            zone.save()
+
+        self.create_records(zone)
+
+    def create_records(self, zone):
+        for record_template in self.record_templates.all():
+            record_template.create_record(zone=zone)
 
 
 @register_search

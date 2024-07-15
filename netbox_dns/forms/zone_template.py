@@ -13,7 +13,6 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
 )
-from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
 from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
@@ -236,42 +235,25 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
-        widget=APISelect(
-            attrs={
-                "data-url": reverse_lazy("plugins-api:netbox_dns-api:registrar-list")
-            }
-        ),
     )
     registrant = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     admin_c = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label="Administrative Contact",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     tech_c = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label="Technical Contact",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     billing_c = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label="Billing Contact",
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:contact-list")}
-        ),
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
