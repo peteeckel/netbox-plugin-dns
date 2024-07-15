@@ -135,14 +135,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
         self.assertTrue(int(zone.soa_serial) >= self.start_time)
 
-    def test_change_to_soa_serial_auto_low_serial(self):
-        zone = self.zones[1]
-
-        zone.soa_serial_auto = True
-        zone.save()
-
-        self.assertTrue(int(zone.soa_serial) >= self.start_time)
-
     def test_change_to_soa_serial_auto_high_serial(self):
         zone = self.zones[1]
         zone.soa_serial = 2100000000
@@ -238,7 +230,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
         self.assertTrue(int(zone.soa_serial) < self.start_time)
 
-        record = Record.objects.create(
+        Record.objects.create(
             zone=zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -318,7 +310,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(f_zone.soa_serial) < self.start_time)
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
 
-        f_record = Record.objects.create(
+        Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -469,7 +461,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
         self.assertTrue(int(rfc2317_zone.soa_serial) < self.start_time)
 
-        f_record = Record.objects.create(
+        Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -517,7 +509,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
         self.assertTrue(int(rfc2317_zone.soa_serial) < self.start_time)
 
-        f_record = Record.objects.create(
+        Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -557,7 +549,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
             rfc2317_parent_managed=False,
         )
 
-        f_record = Record.objects.create(
+        Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -608,7 +600,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
             rfc2317_parent_managed=True,
         )
 
-        f_record = Record.objects.create(
+        Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,
@@ -667,7 +659,7 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertTrue(int(r_zone.soa_serial) < self.start_time)
         self.assertTrue(int(rfc2317_zone.soa_serial) < self.start_time)
 
-        f_record = Record.objects.create(
+        Record.objects.create(
             zone=f_zone,
             name="name1",
             type=RecordTypeChoices.A,

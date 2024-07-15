@@ -31,8 +31,7 @@ from netbox_dns.choices import (
 # +
 # This is a hack designed to break cyclic imports between Record and Zone
 # -
-import netbox_dns.models.zone as zone
-
+from netbox_dns.models import zone
 
 __ALL__ = (
     "Record",
