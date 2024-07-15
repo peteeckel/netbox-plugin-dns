@@ -14,8 +14,8 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     DynamicModelChoiceField,
 )
-from utilities.forms.widgets import BulkEditNullBooleanSelect, APISelect
-from utilities.forms import add_blank_choice
+from utilities.forms.widgets import BulkEditNullBooleanSelect
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
 from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
@@ -61,7 +61,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         label="Zone",
     )
 
-    disable_ptr = forms.BooleanField(
+    disable_ptr = forms.NullBooleanField(
         label="Disable PTR",
         required=False,
     )
@@ -139,6 +139,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     disable_ptr = forms.NullBooleanField(
         required=False,
         label="Disable PTR",
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     status = forms.MultipleChoiceField(
         choices=RecordStatusChoices,
@@ -242,9 +243,6 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
     zone = DynamicModelChoiceField(
         queryset=Zone.objects.all(),
         required=False,
-        widget=APISelect(
-            attrs={"data-url": reverse_lazy("plugins-api:netbox_dns-api:zone-list")}
-        ),
     )
     type = forms.ChoiceField(
         choices=add_blank_choice(RecordTypeChoices),
@@ -263,10 +261,18 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
         label="TTL",
     )
     disable_ptr = forms.NullBooleanField(
-        required=False, widget=BulkEditNullBooleanSelect(), label="Disable PTR"
+        required=False,
+        label="Disable PTR",
+        widget=BulkEditNullBooleanSelect(),
     )
-    description = forms.CharField(max_length=200, required=False)
-    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
+    description = forms.CharField(
+        max_length=200,
+        required=False,
+    )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        required=False,
+    )
 
     fieldsets = (
         FieldSet(

@@ -11,6 +11,7 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     DynamicModelChoiceField,
 )
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
@@ -50,6 +51,7 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     default_view = forms.NullBooleanField(
         required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     description = forms.CharField(
         required=False,
