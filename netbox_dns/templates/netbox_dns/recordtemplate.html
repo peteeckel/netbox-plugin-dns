@@ -76,6 +76,9 @@
     <div class="col col-md-4">
         {% include 'inc/panels/tags.html' %}
     </div>
+    <div class="col col-md-12">
+      {% include 'inc/panel_table.html' with table=zone_template_table heading="Zone Templates" %}
+    </div>
 </div>
 
 {% endblock %}

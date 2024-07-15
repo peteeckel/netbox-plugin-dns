@@ -10,7 +10,7 @@ from netbox_dns.forms import (
     ZoneTemplateBulkEditForm,
 )
 from netbox_dns.models import ZoneTemplate
-from netbox_dns.tables import ZoneTemplateTable
+from netbox_dns.tables import ZoneTemplateTable, RecordTemplateDisplayTable
 
 
 __ALL__ = (
@@ -33,6 +33,15 @@ class ZoneTemplateListView(generic.ObjectListView):
 
 class ZoneTemplateView(generic.ObjectView):
     queryset = ZoneTemplate.objects.all()
+
+    def get_extra_context(self, request, instance):
+        record_template_table = RecordTemplateDisplayTable(
+            data=instance.record_templates.all()
+        )
+
+        return {
+            "record_template_table": record_template_table,
+        }
 
 
 class ZoneTemplateEditView(generic.ObjectEditView):

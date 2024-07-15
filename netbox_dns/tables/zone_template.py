@@ -4,13 +4,17 @@ from netbox.tables import (
     ChoiceFieldColumn,
     NetBoxTable,
     TagColumn,
+    ActionsColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import ZoneTemplate
 
 
-__ALL__ = ("ZoneTemplateTable",)
+__ALL__ = (
+    "ZoneTemplateTable",
+    "ZoneTemplateDisplayTable",
+)
 
 
 class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
@@ -53,4 +57,19 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
         default_columns = (
             "name",
             "tags",
+        )
+
+
+class ZoneTemplateDisplayTable(ZoneTemplateTable):
+    actions = ActionsColumn(actions="")
+
+    class Meta(NetBoxTable.Meta):
+        model = ZoneTemplate
+        fields = (
+            "name",
+            "description",
+        )
+        default_columns = (
+            "name",
+            "description",
         )

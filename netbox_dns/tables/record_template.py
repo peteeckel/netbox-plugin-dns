@@ -13,7 +13,10 @@ from netbox_dns.models import RecordTemplate
 from netbox_dns.utilities import value_to_unicode
 
 
-__ALL__ = ("RecordTemplateTable",)
+__ALL__ = (
+    "RecordTemplateTable",
+    "RecordTemplateDisplayTable",
+)
 
 
 class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
@@ -66,4 +69,29 @@ class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
             "type",
             "value",
             "tags",
+        )
+
+
+class RecordTemplateDisplayTable(RecordTemplateTable):
+    actions = ActionsColumn(actions="")
+
+    class Meta(NetBoxTable.Meta):
+        model = RecordTemplate
+        fields = (
+            "name",
+            "record_name",
+            "ttl",
+            "type",
+            "value",
+            "unicode_value",
+            "status",
+            "disable_ptr",
+            "description",
+        )
+        default_columns = (
+            "name",
+            "record_name",
+            "ttl",
+            "type",
+            "value",
         )

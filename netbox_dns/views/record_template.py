@@ -10,7 +10,7 @@ from netbox_dns.forms import (
     RecordTemplateBulkEditForm,
 )
 from netbox_dns.models import RecordTemplate
-from netbox_dns.tables import RecordTemplateTable
+from netbox_dns.tables import RecordTemplateTable, ZoneTemplateDisplayTable
 from netbox_dns.utilities import value_to_unicode
 
 
@@ -45,6 +45,10 @@ class RecordTemplateView(generic.ObjectView):
         unicode_value = value_to_unicode(instance.value)
         if instance.value != unicode_value:
             context["unicode_value"] = unicode_value
+
+        context["zone_template_table"] = ZoneTemplateDisplayTable(
+            data=instance.zone_templates.all()
+        )
 
         return context
 
