@@ -69,6 +69,11 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
 class Zone(ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (ZoneStatusChoices.STATUS_ACTIVE,)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._soa_serial_dirty = False
+
     view = models.ForeignKey(
         to="View",
         on_delete=models.PROTECT,
@@ -236,8 +241,6 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         null=True,
     )
 
-    soa_serial_dirty = False
-
     objects = ZoneManager()
 
     clone_fields = [
@@ -288,6 +291,14 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             if field.startswith("zone_")
             and field not in ("zone_soa_mname", "zone_nameservers")
         }
+
+    @property
+    def soa_serial_dirty(self):
+        return self._soa_serial_dirty
+
+    @soa_serial_dirty.setter
+    def soa_serial_dirty(self, soa_serial_dirty):
+        self._soa_serial_dirty = soa_serial_dirty
 
     @property
     def display_name(self):
