@@ -693,4 +693,5 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         "admin_c",
         "tech_c",
         "billing_c",
+        "tenant",
     )
