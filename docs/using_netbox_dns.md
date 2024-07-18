@@ -21,6 +21,7 @@ Other main features include:
 * Support for IDN, including the validation of punycode names
 * Full support for the NetBox REST and GraphQL APIs
 * Support for all major NetBox features such as global search, tenancy, change logs, tagging, journaling etc.
+* Templating for zones and records enables faster creations of zones with given boilerplate object relations, such as name servers, tags, tenants or registration information, or records like standard SPF or MX records that are the same for a subset of zones.
 
 ## Non-objectives
 In the same way as NetBox is not a network management application, NetBox DNS does not provide any functionality to manage specific name servers or DNS service providers or to generate input such as configuration and zone files for them. The focus is on the completeness and integrity of the data needed to run DNS zones, not on the peculiarities of a plethora of servers and services that actually use the data. This functionality is left to specialized integration tools, or in many cases it can be easily implemented using Ansible or similar tools based on NetBox DNS data. Example code for some simple use cases is provided.
@@ -166,8 +167,8 @@ Permission               | Action
 ----------               | ------
 `netbox_dns.add_view`    | Create new view objects
 `netbox_dns.change_view` | Edit view information
-`netbox_dns.delete_view` | Delete a name server object
-`netbox_dns.view_view`   | View name server information
+`netbox_dns.delete_view` | Delete a view object
+`netbox_dns.view_view`   | View view information
 
 To use tags, the `extras.view_tag` permission is required as well.
 
@@ -509,6 +510,98 @@ A contact in detail view:
 If there are zones registered for the contact, a second tab shows a list of these zones.
 
 ![Contact DetailZones](images/ContactDetailZones.png)
+
+### Zone Templates
+
+Zone templates can be used to add common sets objects to zones. As an example, there are often groups of zones that are using the same set of name servers, the same tenant or the same registration information. Template records provide another functionality that makes it possible to comfortably assign common objects to zones.
+
+Zone templates can be used interactively at zone creation time, or for existing zones using the edit view. It is also possible to assign a zone template while importing zones via CSV, JSON or YAML, both for new and existing zones, and via the REST API. Assigning zone templates in Bulk Edit operations is currently not supported.
+
+When a zone template is assigned to a zone, all objects associated with the zone template are assigned to the target zone if the target zone does not have a value for the same object yet. If, for example, a zone already has a set of name servers assigned to it, the set of nameservers assigned to the zone template is ignored when the template is assigned to the zone. That makes it possible to override some or all objects of a zone template, both at the time of its application and later on.
+
+A zone to which a zone template was applied does not maintain any kind of relation to that template, and vice versa. Because of this, editing a zone template after it was applied to one or multiple zones does not change the values the target zones received from the template.
+
+A zone template detail view:
+
+![ZoneTemplate Detail](images/ZoneTemplateDetail.png)
+
+Additonally there are tabs showing the journal and the change log for the zone template.
+
+#### Permissions
+The following Django permissions are applicable to ZoneTemplate objects:
+
+Permission             			  | Action
+----------             			  | ------
+`netbox_dns.add_zonetemplate`     | Create new zone template objects
+`netbox_dns.change_zonetemplate`  | Edit zone template information
+`netbox_dns.delete_zonetemplate`  | Delete a zone template object
+`netbox_dns.view_zonetemplate`    | View zone template information
+
+To use tags, the `extras.view_tag` permission is required as well. Additionally, for NameServer, Registrar and Contact type objects the associated view permission is required to create a zone template, but not to apply it.
+
+#### Fields
+The following fields are defined for zone templates:
+
+Field                | Required | Template Field | Explanation
+-----                | -------- | -------------- | -----------
+**Name**             | Yes      | No             | The name of the zone template
+**Description**      | No       | No             | A short textual description of the zone template
+**Nameservers**      | No       | Yes            | The set of nameservers associated with the zone template
+**Record templates** | No       | Yes            | The set of record templates associated with the zone template
+**Registrar**        | No       | Yes            | The registrar associated with the zone template
+**Registrant**       | No       | Yes            | The registrant associated with the zone template
+**Admin contact**    | No       | Yes            | The administrative contact associated with the zone template
+**Tech contact**     | No       | Yes            | The technical contact associated with the zone template
+**Billing contact**  | No       | Yes            | The billing contact associated with the zone template
+**Tags**             | No       | Yes            | NetBox tags assigned to the zone template
+**Tenant**           | No       | Yes            | A tenant associated with the zone template
+
+Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each remplate will be created in the target zone if there is no record with the same name, type and value yet.
+
+### Record Templates
+
+Record templates are used to create records in zones to which zone templates are applied. A record template is very similar to a record without a zone. When it is applied to a zone, it defines a record to be created in that zone.
+
+Record templates undergo a basic name validation when they are created, but without a zone object it is not possible to fully validate a record template. This is done when assignment to a zone takes place. Therefore it can happen that a perfectly valid record template creates an invalid record when assigned to a zone. One possible reason are conflicts with an existing record, e.g. a CNAME with the same name, or violated length restrictions when the FQDN is created from the record and zone names.
+
+On the target zone, a target record is only created if there is no record with the same name, type and value yet. This also applies when the creation of duplicate records has been enabled using the configuration setting `enforce_unique_records: False`.
+
+A record template detail view:
+
+![RecordTemplate Detail](images/RecordTemplateDetail.png)
+
+Under the configuration details of the zone template itself there is a list of record templates assigned to the zone template.
+
+Additonally there are tabs showing the journal and the change log for the record template.
+
+#### Permissions
+The following Django permissions are applicable to RecordTemplate objects:
+
+Permission                         | Action
+----------                         | ------
+`netbox_dns.add_recordtemplate`    | Create new record template objects
+`netbox_dns.change_recordtemplate` | Edit record template information
+`netbox_dns.delete_recordtemplate` | Delete a record template object
+`netbox_dns.view_recordtemplate`   | View record template information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for zone templates:
+
+Field                | Required | Template Field | Explanation
+-----                | -------- | -------------- | -----------
+**Name**             | Yes      | No             | The name of the zone template
+**Description**      | No       | No             | A short textual description of the zone template
+**Record name**      | Yes      | Yes            | The set of nameservers associated with the zone template
+**Type**             | Yes      | Yes            | The set of record templates associated with the zone template
+**Value**            | Yes      | Yes            | The registrar associated with the zone template
+**Status**           | No       | Yes            | The registrant associated with the zone template
+**TTL**              | No       | Yes            | The administrative contact associated with the zone template
+**Tenant**           | No       | Yes            | A tenant associated with the zone template
+**Tags**             | No       | Yes            | NetBox tags assigned to the zone template
+
+Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each remplate will be created in the target zone if there is no record with the same name, type and value yet.
 
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
