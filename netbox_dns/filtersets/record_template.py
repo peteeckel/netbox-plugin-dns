@@ -4,7 +4,7 @@ from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 
-from netbox_dns.models import RecordTemplate
+from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
@@ -18,6 +18,18 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=RecordStatusChoices,
     )
+    zone_template = django_filters.ModelMultipleChoiceFilter(
+        queryset=ZoneTemplate.objects.all(),
+        field_name="zone_templates__name",
+        to_field_name="name",
+        label="Zone Template",
+    )
+    zone_template_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ZoneTemplate.objects.all(),
+        field_name="zone_templates",
+        to_field_name="id",
+        label="Zone Template ID",
+    )
 
     class Meta:
         model = RecordTemplate
@@ -26,7 +38,6 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "name",
             "record_name",
             "value",
-            "status",
             "description",
             "ttl",
             "disable_ptr",

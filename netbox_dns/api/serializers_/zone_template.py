@@ -3,12 +3,12 @@ from rest_framework import serializers
 from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers_.tenants import TenantSerializer
 
+from netbox_dns.models import ZoneTemplate
+from netbox_dns.api.nested_serializers import NestedRecordTemplateSerializer
+
 from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
 from .contact import ContactSerializer
-
-from netbox_dns.models import ZoneTemplate
-
 
 __ALL__ = ("ZoneTemplateSerializer",)
 
@@ -23,6 +23,12 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
         read_only=False,
         required=False,
         help_text="Nameservers for the zone",
+    )
+    record_templates = NestedRecordTemplateSerializer(
+        many=True,
+        read_only=False,
+        required=False,
+        help_text="Record templates assigned to the zone",
     )
     registrar = RegistrarSerializer(
         nested=True,
@@ -68,21 +74,27 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
 
     def create(self, validated_data):
         nameservers = validated_data.pop("nameservers", None)
+        record_templates = validated_data.pop("record_templates", None)
 
         zone_template = super().create(validated_data)
 
         if nameservers is not None:
             zone_template.nameservers.set(nameservers)
+        if record_templates is not None:
+            zone_template.record_templates.set(record_templates)
 
         return zone_template
 
     def update(self, instance, validated_data):
         nameservers = validated_data.pop("nameservers", None)
+        record_templates = validated_data.pop("record_templates", None)
 
         zone_template = super().update(instance, validated_data)
 
         if nameservers is not None:
             zone_template.nameservers.set(nameservers)
+        if record_templates is not None:
+            zone_template.record_templates.set(record_templates)
 
         return zone_template
 
@@ -106,6 +118,7 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
             "active",
             "custom_fields",
             "tenant",
+            "record_templates",
         )
         brief_fields = (
             "id",

@@ -163,6 +163,11 @@ class NetBoxDNSZoneTemplateType(NetBoxObjectType):
             "NetBoxDNSNameServerType", strawberry.lazy("netbox_dns.graphql.types")
         ]
     ]
+    record_templates: List[
+        Annotated[
+            "NetBoxDNSRecordTemplateType", strawberry.lazy("netbox_dns.graphql.types")
+        ]
+    ]
     description: str | None
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
     registrar: (
@@ -199,3 +204,8 @@ class NetBoxDNSRecordTemplateType(NetBoxObjectType):
     disable_ptr: bool
     description: str | None
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    zone_templates: List[
+        Annotated[
+            "NetBoxDNSZoneTemplateType", strawberry.lazy("netbox_dns.graphql.types")
+        ]
+    ]

@@ -18,7 +18,13 @@ from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import ZoneTemplate, NameServer, Registrar, Contact
+from netbox_dns.models import (
+    ZoneTemplate,
+    RecordTemplate,
+    NameServer,
+    Registrar,
+    Contact,
+)
 
 
 __ALL__ = (
@@ -34,9 +40,14 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
         queryset=NameServer.objects.all(),
         required=False,
     )
+    record_templates = DynamicModelMultipleChoiceField(
+        queryset=RecordTemplate.objects.all(),
+        required=False,
+    )
 
     fieldsets = (
         FieldSet("name", "description", "nameservers", name="Zone Template"),
+        FieldSet("record_templates", name="Record Templates"),
         FieldSet(
             "registrar",
             "registrant",
@@ -55,6 +66,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
         fields = (
             "name",
             "nameservers",
+            "record_templates",
             "description",
             "tags",
             "registrar",
@@ -70,7 +82,8 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = ZoneTemplate
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "nameservers", "description", name="Attributes"),
+        FieldSet("name", "nameserver_id", "description", name="Attributes"),
+        FieldSet("record_template_id", name="Record Templates"),
         FieldSet(
             "registrar_id",
             "registrant_id",
@@ -86,9 +99,15 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label="Template name",
     )
-    nameservers = DynamicModelMultipleChoiceField(
+    nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        label="Nameservers",
+    )
+    record_template_id = DynamicModelMultipleChoiceField(
+        queryset=RecordTemplate.objects.all(),
+        required=False,
+        label="Record templates",
     )
     description = forms.CharField(
         required=False,
@@ -126,7 +145,13 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         queryset=NameServer.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="Name servers for the zone",
+        help_text="Name servers for the zone template",
+    )
+    record_templates = CSVModelMultipleChoiceField(
+        queryset=RecordTemplate.objects.all(),
+        to_field_name="name",
+        required=False,
+        help_text="Record templates used by this zone template",
     )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
@@ -186,6 +211,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         fields = (
             "name",
             "nameservers",
+            "record_templates",
             "description",
             "registrar",
             "registrant",
@@ -200,6 +226,10 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
 class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
+        required=False,
+    )
+    record_templates = DynamicModelMultipleChoiceField(
+        queryset=RecordTemplate.objects.all(),
         required=False,
     )
     description = forms.CharField(max_length=200, required=False)
@@ -260,6 +290,10 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
             name="Attributes",
         ),
         FieldSet(
+            "record_templates",
+            name="Record Templates",
+        ),
+        FieldSet(
             "registrar",
             "registrant",
             "admin_c",
@@ -273,6 +307,7 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     nullable_fields = (
         "description",
         "nameservers",
+        "record_templates",
         "registrar",
         "registrant",
         "admin_c",

@@ -5,13 +5,31 @@ from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 
-from netbox_dns.models import ZoneTemplate, Registrar, Contact, NameServer
+from netbox_dns.models import (
+    ZoneTemplate,
+    RecordTemplate,
+    Registrar,
+    Contact,
+    NameServer,
+)
 
 
 __ALL__ = ("ZoneTemplateFilterSet",)
 
 
 class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+    record_template_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=RecordTemplate.objects.all(),
+        field_name="record_templates",
+        to_field_name="id",
+        label="Record Template ID",
+    )
+    record_template = django_filters.ModelMultipleChoiceFilter(
+        queryset=RecordTemplate.objects.all(),
+        field_name="record_templates__name",
+        to_field_name="name",
+        label="Record Template",
+    )
     nameserver_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers",

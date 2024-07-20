@@ -111,6 +111,14 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "record_templates",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="zone_templates",
+                        to="netbox_dns.recordtemplate",
+                    ),
+                ),
+                (
                     "registrant",
                     models.ForeignKey(
                         blank=True,

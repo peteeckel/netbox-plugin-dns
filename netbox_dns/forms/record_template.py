@@ -19,7 +19,7 @@ from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import RecordTemplate
+from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
@@ -97,6 +97,7 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "description",
             name="Attributes",
         ),
+        FieldSet("zone_template_id", name="Zone Templates"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
@@ -125,6 +126,11 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     description = forms.CharField(
         required=False,
+    )
+    zone_template_id = DynamicModelMultipleChoiceField(
+        queryset=ZoneTemplate.objects.all(),
+        required=False,
+        label="Zone templates",
     )
     tag = TagFilterField(RecordTemplate)
 

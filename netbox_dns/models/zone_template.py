@@ -26,6 +26,11 @@ class ZoneTemplate(NetBoxModel):
         related_name="+",
         blank=True,
     )
+    record_templates = models.ManyToManyField(
+        to="RecordTemplate",
+        related_name="zone_templates",
+        blank=True,
+    )
     tenant = models.ForeignKey(
         to="tenancy.Tenant",
         on_delete=models.SET_NULL,
@@ -96,9 +101,6 @@ class ZoneTemplate(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:zonetemplate", kwargs={"pk": self.pk})
-
-    def record_template_count(self):
-        return RecordTemplate.objects.filter(template_zone=self).count()
 
 
 @register_search

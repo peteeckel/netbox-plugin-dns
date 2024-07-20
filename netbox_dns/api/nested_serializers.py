@@ -2,13 +2,15 @@ from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
 
-from netbox_dns.models import Zone, Record
+from netbox_dns.models import Zone, Record, ZoneTemplate, RecordTemplate
 from netbox_dns.api.serializers_.view import ViewSerializer
 
 
 __ALL__ = (
     "NestedZoneSerializer",
     "NestedRecordSerializer",
+    "NestedZoneTemplateSerializer",
+    "NestedRecordTemplateSerializer",
 )
 
 
@@ -86,3 +88,40 @@ class NestedRecordSerializer(WritableNestedSerializer):
             "zone",
             "active",
         ]
+
+
+class NestedRecordTemplateSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:recordtemplate-detail"
+    )
+
+    class Meta:
+        model = RecordTemplate
+        fields = (
+            "id",
+            "url",
+            "display",
+            "type",
+            "name",
+            "record_name",
+            "value",
+            "status",
+            "ttl",
+            "description",
+        )
+
+
+class NestedZoneTemplateSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:zonetemplate-detail"
+    )
+
+    class Meta:
+        model = ZoneTemplate
+        fields = (
+            "id",
+            "url",
+            "name",
+            "display",
+            "description",
+        )
