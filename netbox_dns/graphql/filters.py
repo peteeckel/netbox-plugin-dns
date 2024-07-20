@@ -2,7 +2,16 @@ import strawberry_django
 
 from netbox.graphql.filter_mixins import autotype_decorator, BaseFilterMixin
 
-from netbox_dns.models import NameServer, View, Zone, Record, Contact, Registrar
+from netbox_dns.models import (
+    NameServer,
+    View,
+    Zone,
+    Record,
+    Contact,
+    Registrar,
+    ZoneTemplate,
+    RecordTemplate,
+)
 from netbox_dns.filtersets import (
     NameServerFilterSet,
     ViewFilterSet,
@@ -10,6 +19,8 @@ from netbox_dns.filtersets import (
     RecordFilterSet,
     ContactFilterSet,
     RegistrarFilterSet,
+    ZoneTemplateFilterSet,
+    RecordTemplateFilterSet,
 )
 
 
@@ -35,6 +46,18 @@ class NetBoxDNSZoneFilter(BaseFilterMixin):
 @autotype_decorator(RecordFilterSet)
 class NetBoxDNSRecordFilter(BaseFilterMixin):
     ip_address: str | None
+
+
+@strawberry_django.filter(ZoneTemplate, lookups=True)
+@autotype_decorator(ZoneTemplateFilterSet)
+class NetBoxDNSZoneTemplateFilter(BaseFilterMixin):
+    pass
+
+
+@strawberry_django.filter(RecordTemplate, lookups=True)
+@autotype_decorator(RecordTemplateFilterSet)
+class NetBoxDNSRecordTemplateFilter(BaseFilterMixin):
+    pass
 
 
 @strawberry_django.filter(Contact, lookups=True)

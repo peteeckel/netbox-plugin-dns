@@ -1,0 +1,86 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
+{% load perms %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">
+                Zone Template
+            </h5>
+            <table class="table table-hover attr-table">
+                <tr>
+                    <th scope="row">Name</th>
+                    <td>{{ object.name }}</td>
+                </tr>
+                {% if object.description %}
+                <tr>
+                    <th scope="row">Description</th>
+                    <td style="word-break:break-all;">{{ object.description }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Tenant</th>
+                    <td>
+                        {% if object.tenant.group %}
+                            {{ object.tenant.group|linkify }} /
+                        {% endif %}
+                        {{ object.tenant|linkify|placeholder }}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Nameservers</th>
+                    <td>
+                        <table>
+                            {% for nameserver in object.nameservers.all %}
+                            <tr><td>{{ nameserver|linkify }}</td></tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Description</th>
+                    <td>{{ object.description }}</td>
+                </tr>
+            </table>
+        </div>
+
+        {% include 'inc/panels/tags.html' %}
+        {% include 'inc/panels/custom_fields.html' %}
+    </div>
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Domain Registration</h5>
+            <table class="table table-hover attr-table">
+                <tr>
+                    <th scope="row">Registrar</th>
+                    <td>{{ object.registrar|linkify|placeholder }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Registrant</th>
+                    <td>{{ object.registrant|linkify|placeholder }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Administrative Contact</th>
+                    <td>{{ object.admin_c|linkify|placeholder }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Technical Contact</th>
+                    <td>{{ object.tech_c|linkify|placeholder }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Billing Contact</th>
+                    <td>{{ object.billing_c|linkify|placeholder }}</td>
+                </tr>
+            </table>
+            </div>
+        </div>
+    </div>
+    <div class="col col-md-12">
+      {% include 'inc/panel_table.html' with table=record_template_table heading="Record Templates" %}
+    </div>
+</div>
+{% endblock %}

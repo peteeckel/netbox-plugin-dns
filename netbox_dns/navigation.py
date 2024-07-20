@@ -90,6 +90,46 @@ managed_record_menu_item = PluginMenuItem(
     permissions=["netbox_dns.view_record"],
 )
 
+zonetemplate_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:zonetemplate_list",
+    link_text="Zone Templates",
+    permissions=["netbox_dns.view_zonetemplate"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:zonetemplate_add",
+            "Add",
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_zonetemplate"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:zonetemplate_import",
+            "Import",
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_zonetemplate"],
+        ),
+    ),
+)
+
+recordtemplate_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:recordtemplate_list",
+    link_text="Record Templates",
+    permissions=["netbox_dns.view_recordtemplate"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:recordtemplate_add",
+            "Add",
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_recordtemplate"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:recordtemplate_import",
+            "Import",
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_recordtemplate"],
+        ),
+    ),
+)
+
 registrar_menu_item = PluginMenuItem(
     link="plugins:netbox_dns:registrar_list",
     link_text="Registrars",
@@ -143,6 +183,13 @@ if top_level_menu:
                     nameserver_menu_item,
                     record_menu_item,
                     managed_record_menu_item,
+                ),
+            ),
+            (
+                "Templates",
+                (
+                    zonetemplate_menu_item,
+                    recordtemplate_menu_item,
                 ),
             ),
             (

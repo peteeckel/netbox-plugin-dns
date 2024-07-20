@@ -1,0 +1,84 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
+{% load perms %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-md-8">
+        <div class="card">
+            <h5 class="card-header">Record Template</h5>
+            <table class="table table-hover attr-table">
+                <tr>
+                    <th scope="row">Template Name</th>
+                    <td style="word-break:break-all;">{{ object.name }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Name</th>
+                    <td style="word-break:break-all;">{{ object.record_name }}</td>
+                </tr>
+                {% if unicode_name %}
+                <tr>
+                    <th scope="row">IDN</th>
+                    <td style="word-break:break-all;">{{ unicode_name }}</td>
+                </tr>
+                {% endif %}
+                {% if object.tenant %}
+                <tr>
+                    <th scope="row">Tenant</th>
+                    <td>
+                        {% if object.tenant.group %}
+                            {{ object.tenant.group|linkify }} /
+                        {% endif %}
+                        {{ object.tenant|linkify|placeholder }}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Type</th>
+                    <td>{{ object.type }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Value</th>
+                    <td style="word-break:break-all;">{{ object.value }}</td>
+                </tr>
+                {% if unicode_value %}
+                <tr>
+                    <th scope="row">Unicode Value</th>
+                    <td style="word-break:break-all;">{{ unicode_value }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">TTL</th>
+                    <td>{{ object.ttl|placeholder }}</td>
+                </tr>
+                {% if object.type == 'A' or object.type == 'AAAA' %}
+                <tr>
+                    <th scope="row">Disable PTR</th>
+                    <td>{% checkmark object.disable_ptr %}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Status</th>
+                    <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+                </tr>
+                {% if object.description %}
+                <tr>
+                    <th scope="row">Description</th>
+                    <td style="word-break:break-all;">{{ object.description }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        {% include 'inc/panels/custom_fields.html' %}
+    </div>
+    <div class="col col-md-4">
+        {% include 'inc/panels/tags.html' %}
+    </div>
+    <div class="col col-md-12">
+      {% include 'inc/panel_table.html' with table=zone_template_table heading="Zone Templates" %}
+    </div>
+</div>
+
+{% endblock %}

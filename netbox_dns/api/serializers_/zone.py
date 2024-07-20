@@ -1,16 +1,17 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
-from tenancy.api.serializers_.tenants import TenantSerializer
+from tenancy.api.serializers import TenantSerializer
 
 from netbox_dns.api.serializers_.view import ViewSerializer
 from netbox_dns.api.serializers_.nameserver import NameServerSerializer
 from netbox_dns.api.serializers_.registrar import RegistrarSerializer
 from netbox_dns.api.serializers_.contact import ContactSerializer
+from netbox_dns.api.serializers_.zone_template import ZoneTemplateSerializer
+
 from netbox_dns.api.nested_serializers import NestedZoneSerializer
 
 from netbox_dns.models import Zone
-
 
 __ALL__ = ("NameServerSerializer",)
 
@@ -88,6 +89,13 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text="The billing contact for the domain",
     )
+    template = ZoneTemplateSerializer(
+        nested=True,
+        write_only=True,
+        required=False,
+        default=None,
+        help_text="Template to apply to the zone",
+    )
     active = serializers.BooleanField(
         required=False,
         read_only=True,
@@ -96,6 +104,7 @@ class ZoneSerializer(NetBoxModelSerializer):
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
     def create(self, validated_data):
+        template = validated_data.pop("template", None)
         nameservers = validated_data.pop("nameservers", None)
 
         zone = super().create(validated_data)
@@ -103,15 +112,22 @@ class ZoneSerializer(NetBoxModelSerializer):
         if nameservers is not None:
             zone.nameservers.set(nameservers)
 
+        if template is not None:
+            template.apply_to_zone(zone)
+
         return zone
 
     def update(self, instance, validated_data):
+        template = validated_data.pop("template", None)
         nameservers = validated_data.pop("nameservers", None)
 
         zone = super().update(instance, validated_data)
 
         if nameservers is not None:
             zone.nameservers.set(nameservers)
+
+        if template is not None:
+            template.apply_to_zone(zone)
 
         return zone
 
@@ -152,6 +168,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             "active",
             "custom_fields",
             "tenant",
+            "template",
         )
         brief_fields = (
             "id",

@@ -1,6 +1,8 @@
 from django import forms
+from django.db import transaction
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -8,6 +10,7 @@ from netbox.forms import (
     NetBoxModelImportForm,
     NetBoxModelForm,
 )
+from netbox.context import events_queue
 from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
     TagFilterField,
@@ -28,6 +31,7 @@ from netbox_dns.models import (
     NameServer,
     Registrar,
     Contact,
+    ZoneTemplate,
 )
 from netbox_dns.choices import ZoneStatusChoices
 from netbox_dns.utilities import name_to_unicode
@@ -43,7 +47,79 @@ __ALL__ = (
 )
 
 
-class ZoneForm(TenancyForm, NetBoxModelForm):
+class RollbackTransaction(Exception):
+    pass
+
+
+class ZoneTemplateUpdateMixin:
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+
+        if (template := self.cleaned_data.get("template")) is None:
+            return
+
+        if not self.cleaned_data.get("nameservers") and template.nameservers.all():
+            self.cleaned_data["nameservers"] = template.nameservers.all()
+
+        if not self.cleaned_data.get("tags") and template.tags.all():
+            self.cleaned_data["tags"] = template.tags.all()
+
+        for field in template.template_fields:
+            if (
+                self.cleaned_data.get(field) is None
+                and getattr(template, field) is not None
+            ):
+                self.cleaned_data[field] = getattr(template, field)
+
+        template_error = None
+        saved_events_queue = events_queue.get()
+
+        try:
+            with transaction.atomic():
+                if self.instance.id is not None:
+                    zone = super().save(*args, **kwargs)
+                else:
+                    zone_data = self.cleaned_data.copy()
+
+                    zone_data.pop("template", None)
+                    zone_data.pop("tenant_group", None)
+                    zone_data.pop("_init_time", None)
+
+                    nameservers = zone_data.pop("nameservers")
+                    tags = zone_data.pop("tags")
+
+                    zone = Zone.objects.create(**zone_data)
+
+                    zone.nameservers.set(nameservers)
+                    zone.tags.set(tags)
+
+                template.create_records(zone)
+                raise RollbackTransaction
+
+        except ValidationError as exc:
+            if isinstance(exc, dict):
+                template_error = item.value()
+            else:
+                template_error = [exc]
+        except RollbackTransaction:
+            pass
+
+        events_queue.set(saved_events_queue)
+        if template_error is not None:
+            raise ValidationError({"template": template_error})
+
+        return self.cleaned_data
+
+    def save(self, *args, **kwargs):
+        zone = super().save(*args, **kwargs)
+
+        if (template := self.cleaned_data.get("template")) is not None:
+            template.create_records(zone)
+
+        return zone
+
+
+class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
@@ -111,11 +187,17 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
         help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
         required=False,
     )
+    template = DynamicModelChoiceField(
+        queryset=ZoneTemplate.objects.all(),
+        required=False,
+        label="Template",
+    )
 
     fieldsets = (
         FieldSet(
             "view",
             "name",
+            "template",
             "status",
             "nameservers",
             "default_ttl",
@@ -213,6 +295,7 @@ class ZoneForm(TenancyForm, NetBoxModelForm):
             "name",
             "view",
             "status",
+            "template",
             "nameservers",
             "default_ttl",
             "description",
@@ -352,7 +435,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     tag = TagFilterField(Zone)
 
 
-class ZoneImportForm(NetBoxModelImportForm):
+class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
     view = CSVModelChoiceField(
         queryset=View.objects.all(),
         required=False,
@@ -482,6 +565,12 @@ class ZoneImportForm(NetBoxModelImportForm):
         to_field_name="name",
         help_text="Assigned tenant",
     )
+    template = CSVModelChoiceField(
+        queryset=ZoneTemplate.objects.all(),
+        required=False,
+        to_field_name="name",
+        label="Template",
+    )
 
     class Meta:
         model = Zone
@@ -490,6 +579,7 @@ class ZoneImportForm(NetBoxModelImportForm):
             "view",
             "name",
             "status",
+            "template",
             "nameservers",
             "default_ttl",
             "description",
@@ -686,6 +776,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
 
     nullable_fields = (
         "description",
+        "nameservers",
         "rfc2317_prefix",
         "registrar",
         "registry_domain_id",

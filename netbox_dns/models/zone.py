@@ -70,6 +70,8 @@ class Zone(ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (ZoneStatusChoices.STATUS_ACTIVE,)
 
     def __init__(self, *args, **kwargs):
+        kwargs.pop("template", None)
+
         super().__init__(*args, **kwargs)
 
         self._soa_serial_dirty = False
@@ -278,8 +280,11 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             except dns_name.IDNAException:
                 name = self.name
 
-        if not self.view.default_view:
-            return f"[{self.view}] {name}"
+        try:
+            if not self.view.default_view:
+                return f"[{self.view}] {name}"
+        except ObjectDoesNotExist:
+            return f"[<no view assigned>] {name}"
 
         return str(name)
 

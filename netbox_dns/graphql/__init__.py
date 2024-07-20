@@ -5,6 +5,8 @@ from .schema import (
     NetBoxDNSRegistrarQuery,
     NetBoxDNSZoneQuery,
     NetBoxDNSRecordQuery,
+    NetBoxDNSZoneTemplateQuery,
+    NetBoxDNSRecordTemplateQuery,
 )
 
 schema = [
@@ -14,4 +16,6 @@ schema = [
     NetBoxDNSRecordQuery,
     NetBoxDNSContactQuery,
     NetBoxDNSRegistrarQuery,
+    NetBoxDNSZoneTemplateQuery,
+    NetBoxDNSRecordTemplateQuery,
 ]
