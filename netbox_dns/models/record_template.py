@@ -9,9 +9,10 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 
-from netbox_dns.models import Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 from netbox_dns.validators import validate_generic_name, validate_record_value
+
+from .record import Record
 
 
 __ALL__ = (

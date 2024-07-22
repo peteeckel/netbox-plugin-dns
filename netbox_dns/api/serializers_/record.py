@@ -5,10 +5,8 @@ from ipam.api.serializers import IPAddressSerializer
 from tenancy.api.serializers import TenantSerializer
 
 from netbox_dns.models import Record
-from netbox_dns.api.nested_serializers import (
-    NestedZoneSerializer,
-    NestedRecordSerializer,
-)
+
+from ..nested_serializers import NestedZoneSerializer, NestedRecordSerializer
 
 
 __ALL__ = ("RecordSerializer",)

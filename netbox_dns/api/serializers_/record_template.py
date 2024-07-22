@@ -4,7 +4,8 @@ from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers import TenantSerializer
 
 from netbox_dns.models import RecordTemplate
-from netbox_dns.api.nested_serializers import NestedZoneTemplateSerializer
+
+from ..nested_serializers import NestedZoneTemplateSerializer
 
 __ALL__ = ("RecordTemplateSerializer",)
 
