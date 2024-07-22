@@ -85,6 +85,7 @@ class ZoneTemplate(NetBoxModel):
     clone_fields = [
         "description",
         "nameservers",
+        "record_templates",
         "tenant",
         "registrar",
         "registrant",
