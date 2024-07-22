@@ -3,13 +3,13 @@ from rest_framework import serializers
 from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers import TenantSerializer
 
-from netbox_dns.api.serializers_.view import ViewSerializer
-from netbox_dns.api.serializers_.nameserver import NameServerSerializer
-from netbox_dns.api.serializers_.registrar import RegistrarSerializer
-from netbox_dns.api.serializers_.contact import ContactSerializer
-from netbox_dns.api.serializers_.zone_template import ZoneTemplateSerializer
+from .view import ViewSerializer
+from .nameserver import NameServerSerializer
+from .registrar import RegistrarSerializer
+from .contact import ContactSerializer
+from .zone_template import ZoneTemplateSerializer
 
-from netbox_dns.api.nested_serializers import NestedZoneSerializer
+from ..nested_serializers import NestedZoneSerializer
 
 from netbox_dns.models import Zone
 

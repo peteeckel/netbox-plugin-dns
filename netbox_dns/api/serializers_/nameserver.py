@@ -5,7 +5,7 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 
 from netbox_dns.models import NameServer
 
-from netbox_dns.api.nested_serializers import NestedZoneSerializer
+from ..nested_serializers import NestedZoneSerializer
 
 
 __ALL__ = ("NameServerSerializer",)
