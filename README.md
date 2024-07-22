@@ -27,6 +27,7 @@ The main focus of the plugin is to ensure the quality of the data stored in it. 
 * Validation of changes to the SOA SERIAL number, whether they are done automatically or manually
 * Validation of record types such as CNAME and singletons, to ensure DNS zone validity
 * Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
+* Templating for zones and records enables faster creations of zones with given boilerplate object relations, such as name servers, tags, tenants or registration information, or records like standard SPF or MX records that are the same for a subset of zones
 
 Other main features include:
 
