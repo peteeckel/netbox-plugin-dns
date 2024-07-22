@@ -50,6 +50,6 @@ jobs:
           body_path: ".github/RELEASE-TEMPLATE.md"
           draft: true
           files: |
-            dist/netbox_dns-${{env.PROJECT_VERSION}}-py3-none-any.whl
+            dist/netbox_plugin_dns-${{env.PROJECT_VERSION}}-py3-none-any.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
