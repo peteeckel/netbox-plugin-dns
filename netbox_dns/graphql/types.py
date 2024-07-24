@@ -40,6 +40,7 @@ class NetBoxDNSViewType(NetBoxObjectType):
     name: str
     description: str
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    prefixes: List[Annotated["PrefixType", strawberry.lazy("ipam.graphql.types")]]
 
 
 @strawberry_django.type(Zone, fields="__all__", filters=NetBoxDNSZoneFilter)
