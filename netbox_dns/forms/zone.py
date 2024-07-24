@@ -330,7 +330,12 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet(
-            "view_id", "status", "name", "nameservers", "description", name="Attributes"
+            "view_id",
+            "status",
+            "name",
+            "nameserver_id",
+            "description",
+            name="Attributes",
         ),
         FieldSet(
             "soa_mname_id",
@@ -368,9 +373,10 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     name = forms.CharField(
         required=False,
     )
-    nameservers = DynamicModelMultipleChoiceField(
+    nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        label="Nameservers",
     )
     description = forms.CharField(
         required=False,
