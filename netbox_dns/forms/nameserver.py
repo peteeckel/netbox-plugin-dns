@@ -11,12 +11,13 @@ from utilities.forms.fields import (
     TagFilterField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import NameServer
+from netbox_dns.models import NameServer, Zone
 from netbox_dns.utilities import name_to_unicode
 
 
@@ -50,6 +51,16 @@ class NameServerForm(TenancyForm, NetBoxModelForm):
 class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = NameServer
 
+    zone_id = DynamicModelMultipleChoiceField(
+        queryset=Zone.objects.all(),
+        required=False,
+        label="Zones",
+    )
+    soa_zone_id = DynamicModelMultipleChoiceField(
+        queryset=Zone.objects.all(),
+        required=False,
+        label="SOA Zones",
+    )
     name = forms.CharField(
         required=False,
     )
@@ -60,7 +71,7 @@ class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "description", name="Attributes"),
+        FieldSet("name", "zone_id", "soa_zone_id", "description", name="Attributes"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
