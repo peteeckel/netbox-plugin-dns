@@ -9,7 +9,9 @@ from netbox.forms import (
 from utilities.forms.fields import (
     TagFilterField,
     CSVModelChoiceField,
+    CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.rendering import FieldSet
@@ -59,6 +61,7 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "default_view", "description", name="Attributes"),
+        FieldSet("prefix_id", name="IPAM"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
@@ -72,10 +75,21 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     description = forms.CharField(
         required=False,
     )
+    prefix_id = DynamicModelMultipleChoiceField(
+        queryset=Prefix.objects.all(),
+        required=False,
+        label="Prefix",
+    )
     tag = TagFilterField(View)
 
 
 class ViewImportForm(NetBoxModelImportForm):
+    prefixes = CSVModelMultipleChoiceField(
+        queryset=Prefix.objects.all(),
+        to_field_name="prefix",
+        required=False,
+        help_text="Prefixes assigned to the view",
+    )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
@@ -85,7 +99,7 @@ class ViewImportForm(NetBoxModelImportForm):
 
     class Meta:
         model = View
-        fields = ("name", "description", "tenant", "tags")
+        fields = ("name", "description", "prefixes", "tenant", "tags")
 
 
 class ViewBulkEditForm(NetBoxModelBulkEditForm):
