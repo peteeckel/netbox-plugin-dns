@@ -800,10 +800,11 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 address_record.ptr_record.delete()
 
             ptr_records = self.record_set.filter(address_record__isnull=False)
-            update_records = [
-                address_record.pk
-                for address_record in Record.objects.filter(ptr_record__in=ptr_records)
-            ]
+            update_records = list(
+                Record.objects.filter(ptr_record__in=ptr_records).values_list(
+                    "pk", flat=True
+                )
+            )
 
             cname_records = {
                 ptr_record.rfc2317_cname_record
@@ -818,9 +819,9 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 cname_zone.save_soa_serial()
                 cname_zone.update_soa_record()
 
-            rfc2317_child_zones = [
-                child_zone.pk for child_zone in self.rfc2317_child_zones.all()
-            ]
+            rfc2317_child_zones = list(
+                self.rfc2317_child_zones.all().values_list("pk", flat=True)
+            )
 
             if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
                 for ip in IPAddress.objects.filter(
