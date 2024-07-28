@@ -60,7 +60,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         label="Zone",
     )
 
-    disable_ptr = forms.NullBooleanField(
+    disable_ptr = forms.BooleanField(
         label="Disable PTR",
         required=False,
     )
