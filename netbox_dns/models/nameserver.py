@@ -20,7 +20,7 @@ from netbox_dns.mixins import ObjectModificationMixin
 from .record import Record
 
 
-__ALL__ = (
+__all__ = (
     "NameServer",
     "NameServerIndex",
 )

@@ -10,7 +10,10 @@ from .network import NetContains, NetContained, NetOverlap, NetMaskLength
 INVALID_RFC2317 = "RFC2317 requires an IPv4 prefix with a length of at least 25 bits."
 
 
-__ALL__ = ()
+__all__ = (
+    "RFC2317NetworkField",
+    "RFC2317NetworkFormField",
+)
 
 
 class RFC2317NetworkFormField(forms.Field):

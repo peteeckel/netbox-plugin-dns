@@ -5,7 +5,7 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 
 
-__ALL__ = (
+__all__ = (
     "ZoneTemplate",
     "ZoneTemplateIndex",
 )

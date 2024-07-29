@@ -21,7 +21,7 @@ from netbox_dns.models import NameServer, Zone
 from netbox_dns.utilities import name_to_unicode
 
 
-__ALL__ = (
+__all__ = (
     "NameServerForm",
     "NameServerFilterForm",
     "NameServerImportForm",

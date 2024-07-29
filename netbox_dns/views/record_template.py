@@ -14,7 +14,7 @@ from netbox_dns.tables import RecordTemplateTable, ZoneTemplateDisplayTable
 from netbox_dns.utilities import value_to_unicode
 
 
-__ALL__ = (
+__all__ = (
     "RecordTemplateListView",
     "RecordTemplateView",
     "RecordTemplateEditView",

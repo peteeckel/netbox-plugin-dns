@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from netaddr import AddrFormatError, IPAddress
 
 
-__ALL__ = (
+__all__ = (
     "AddressFormField",
     "AddressField",
 )

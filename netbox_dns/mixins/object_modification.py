@@ -1,7 +1,7 @@
 from netbox.models import NetBoxModel
 
 
-__ALL__ = ("ObjectModificationMixin",)
+__all__ = ("ObjectModificationMixin",)
 
 
 class ObjectModificationMixin:

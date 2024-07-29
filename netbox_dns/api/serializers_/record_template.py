@@ -7,7 +7,8 @@ from netbox_dns.models import RecordTemplate
 
 from ..nested_serializers import NestedZoneTemplateSerializer
 
-__ALL__ = ("RecordTemplateSerializer",)
+
+__all__ = ("RecordTemplateSerializer",)
 
 
 class RecordTemplateSerializer(NetBoxModelSerializer):

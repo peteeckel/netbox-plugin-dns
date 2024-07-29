@@ -13,7 +13,7 @@ from netbox_dns.forms import (
 from netbox_dns.tables import RegistrarTable, ZoneTable
 
 
-__ALL__ = (
+__all__ = (
     "RegistrarView",
     "RegistrarListView",
     "RegistrarEditView",

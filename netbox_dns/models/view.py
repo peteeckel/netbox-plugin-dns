@@ -10,7 +10,7 @@ from utilities.exceptions import AbortRequest
 from netbox_dns.mixins import ObjectModificationMixin
 
 
-__ALL__ = (
+__all__ = (
     "View",
     "ViewIndex",
 )

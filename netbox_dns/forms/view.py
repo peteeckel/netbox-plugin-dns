@@ -19,7 +19,7 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from netbox_dns.models import View
 
 
-__ALL__ = (
+__all__ = (
     "ViewForm",
     "ViewFilterForm",
     "ViewImportForm",

@@ -5,7 +5,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from netbox_dns.models import Registrar
 
 
-__ALL__ = ("RegistrarFilterSet",)
+__all__ = ("RegistrarFilterSet",)
 
 
 class RegistrarFilterSet(NetBoxModelFilterSet):

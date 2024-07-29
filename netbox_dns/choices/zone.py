@@ -1,7 +1,7 @@
 from utilities.choices import ChoiceSet
 
 
-__ALL__ = ("ZoneStatusChoices",)
+__all__ = ("ZoneStatusChoices",)
 
 
 class ZoneStatusChoices(ChoiceSet):

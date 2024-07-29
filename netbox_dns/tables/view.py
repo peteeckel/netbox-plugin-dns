@@ -6,7 +6,7 @@ from tenancy.tables import TenancyColumnsMixin
 from netbox_dns.models import View
 
 
-__ALL__ = ("ViewTable",)
+__all__ = ("ViewTable",)
 
 
 class ViewTable(TenancyColumnsMixin, NetBoxTable):

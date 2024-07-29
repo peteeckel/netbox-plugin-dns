@@ -5,7 +5,7 @@ from netbox.api.serializers import NetBoxModelSerializer
 from netbox_dns.models import Contact
 
 
-__ALL__ = ("ContactSerializer",)
+__all__ = ("ContactSerializer",)
 
 
 class ContactSerializer(NetBoxModelSerializer):

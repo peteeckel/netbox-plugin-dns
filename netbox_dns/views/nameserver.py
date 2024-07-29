@@ -14,12 +14,13 @@ from netbox_dns.models import Zone, NameServer
 from netbox_dns.tables import NameServerTable, ZoneTable
 
 
-__ALL__ = (
+__all__ = (
     "NameServerListView",
     "NameServerView",
     "NameServerEditView",
     "NameServerDeleteView",
     "NameServerBulkEditView",
+    "NameServerBulkImportView",
     "NameServerBulkDeleteView",
     "NameServerZoneListView",
     "NameServerSOAZoneListView",

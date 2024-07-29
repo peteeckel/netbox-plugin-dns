@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 
 
-__ALL__ = (
+__all__ = (
     "validate_prefix",
     "validate_ipv4",
     "validate_rfc2317",

@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from netaddr import AddrFormatError, IPNetwork
 
 
-__ALL__ = ()
+__all__ = ("NetworkField",)
 
 
 class NetContains(Lookup):

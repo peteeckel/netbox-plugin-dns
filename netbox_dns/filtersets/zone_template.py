@@ -14,7 +14,7 @@ from netbox_dns.models import (
 )
 
 
-__ALL__ = ("ZoneTemplateFilterSet",)
+__all__ = ("ZoneTemplateFilterSet",)
 
 
 class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

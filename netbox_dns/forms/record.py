@@ -24,7 +24,7 @@ from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
 
-__ALL__ = (
+__all__ = (
     "RecordForm",
     "RecordFilterForm",
     "RecordImportForm",

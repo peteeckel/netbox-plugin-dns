@@ -7,7 +7,7 @@ from netbox.search import SearchIndex, register_search
 from taggit.managers import TaggableManager
 
 
-__ALL__ = (
+__all__ = (
     "Contact",
     "ContactIndex",
 )

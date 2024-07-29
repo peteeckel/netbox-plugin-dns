@@ -8,7 +8,7 @@ from netbox_dns.forms import ViewForm, ViewFilterForm, ViewImportForm, ViewBulkE
 from netbox_dns.tables import ViewTable, ZoneTable
 
 
-__ALL__ = (
+__all__ = (
     "ViewView",
     "ViewListView",
     "ViewEditView",
