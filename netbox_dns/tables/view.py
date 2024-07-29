@@ -6,7 +6,10 @@ from tenancy.tables import TenancyColumnsMixin
 from netbox_dns.models import View
 
 
-__all__ = ("ViewTable",)
+__all__ = (
+    "ViewTable",
+    "RelatedViewTable",
+)
 
 
 class ViewTable(TenancyColumnsMixin, NetBoxTable):
@@ -37,7 +40,7 @@ class RelatedViewTable(TenancyColumnsMixin, NetBoxTable):
             "name",
             "description",
             "tenant",
-            "tenant_group"
+            "tenant_group",
             "tags",
         )
         default_columns = ("name", "description")
