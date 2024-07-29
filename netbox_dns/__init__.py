@@ -37,6 +37,11 @@ class DNSConfig(PluginConfig):
     }
     base_url = "netbox-dns"
 
+    def ready(self):
+        from netbox_dns.signals import ipam_autodns
+
+        super().ready()
+
 
 #
 # Initialize plugin config

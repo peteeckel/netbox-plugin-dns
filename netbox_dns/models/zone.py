@@ -28,6 +28,8 @@ from ipam.models import IPAddress
 from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
+    update_dns_records,
+    get_ip_addresses_by_zone,
     arpa_to_prefix,
     name_to_unicode,
     normalize_name,
@@ -793,6 +795,16 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     update_rfc2317_cname=False,
                 )
 
+        if changed_fields is None or {"name", "view"} & changed_fields:
+            update_ip_addresses = IPAddress.objects.filter(
+                pk__in=self.record_set.filter(
+                    ipam_ip_address__isnull=False
+                ).values_list("ipam_ip_address", flat=True)
+            )
+            update_ip_addresses |= get_ip_addresses_by_zone(self)
+            for ip_address in update_ip_addresses:
+                update_dns_records(ip_address)
+
         self.save_soa_serial()
         self.update_soa_record()
 
@@ -828,6 +840,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_child_zones.all().values_list("pk", flat=True)
             )
 
+            ipam_ip_addresses = list(
+                IPAddress.objects.filter(
+                    netbox_dns_records__in=self.record_set.filter(
+                        ipam_ip_address__isnull=False
+                    )
+                ).values_list("pk", flat=True)
+            )
+
             if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
                 for ip in IPAddress.objects.filter(
                     custom_field_data__ipaddress_dns_zone_id=self.pk
@@ -848,6 +868,10 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         for address_zone in {address_record.zone for address_record in address_records}:
             address_zone.save_soa_serial()
             address_zone.update_soa_record()
+
+        ip_addresses = IPAddress.objects.filter(pk__in=ipam_ip_addresses)
+        for ip_address in ip_addresses:
+            update_dns_records(ip_address)
 
         rfc2317_child_zones = Zone.objects.filter(pk__in=rfc2317_child_zones)
         if rfc2317_child_zones:
