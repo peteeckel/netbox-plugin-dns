@@ -6,7 +6,7 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 from netbox_dns.models import View
 
 
-__ALL__ = ("ViewSerializer",)
+__all__ = ("ViewSerializer",)
 
 
 class ViewSerializer(NetBoxModelSerializer):

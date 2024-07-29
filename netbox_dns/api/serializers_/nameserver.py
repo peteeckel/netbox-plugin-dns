@@ -8,7 +8,7 @@ from netbox_dns.models import NameServer
 from ..nested_serializers import NestedZoneSerializer
 
 
-__ALL__ = ("NameServerSerializer",)
+__all__ = ("NameServerSerializer",)
 
 
 class NameServerSerializer(NetBoxModelSerializer):

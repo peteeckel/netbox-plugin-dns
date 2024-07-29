@@ -43,7 +43,7 @@ from .view import View
 from .nameserver import NameServer
 
 
-__ALL__ = (
+__all__ = (
     "Zone",
     "ZoneIndex",
 )

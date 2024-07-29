@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from netbox.plugins.utils import get_plugin_config
 
 
-__ALL__ = (
+__all__ = (
     "validate_fqdn",
     "validate_generic_name",
     "validate_domain_name",

@@ -13,7 +13,7 @@ from netbox_dns.models import View, Zone, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
-__ALL__ = ("RecordFilterSet",)
+__all__ = ("RecordFilterSet",)
 
 
 class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

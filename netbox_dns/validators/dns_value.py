@@ -11,7 +11,7 @@ from netbox_dns.validators import (
 )
 
 
-__ALL__ = ("validate_record_value",)
+__all__ = ("validate_record_value",)
 
 
 def validate_record_value(record_type, value):

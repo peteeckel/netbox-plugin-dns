@@ -11,7 +11,7 @@ from netbox_dns.models import View, Zone, Registrar, Contact, NameServer
 from netbox_dns.choices import ZoneStatusChoices
 
 
-__ALL__ = ("ZoneFilterSet",)
+__all__ = ("ZoneFilterSet",)
 
 
 class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

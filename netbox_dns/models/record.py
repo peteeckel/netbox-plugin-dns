@@ -24,7 +24,8 @@ from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 # -
 from netbox_dns.models import zone
 
-__ALL__ = (
+
+__all__ = (
     "Record",
     "RecordIndex",
 )

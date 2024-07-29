@@ -18,7 +18,7 @@ from netbox_dns.tables import (
 )
 
 
-__ALL__ = (
+__all__ = (
     "ZoneListView",
     "ZoneView",
     "ZoneEditView",

@@ -8,7 +8,7 @@ from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
-__ALL__ = ("RecordTemplateFilterSet",)
+__all__ = ("RecordTemplateFilterSet",)
 
 
 class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

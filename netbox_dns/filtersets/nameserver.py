@@ -7,7 +7,7 @@ from tenancy.filtersets import TenancyFilterSet
 from netbox_dns.models import NameServer, Zone
 
 
-__ALL__ = ("NameServerFilterSet",)
+__all__ = ("NameServerFilterSet",)
 
 
 class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):

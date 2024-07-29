@@ -39,7 +39,7 @@ from netbox_dns.fields import RFC2317NetworkFormField
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
 
 
-__ALL__ = (
+__all__ = (
     "ZoneForm",
     "ZoneFilterForm",
     "ZoneImportForm",

@@ -7,7 +7,7 @@ from netbox_dns.models import RecordTemplate
 from netbox_dns.utilities import value_to_unicode
 
 
-__ALL__ = (
+__all__ = (
     "RecordTemplateTable",
     "RecordTemplateDisplayTable",
 )

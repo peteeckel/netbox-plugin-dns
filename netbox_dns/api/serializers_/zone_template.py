@@ -10,7 +10,8 @@ from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
 from .contact import ContactSerializer
 
-__ALL__ = ("ZoneTemplateSerializer",)
+
+__all__ = ("ZoneTemplateSerializer",)
 
 
 class ZoneTemplateSerializer(NetBoxModelSerializer):

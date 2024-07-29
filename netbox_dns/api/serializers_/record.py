@@ -9,7 +9,7 @@ from netbox_dns.models import Record
 from ..nested_serializers import NestedZoneSerializer, NestedRecordSerializer
 
 
-__ALL__ = ("RecordSerializer",)
+__all__ = ("RecordSerializer",)
 
 
 class RecordSerializer(NetBoxModelSerializer):

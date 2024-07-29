@@ -15,7 +15,7 @@ from netbox_dns.validators import validate_generic_name, validate_record_value
 from .record import Record
 
 
-__ALL__ = (
+__all__ = (
     "RecordTemplate",
     "RecordTemplateIndex",
 )

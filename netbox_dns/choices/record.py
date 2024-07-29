@@ -9,7 +9,7 @@ def initialize_choice_names(cls):
     return cls
 
 
-__ALL__ = (
+__all__ = (
     "RecordTypeChoices",
     "RecordClassChoices",
     "RecordStatusChoices",

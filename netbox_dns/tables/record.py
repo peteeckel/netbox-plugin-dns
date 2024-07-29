@@ -12,7 +12,7 @@ from netbox_dns.models import Record
 from netbox_dns.utilities import value_to_unicode
 
 
-__ALL__ = (
+__all__ = (
     "RecordTable",
     "ManagedRecordTable",
     "RelatedRecordTable",

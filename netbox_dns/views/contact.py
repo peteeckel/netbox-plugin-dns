@@ -15,8 +15,9 @@ from netbox_dns.forms import (
 from netbox_dns.tables import ContactTable, ZoneTable
 
 
-__ALL__ = (
+__all__ = (
     "ContactView",
+    "ContactEditView",
     "ContactListView",
     "ContactDeleteView",
     "ContactBulkImportView",

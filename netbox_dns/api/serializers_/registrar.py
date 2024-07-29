@@ -5,7 +5,7 @@ from netbox.api.serializers import NetBoxModelSerializer
 from netbox_dns.models import Registrar
 
 
-__ALL__ = ("RegistrarSerializer",)
+__all__ = ("RegistrarSerializer",)
 
 
 class RegistrarSerializer(NetBoxModelSerializer):

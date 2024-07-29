@@ -15,7 +15,7 @@ from netbox_dns.tables import RecordTable, ManagedRecordTable, RelatedRecordTabl
 from netbox_dns.utilities import value_to_unicode
 
 
-__ALL__ = (
+__all__ = (
     "RecordListView",
     "ManagedRecordListView",
     "RecordView",

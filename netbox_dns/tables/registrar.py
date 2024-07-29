@@ -5,7 +5,7 @@ from netbox.tables import NetBoxTable, TagColumn
 from netbox_dns.models import Registrar
 
 
-__ALL__ = ("RegistrarTable",)
+__all__ = ("RegistrarTable",)
 
 
 class RegistrarTable(NetBoxTable):

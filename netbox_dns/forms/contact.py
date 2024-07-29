@@ -12,7 +12,7 @@ from utilities.forms.rendering import FieldSet
 from netbox_dns.models import Contact
 
 
-__ALL__ = (
+__all__ = (
     "ContactForm",
     "ContactFilterForm",
     "ContactImportForm",

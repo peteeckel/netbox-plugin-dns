@@ -26,7 +26,7 @@ from netbox_dns.models import (
 )
 
 
-__ALL__ = (
+__all__ = (
     "ZoneTemplateForm",
     "ZoneTemplateFilterForm",
     "ZoneTemplateImportForm",

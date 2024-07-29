@@ -5,7 +5,7 @@ from netbox.tables import NetBoxTable, TagColumn
 from netbox_dns.models import Contact
 
 
-__ALL__ = ("ContactTable",)
+__all__ = ("ContactTable",)
 
 
 class ContactTable(NetBoxTable):
