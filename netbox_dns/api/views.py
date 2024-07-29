@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 
+from ipam.models import Prefix
+
 from netbox.api.viewsets import NetBoxModelViewSet
 
 from netbox_dns.api.serializers import (
@@ -14,6 +16,7 @@ from netbox_dns.api.serializers import (
     ContactSerializer,
     ZoneTemplateSerializer,
     RecordTemplateSerializer,
+    PrefixSerializer,
 )
 from netbox_dns.filtersets import (
     ViewFilterSet,
@@ -152,3 +155,8 @@ class RecordTemplateViewSet(NetBoxModelViewSet):
     queryset = RecordTemplate.objects.all()
     serializer_class = RecordTemplateSerializer
     filterset_class = RecordTemplateFilterSet
+
+
+class PrefixViewSet(NetBoxModelViewSet):
+    queryset = Prefix.objects.all()
+    serializer_class = PrefixSerializer
