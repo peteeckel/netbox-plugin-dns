@@ -20,7 +20,7 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from ipam.models import Prefix
 
 from netbox_dns.models import View
-from netbox_dns.extras.fields import PrefixDynamicModelMultipleChoiceField
+from netbox_dns.fields import PrefixDynamicModelMultipleChoiceField
 
 
 __all__ = (
@@ -36,6 +36,9 @@ class ViewForm(TenancyForm, NetBoxModelForm):
         queryset=Prefix.objects.all(),
         required=False,
         label="IPAM Prefixes",
+        context={
+            "depth": None,
+        },
     )
 
     fieldsets = (
@@ -75,10 +78,13 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     description = forms.CharField(
         required=False,
     )
-    prefix_id = DynamicModelMultipleChoiceField(
+    prefix_id = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         required=False,
         label="Prefix",
+        context={
+            "depth": None,
+        },
     )
     tag = TagFilterField(View)
 
@@ -86,9 +92,9 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 class ViewImportForm(NetBoxModelImportForm):
     prefixes = CSVModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
-        to_field_name="prefix",
+        to_field_name="id",
         required=False,
-        help_text="Prefixes assigned to the view",
+        help_text="Prefix IDs assigned to the view",
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -111,6 +117,9 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Prefix.objects.all(),
         required=False,
         label="IPAM Prefixes",
+        context={
+            "depth": None,
+        },
     )
 
     fieldsets = (

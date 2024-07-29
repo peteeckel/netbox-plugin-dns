@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from tenancy.models import Tenant, TenantGroup
+from ipam.models import Prefix
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_dns.models import View
@@ -59,4 +60,26 @@ class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {
             "tenant_group": [self.tenant_groups[0].slug, self.tenant_groups[1].slug]
         }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_prefixes(self):
+        prefixes = (
+            Prefix(prefix="10.13.1.0/24"),
+            Prefix(prefix="10.23.1.0/24"),
+            Prefix(prefix="10.37.1.0/24"),
+            Prefix(prefix="10.42.1.0/24"),
+        )
+        Prefix.objects.bulk_create(prefixes)
+
+        self.views[0].prefixes.set(prefixes[0:2])
+        self.views[1].prefixes.set(prefixes[2:4])
+        self.views[2].prefixes.set(prefixes[0:4])
+
+        params = {"prefix_id": [prefix.pk for prefix in prefixes[0:2]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"prefix_id": [prefix.pk for prefix in prefixes[0:4]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"prefix": [prefix.prefix for prefix in prefixes[0:2]]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"prefix": [prefixes[3].prefix]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
