@@ -1,6 +1,7 @@
 from django.test import override_settings
 from rest_framework import status
 
+from ipam.models import Prefix
 from utilities.testing import APIViewTestCases
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
@@ -20,16 +21,6 @@ class ViewAPITestCase(
     model = View
 
     brief_fields = ["default_view", "description", "display", "id", "name", "url"]
-
-    create_data = [
-        {"name": "external"},
-        {"name": "internal"},
-        {"name": "diverse"},
-    ]
-
-    bulk_update_data = {
-        "description": "Test View",
-    }
 
     def _get_queryset(self):
         return self.model.objects.filter(default_view=False)
@@ -62,3 +53,22 @@ class ViewAPITestCase(
             View(name="test3"),
         )
         View.objects.bulk_create(views)
+
+        prefixes = (
+            Prefix(prefix="10.13.1.0/24"),
+            Prefix(prefix="10.23.1.0/24"),
+            Prefix(prefix="10.37.1.0/24"),
+            Prefix(prefix="10.42.1.0/24"),
+        )
+        Prefix.objects.bulk_create(prefixes)
+
+        cls.create_data = [
+            {"name": "external", "prefixes": [prefixes[0].pk, prefixes[1].pk]},
+            {"name": "internal", "prefixes": [prefixes[2].pk]},
+            {"name": "diverse"},
+        ]
+
+        cls.bulk_update_data = {
+            "description": "Test View",
+            "prefixes": [prefixes[0].pk, prefixes[1].pk],
+        }
