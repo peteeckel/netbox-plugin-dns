@@ -10,8 +10,8 @@ from netbox_dns.api.views import (
     ContactViewSet,
     ZoneTemplateViewSet,
     RecordTemplateViewSet,
+    PrefixViewSet,
 )
-from netbox_dns.api.ipam.views import PrefixViewSet
 
 router = NetBoxRouter()
 router.APIRootView = NetBoxDNSRootView
