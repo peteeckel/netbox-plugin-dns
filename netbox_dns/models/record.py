@@ -423,6 +423,51 @@ class Record(ObjectModificationMixin, NetBoxModel):
                 self.rfc2317_cname_record.delete(save_zone_serial=save_zone_serial)
                 self.rfc2317_cname_record = None
 
+    def update_from_ip_address(self, ip_address):
+        value = ip_address.address.ip
+        _type = (
+            RecordTypeChoices.A
+            if ip_address.address.version == 4
+            else RecordTypeChoices.AAAA
+        )
+        name = (
+            dns_name.from_text(ip_address.dns_name)
+            .relativize(dns_name.from_text(self.zone.name))
+            .to_text()
+        )
+
+        if any(
+            (
+                self.value != value,
+                self.type != _type,
+                self.name != name,
+            )
+        ):
+            self.value = value
+            self.type = _type
+            self.name = name
+
+            self.save()
+
+    @classmethod
+    def create_from_ip_address(cls, ip_address, zone):
+        return cls.objects.create(
+            zone=zone,
+            name=(
+                dns_name.from_text(ip_address.dns_name)
+                .relativize(dns_name.from_text(zone.name))
+                .to_text()
+            ),
+            type=(
+                RecordTypeChoices.A
+                if ip_address.address.version == 4
+                else RecordTypeChoices.AAAA
+            ),
+            value=ip_address.address.ip,
+            managed=True,
+            ipam_ip_address=ip_address,
+        )
+
     def validate_name(self):
         try:
             _zone = dns_name.from_text(self.zone.name, origin=dns_name.root)
