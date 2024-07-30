@@ -790,76 +790,8 @@ The following limitations exist for RFC2317 zones:
 * The RFC2317 CNAME records in parent zones are created on demand when a PTR in a child zone is created. Pre-creating them on creation of an RFC2317 zone is currently not supported.
 * The RFC2317 CNAME records are managed records and can not be edited manually. In normal operation this should never be necessary.
 
-## IPAM Coupling
-
-Starting with NetBox DNS 0.20.0, a new experimental feature that enables coupling between NetBox DNS and NetBox IPAM data is available. This feature allows users to link IP addresses in IPAM to NetBox DNS address records. The old IPAM integration feature was discontinued in favour of the new and improved functionality.
-
-Thanks to Jean Benoît for this contribution!
-
-### Enabling IPAM Coupling
-
-The new experimental feature needs to be enabled in the NetBox configuration file by setting its flag:
-
-```
-PLUGINS_CONFIG = {
-    'netbox_dns': {
-        ...
-        'feature_ipam_coupling': True,
-        ...
-    },
-}
-```
-
-Furthermore, a number of custom fields on `ipam.IPAddress` objects are required for the feature to function correctly. These custom fields need to be created using the Django management command `setup_coupling`:
-
-```
-/opt/netbox/netbox/manage.py setup_coupling
-```
-
-In order to remove the custom fields and all related data, the same command can be used with the option `--remove`.
-
-After these steps, a restart of NetBox is required.
-
-### Using IPAM Coupling
-
-The new custom fields allow for the automatic generation of a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom field in the DNS group.
-
-It is also possible to set a TTL value for the records created via IPAM coupling, and the 'Disable PTR' option can be set as well. The 'Disable PTR' option is set to 'False' by default, which results in the creation of pointer records for address records associated with IP addresses.
-
-![Custom Fields for IPAM Coupling](images/IPAMCouplingCustomFields.png)
-
-Once the IP address has been saved, NetBox DNS will automatically create a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address will be set to the FQDN of the resulting address record.
-
-If the TTL field was filled in, the TTL value for the newly created or updated address record will be set to that value.
-
-If the 'Disable PTR' checkbox is selected, the resulting address record will have that option set as well and no pointer record will be created for the address.
-
-The IP address is now linked to the address record in the following ways:
-
-* When one of the custom fields for the IP address is updated, the DNS record is updated as well. This includes changing the name as well as moving it to a different DNS zone
-* When the IP address is deleted, the managed DNS record is deleted as well
-* When the DNS zone is renamed, the 'DNS Name' for the IP address is updated to reflect the zone's new name
-* When the DNS zone is deleted, the address record is deleted and the connection from the IP address object is cleared
-
-#### Record Status set by IPAM Coupling
-
-The status of the address record created for an IP address depends on the status of the IP address. By default, address records for IP addresses in the statuses 'Active', 'DHCP' and 'SLAAC' are set to 'Active', while the status of the address record will be 'Inactive' in all other cases.
-
-This mapping can be configured using the configuration variable `ipam_coupling_ip_active_status_list` in the plugin configuration. This variable contains an array of status names. The default setting for the status list is `None`, which is equivalent to
-
-```
-PLUGINS_CONFIG = {
-    'netbox_dns': {
-        ...
-        'ipam_coupling_ip_address_status_list': [
-            'active',
-            'dhcp',
-            'slaac',
-        ],
-        ...
-    },
-}
-```
+## IPAM AutoDNS
+(tbd)
 
 ### Additional Information for IP Addresses and DNS Records
 
