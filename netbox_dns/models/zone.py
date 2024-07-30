@@ -775,17 +775,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             ):
                 address_record.save(update_fields=["ptr_record"])
 
-            # Fix name in IP Address when zone name is changed
-            if (
-                get_plugin_config("netbox_dns", "feature_ipam_coupling")
-                and "name" in changed_fields
-            ):
-                for ip in IPAddress.objects.filter(
-                    custom_field_data__ipaddress_dns_zone_id=self.pk
-                ):
-                    ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
-                    ip.save(update_fields=["dns_name"])
-
         if changed_fields is not None and "name" in changed_fields:
             for _record in self.record_set.all():
                 _record.save(
@@ -847,15 +836,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     )
                 ).values_list("pk", flat=True)
             )
-
-            if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
-                for ip in IPAddress.objects.filter(
-                    custom_field_data__ipaddress_dns_zone_id=self.pk
-                ):
-                    ip.dns_name = ""
-                    ip.custom_field_data["ipaddress_dns_record_name"] = None
-                    ip.custom_field_data["ipaddress_dns_zone_id"] = None
-                    ip.save(update_fields=["dns_name", "custom_field_data"])
 
             super().delete(*args, **kwargs)
 
