@@ -1,7 +1,9 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, post_save, m2m_changed
+from django.core.exceptions import ValidationError
 
 from netbox.context import current_request
+from netbox.signals import post_clean
 from ipam.models import IPAddress, Prefix
 
 from netbox_dns.models import View
@@ -11,6 +13,18 @@ from netbox_dns.utilities import (
     get_ip_addresses_by_prefix,
     get_ip_addresses_by_view,
 )
+
+
+@receiver(post_clean, sender=IPAddress)
+def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
+    try:
+        update_dns_records(instance, commit=False)
+    except ValidationError as exc:
+        if hasattr(exc, "error_dict"):
+            for field in ("name", "ttl", "value", "type"):
+                value = exc.error_dict.pop(field, None)
+                if value is not None:
+                    raise ValidationError({"dns_name": value})
 
 
 @receiver(pre_delete, sender=IPAddress)

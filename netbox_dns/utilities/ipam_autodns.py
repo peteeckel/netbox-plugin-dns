@@ -64,25 +64,39 @@ def get_zones(ip_address):
     ]
 
 
-def update_dns_records(ip_address):
+def update_dns_records(ip_address, commit=True):
     if ip_address.dns_name == "":
-        delete_dns_records(ip_address)
+        if commit:
+            delete_dns_records(ip_address)
         return
 
     zones = get_zones(ip_address)
 
     for record in ip_address.netbox_dns_records.all():
         if record.zone not in zones:
-            record.delete()
+            if commit:
+                record.delete()
             continue
 
         if record.fqdn != ip_address.dns_name or record.value != ip_address.address.ip:
             record.update_from_ip_address(ip_address)
 
+            if record is not None:
+                if commit:
+                    record.save()
+                else:
+                    record.clean()
+
     for zone in set(zones).difference(
         {record.zone for record in ip_address.netbox_dns_records.all()}
     ):
-        _record.Record.create_from_ip_address(ip_address, zone)
+        record = _record.Record.create_from_ip_address(ip_address, zone)
+
+        if record is not None:
+            if commit:
+                record.save()
+            else:
+                record.clean()
 
 
 def delete_dns_records(ip_address):
