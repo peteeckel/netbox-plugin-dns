@@ -52,7 +52,7 @@ def record_data_from_ip_address(ip_address, zone):
             if ip_address.address.version == 4
             else RecordTypeChoices.AAAA
         ),
-        "value": ip_address.address.ip,
+        "value": str(ip_address.address.ip),
     }
 
     if "ipaddress_dns_record_ttl" in cf_data:
@@ -459,11 +459,13 @@ class Record(ObjectModificationMixin, NetBoxModel):
             self.delete()
             return
 
-        if any((getattr(self, attr) != data[attr] for attr in data.keys())):
-            for attr, value in data.items():
-                setattr(self, attr, value)
+        if all((getattr(self, attr) == data[attr] for attr in data.keys())):
+            return
 
-            self.save()
+        for attr, value in data.items():
+            setattr(self, attr, value)
+
+        return self
 
     @classmethod
     def create_from_ip_address(cls, ip_address, zone):
@@ -472,7 +474,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
         if data is None:
             return
 
-        return cls.objects.create(
+        return Record(
             zone=zone,
             managed=True,
             ipam_ip_address=ip_address,
