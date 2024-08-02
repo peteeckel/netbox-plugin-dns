@@ -104,7 +104,7 @@ def delete_dns_records(ip_address):
         record.delete()
 
 
-def get_ip_addresses_by_prefix(prefix):
+def get_ip_addresses_by_prefix(prefix, saved=True):
     """
     Find all IPAddress objects that are in a given prefix, provided that prefix
     is assigned to NetBox DNS view. IPAddress objects belonging to a sub-prefix
@@ -114,10 +114,8 @@ def get_ip_addresses_by_prefix(prefix):
     If neither the prefix nor any parent prefix is assigned to a view, the list
     of IPAddress objects returned is empty.
     """
-    if not (
-        Prefix.objects.filter(
-            vrf=prefix.vrf, prefix__net_contains_or_equals=prefix.prefix
-        )
+    if not prefix.netbox_dns_views.exists() and not (
+        Prefix.objects.filter(vrf=prefix.vrf, prefix__net_contains=prefix.prefix)
         .exclude(netbox_dns_views__isnull=True)
         .exists()
     ):

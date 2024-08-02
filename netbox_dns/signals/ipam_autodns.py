@@ -1,5 +1,5 @@
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_save, m2m_changed
+from django.db.models.signals import pre_delete, pre_save, post_save, m2m_changed
 from django.core.exceptions import ValidationError
 
 from netbox.context import current_request
@@ -37,13 +37,20 @@ def ipam_autodns_ipaddress_post_save(instance, **kwargs):
     update_dns_records(instance)
 
 
-@receiver(post_save, sender=Prefix)
-def ipam_autodns_prefix_post_save(instance, **kwargs):
-    if kwargs.get("created"):
+@receiver(pre_save, sender=Prefix)
+def ipam_autodns_prefix_pre_save(instance, **kwargs):
+    """
+    Changes that modify the prefix hierarchy cannot be validated properly before
+    commiting them. So the solution in this case is to remove a prefix whose
+    VRF or network has changed from all views it currently is assigned to.
+    """
+    if instance.pk is None or not instance.netbox_dns_views.exists():
         return
 
-    for ip_address in get_ip_addresses_by_prefix(instance):
-        update_dns_records(ip_address)
+    saved_prefix = Prefix.objects.get(pk=instance.pk)
+    if saved_prefix.prefix != instance.prefix or saved_prefix.vrf != instance.vrf:
+        for view in saved_prefix.netbox_dns_views.all():
+            view.prefixes.remove(saved_prefix)
 
 
 @receiver(pre_delete, sender=Prefix)
