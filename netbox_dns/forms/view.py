@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from django.db.models import Q, Count
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -21,6 +23,11 @@ from ipam.models import Prefix
 
 from netbox_dns.models import View
 from netbox_dns.fields import PrefixDynamicModelMultipleChoiceField
+from netbox_dns.utilities import (
+    get_ip_addresses_by_prefix,
+    update_dns_records,
+    get_views_by_prefix,
+)
 
 
 __all__ = (
@@ -31,7 +38,55 @@ __all__ = (
 )
 
 
-class ViewForm(TenancyForm, NetBoxModelForm):
+class ViewPrefixUpdateMixin:
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+
+        if self.instance.pk is None or "prefixes" not in self.changed_data:
+            return
+
+        prefixes = self.cleaned_data.get("prefixes")
+        old_prefixes = View.objects.get(pk=self.instance.pk).prefixes.all()
+
+        for prefix in prefixes.difference(old_prefixes):
+            for ip_address in get_ip_addresses_by_prefix(prefix, check_view=False):
+                try:
+                    update_dns_records(ip_address, commit=False, view=self.instance)
+                except ValidationError as exc:
+                    self.add_error("prefixes", exc.messages)
+
+        # +
+        # Determine the prefixes that, when removed from the view, have no direct view
+        # assignment left. These prefixes will potentially inherit from a different view,
+        # which means that they have to be validated against different zones.
+        # -
+        check_prefixes = set(
+            old_prefixes.annotate(view_count=Count("netbox_dns_views")).filter(
+                Q(view_count=1, netbox_dns_views=self.instance)
+                | Q(netbox_dns_views__isnull=True)
+            )
+        ) - set(prefixes)
+
+        for check_prefix in check_prefixes:
+            # +
+            # Check whether the prefix will get a new view by inheritance from its
+            # parent. If that's the case, the IP addresses need to be checked.
+            # -
+            views = get_views_by_prefix(check_prefix.get_parents().last())
+            for view in views:
+                if view == self.instance:
+                    continue
+
+                for ip_address in get_ip_addresses_by_prefix(
+                    check_prefix, check_view=False
+                ):
+                    try:
+                        update_dns_records(ip_address, commit=False, view=view)
+                    except ValidationError as exc:
+                        self.add_error("prefixes", exc.messages)
+
+
+class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
     prefixes = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         required=False,
@@ -89,7 +144,7 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     tag = TagFilterField(View)
 
 
-class ViewImportForm(NetBoxModelImportForm):
+class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
     prefixes = CSVModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         to_field_name="id",

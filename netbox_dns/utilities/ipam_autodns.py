@@ -10,12 +10,14 @@ from ipam.models import IPAddress, Prefix
 
 from netbox_dns.models import zone as _zone
 from netbox_dns.models import record as _record
+from netbox_dns.models import view as _view
 
 
 __all__ = (
     "get_zones",
     "update_dns_records",
     "delete_dns_records",
+    "get_views_by_prefix",
     "get_ip_addresses_by_prefix",
     "get_ip_addresses_by_view",
     "get_ip_addresses_by_zone",
@@ -35,10 +37,14 @@ def _get_assigned_views(ip_address):
     return longest_prefix.netbox_dns_views.all()
 
 
-def get_zones(ip_address):
-    views = _get_assigned_views(ip_address)
-    if not views:
-        return []
+def get_zones(ip_address, view=None):
+    if view is None:
+        views = _get_assigned_views(ip_address)
+        if not views:
+            return []
+
+    else:
+        views = [view]
 
     fqdn = dns_name.from_text(ip_address.dns_name)
     zone_name_candidates = [
@@ -64,33 +70,42 @@ def get_zones(ip_address):
     ]
 
 
-def update_dns_records(ip_address, commit=True):
+def update_dns_records(ip_address, commit=True, view=None):
     if ip_address.dns_name == "":
         if commit:
             delete_dns_records(ip_address)
         return
 
-    zones = get_zones(ip_address)
+    zones = get_zones(ip_address, view=view)
 
-    for record in ip_address.netbox_dns_records.all():
-        if record.zone not in zones:
-            if commit:
-                record.delete()
-            continue
-
-        if record.fqdn != ip_address.dns_name or record.value != ip_address.address.ip:
-            record.update_from_ip_address(ip_address)
-
-            if record is not None:
+    if ip_address.pk is not None:
+        for record in ip_address.netbox_dns_records.all():
+            if record.zone not in zones:
                 if commit:
-                    record.save()
-                else:
-                    record.clean()
+                    record.delete()
+                continue
 
-    for zone in set(zones).difference(
-        {record.zone for record in ip_address.netbox_dns_records.all()}
-    ):
-        record = _record.Record.create_from_ip_address(ip_address, zone)
+            if (
+                record.fqdn != ip_address.dns_name
+                or record.value != ip_address.address.ip
+            ):
+                record.update_from_ip_address(ip_address)
+
+                if record is not None:
+                    if commit:
+                        record.save()
+                    else:
+                        record.clean()
+
+        zones = set(zones).difference(
+            {record.zone for record in ip_address.netbox_dns_records.all()}
+        )
+
+    for zone in zones:
+        record = _record.Record.create_from_ip_address(
+            ip_address,
+            zone,
+        )
 
         if record is not None:
             if commit:
@@ -104,7 +119,17 @@ def delete_dns_records(ip_address):
         record.delete()
 
 
-def get_ip_addresses_by_prefix(prefix, saved=True):
+def get_views_by_prefix(prefix):
+    if (views := prefix.netbox_dns_views.all()).exists():
+        return views
+
+    if (parent := prefix.get_parents().filter(netbox_dns_views__isnull=False)).exists():
+        return parent.last().netbox_dns_views.all()
+
+    return _view.View.objects.none()
+
+
+def get_ip_addresses_by_prefix(prefix, check_view=True):
     """
     Find all IPAddress objects that are in a given prefix, provided that prefix
     is assigned to NetBox DNS view. IPAddress objects belonging to a sub-prefix
@@ -114,11 +139,7 @@ def get_ip_addresses_by_prefix(prefix, saved=True):
     If neither the prefix nor any parent prefix is assigned to a view, the list
     of IPAddress objects returned is empty.
     """
-    if not prefix.netbox_dns_views.exists() and not (
-        Prefix.objects.filter(vrf=prefix.vrf, prefix__net_contains=prefix.prefix)
-        .exclude(netbox_dns_views__isnull=True)
-        .exists()
-    ):
+    if check_view and not get_views_by_prefix(prefix):
         return IPAddress.objects.none()
 
     queryset = IPAddress.objects.filter(
