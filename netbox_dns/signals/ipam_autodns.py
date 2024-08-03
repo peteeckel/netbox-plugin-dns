@@ -1,3 +1,5 @@
+from netaddr import IPNetwork
+
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, pre_save, post_save, m2m_changed
 from django.core.exceptions import ValidationError
@@ -17,6 +19,9 @@ from netbox_dns.utilities import (
 
 @receiver(post_clean, sender=IPAddress)
 def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
+    if not isinstance(instance.address, IPNetwork):
+        return
+
     try:
         update_dns_records(instance, commit=False)
     except ValidationError as exc:
