@@ -72,8 +72,10 @@ class ViewPrefixUpdateMixin:
             # Check whether the prefix will get a new view by inheritance from its
             # parent. If that's the case, the IP addresses need to be checked.
             # -
-            views = get_views_by_prefix(check_prefix.get_parents().last())
-            for view in views:
+            if (parent := check_prefix.get_parents().last()) is None:
+                return
+
+            for view in get_views_by_prefix(parent):
                 if view == self.instance:
                     continue
 
