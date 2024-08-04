@@ -15,6 +15,8 @@ class ObjectModificationMixin:
                 - {"id"}
             )
 
+            self.__class__.check_fields.add("custom_field_data")
+
     @property
     def changed_fields(self):
         if self.pk is None:
