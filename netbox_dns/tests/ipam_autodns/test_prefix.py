@@ -101,6 +101,27 @@ class AutoDNSPrefixTestCase(TestCase):
             Record.objects.filter(fqdn="name1.zone1.example.com.").exists()
         )
 
+    def test_update_prefix_view(self):
+        prefix = self.prefixes[0]
+        self.views[0].prefixes.add(prefix)
+
+        IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+
+        record = Record.objects.get(
+            fqdn="name1.zone1.example.com.", type=RecordTypeChoices.A
+        )
+        self.assertEqual(record.zone, self.zones[0])
+
+        self.views[0].prefixes.remove(prefix)
+        self.views[1].prefixes.add(prefix)
+
+        record = Record.objects.get(
+            fqdn="name1.zone1.example.com.", type=RecordTypeChoices.A
+        )
+        self.assertEqual(record.zone, self.zones[1])
+
     def test_create_prefix(self):
         prefix = Prefix.objects.create(prefix="10.1.0.0/16")
 
