@@ -33,10 +33,17 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
                 if value is not None:
                     raise ValidationError({"dns_name": value})
 
+        raise exc
+
 
 @receiver(pre_delete, sender=IPAddress)
 def ipam_autodns_ipaddress_pre_delete(instance, **kwargs):
     delete_dns_records(instance)
+
+
+@receiver(pre_save, sender=IPAddress)
+def ipam_autodns_ipaddress_post_save(instance, **kwargs):
+    update_dns_records(instance, commit=False)
 
 
 @receiver(post_save, sender=IPAddress)
