@@ -189,14 +189,6 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
 
     description = forms.CharField(max_length=200, required=False)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
-    prefixes = PrefixDynamicModelMultipleChoiceField(
-        queryset=Prefix.objects.all(),
-        required=False,
-        label="IPAM Prefixes",
-        context={
-            "depth": None,
-        },
-    )
 
     fieldsets = (
         FieldSet(
