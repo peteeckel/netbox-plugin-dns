@@ -42,7 +42,9 @@ def _get_record_status(ip_address):
     return (
         RecordStatusChoices.STATE_ACTIVE
         if ip_address.status
-        in settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_ipaddress_active_status", [])
+        in settings.PLUGINS_CONFIG["netbox_dns"].get(
+            "autodns_ipaddress_active_status", []
+        )
         else RecordStatusChoices.STATUS_INACTIVE
     )
 
@@ -157,9 +159,7 @@ def get_ip_addresses_by_prefix(prefix, check_view=True):
         vrf=prefix.vrf, address__net_host_contained=prefix.prefix
     )
 
-    for exclude_child in prefix.get_child_prefixes().filter(
-        netbox_dns_views__isnull=False
-    ):
+    for exclude_child in prefix.get_children().filter(netbox_dns_views__isnull=False):
         queryset = queryset.exclude(
             vrf=exclude_child.vrf,
             address__net_host_contained=exclude_child.prefix,
@@ -182,7 +182,7 @@ def get_ip_addresses_by_view(view):
         sub_queryset = IPAddress.objects.filter(
             vrf=prefix.vrf, address__net_host_contained=prefix.prefix
         )
-        for exclude_child in prefix.get_child_prefixes().exclude(
+        for exclude_child in prefix.get_children().exclude(
             Q(netbox_dns_views__isnull=True) | Q(netbox_dns_views__in=[view])
         ):
             sub_queryset = sub_queryset.exclude(
