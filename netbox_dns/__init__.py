@@ -5,14 +5,14 @@ from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.choices import RecordTypeChoices
 
-__version__ = "1.1.0-dev"
+__version__ = "1.1.0-beta1"
 
 
 class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = "NetBox DNS"
     description = "NetBox plugin for DNS data"
-    min_version = "4.1.0-dev"
+    min_version = "4.1.0-beta1"
     version = __version__
     author = "Peter Eckel"
     author_email = "pete@netbox-dns.org"
