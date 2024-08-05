@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
 from django.urls import reverse
+from django.conf import settings
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -53,6 +54,14 @@ def record_data_from_ip_address(ip_address, zone):
             else RecordTypeChoices.AAAA
         ),
         "value": str(ip_address.address.ip),
+        "status": (
+            RecordStatusChoices.STATUS_ACTIVE
+            if ip_address.status
+            in settings.PLUGINS_CONFIG["netbox_dns"].get(
+                "autodns_ipaddress_active_status", []
+            )
+            else RecordStatusChoices.STATUS_INACTIVE
+        ),
     }
 
     if "ipaddress_dns_record_ttl" in cf_data:
