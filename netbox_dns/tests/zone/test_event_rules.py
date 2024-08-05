@@ -9,6 +9,7 @@ from django.test import RequestFactory
 from rest_framework import status
 
 from core.models import ObjectType
+from core.events import OBJECT_CREATED, OBJECT_UPDATED
 from core.choices import ObjectChangeActionChoices
 from extras.models import EventRule, Tag, Webhook
 from extras.choices import EventRuleActionChoices
@@ -44,14 +45,14 @@ class ZoneEventRuleTest(APITestCase):
         event_rules = (
             EventRule(
                 name="Zone Create",
-                type_create=True,
+                event_types=[OBJECT_CREATED],
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
             ),
             EventRule(
                 name="Zone Update",
-                type_update=True,
+                event_types=[OBJECT_UPDATED],
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
