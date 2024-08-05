@@ -261,9 +261,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         if self.initial.get("soa_ttl") is None:
             self.initial["soa_ttl"] = self.initial.get("default_ttl")
 
-        if self.initial.get("soa_serial_auto"):
-            self.initial["soa_serial"] = None
-
         if self.initial.get("soa_mname") is None:
             default_soa_mname = defaults.get("zone_soa_mname")
             if default_soa_mname is not None:
