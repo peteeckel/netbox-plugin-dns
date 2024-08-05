@@ -711,6 +711,7 @@ PLUGINS_CONFIG = {
 Please note that setting this option to `True` in an existing NetBox installation or updating NetBox to a later version that enforces this behaviour does not affect duplicate records that are already present in the database, and so it might make sense to clean them up manually or by script. It will not be possible to save any changes to either of the duplicate records as long as the other one is still present and active.
 
 ## Uniqueness of TTLs across RRSets
+
 [RFC2181, Section 5.2](https://www.rfc-editor.org/rfc/rfc2181#section-5.2) specifies that having different TTL values for resource records in RRSets, i.e. sets of records that have the same name, zone and type, is deprecated.
 
 NetBox DNS by default enforces this restriction, which can be disabled by setting the configuration variable `enforce_unique_rrset_ttl` to `False`:
@@ -750,6 +751,7 @@ The NetBox detail view for tenants shows a tenants in the list of objects on the
 The columns of the table on the left side are clickable and link to filtered lists showing the related views, nameservers, zones and records.
 
 ## RFC 2317
+
 RFC 2317 provides a solution to the issue of delegation of reverse zones for IPv4 subnets with a longer network mask than /24, which is not possible using the classical `in-addr.arpa` zone hierarchy.
 
 The solution works is to define specific zones that hold the PTR records for such a subnet, and then insert CNAME records for these PTR records in the `in-addr.arpa` zone containing it. NetBox DNS release 0.22.0 and later support creating these RFC2317 zones and the automatic insertion of PTR records within them and, optionally, CNAME records in the containing `in-addr.arpa` zone that point to the PTR records.
@@ -791,27 +793,169 @@ The following limitations exist for RFC2317 zones:
 * The RFC2317 CNAME records are managed records and can not be edited manually. In normal operation this should never be necessary.
 
 ## IPAM AutoDNS
-(tbd)
+
+IPAM AutoDNS is a new feature introduced with NetBox DNS 1.1 and replaces the experimental IPAM Coupling feature. The functionality of IPAM AutoDNS builds upon the IPAM Coupling functionality, but extends it in several ways, providing a much more powerful solution in larger environments.
+
+**This solution totally replaces IPAM Coupling.** It is not possible to continue to use IPAM Coupling starting from NetBox DNS version 1.1. IPAM Coupling has always been labelled an experimental feature which was bound to change significantly, and with the release of NetBox DNS 1.1 this change is taking place.
+
+### Basic functionality
+The functionality of IPAM AutoDNS is based on mapping IPAM Prefix objects to NetBox DNS View objects. An IPAM prefix can be assigned to one or multiple DNS views via the edit view for View objects.
+
+If a prefix is assigned to one or more views, NetBox DNS checks all IP addresses in the prefix for their 'DNS Name' field. If the DNS name ends in the zone name of any zone within the view, an address record within that zone is created so that the records's FQDN matches the DNS name of the IP address.
+
+If there are multiple matching zones within the view, the one with the longest name is chosen. For example, if the DNS name is `name1.zone1.example.com` and there are zones `example.com` and `zone1.example.com` in the view, the resulting DNS record will be `name1` in zone `zone1.example.com` rather than `name1.zone1` in zone `example.com`.
+
+If there is no matching zone, no record will be created.
+
+### Differences from IPAM Coupling
+The main differences between IPAM AutoDNS and IPAM Coupling are the much higher degree of automation of the interaction between IPAM and NetBox DNS, and the extended functionality the new feature provides compared to IPAM Coupling. In more detail:
+
+* IPAM AutoDNS does not require manual interaction when an IP address is created or updated. Particularly it ist not necessary to manually define the name and the zone of the address record for an IP address, but only a value in the 'DNS Name' field and a mapping from prefixes to DNS views
+* IPAM AutoDNS does not require any custom fields on IPAddress objects, but supports the relevant part of the IPAM Coupling custom fields ('Disable PTR' and 'TTL') and adds a new field 'Disable AutoDNS' to make it possible to exempt IP addresses from record generation
+* IPAM AutoDNS is not limited to one DNS record per IP address, which was a major limitation in split horizon DNS settings. It is now possible to create multiple records in zones in different views for the same IP address
+* With IPAM Coupling it was possible to create inconsistent date, i.e. by first adding a record `name1.zone1` in zone `example.com` and then adding a new zone `zone1.example.com` to the DNS model. This creates a situation where the old address record can no longer be found due to the zone hierarchy. IPAM AutoDNS automatically migrates the record(s) in such cases.
+* An IPAM Coupling functionality that is lost in IPAM AutoDNS is the observance of NetBox DNS permissions in IPAM operations, and especially object-level permissions. The operation of AutoDNS is a pretty complicated thing, where just creating an IP address may result in
+	* the creation of an address record
+	* the update of the zone SOA SERIAL for the address record zone
+	* the creation of a new SOA record for the address record zone
+	* the creation of a PTR record for the address record
+	* the update of the zone SOA SERIAL for the PTR record zone
+	* the creation of a new SOA record for the PTR record zone
+	* the creation of an RFC2317 CNAME record
+	* the update of the zone SOA SERIAL for the RFC2317 CNAME record zone
+	* the creation of a new SOA record for the RFC2317 CNAME record zone
+
+	and that is the simplest case. Updating records, changing view assignments, renaming zones etc. can each create the same operations for multiple records, and whether or not these actions are performed is depending on not only the operation itself, but also the data that is changed. This is a nightmare to validate, and a squared nightmare to test. Maintaining object permission validation was just impractical as long as Django's functionality does not change, so the functionality was dropped. If necessary, restrictions can be implemented using NetBox custom validators, but that is out of scope for this plugin.
+* IPAM AutoDNS no longer overwrites the 'DNS Name' field of IP addresses but uses it to create DNS records. There is one downside to this, which is that IDNs cannot be entered directly but have to be formulated in Punycode, but on the upside the 'DNS Name' field is now properly validated.
+
+### Multiple assigned views per prefix
+If there is more than one view assigned, the zone matching takes place for each view independently, and if there are matching zones in two or more views, an address record will be created in each of the zones. That way, a record can be added to more than one zone in a split horizon DNS setup.
+
+### Prefix hierarchy
+When determining the views that will be searched for matching zones, NetBox DNS uses the longest prefix containing the IP address that is assigned to one or more views. That way, hierarchical matching is possible. Take the following example:
+
+Prefix                              | Views
+--------                            | ---------------
+`10.0.0.0/8`                        | `View 1`
+`10.1.0.0/16`                       | `View 2`
+`10.1.1.0/24`                       | `View 1, View 2`
+
+In this example, the whole prefix `10.0.0.0/8` is assigned to `View 1`. All sub-prefixes of `10.0.0.0/8` inherit that assignment except for `10.1.0.0/16`, which is assigned to `View 2` (and only `View 2`, as inheritance is not cumulative). There is, however, a sub-prefix `10.1.1.0/24` that is assigned to both `View 1` and `View 2`.
+
+Sub-prefixes that are not assigned to a view inherit their views from their parent prefix, so in this example the prefix `10.0.1.0/24` would be assigned to `View 1` by inheritance, `10.1.1.0/24` to `View 2`, and `10.1.1.128/25` to `View 1` and `View 2`.
+
+If it should become necessary to explicitly disable DNS record generation for a given prefix that otherwise inherits a view assignment from its parents, the solution is to create a view (e.g. named 'NoDNS') that doesn't contain any zones and assign the prefix to that view.
+
+The mechanism is exactly the same for IPv4 and IPv6 prefixes.
+
+### DNS records
+The records created by IPAM AutoDNS are managed records, i.e. they cannot be modified manually. There are, however, some ways in which record creation can be influenced.
+
+#### Record status
+The status of an automatically generated address record is controlled by the status of the IP address object the record is created for. If the address object has one of the statuses `Active`, `DHCP` or `SLAAC`, the address record created will be `Active`, otherwise `Inactive`. 
+
+This mapping can be controlled via the plugin configuration by setting the variable `autodns_ipaddress_active_status`. The Variable is a list of IP address statuses that result in an active address record and can be overridden in `confguration.py` like in the following example:
+
+```
+from ipam.choices import IPAddressStatusChoices
+
+...
+
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'autodns_ipaddress_active_status': [
+            IPAddressStatusChoices.STATUS_ACTIVE,
+            IPAddressStatusChoices.STATUS_RESERVED,
+            IPAddressStatusChoices.STATUS_DHCP,
+        ]
+        ...
+    },
+}
+```
+
+This makes IP addresses with the status `Active`, `Reserved` and `DHCP` create active address records, while all other IP address statuses result in inactive address records.
+
+Please note that changing this setting will not result in immediate changes to the address record statuses, but only be observed when the IP address is saved or updated.
+
+#### Creating the IPAM AutoDNS custom fields
+For the next settings, the optional custom fields for IPAM AutoDNS need to be created. This can be done by running the manage command `setup_autodns` from the command line:
+
+```
+/opt/netbox/netbox/manage.py setup_autodns
+```
+
+This comamnd creates three custom fields and removes old custom fields formerly used by the experimental `IPAM Coupling` feature except for 'TTL' and 'Disable PTR'. The function of these fields has been retained from IPAM Coupling for convenience, so the settings made for individual IP addresses will not be lost.
+
+Unlike with IPAM Coupling, the custom fields are optional. They are required to make use of the three settings described below, but the general AutoDNS functionality does not require them.
+
+#### Record TTL
+To explicitly set the TTL for an address record, the optional custom fields need to be set up. Then it is possible to specify the TTL by using the 'TTL' custom field for the IP address. The value entered in this field will then be used for the address record being created.
+
+#### Disable PTR
+Normally, NetBox DNS automatically creates PTR records for address records if the PTR zone is present. To disable that functionality for a record, the 'Disable PTR' flag can be set. 
+
+To set the flag for an address record created by IPAM AutoDNS, the optional custom field `Disable PTR` can be used on the IP address. If set, it results in the corresponding flag being set for the IP address, so no PTR record will be created even if the reverse zone is defined in the view.
+
+#### Disable address record creation
+To disable the creation of an address record altogether, either leave the 'DNS Name' field empty or check the optional custom field `Disable AutoDNS`. No address record will be created if that field is checked.
+
+### Conflicts
+When IPAM AutoDNS creates address records there may be conflicts caused by duplicate address records (which are by defauld not allowed) or address records that otherwise violate DNS restrictions like having the same name as a CNAME in the same zone, which DNS does not allow.
+
+Conflicts like these can happen on several levels, for example when IP addresses are created or updated, or when prefixes are assigned to deassigned from views or deleted (all of these operations can change the inheritance by which prefixes and IP addresses are assigned to zones, so they may result in new conflicts. The current solution to handle that kind of conflict is to report it and refuse to execute the operation that would cause the DNS misconfiguration.
+
+An example of a conflict at IP address level:
+![DNS Conflict for IPAddress](images/IPAMAutoDNSIPAddressConflict.png)
+
+Another example shows a conflict at View level when assigning a prefix:
+![DNS Conflict for View Prefix Assignment](images/IPAMAutoDNSPrefixConflict.png)
+
+The solution is to either disable automatic DNS record configuration for the affected IP addresses (which retains the original DNS records) or to remove or deactivate the existing address records and try again. 
 
 ### Additional Information for IP Addresses and DNS Records
-
 When a link between an IP address and a DNS address record is present, additional panes will appear in the IPAM IP address and NetBox DNS record view, as well as in the detail views for NetBox DNS managed records.
 
-#### IP Address Information
+#### IPAM IP Address Information
+For each IP address with DNS address records created by IPAM AutoDNS, the detail view has a pane showing a list of the addresses created for it.
 
-If a DNS address record is linked to an IP address, the detail view for the IP address will show an additional pane displaying that address record.
+![Related DNS Address Record](images/IPAMAutoDNSRelatedAddressRecords.png)
 
-![Related DNS Address Record](images/IPAMCouplingRelatedAddressRecord.png)
+If NetBox DNS also PTR records for the created DNS address record, the detail view for the IP address will contain a second pane showing these pointer records.
 
-If NetBox DNS also created a PTR record for the linked DNS address record, the detail view for the IP address will contain an a second additional pane showing that pointer record.
+![Related DNS Address Record](images/IPAMAutoDNSRelatedPointerRecords.png)
 
-![Related DNS Address Record](images/IPAMCouplingRelatedPointerRecord.png)
+#### IPAM Prefix Information
+For each prefix assigned to one or more DNS views, the detail view has a pane showing a list of the views it is assiged to.
+
+![Related DNS Address Record](images/IPAMAutoDNSPrefixRelatedViews.png)
+
+If NetBox DNS also PTR records for the created DNS address record, the detail view for the IP address will contain a second pane showing these pointer records.
+
+#### DNS View Information
+For each DNS view with one or more assigned prefixes, the detail view has a pane showing a list of the prefixes assigned to it.
+
+![Related DNS Address Record](images/IPAMAutoDNSViewRelatedPrefixes.png)
+
 
 #### DNS Record Information
-
 The detail views for the address and pointer records created for a coupled IP address include a link to that IP address, which can be used to navigate to the address.
 
-![Record Detail View for Coupled IP Address](images/IPAMCouplingRecordDetailView.png)
+![Record Detail View for Coupled IP Address](images/IPAMAutoDNSRecordDetailView.png)
+
+### Disabling AutoDNS
+IPAM AutoDNS modifies the core functionality for IPAM `Prefix` and `IPAddress` objects in some ways by modifying the functionality of saving and deleting objects of these classes. If the functionality of IPAM AutoDNS is not required and the impact of having NetBox DNS installed on systems where this is the case needs to be minimized, these mechanisms can be disabled by setting the `autodns_disabled` variable in `configuration.py`:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'autodns_disabled': True,
+        ...
+    },
+}
+```
+This will disable the AutoDNS functionality and the GUI elements required to use it completely, but will not delete any data already present in the database.
 
 ## UI Customization
 
