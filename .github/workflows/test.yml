@@ -60,4 +60,4 @@ jobs:
       - name: Run tests
         working-directory: netbox
         run: |
-          python netbox/manage.py test netbox_dns.tests --parallel -v 2
+          python netbox/manage.py test netbox_dns.tests -v 2
