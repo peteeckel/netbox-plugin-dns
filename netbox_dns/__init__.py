@@ -1,3 +1,4 @@
+from django.conf import settings
 from netbox.plugins import PluginConfig
 
 __version__ = "1.1.0-dev"
@@ -20,6 +21,7 @@ class DNSConfig(PluginConfig):
         "zone_soa_retry": 7200,
         "zone_soa_expire": 2419200,
         "zone_soa_minimum": 3600,
+        "autodns_disabled": False,
         "tolerate_characters_in_zone_labels": "",
         "tolerate_underscores_in_labels": False,
         "tolerate_underscores_in_hostnames": False,  # Deprecated, will be removed in 1.2.0
@@ -37,9 +39,10 @@ class DNSConfig(PluginConfig):
     base_url = "netbox-dns"
 
     def ready(self):
-        from netbox_dns.signals import ipam_autodns
-
         super().ready()
+
+        if not settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+            from netbox_dns.signals import ipam_autodns
 
 
 #

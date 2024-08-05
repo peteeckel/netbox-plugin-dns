@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Count
 
@@ -89,6 +90,12 @@ class ViewPrefixUpdateMixin:
 
 
 class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+            del self.fields["prefixes"]
+
     prefixes = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         required=False,
@@ -100,8 +107,8 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
 
     fieldsets = (
         FieldSet("name", "default_view", "description", "tags", name="View"),
+        FieldSet("prefixes"),
         FieldSet("tenant_group", "tenant", name="Tenancy"),
-        FieldSet("prefixes", name="IPAM"),
     )
 
     class Meta:
@@ -117,11 +124,17 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
 
 
 class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+            del self.fields["prefix_id"]
+
     model = View
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "default_view", "description", name="Attributes"),
-        FieldSet("prefix_id", name="IPAM"),
+        FieldSet("prefix_id"),
         FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
     )
 
@@ -147,6 +160,12 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+            del self.fields["prefixes"]
+
     prefixes = CSVModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         to_field_name="id",
