@@ -1,5 +1,9 @@
 from django.conf import settings
+
 from netbox.plugins import PluginConfig
+from ipam.choices import IPAddressStatusChoices
+
+from netbox_dns.choices import RecordTypeChoices
 
 __version__ = "1.1.0-dev"
 
@@ -22,12 +26,17 @@ class DNSConfig(PluginConfig):
         "zone_soa_expire": 2419200,
         "zone_soa_minimum": 3600,
         "autodns_disabled": False,
+        "autodns_ipaddress_active_status": [
+            IPAddressStatusChoices.STATUS_ACTIVE,
+            IPAddressStatusChoices.STATUS_DHCP,
+            IPAddressStatusChoices.STATUS_SLAAC,
+        ],
         "tolerate_characters_in_zone_labels": "",
         "tolerate_underscores_in_labels": False,
         "tolerate_underscores_in_hostnames": False,  # Deprecated, will be removed in 1.2.0
         "tolerate_leading_underscore_types": [
-            "TXT",
-            "SRV",
+            RecordTypeChoices.TXT,
+            RecordTypeChoices.SRV,
         ],
         "tolerate_non_rfc1035_types": [],
         "enable_root_zones": False,
