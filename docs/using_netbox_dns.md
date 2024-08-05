@@ -928,9 +928,11 @@ If NetBox DNS also PTR records for the created DNS address record, the detail vi
 #### IPAM Prefix Information
 For each prefix assigned to one or more DNS views, the detail view has a pane showing a list of the views it is assiged to.
 
-![Related DNS Address Record](images/IPAMAutoDNSPrefixRelatedViews.png)
+![Assigned DNS Views](images/IPAMAutoDNSPrefixAssignedViews.png)
 
-If NetBox DNS also PTR records for the created DNS address record, the detail view for the IP address will contain a second pane showing these pointer records.
+If the prefix does not have any views directly assigned to it, but inherits view from a parent prefix, the pane shows the list of inherited views instead:
+
+![Inherited DNS Views](images/IPAMAutoDNSPrefixInheritedViews.png)
 
 #### DNS View Information
 For each DNS view with one or more assigned prefixes, the detail view has a pane showing a list of the prefixes assigned to it.
