@@ -1,12 +1,15 @@
-from netaddr import IPNetwork
+from copy import deepcopy
 
+from netaddr import IPNetwork
 from unittest import skip
 
 from django.test import TestCase
 from django.core import management
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 from ipam.models import IPAddress, Prefix
+from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
@@ -245,13 +248,71 @@ class AutoDNSIPAddressTestCase(TestCase):
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).exists()
         )
 
-    @skip("status dependent autodns not implemented yet")
     def test_create_ip_address_status_inactive(self):
-        pass
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"),
+            dns_name="name1.zone1.example.com",
+            status=IPAddressStatusChoices.STATUS_RESERVED,
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+            status=IPAddressStatusChoices.STATUS_RESERVED,
+        )
 
-    @skip("status dependent autodns not implemented yet")
-    def test_create_ip_address_status_custom(self):
-        pass
+        record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+        self.assertEqual(record4.status, RecordStatusChoices.STATUS_INACTIVE)
+
+        record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+        self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
+
+    def test_create_ip_address_status_custom_active(self):
+        test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
+        test_settings["autodns_ipaddress_active_status"].append(
+            IPAddressStatusChoices.STATUS_RESERVED
+        )
+
+        with self.settings(PLUGINS_CONFIG={"netbox_dns": test_settings}):
+            ipv4_address = IPAddress.objects.create(
+                address=IPNetwork("10.0.0.1/24"),
+                dns_name="name1.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_RESERVED,
+            )
+            ipv6_address = IPAddress.objects.create(
+                address=IPNetwork("fe80:dead:beef::1/64"),
+                dns_name="name2.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_RESERVED,
+            )
+
+            record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+            self.assertEqual(record4.status, RecordStatusChoices.STATUS_ACTIVE)
+
+            record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+            self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
+
+    def test_create_ip_address_status_custom_inactive(self):
+        test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
+        test_settings["autodns_ipaddress_active_status"].remove(
+            IPAddressStatusChoices.STATUS_DHCP
+        )
+
+        with self.settings(PLUGINS_CONFIG={"netbox_dns": test_settings}):
+            ipv4_address = IPAddress.objects.create(
+                address=IPNetwork("10.0.0.1/24"),
+                dns_name="name1.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_DHCP,
+            )
+            ipv6_address = IPAddress.objects.create(
+                address=IPNetwork("fe80:dead:beef::1/64"),
+                dns_name="name2.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_DHCP,
+            )
+
+            record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+            self.assertEqual(record4.status, RecordStatusChoices.STATUS_INACTIVE)
+
+            record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+            self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
 
     def test_update_ip_address_name(self):
         ipv4_address = IPAddress.objects.create(
@@ -557,17 +618,135 @@ class AutoDNSIPAddressTestCase(TestCase):
     def test_update_ip_address_ttl_rrset_conflict(self):
         pass
 
-    @skip("status dependent autodns not implemented yet")
     def test_update_ip_address_status_inactive(self):
-        pass
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"),
+            dns_name="name1.zone1.example.com",
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+        )
 
-    @skip("status dependent autodns not implemented yet")
+        record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+        self.assertEqual(record4.status, RecordStatusChoices.STATUS_ACTIVE)
+
+        record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+        self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
+
+        ipv4_address.status = IPAddressStatusChoices.STATUS_RESERVED
+        ipv4_address.save()
+
+        ipv6_address.status = IPAddressStatusChoices.STATUS_RESERVED
+        ipv6_address.save()
+
+        record4.refresh_from_db()
+        self.assertEqual(record4.status, RecordStatusChoices.STATUS_INACTIVE)
+
+        record6.refresh_from_db()
+        self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
+
     def test_update_ip_address_status_active(self):
-        pass
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"),
+            dns_name="name1.zone1.example.com",
+            status=IPAddressStatusChoices.STATUS_RESERVED,
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+            status=IPAddressStatusChoices.STATUS_RESERVED,
+        )
 
-    @skip("status dependent autodns not implemented yet")
-    def test_update_ip_address_status_custom(self):
-        pass
+        record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+        self.assertEqual(record4.status, RecordStatusChoices.STATUS_INACTIVE)
+
+        record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+        self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
+
+        ipv4_address.status = IPAddressStatusChoices.STATUS_ACTIVE
+        ipv4_address.save()
+
+        ipv6_address.status = IPAddressStatusChoices.STATUS_ACTIVE
+        ipv6_address.save()
+
+        record4.refresh_from_db()
+        self.assertEqual(record4.status, RecordStatusChoices.STATUS_ACTIVE)
+
+        record6.refresh_from_db()
+        self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
+
+    def test_update_ip_address_status_custom_active(self):
+        test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
+        test_settings["autodns_ipaddress_active_status"].append(
+            IPAddressStatusChoices.STATUS_RESERVED
+        )
+
+        with self.settings(PLUGINS_CONFIG={"netbox_dns": test_settings}):
+            ipv4_address = IPAddress.objects.create(
+                address=IPNetwork("10.0.0.1/24"),
+                dns_name="name1.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_DEPRECATED,
+            )
+            ipv6_address = IPAddress.objects.create(
+                address=IPNetwork("fe80:dead:beef::1/64"),
+                dns_name="name2.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_DEPRECATED,
+            )
+
+            record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+            self.assertEqual(record4.status, RecordStatusChoices.STATUS_INACTIVE)
+
+            record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+            self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
+
+            ipv4_address.status = IPAddressStatusChoices.STATUS_RESERVED
+            ipv4_address.save()
+
+            ipv6_address.status = IPAddressStatusChoices.STATUS_RESERVED
+            ipv6_address.save()
+
+            record4.refresh_from_db()
+            self.assertEqual(record4.status, RecordStatusChoices.STATUS_ACTIVE)
+
+            record6.refresh_from_db()
+            self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
+
+    def test_update_ip_address_status_custom_inactive(self):
+        test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
+        test_settings["autodns_ipaddress_active_status"].remove(
+            IPAddressStatusChoices.STATUS_DHCP
+        )
+
+        with self.settings(PLUGINS_CONFIG={"netbox_dns": test_settings}):
+            ipv4_address = IPAddress.objects.create(
+                address=IPNetwork("10.0.0.1/24"),
+                dns_name="name1.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_ACTIVE,
+            )
+            ipv6_address = IPAddress.objects.create(
+                address=IPNetwork("fe80:dead:beef::1/64"),
+                dns_name="name2.zone1.example.com",
+                status=IPAddressStatusChoices.STATUS_ACTIVE,
+            )
+
+            record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+            self.assertEqual(record4.status, RecordStatusChoices.STATUS_ACTIVE)
+
+            record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+            self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
+
+            ipv4_address.status = IPAddressStatusChoices.STATUS_DHCP
+            ipv4_address.save()
+
+            ipv6_address.status = IPAddressStatusChoices.STATUS_DHCP
+            ipv6_address.save()
+
+            record4.refresh_from_db()
+            self.assertEqual(record4.status, RecordStatusChoices.STATUS_INACTIVE)
+
+            record6.refresh_from_db()
+            self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
 
     def test_delete_ip_address(self):
         ipv4_address = IPAddress.objects.create(
