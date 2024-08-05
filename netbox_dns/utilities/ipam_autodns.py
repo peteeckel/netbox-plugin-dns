@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from dns import name as dns_name
 
+from django.conf import settings
 from django.db.models import Q
 
 from ipam.models import IPAddress, Prefix
@@ -35,6 +36,15 @@ def _get_assigned_views(ip_address):
         return []
 
     return longest_prefix.netbox_dns_views.all()
+
+
+def _get_record_status(ip_address):
+    return (
+        RecordStatusChoices.STATE_ACTIVE
+        if ip_address.status
+        in settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_ipaddress_active_status", [])
+        else RecordStatusChoices.STATUS_INACTIVE
+    )
 
 
 def get_zones(ip_address, view=None):
@@ -88,6 +98,7 @@ def update_dns_records(ip_address, commit=True, view=None):
             if (
                 record.fqdn != ip_address.dns_name
                 or record.value != ip_address.address.ip
+                or record.status != _get_record_status(ip_address)
             ):
                 record.update_from_ip_address(ip_address)
 
