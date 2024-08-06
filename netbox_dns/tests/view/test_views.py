@@ -49,7 +49,6 @@ class ViewViewTestCase(
 
         cls.bulk_edit_data = {
             "description": "New Description",
-            "prefixes": [prefix.pk for prefix in prefixes[0:2]],
         }
 
         cls.csv_data = (
