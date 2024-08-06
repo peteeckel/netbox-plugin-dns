@@ -11,6 +11,7 @@ from utilities.exceptions import AbortRequest
 
 from netbox_dns.models import view as _view
 from netbox_dns.utilities import (
+    check_dns_records,
     update_dns_records,
     delete_dns_records,
     get_views_by_prefix,
@@ -25,15 +26,9 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
         return
 
     try:
-        update_dns_records(instance, commit=False)
+        check_dns_records(instance)
     except ValidationError as exc:
-        if hasattr(exc, "error_dict"):
-            for field in ("name", "ttl", "value", "type"):
-                value = exc.error_dict.pop(field, None)
-                if value is not None:
-                    raise ValidationError({"dns_name": value})
-
-        raise exc
+        raise ValidationError({"dns_name": exc.messages})
 
 
 @receiver(pre_delete, sender=IPAddress)
@@ -42,8 +37,8 @@ def ipam_autodns_ipaddress_pre_delete(instance, **kwargs):
 
 
 @receiver(pre_save, sender=IPAddress)
-def ipam_autodns_ipaddress_post_save(instance, **kwargs):
-    update_dns_records(instance, commit=False)
+def ipam_autodns_ipaddress_pre_save(instance, **kwargs):
+    check_dns_records(instance)
 
 
 @receiver(post_save, sender=IPAddress)
@@ -80,7 +75,7 @@ def ipam_autodns_prefix_pre_delete(instance, **kwargs):
                 _depth=instance.depth + 1, netbox_dns_views__isnull=True
             ):
                 for ip_address in get_ip_addresses_by_prefix(prefix):
-                    update_dns_records(ip_address, commit=False)
+                    check_dns_records(ip_address)
         except ValidationError as exc:
             if request is not None:
                 raise AbortRequest(
