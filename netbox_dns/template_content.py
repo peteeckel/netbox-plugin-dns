@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from netbox.plugins.utils import get_plugin_config
 from netbox.plugins import PluginTemplateExtension
 
@@ -103,7 +105,10 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
         )
 
 
-template_extensions = [RelatedDNSRecords, RelatedDNSViews]
+if not settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+    template_extensions = [RelatedDNSRecords, RelatedDNSViews]
+else:
+    template_extensions = []
 
 if get_plugin_config("netbox_dns", "feature_ipam_dns_info"):
     template_extensions.append(IPRelatedDNSRecords)
