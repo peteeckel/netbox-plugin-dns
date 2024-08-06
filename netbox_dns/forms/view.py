@@ -25,8 +25,9 @@ from ipam.models import Prefix
 from netbox_dns.models import View
 from netbox_dns.fields import PrefixDynamicModelMultipleChoiceField
 from netbox_dns.utilities import (
-    get_ip_addresses_by_prefix,
+    check_dns_records,
     update_dns_records,
+    get_ip_addresses_by_prefix,
     get_views_by_prefix,
 )
 
@@ -52,7 +53,7 @@ class ViewPrefixUpdateMixin:
         for prefix in prefixes.difference(old_prefixes):
             for ip_address in get_ip_addresses_by_prefix(prefix, check_view=False):
                 try:
-                    update_dns_records(ip_address, commit=False, view=self.instance)
+                    check_dns_records(ip_address, view=self.instance)
                 except ValidationError as exc:
                     self.add_error("prefixes", exc.messages)
 
@@ -74,7 +75,7 @@ class ViewPrefixUpdateMixin:
             # parent. If that's the case, the IP addresses need to be checked.
             # -
             if (parent := check_prefix.get_parents().last()) is None:
-                return
+                continue
 
             for view in get_views_by_prefix(parent):
                 if view == self.instance:
@@ -84,7 +85,7 @@ class ViewPrefixUpdateMixin:
                     check_prefix, check_view=False
                 ):
                     try:
-                        update_dns_records(ip_address, commit=False, view=view)
+                        check_dns_records(ip_address, view=view)
                     except ValidationError as exc:
                         self.add_error("prefixes", exc.messages)
 

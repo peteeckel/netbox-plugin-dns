@@ -28,6 +28,7 @@ from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatus
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
     update_dns_records,
+    check_dns_records,
     get_ip_addresses_by_zone,
     arpa_to_prefix,
     name_to_unicode,
@@ -651,6 +652,19 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                             "soa_serial_auto": f"Enabling soa_serial_auto would decrease soa_serial for zone {self.name}."
                         }
                     )
+
+            if old_zone.name != self.name or old_zone.view != self.view:
+                update_ip_addresses = IPAddress.objects.filter(
+                    pk__in=self.record_set.filter(
+                        ipam_ip_address__isnull=False
+                    ).values_list("ipam_ip_address", flat=True)
+                )
+                update_ip_addresses |= get_ip_addresses_by_zone(self)
+                for ip_address in update_ip_addresses:
+                    try:
+                        check_dns_records(ip_address, zone=self)
+                    except ValidationError as exc:
+                        raise ValidationError(exc.messages)
 
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name
