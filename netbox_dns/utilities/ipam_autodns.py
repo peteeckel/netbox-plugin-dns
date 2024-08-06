@@ -16,6 +16,7 @@ from netbox_dns.models import view as _view
 
 __all__ = (
     "get_zones",
+    "check_dns_records",
     "update_dns_records",
     "delete_dns_records",
     "get_views_by_prefix",
@@ -82,19 +83,54 @@ def get_zones(ip_address, view=None):
     ]
 
 
-def update_dns_records(ip_address, commit=True, view=None):
+def check_dns_records(ip_address, zone=None, view=None):
     if ip_address.dns_name == "":
-        if commit:
-            delete_dns_records(ip_address)
         return
 
-    zones = get_zones(ip_address, view=view)
+    if zone is None:
+        zones = get_zones(ip_address, view=view)
+    else:
+        zones = [zone]
+
+    if ip_address.pk is not None:
+        for record in ip_address.netbox_dns_records.filter(zone__in=zones):
+            if (
+                record.fqdn != ip_address.dns_name
+                or record.value != ip_address.address.ip
+                or record.status != _get_record_status(ip_address)
+            ):
+                record.update_from_ip_address(ip_address)
+
+                if record is not None:
+                    record.clean()
+
+        zones = _zone.Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
+            pk__in=set(
+                ip_address.netbox_dns_records.all().values_list("zone", flat=True)
+            )
+        )
+
+    for zone in zones:
+        record = _record.Record.create_from_ip_address(
+            ip_address,
+            zone,
+        )
+
+        if record is not None:
+            record.clean()
+
+
+def update_dns_records(ip_address):
+    if ip_address.dns_name == "":
+        delete_dns_records(ip_address)
+        return
+
+    zones = get_zones(ip_address)
 
     if ip_address.pk is not None:
         for record in ip_address.netbox_dns_records.all():
             if record.zone not in zones:
-                if commit:
-                    record.delete()
+                record.delete()
                 continue
 
             if (
@@ -105,13 +141,12 @@ def update_dns_records(ip_address, commit=True, view=None):
                 record.update_from_ip_address(ip_address)
 
                 if record is not None:
-                    if commit:
-                        record.save()
-                    else:
-                        record.clean()
+                    record.save()
 
-        zones = set(zones).difference(
-            {record.zone for record in ip_address.netbox_dns_records.all()}
+        zones = _zone.Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
+            pk__in=set(
+                ip_address.netbox_dns_records.all().values_list("zone", flat=True)
+            )
         )
 
     for zone in zones:
@@ -121,10 +156,7 @@ def update_dns_records(ip_address, commit=True, view=None):
         )
 
         if record is not None:
-            if commit:
-                record.save()
-            else:
-                record.clean()
+            record.save()
 
 
 def delete_dns_records(ip_address):
