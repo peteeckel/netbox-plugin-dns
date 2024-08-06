@@ -6,6 +6,7 @@ from netbox.plugins import PluginTemplateExtension
 from netbox_dns.models import Record, Zone, View, NameServer
 from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.tables import RelatedRecordTable, RelatedViewTable
+from netbox_dns.utilities import get_views_by_prefix
 
 
 class RelatedDNSRecords(PluginTemplateExtension):
@@ -50,20 +51,16 @@ class RelatedDNSViews(PluginTemplateExtension):
     def right_page(self):
         prefix = self.context.get("object")
 
-        views = prefix.netbox_dns_views.all()
-
-        if views:
-            view_table = RelatedViewTable(
-                data=views,
-            )
+        if assigned_views := prefix.netbox_dns_views.all():
+            context = {"assigned_views": RelatedViewTable(data=assigned_views)}
+        elif inherited_views := get_views_by_prefix(prefix):
+            context = {"inherited_views": RelatedViewTable(data=inherited_views)}
         else:
-            view_table = None
+            context = {}
 
         return self.render(
             "netbox_dns/view/related.html",
-            extra_context={
-                "related_views": view_table,
-            },
+            extra_context=context,
         )
 
 
