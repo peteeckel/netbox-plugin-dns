@@ -102,12 +102,12 @@
                     <th scope="row">Address Record</th>
                     <td>{{ object.address_record|linkify }}</td>
                 </tr>
-                    {% if object.address_record.ipam_ip_address %}
-                    <tr>
-                        <th scope="row">IPAM IP Address</th>
-                        <td>{{ object.address_record.ipam_ip_address|linkify }}</td>
-                    </tr>
-                    {% endif %}
+                {% if object.address_record.ipam_ip_address %}
+                <tr>
+                    <th scope="row">IPAM IP Address</th>
+                    <td>{{ object.address_record.ipam_ip_address|linkify }}</td>
+                </tr>
+                {% endif %}
                 {% endif %}
                 {% if object.ipam_ip_address %}
                 <tr>
