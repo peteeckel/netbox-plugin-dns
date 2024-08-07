@@ -562,12 +562,40 @@ class Record(ObjectModificationMixin, NetBoxModel):
         if self.pk is not None:
             records = records.exclude(pk=self.pk)
 
-        if len(records):
+        if records.exists():
+            if self.ipam_ip_address is not None:
+                if not records.filter(
+                    ipam_ip_address__isnull=True
+                ).exists() or get_plugin_config(
+                    "netbox_dns", "autodns_conflict_deactivate", False
+                ):
+                    return
+
             raise ValidationError(
                 {
                     "value": f"There is already an active {self.type} record for name {self.name} in zone {self.zone} with value {self.value}."
                 }
             ) from None
+
+    def handle_conflicting_address_records(self):
+        if self.ipam_ip_address is None or not self.is_active:
+            return
+
+        if not get_plugin_config("netbox_dns", "autodns_conflict_deactivate", False):
+            return
+
+        records = Record.objects.filter(
+            zone=self.zone,
+            name=self.name,
+            type=self.type,
+            value=self.value,
+            status__in=Record.ACTIVE_STATUS_LIST,
+            ipam_ip_address__isnull=True,
+        )
+
+        for record in records:
+            record.status = RecordStatusChoices.STATUS_INACTIVE
+            record.save(update_fields=["status"])
 
     def check_unique_rrset_ttl(self):
         if self.pk is not None:
@@ -742,6 +770,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
             self.ip_address = None
 
         if self.is_address_record:
+            self.handle_conflicting_address_records()
             self.update_ptr_record(
                 update_rfc2317_cname=update_rfc2317_cname,
                 save_zone_serial=save_zone_serial,
