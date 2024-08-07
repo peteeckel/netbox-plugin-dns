@@ -96,6 +96,81 @@ class AutoDNSIPAddressTestCase(TestCase):
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True)
         )
 
+    def test_create_ip_address_duplicate_record_deactivate(self):
+        test_settings = settings.PLUGINS_CONFIG["netbox_dns"].copy()
+        test_settings["autodns_conflict_deactivate"] = True
+
+        with self.settings(PLUGINS_CONFIG={"netbox_dns": test_settings}):
+            records = (
+                Record(
+                    name="name1",
+                    zone=self.zone,
+                    type=RecordTypeChoices.A,
+                    value="10.0.0.1",
+                ),
+                Record(
+                    name="name2",
+                    zone=self.zone,
+                    type=RecordTypeChoices.AAAA,
+                    value="fe80:dead:beef::1",
+                ),
+            )
+            for record in records:
+                record.save()
+
+            ipv4_address = IPAddress.objects.create(
+                address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+            )
+            ipv6_address = IPAddress.objects.create(
+                address=IPNetwork("fe80:dead:beef::1/64"),
+                dns_name="name2.zone1.example.com",
+            )
+
+            for record in records:
+                record.refresh_from_db()
+                self.assertTrue(record.status, RecordStatusChoices.STATUS_INACTIVE)
+            self.assertTrue(
+                Record.objects.filter(ipam_ip_address=ipv4_address).exists()
+            )
+            self.assertTrue(
+                Record.objects.filter(ipam_ip_address=ipv6_address).exists()
+            )
+
+    def test_create_ip_address_duplicate_autodns_record(self):
+        ipv4_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ipv6_address1 = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+        )
+
+        ipv4_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ipv6_address2 = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+        )
+
+        self.assertEqual(
+            IPAddress.objects.filter(address=IPNetwork("10.0.0.1/24")).count(), 2
+        )
+        self.assertEqual(
+            IPAddress.objects.filter(address=IPNetwork("fe80:dead:beef::1/64")).count(),
+            2,
+        )
+        self.assertEqual(
+            Record.objects.filter(type=RecordTypeChoices.A, value="10.0.0.1").count(),
+            2,
+        )
+        self.assertEqual(
+            Record.objects.filter(
+                type=RecordTypeChoices.AAAA, value="fe80:dead:beef::1"
+            ).count(),
+            2,
+        )
+
     def test_create_ip_address_ttl_rrset_conflict(self):
         records = (
             Record(
