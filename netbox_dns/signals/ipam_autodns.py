@@ -12,6 +12,7 @@ from utilities.exceptions import AbortRequest
 from netbox_dns.models import view as _view
 from netbox_dns.utilities import (
     check_dns_records,
+    check_record_permission,
     update_dns_records,
     delete_dns_records,
     get_views_by_prefix,
@@ -19,11 +20,47 @@ from netbox_dns.utilities import (
     get_ip_addresses_by_view,
 )
 
+AUTODNS_CUSTOM_FIELDS = {
+    "ipaddress_dns_disabled": False,
+    "ipaddress_dns_record_ttl": None,
+    "ipaddress_dns_record_disable_ptr": False,
+}
+
 
 @receiver(post_clean, sender=IPAddress)
 def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
     if not isinstance(instance.address, IPNetwork):
         return
+
+    # +
+    # Check NetBox DNS record permission for changes to IPAddress custom fields
+    #
+    # Normally, as the modfication of DNS fields
+    if (request := current_request.get()) is not None:
+        cf_data = instance.custom_field_data
+        if (
+            instance.pk is not None
+            and any(
+                (
+                    cf_data.get(cf)
+                    != IPAddress.objects.get(pk=instance.pk).custom_field_data.get(cf)
+                    for cf in AUTODNS_CUSTOM_FIELDS.keys()
+                )
+            )
+            and not check_record_permission(request)
+        ) or (
+            instance.pk is None
+            and any(
+                (
+                    cf_data.get(cf) != cf_default
+                    for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
+                )
+            )
+            and not check_record_permission(request, change=False, delete=False)
+        ):
+            raise ValidationError(
+                f"User '{request.user}' is not allowed to alter AutoDNS custom fields"
+            )
 
     try:
         check_dns_records(instance)

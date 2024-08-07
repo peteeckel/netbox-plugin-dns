@@ -7,6 +7,7 @@ from dns import name as dns_name
 from django.conf import settings
 from django.db.models import Q
 
+from netbox.context import current_request
 from ipam.models import IPAddress, Prefix
 
 from netbox_dns.models import zone as _zone
@@ -23,6 +24,7 @@ __all__ = (
     "get_ip_addresses_by_prefix",
     "get_ip_addresses_by_view",
     "get_ip_addresses_by_zone",
+    "check_record_permission",
 )
 
 
@@ -235,3 +237,20 @@ def get_ip_addresses_by_zone(zone):
     queryset = get_ip_addresses_by_view(zone.view)
 
     return queryset.filter(dns_name__regex=rf"\.{re.escape(zone.name)}\.?$")
+
+
+def check_record_permission(add=True, change=True, delete=True):
+    checks = locals()
+
+    request = current_request.get()
+
+    if request is None:
+        return True
+
+    return all(
+        (
+            request.user.has_perm(f"nebox_dns.{perm}_record")
+            for perm, check in locals().items()
+            if check
+        )
+    )
