@@ -629,6 +629,9 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             .exclude(status=RecordStatusChoices.STATUS_INACTIVE)
         )
 
+        if self.ipam_ip_address is not None:
+            records = records.exclude(ipam_ip_address__isnull=False)
+
         if not records.exists():
             return
 
