@@ -31,6 +31,7 @@ class DNSConfig(PluginConfig):
             IPAddressStatusChoices.STATUS_DHCP,
             IPAddressStatusChoices.STATUS_SLAAC,
         ],
+        "autodns_conflict_deactivate": False,
         "tolerate_characters_in_zone_labels": "",
         "tolerate_underscores_in_labels": False,
         "tolerate_underscores_in_hostnames": False,  # Deprecated, will be removed in 1.2.0
