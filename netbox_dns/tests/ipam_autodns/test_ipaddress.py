@@ -35,7 +35,7 @@ class AutoDNSIPAddressTestCase(TestCase):
         view.prefixes.add(prefixes[0])
         view.prefixes.add(prefixes[1])
 
-        management.call_command("setup_autodns")
+        management.call_command("setup_autodns", verbosity=0)
 
     def test_create_ip_address(self):
         ipv4_address = IPAddress.objects.create(
