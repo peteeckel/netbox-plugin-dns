@@ -42,9 +42,9 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
             instance.pk is not None
             and any(
                 (
-                    cf_data.get(cf)
-                    != IPAddress.objects.get(pk=instance.pk).custom_field_data.get(cf)
-                    for cf in AUTODNS_CUSTOM_FIELDS.keys()
+                    cf_data.get(cf, cf_default)
+                    != IPAddress.objects.get(pk=instance.pk).custom_field_data.get(cf, cf_default)
+                    for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
                 )
             )
             and not check_record_permission(request)
@@ -52,7 +52,7 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
             instance.pk is None
             and any(
                 (
-                    cf_data.get(cf) != cf_default
+                    cf_data.get(cf, cf_default) != cf_default
                     for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
                 )
             )
