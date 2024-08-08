@@ -52,7 +52,13 @@ def _get_record_status(ip_address):
     )
 
 
-def get_zones(ip_address, view=None):
+def _valid_entry(ip_address, zone):
+    return zone.view in _get_assigned_views(ip_address) and dns_name.from_text(
+        ip_address.dns_name
+    ).is_subdomain(dns_name.from_text(zone.name))
+
+
+def get_zones(ip_address, view=None, old_zone=None):
     if view is None:
         views = _get_assigned_views(ip_address)
         if not views:
@@ -72,10 +78,13 @@ def get_zones(ip_address, view=None):
         active=True,
     )
 
-    if not zones:
-        return []
-
     zone_map = defaultdict(list)
+
+    if old_zone is not None:
+        zones = zones.exclude(pk=old_zone.pk)
+        if _valid_entry(ip_address, old_zone):
+            zone_map[old_zone.view].append(old_zone)
+
     for zone in zones:
         zone_map[zone.view].append(zone)
 
@@ -91,35 +100,49 @@ def check_dns_records(ip_address, zone=None, view=None):
 
     if zone is None:
         zones = get_zones(ip_address, view=view)
-    else:
-        zones = [zone]
 
-    if ip_address.pk is not None:
-        for record in ip_address.netbox_dns_records.filter(zone__in=zones):
-            if (
-                record.fqdn != ip_address.dns_name
-                or record.value != ip_address.address.ip
-                or record.status != _get_record_status(ip_address)
-            ):
-                record.update_from_ip_address(ip_address)
+        if ip_address.pk is not None:
+            for record in ip_address.netbox_dns_records.filter(zone__in=zones):
+                if (
+                    record.fqdn != ip_address.dns_name
+                    or record.value != ip_address.address.ip
+                    or record.status != _get_record_status(ip_address)
+                ):
+                    record.update_from_ip_address(ip_address)
 
-                if record is not None:
-                    record.clean()
+                    if record is not None:
+                        record.clean()
 
-        zones = _zone.Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
-            pk__in=set(
-                ip_address.netbox_dns_records.all().values_list("zone", flat=True)
+            zones = _zone.Zone.objects.filter(
+                pk__in=[zone.pk for zone in zones]
+            ).exclude(
+                pk__in=set(
+                    ip_address.netbox_dns_records.all().values_list("zone", flat=True)
+                )
             )
-        )
 
-    for zone in zones:
-        record = _record.Record.create_from_ip_address(
-            ip_address,
-            zone,
-        )
+        for zone in zones:
+            record = _record.Record.create_from_ip_address(
+                ip_address,
+                zone,
+            )
+
+            if record is not None:
+                record.clean()
+
+    if ip_address.pk is None:
+        return
+
+    try:
+        new_zone = get_zones(ip_address, old_zone=zone)[0]
+    except IndexError:
+        return
+
+    for record in ip_address.netbox_dns_records.filter(zone=zone):
+        record.update_from_ip_address(ip_address, new_zone)
 
         if record is not None:
-            record.clean()
+            record.clean(new_zone=new_zone)
 
 
 def update_dns_records(ip_address):
