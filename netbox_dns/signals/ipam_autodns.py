@@ -54,7 +54,7 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
             instance.pk is None
             and any(
                 (
-                    cf_data.get(cf) != cf_default
+                    cf_data.get(cf, cf_default) != cf_default
                     for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
                 )
             )
