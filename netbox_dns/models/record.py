@@ -472,8 +472,11 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_cname_record.delete(save_zone_serial=save_zone_serial)
                 self.rfc2317_cname_record = None
 
-    def update_from_ip_address(self, ip_address):
-        data = record_data_from_ip_address(ip_address, self.zone)
+    def update_from_ip_address(self, ip_address, zone=None):
+        if zone is None:
+            zone = self.zone
+
+        data = record_data_from_ip_address(ip_address, zone)
 
         if data is None:
             self.delete()
@@ -501,9 +504,12 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             **data,
         )
 
-    def validate_name(self):
+    def validate_name(self, new_zone=None):
+        if new_zone is None:
+            new_zone = self.zone
+
         try:
-            _zone = dns_name.from_text(self.zone.name, origin=dns_name.root)
+            _zone = dns_name.from_text(new_zone.name, origin=dns_name.root)
             name = dns_name.from_text(self.name, origin=None)
             fqdn = dns_name.from_text(self.name, origin=_zone)
 
@@ -523,7 +529,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if not fqdn.is_subdomain(_zone):
             raise ValidationError(
                 {
-                    "name": f"{self.name} is not a name in {self.zone.name}",
+                    "name": f"{self.name} is not a name in {new_zone.name}",
                 }
             )
 
@@ -555,15 +561,18 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         except ValidationError as exc:
             raise ValidationError({"value": exc}) from None
 
-    def check_unique_record(self):
+    def check_unique_record(self, new_zone=None):
         if not get_plugin_config("netbox_dns", "enforce_unique_records", False):
             return
 
         if not self.is_active:
             return
 
+        if new_zone is None:
+            new_zone = self.zone
+
         records = Record.objects.filter(
-            zone=self.zone,
+            zone=new_zone,
             name=self.name,
             type=self.type,
             value=self.value,
@@ -675,10 +684,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self.type = self.type.upper()
         super().clean_fields(*args, **kwargs)
 
-    def clean(self, *args, **kwargs):
-        self.validate_name()
+    def clean(self, *args, new_zone=None, **kwargs):
+        self.validate_name(new_zone=new_zone)
         self.validate_value()
-        self.check_unique_record()
+        self.check_unique_record(new_zone=new_zone)
         if self.pk is None:
             self.check_unique_rrset_ttl()
 
