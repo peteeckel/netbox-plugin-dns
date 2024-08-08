@@ -35,7 +35,7 @@ class AutoDNSIPAddressTestCase(TestCase):
         view.prefixes.add(prefixes[0])
         view.prefixes.add(prefixes[1])
 
-        management.call_command("setup_autodns")
+        management.call_command("setup_autodns", verbosity=0)
 
     def test_create_ip_address(self):
         ipv4_address = IPAddress.objects.create(
@@ -167,6 +167,48 @@ class AutoDNSIPAddressTestCase(TestCase):
         self.assertEqual(
             Record.objects.filter(
                 type=RecordTypeChoices.AAAA, value="fe80:dead:beef::1"
+            ).count(),
+            2,
+        )
+
+    def test_create_ip_address_autodns_record_rrset_ttl_conflict(self):
+        ipv4_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"),
+            dns_name="name1.zone1.example.com",
+            custom_field_data={"ipaddress_dns_record_ttl": 42},
+        )
+        ipv4_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"),
+            dns_name="name1.zone1.example.com",
+            custom_field_data={"ipaddress_dns_record_ttl": 23},
+        )
+        ipv6_address1 = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+            custom_field_data={"ipaddress_dns_record_ttl": 42},
+        )
+        ipv6_address2 = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::2/64"),
+            dns_name="name2.zone1.example.com",
+            custom_field_data={"ipaddress_dns_record_ttl": 23},
+        )
+
+        self.assertEqual(
+            IPAddress.objects.filter(dns_name="name1.zone1.example.com").count(), 2
+        )
+        self.assertEqual(
+            IPAddress.objects.filter(dns_name="name2.zone1.example.com").count(),
+            2,
+        )
+        self.assertEqual(
+            Record.objects.filter(
+                type=RecordTypeChoices.A, fqdn="name1.zone1.example.com."
+            ).count(),
+            2,
+        )
+        self.assertEqual(
+            Record.objects.filter(
+                type=RecordTypeChoices.AAAA, fqdn="name2.zone1.example.com."
             ).count(),
             2,
         )
