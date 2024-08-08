@@ -43,11 +43,13 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
             and any(
                 (
                     cf_data.get(cf, cf_default)
-                    != IPAddress.objects.get(pk=instance.pk).custom_field_data.get(cf, cf_default)
+                    != IPAddress.objects.get(pk=instance.pk).custom_field_data.get(
+                        cf, cf_default
+                    )
                     for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
                 )
             )
-            and not check_record_permission(request)
+            and not check_record_permission()
         ) or (
             instance.pk is None
             and any(
@@ -56,7 +58,7 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
                     for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
                 )
             )
-            and not check_record_permission(request, change=False, delete=False)
+            and not check_record_permission(change=False, delete=False)
         ):
             raise ValidationError(
                 f"User '{request.user}' is not allowed to alter AutoDNS custom fields"

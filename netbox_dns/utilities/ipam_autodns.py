@@ -263,7 +263,7 @@ def get_ip_addresses_by_zone(zone):
 
 
 def check_record_permission(add=True, change=True, delete=True):
-    checks = locals()
+    checks = locals().copy()
 
     request = current_request.get()
 
@@ -272,8 +272,8 @@ def check_record_permission(add=True, change=True, delete=True):
 
     return all(
         (
-            request.user.has_perm(f"nebox_dns.{perm}_record")
-            for perm, check in locals().items()
+            request.user.has_perm(f"netbox_dns.{perm}_record")
+            for perm, check in checks.items()
             if check
         )
     )
