@@ -655,13 +655,18 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                     )
 
             if old_zone.name != self.name or old_zone.view != self.view:
-                update_ip_addresses = IPAddress.objects.filter(
-                    pk__in=self.record_set.filter(
+                for ip_address in get_ip_addresses_by_zone(self):
+                    try:
+                        check_dns_records(ip_address, zone=self)
+                    except ValidationError as exc:
+                        raise ValidationError(exc.messages)
+
+                ip_addresses = IPAddress.objects.filter(
+                    netbox_dns_records__in=self.record_set.filter(
                         ipam_ip_address__isnull=False
-                    ).values_list("ipam_ip_address", flat=True)
+                    )
                 )
-                update_ip_addresses |= get_ip_addresses_by_zone(self)
-                for ip_address in update_ip_addresses:
+                for ip_address in ip_addresses:
                     try:
                         check_dns_records(ip_address, zone=self)
                     except ValidationError as exc:
