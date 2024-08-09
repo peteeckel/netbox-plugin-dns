@@ -81,6 +81,14 @@ class ZoneTemplateUpdateMixin:
                 else:
                     zone_data = self.cleaned_data.copy()
 
+                    custom_fields = dict()
+                    for key, value in zone_data.copy().items():
+                        if key.startswith("cf_"):
+                            custom_fields[key[3:]] = value
+                            zone_data.pop(key)
+                    if custom_fields:
+                        zone_data["custom_field_data"] = custom_fields
+
                     zone_data.pop("template", None)
                     zone_data.pop("tenant_group", None)
                     zone_data.pop("_init_time", None)
