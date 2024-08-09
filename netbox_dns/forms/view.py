@@ -21,6 +21,7 @@ from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 from ipam.models import Prefix
+from netbox.context import current_request
 
 from netbox_dns.models import View
 from netbox_dns.fields import PrefixDynamicModelMultipleChoiceField
@@ -96,6 +97,21 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
 
         if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
             del self.fields["prefixes"]
+
+        if request := current_request.get():
+            if not request.user.has_perm("ipam.view_prefixes"):
+                self._saved_prefixes = self.initial["prefixes"]
+                self.initial["prefixes"] = []
+                self.fields["prefixes"].disabled = True
+                self.fields["prefixes"].widget.attrs[
+                    "placeholder"
+                ] = "You do not have permission to modify assigned prefixes"
+
+    def clean_prefixes(self):
+        if hasattr(self, "_saved_prefixes"):
+            return self._saved_prefixes
+
+        return self.cleaned_data["prefixes"]
 
     prefixes = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
