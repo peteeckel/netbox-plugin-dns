@@ -520,6 +520,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
             )
             .exclude(ttl=self.ttl)
             .exclude(type=RecordTypeChoices.PTR, managed=True)
+            .exclude(status=RecordStatusChoices.STATUS_INACTIVE)
         )
 
         if not records.exists():
@@ -554,6 +555,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
             .exclude(pk=self.pk)
             .exclude(ttl=ttl)
             .exclude(type=RecordTypeChoices.PTR, managed=True)
+            .exclude(status=RecordStatusChoices.STATUS_INACTIVE)
         )
 
         for record in records:
