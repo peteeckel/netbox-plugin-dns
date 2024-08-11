@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.urls import reverse
 
 from netbox.plugins.utils import get_plugin_config
 from netbox.plugins import PluginTemplateExtension
@@ -61,6 +62,17 @@ class RelatedDNSViews(PluginTemplateExtension):
         return self.render(
             "netbox_dns/view/related.html",
             extra_context=context,
+        )
+
+    def buttons(self):
+        return self.render(
+            "netbox_dns/view/button.html",
+            extra_context={
+                "url": reverse(
+                    "plugins:netbox_dns:prefix_views",
+                    kwargs={"pk": self.context.get("object").pk},
+                ),
+            },
         )
 
 

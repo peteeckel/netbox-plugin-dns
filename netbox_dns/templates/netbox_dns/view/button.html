@@ -1,0 +1,9 @@
+{% load perms %}
+
+{% if perms.netbox_dns.change_view %}
+<a href="{{ url }}?return_url={{ object.get_absolute_url }}">
+    <button type="submit" class="btn btn-primary" name="assign-view">
+        <i class="mdi mdi-eye-outline" aria-hidden="true"></i> DNS Views
+    </button>
+</a>
+{% endif %}
