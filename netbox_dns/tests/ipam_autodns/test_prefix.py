@@ -68,14 +68,13 @@ class AutoDNSPrefixTestCase(TestCase):
         self.assertTrue(Record.objects.filter(fqdn="name1.zone1.example.com.").exists())
 
         prefix.prefix = "10.0.0.0/12"
-        prefix.save()
+        with self.assertRaises(ValidationError):
+            prefix.save()
 
         view.refresh_from_db()
-        self.assertEqual(view.prefixes.count(), 0)
-        self.assertFalse(prefix.netbox_dns_views.exists())
-        self.assertFalse(
-            Record.objects.filter(fqdn="name1.zone1.example.com.").exists()
-        )
+        self.assertTrue(prefix.netbox_dns_views.exists())
+        self.assertEqual(view.prefixes.first(), prefix)
+        self.assertTrue(Record.objects.filter(fqdn="name1.zone1.example.com.").exists())
 
     def test_update_prefix_vrf(self):
         prefix = self.prefixes[0]
@@ -92,14 +91,13 @@ class AutoDNSPrefixTestCase(TestCase):
         self.assertTrue(Record.objects.filter(fqdn="name1.zone1.example.com.").exists())
 
         prefix.vrf = self.vrfs[0]
-        prefix.save()
+        with self.assertRaises(ValidationError):
+            prefix.save()
 
         view.refresh_from_db()
-        self.assertEqual(view.prefixes.count(), 0)
-        self.assertFalse(prefix.netbox_dns_views.exists())
-        self.assertFalse(
-            Record.objects.filter(fqdn="name1.zone1.example.com.").exists()
-        )
+        self.assertTrue(prefix.netbox_dns_views.exists())
+        self.assertEqual(view.prefixes.first(), prefix)
+        self.assertTrue(Record.objects.filter(fqdn="name1.zone1.example.com.").exists())
 
     def test_update_prefix_view(self):
         prefix = self.prefixes[0]
