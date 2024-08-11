@@ -89,16 +89,29 @@ def ipam_autodns_ipaddress_post_save(instance, **kwargs):
 def ipam_autodns_prefix_pre_save(instance, **kwargs):
     """
     Changes that modify the prefix hierarchy cannot be validated properly before
-    commiting them. So the solution in this case is to remove a prefix whose
-    VRF or network has changed from all views it currently is assigned to.
+    commiting them. So the solution in this case is to ask the user to deassign
+    the prefix from any views it is assigned to and retry.
     """
+    request = current_request.get()
+
     if instance.pk is None or not instance.netbox_dns_views.exists():
         return
 
-    saved_prefix = Prefix.objects.get(pk=instance.pk)
+    saved_prefix = Prefix.objects.prefetch_related("netbox_dns_views").get(
+        pk=instance.pk
+    )
     if saved_prefix.prefix != instance.prefix or saved_prefix.vrf != instance.vrf:
-        for view in saved_prefix.netbox_dns_views.all():
-            view.prefixes.remove(saved_prefix)
+        dns_views = ", ".join([view.name for view in instance.netbox_dns_views.all()])
+        if request is not None:
+            raise AbortRequest(
+                f"This prefix is currently assigned to the following DNS views: {dns_views}"
+                f"Please deassign it from these views before making changes to the prefix "
+                f"or VRF."
+            )
+
+        raise ValidationError(
+            f"Prefix is assigned to DNS views {dns_views}. Prefix and VRF must not be changed"
+        )
 
 
 @receiver(pre_delete, sender=Prefix)
