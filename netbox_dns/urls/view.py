@@ -12,6 +12,7 @@ from netbox_dns.views import (
     ViewBulkEditView,
     ViewBulkDeleteView,
     ViewZoneListView,
+    ViewPrefixEditView,
 )
 
 view_urlpatterns = [
@@ -35,5 +36,10 @@ view_urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="view_changelog",
         kwargs={"model": View},
+    ),
+    path(
+        "prefixes/<int:pk>/assign-views/",
+        ViewPrefixEditView.as_view(),
+        name="prefix_views",
     ),
 ]
