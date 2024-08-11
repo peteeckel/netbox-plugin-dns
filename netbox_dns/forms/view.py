@@ -38,6 +38,7 @@ __all__ = (
     "ViewFilterForm",
     "ViewImportForm",
     "ViewBulkEditForm",
+    "ViewPrefixEditForm",
 )
 
 
@@ -99,7 +100,7 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
             del self.fields["prefixes"]
 
         if request := current_request.get():
-            if not request.user.has_perm("ipam.view_prefixes"):
+            if not request.user.has_perm("ipam.view_prefix"):
                 self._saved_prefixes = self.initial["prefixes"]
                 self.initial["prefixes"] = []
                 self.fields["prefixes"].disabled = True
@@ -217,3 +218,74 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     nullable_fields = ("description", "tenant")
+
+
+class ViewPrefixEditForm(forms.ModelForm):
+    views = DynamicModelMultipleChoiceField(
+        queryset=View.objects.all(),
+        required=False,
+        label="Assigned DNS Views",
+        help_text="Explicitly assigning DNS views overrides all inherited views for this prefix",
+    )
+
+    class Meta:
+        model = Prefix
+        fields = ("views",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.initial["views"] = self.instance.netbox_dns_views.all()
+        self._permission_denied = False
+
+        if request := current_request.get():
+            if not request.user.has_perm("netbox_dns.change_view"):
+                self._permission_denied = True
+                self.initial["views"] = []
+                self.fields["views"].disabled = True
+                self.fields["views"].widget.attrs[
+                    "placeholder"
+                ] = "You do not have permission to modify assigned views"
+
+    def clean(self, *args, **kwargs):
+        if self._permission_denied:
+            return
+
+        prefix = self.instance
+
+        super().clean(*args, **kwargs)
+
+        views = self.cleaned_data.get("views")
+        old_views = prefix.netbox_dns_views.all()
+
+        check_views = View.objects.none()
+
+        if not views.exists():
+            if (parent := prefix.get_parents().last()) is not None:
+                check_views = parent.netbox_dns_views.all().difference(old_views)
+
+        else:
+            check_views = views.difference(old_views)
+
+        for view in check_views:
+            try:
+                for ip_address in get_ip_addresses_by_prefix(prefix, check_view=False):
+                    check_dns_records(ip_address, view=view)
+            except ValidationError as exc:
+                self.add_error("views", exc.messages)
+
+    def save(self, *args, **kwargs):
+        prefix = self.instance
+
+        if self._permission_denied:
+            return prefix
+
+        old_views = prefix.netbox_dns_views.all()
+        views = self.cleaned_data.get("views")
+
+        for view in views.difference(old_views):
+            view.prefixes.add(prefix)
+        for view in old_views.difference(views):
+            view.prefixes.remove(prefix)
+
+        return prefix

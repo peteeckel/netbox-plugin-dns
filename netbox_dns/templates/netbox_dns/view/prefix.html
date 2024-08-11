@@ -1,0 +1,41 @@
+{% extends 'generic/_base.html' %}
+
+{% block title %}
+Configure DNS views for {{ object|meta:"verbose_name" }} {{ object }} {% if object.vrf %}[{{ object.vrf }}]{% endif %}
+{% endblock title %}
+
+{% block content %}
+    <div class="tab-pane show active" id="edit-form" role="tabpanel" aria-labelledby="object-list-tab">
+
+    <form action="" method="post" enctype="multipart/form-data" class="object-edit mt-5">
+    {% csrf_token %}
+
+    <div id="form_fields" hx-disinherit="hx-select hx-swap">
+    {% if inherited_from %}
+        <div class="card">
+            <table class="table table-hover attr-table">
+                <th>Views inherited from prefix {{ inherited_from }} {% if inherited_from.vrf %}[{{ inherited_from.vrf }}] {% endif %}</th>
+                {% for view in inherited_views %}
+                    <tr><td>{{ view|linkify }}</td><td>{{ view.description }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+    {% block form %}
+    {% include 'htmx/form.html' %}
+    {% endblock form %}
+    </div>
+
+    <div class="text-end my-3">
+    {% block buttons %}
+        <a href="{{ return_url }}" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" name="_update" class="btn btn-primary">Save</button>
+    {% endblock buttons %}
+    </div>
+    </form>
+    </div>
+{% endblock content %}
+
+{% block modals %}
+{% include 'inc/htmx_modal.html' with size='lg' %}
+{% endblock %}
