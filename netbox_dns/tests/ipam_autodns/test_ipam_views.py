@@ -1,5 +1,6 @@
 from netaddr import IPNetwork
 
+from django.test import override_settings
 from django.urls import reverse
 from django.core import management
 from rest_framework import status
@@ -268,6 +269,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).exists()
         )
 
+    @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress(self):
         view = self.views[0]
         zone = self.zones[0]
@@ -308,6 +310,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).count(), 1
         )
 
+    @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_existing_inactive(self):
         view = self.views[0]
         zone = self.zones[0]
@@ -348,6 +351,45 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).count(), 2
         )
 
+    @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
+    def test_create_duplicate_ipaddress_new_inactive(self):
+        view = self.views[0]
+        zone = self.zones[0]
+        prefix = self.prefixes[0]
+
+        address = "2001:db8::1/64"
+        name = "name1.zone1.example.com"
+
+        view.prefixes.add(prefix)
+
+        IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
+
+        self.add_permissions("ipam.add_ipaddress")
+
+        url = reverse("ipam:ipaddress_add")
+
+        request_data = {
+            "address": address,
+            "dns_name": name,
+            **self.default_ipaddress_data,
+            "status": IPAddressStatusChoices.STATUS_RESERVED,
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        self.assertEqual(IPAddress.objects.filter(dns_name=name).count(), 2)
+        self.assertEqual(
+            Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).count(), 2
+        )
+
+    @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_existing_dns_disabled(self):
         view = self.views[0]
         zone = self.zones[0]
@@ -390,6 +432,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).count(), 1
         )
 
+    @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_new_dns_disabled(self):
         view = self.views[0]
         zone = self.zones[0]
@@ -428,43 +471,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(IPAddress.objects.filter(dns_name=name).count(), 2)
         self.assertEqual(
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).count(), 1
-        )
-
-    def test_create_duplicate_ipaddress_new_inactive(self):
-        view = self.views[0]
-        zone = self.zones[0]
-        prefix = self.prefixes[0]
-
-        address = "2001:db8::1/64"
-        name = "name1.zone1.example.com"
-
-        view.prefixes.add(prefix)
-
-        IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
-
-        self.add_permissions("ipam.add_ipaddress")
-
-        url = reverse("ipam:ipaddress_add")
-
-        request_data = {
-            "address": address,
-            "dns_name": name,
-            **self.default_ipaddress_data,
-            "status": IPAddressStatusChoices.STATUS_RESERVED,
-        }
-        request = {
-            "data": post_data(request_data),
-        }
-
-        response = self.client.get(path=url)
-        self.assertHttpStatus(response, status.HTTP_200_OK)
-
-        response = self.client.post(path=url, **request)
-        self.assertHttpStatus(response, status.HTTP_302_FOUND)
-
-        self.assertEqual(IPAddress.objects.filter(dns_name=name).count(), 2)
-        self.assertEqual(
-            Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True).count(), 2
         )
 
     def test_create_ipaddress_invalid_record(self):
