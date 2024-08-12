@@ -36,6 +36,35 @@ def min_ttl(*ttl_list):
     return min((ttl for ttl in ttl_list if ttl is not None), default=None)
 
 
+def record_data_from_ip_address(ip_address, zone):
+    cf_data = ip_address.custom_field_data
+
+    if cf_data.get("ipaddress_dns_disabled"):
+        return None
+
+    data = {
+        "name": (
+            dns_name.from_text(ip_address.dns_name)
+            .relativize(dns_name.from_text(zone.name))
+            .to_text()
+        ),
+        "type": (
+            RecordTypeChoices.A
+            if ip_address.address.version == 4
+            else RecordTypeChoices.AAAA
+        ),
+        "value": str(ip_address.address.ip),
+    }
+
+    if "ipaddress_dns_record_ttl" in cf_data:
+        data["ttl"] = cf_data.get("ipaddress_dns_record_ttl")
+
+    if (disable_ptr := cf_data.get("ipaddress_dns_record_disable_ptr")) is not None:
+        data["disable_ptr"] = disable_ptr
+
+    return data
+
+
 class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
     """
     Custom manager for records providing the activity status annotation
@@ -435,48 +464,32 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_cname_record = None
 
     def update_from_ip_address(self, ip_address):
-        value = ip_address.address.ip
-        _type = (
-            RecordTypeChoices.A
-            if ip_address.address.version == 4
-            else RecordTypeChoices.AAAA
-        )
-        name = (
-            dns_name.from_text(ip_address.dns_name)
-            .relativize(dns_name.from_text(self.zone.name))
-            .to_text()
-        )
+        data = record_data_from_ip_address(ip_address, self.zone)
 
-        if any(
-            (
-                self.value != value,
-                self.type != _type,
-                self.name != name,
-            )
-        ):
-            self.value = value
-            self.type = _type
-            self.name = name
+        if data is None:
+            self.delete()
+            return
 
-            self.save()
+        if all((getattr(self, attr) == data[attr] for attr in data.keys())):
+            return
+
+        for attr, value in data.items():
+            setattr(self, attr, value)
+
+        return self
 
     @classmethod
     def create_from_ip_address(cls, ip_address, zone):
-        return cls.objects.create(
+        data = record_data_from_ip_address(ip_address, zone)
+
+        if data is None:
+            return
+
+        return Record(
             zone=zone,
-            name=(
-                dns_name.from_text(ip_address.dns_name)
-                .relativize(dns_name.from_text(zone.name))
-                .to_text()
-            ),
-            type=(
-                RecordTypeChoices.A
-                if ip_address.address.version == 4
-                else RecordTypeChoices.AAAA
-            ),
-            value=ip_address.address.ip,
             managed=True,
             ipam_ip_address=ip_address,
+            **data,
         )
 
     def validate_name(self):
