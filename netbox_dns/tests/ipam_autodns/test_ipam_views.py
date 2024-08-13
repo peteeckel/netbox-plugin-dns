@@ -842,3 +842,203 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(record.fqdn, f"{name1}.")
         self.assertEqual(record.value, address.split("/")[0])
         self.assertEqual(record.zone, zone)
+
+    def test_update_prefix_assign_view(self):
+        view = self.views[0]
+        prefix = self.prefixes[0]
+
+        self.add_permissions(
+            "ipam.view_prefix",
+            "ipam.change_prefix",
+            "netbox_dns.change_view",
+            "netbox_dns.view_view",
+        )
+
+        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+
+        request_data = {
+            "views": [view.pk],
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        self.assertIn(view, prefix.netbox_dns_views.all())
+        self.assertIn(prefix, view.prefixes.all())
+
+    def test_update_prefix_assign_view_conflict(self):
+        view = self.views[0]
+        prefix = self.prefixes[0]
+        zone = self.zones[0]
+
+        name = "name1.zone1.example.com"
+        address = "2001:db8::1/64"
+
+        Record.objects.create(
+            name="name1",
+            zone=zone,
+            type=RecordTypeChoices.AAAA,
+            value=address.split("/")[0],
+        )
+        IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
+
+        self.add_permissions(
+            "ipam.view_prefix",
+            "ipam.change_prefix",
+            "netbox_dns.change_view",
+            "netbox_dns.view_view",
+        )
+
+        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+
+        request_data = {
+            "views": [view.pk],
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertRegex(
+            response.content.decode(), "There is already an active AAAA record"
+        )
+
+        self.assertNotIn(view, prefix.netbox_dns_views.all())
+        self.assertNotIn(prefix, view.prefixes.all())
+
+    def test_update_prefix_remove_view(self):
+        view = self.views[0]
+        prefix = self.prefixes[0]
+        zone = self.zones[0]
+
+        view.prefixes.add(prefix)
+
+        name = "name1.zone1.example.com"
+        address = "2001:db8::1/64"
+
+        ip_address = IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        self.add_permissions(
+            "ipam.view_prefix",
+            "ipam.change_prefix",
+            "netbox_dns.change_view",
+            "netbox_dns.view_view",
+        )
+
+        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+
+        request_data = {
+            "views": [],
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        self.assertNotIn(view, prefix.netbox_dns_views.all())
+        self.assertNotIn(prefix, view.prefixes.all())
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+    def test_update_prefix_remove_view_conflict(self):
+        view1 = self.views[0]
+        view2 = self.views[1]
+        prefix1 = self.prefixes[0]
+        prefix2 = self.prefixes[3]
+        zone1 = self.zones[0]
+        zone2 = self.zones[3]
+
+        view1.prefixes.add(prefix1)
+        view2.prefixes.add(prefix2)
+
+        name = "name1.zone1.example.com"
+        address = "2001:db8::1/64"
+
+        Record.objects.create(
+            name="name1",
+            zone=zone2,
+            type=RecordTypeChoices.AAAA,
+            value=address.split("/")[0],
+        )
+        ip_address = IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
+
+        self.assertTrue(
+            Record.objects.filter(ipam_ip_address=ip_address, zone=zone1).exists()
+        )
+
+        self.add_permissions(
+            "ipam.view_prefix",
+            "ipam.change_prefix",
+            "netbox_dns.change_view",
+            "netbox_dns.view_view",
+        )
+
+        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix1.pk})
+
+        request_data = {
+            "views": [],
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertRegex(
+            response.content.decode(), "There is already an active AAAA record"
+        )
+
+        self.assertIn(view1, prefix1.netbox_dns_views.all())
+        self.assertIn(prefix1, view1.prefixes.all())
+        self.assertTrue(
+            Record.objects.filter(ipam_ip_address=ip_address, zone=zone1).exists()
+        )
+
+    def test_update_prefix_assign_view_insufficient_permissions(self):
+        view = self.views[0]
+        prefix = self.prefixes[0]
+
+        self.add_permissions(
+            "ipam.view_prefix", "ipam.change_prefix", "netbox_dns.view_view"
+        )
+
+        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+
+        request_data = {
+            "views": [view.pk],
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertRegex(
+            response.content.decode(),
+            "You do not have permission to modify assigned views",
+        )
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        self.assertNotIn(view, prefix.netbox_dns_views.all())
+        self.assertNotIn(prefix, view.prefixes.all())
