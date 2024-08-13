@@ -1,5 +1,6 @@
 from netaddr import IPNetwork
 
+from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, pre_save, post_save, m2m_changed
 from django.core.exceptions import ValidationError
@@ -26,11 +27,46 @@ AUTODNS_CUSTOM_FIELDS = {
     "ipaddress_dns_record_disable_ptr": False,
 }
 
+IPADDRESS_ACTIVE_STATUS = settings.PLUGINS_CONFIG["netbox_dns"][
+    "autodns_ipaddress_active_status"
+]
+ENFORCE_UNIQUE_RECORDS = settings.PLUGINS_CONFIG["netbox_dns"]["enforce_unique_records"]
+
 
 @receiver(post_clean, sender=IPAddress)
 def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
     if not isinstance(instance.address, IPNetwork):
         return
+
+    if instance.custom_field_data.get("ipaddress_dns_disabled"):
+        return
+
+    # +
+    # Check for uniqueness of IP address and dns_name. If unique records are
+    # enforced, report an error when trying to create the same IP address with
+    # the same dns_name. Ignore existing IP addresses that have their CF
+    # "ipaddress_dns_disabled" set to "True".
+    # -
+    duplicate_addresses = IPAddress.objects.filter(
+        address=instance.address,
+        vrf=instance.vrf,
+        dns_name=instance.dns_name,
+        status__in=IPADDRESS_ACTIVE_STATUS,
+    )
+    if instance.pk is not None:
+        duplicate_addresses = duplicate_addresses.exclude(pk=instance.pk)
+
+    if ENFORCE_UNIQUE_RECORDS and instance.status in IPADDRESS_ACTIVE_STATUS:
+        for ip_address in duplicate_addresses.only("custom_field_data"):
+            if not ip_address.custom_field_data.get("ipaddress_dns_disabled"):
+                raise ValidationError(
+                    {
+                        "dns_name": "Unique DNS records are enforced and there is already "
+                        f"an active IP address {instance.address} with DNS name {instance.dns_name}. "
+                        "Plesase choose a different name or disable record creation for this "
+                        "IP address."
+                    }
+                )
 
     # +
     # Check NetBox DNS record permission for changes to IPAddress custom fields
