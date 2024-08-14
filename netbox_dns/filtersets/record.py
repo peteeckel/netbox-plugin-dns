@@ -121,7 +121,7 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         if not value.strip():
             return queryset
         qs_filter = (
-            Q(name__icontains=value)
+            Q(fqdn__icontains=value)
             | Q(value__icontains=value)
             | Q(zone__name__icontains=value)
         )
