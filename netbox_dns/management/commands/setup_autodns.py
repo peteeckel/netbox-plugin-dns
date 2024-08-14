@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         if options.get("remove"):
             if options.get("verbosity"):
-                self.stdout.write(f"Trying to remove IPAM AutoDNS custom fields")
+                self.stdout.write("Trying to remove IPAM AutoDNS custom fields")
             for cf in (
                 "ipaddress_dns_disabled",
                 "ipaddress_dns_record_ttl",
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         # Remove pre-existing IPAM Coupling custom fields
         # -
         if options.get("verbosity") >= 2:
-            self.stdout.write(f"Trying to remove obsolete IPAM Coupling custom fields")
+            self.stdout.write("Trying to remove obsolete IPAM Coupling custom fields")
         for cf in (
             "ipaddress_dns_record_name",
             "ipaddress_dns_zone_id",
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 pass
 
         if options.get("verbosity") >= 2:
-            self.stdout.write(f"Creating IPAM AutoDNS custom fields")
+            self.stdout.write("Creating IPAM AutoDNS custom fields")
 
         if not CustomField.objects.filter(
             name="ipaddress_dns_disabled",

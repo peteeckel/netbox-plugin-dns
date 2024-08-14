@@ -633,7 +633,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
         if not records.exists():
             return
 
-        conflicting_ttls = ", ".join(set(str(record.ttl) for record in records))
+        conflicting_ttls = ", ".join({str(record.ttl) for record in records})
         raise ValidationError(
             {
                 "ttl": f"There is at least one active {self.type} record for name {self.name} in zone {self.zone} and TTL is different ({conflicting_ttls})."

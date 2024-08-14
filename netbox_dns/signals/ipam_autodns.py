@@ -18,7 +18,6 @@ from netbox_dns.utilities import (
     delete_dns_records,
     get_views_by_prefix,
     get_ip_addresses_by_prefix,
-    get_ip_addresses_by_view,
 )
 
 AUTODNS_CUSTOM_FIELDS = {
