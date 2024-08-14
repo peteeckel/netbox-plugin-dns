@@ -52,7 +52,8 @@ class DNSConfig(PluginConfig):
         super().ready()
 
         if not settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
-            from netbox_dns.signals import ipam_autodns as ipam_autodns
+            import netbox_dns.signals.ipam_autodns
+            import netbox_dns.tables.ipam_autodns
 
 
 #
