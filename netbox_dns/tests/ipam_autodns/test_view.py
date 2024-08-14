@@ -1,10 +1,7 @@
 from netaddr import IPNetwork
 
-from unittest import skip
-
 from django.test import TestCase
 from django.core import management
-from django.core.exceptions import ValidationError
 
 from ipam.models import IPAddress, Prefix
 

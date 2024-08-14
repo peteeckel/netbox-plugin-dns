@@ -1,7 +1,6 @@
 from copy import deepcopy
 
 from netaddr import IPNetwork
-from unittest import skip
 
 from django.test import TestCase
 from django.core import management
@@ -82,11 +81,11 @@ class AutoDNSIPAddressTestCase(TestCase):
             record.save()
 
         with self.assertRaises(ValidationError):
-            ipv4_address = IPAddress.objects.create(
+            IPAddress.objects.create(
                 address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
             )
         with self.assertRaises(ValidationError):
-            ipv6_address = IPAddress.objects.create(
+            IPAddress.objects.create(
                 address=IPNetwork("fe80:dead:beef::1/64"),
                 dns_name="name2.zone1.example.com",
             )
@@ -137,18 +136,18 @@ class AutoDNSIPAddressTestCase(TestCase):
             )
 
     def test_create_ip_address_duplicate_autodns_record(self):
-        ipv4_address1 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
         )
-        ipv6_address1 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("fe80:dead:beef::1/64"),
             dns_name="name2.zone1.example.com",
         )
 
-        ipv4_address2 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
         )
-        ipv6_address2 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("fe80:dead:beef::1/64"),
             dns_name="name2.zone1.example.com",
         )
@@ -172,22 +171,22 @@ class AutoDNSIPAddressTestCase(TestCase):
         )
 
     def test_create_ip_address_autodns_record_rrset_ttl_conflict(self):
-        ipv4_address1 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"),
             dns_name="name1.zone1.example.com",
             custom_field_data={"ipaddress_dns_record_ttl": 42},
         )
-        ipv4_address2 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("10.0.0.2/24"),
             dns_name="name1.zone1.example.com",
             custom_field_data={"ipaddress_dns_record_ttl": 23},
         )
-        ipv6_address1 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("fe80:dead:beef::1/64"),
             dns_name="name2.zone1.example.com",
             custom_field_data={"ipaddress_dns_record_ttl": 42},
         )
-        ipv6_address2 = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("fe80:dead:beef::2/64"),
             dns_name="name2.zone1.example.com",
             custom_field_data={"ipaddress_dns_record_ttl": 23},
@@ -234,11 +233,11 @@ class AutoDNSIPAddressTestCase(TestCase):
             record.save()
 
         with self.assertRaises(ValidationError):
-            ipv4_address = IPAddress.objects.create(
+            IPAddress.objects.create(
                 address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
             )
         with self.assertRaises(ValidationError):
-            ipv6_address = IPAddress.objects.create(
+            IPAddress.objects.create(
                 address=IPNetwork("fe80:dead:beef::1/64"),
                 dns_name="name2.zone1.example.com",
             )
@@ -261,11 +260,11 @@ class AutoDNSIPAddressTestCase(TestCase):
             record.save()
 
         with self.assertRaises(ValidationError):
-            ipv4_address = IPAddress.objects.create(
+            IPAddress.objects.create(
                 address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
             )
         with self.assertRaises(ValidationError):
-            ipv6_address = IPAddress.objects.create(
+            IPAddress.objects.create(
                 address=IPNetwork("fe80:dead:beef::1/64"),
                 dns_name="name2.zone1.example.com",
             )
@@ -278,12 +277,8 @@ class AutoDNSIPAddressTestCase(TestCase):
         )
 
     def test_create_ip_address_disable_ptr(self):
-        reverse4_zone = Zone.objects.create(
-            name="0.0.10.in-addr.arpa", **self.zone_data
-        )
-        reverse6_zone = Zone.objects.create(
-            name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **self.zone_data
-        )
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **self.zone_data)
 
         ipv4_address = IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"),
@@ -347,12 +342,12 @@ class AutoDNSIPAddressTestCase(TestCase):
         self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
 
     def test_create_ip_address_dns_disabled(self):
-        ipv4_address = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"),
             dns_name="name1.zone1.example.com",
             custom_field_data={"ipaddress_dns_disabled": True},
         )
-        ipv6_address = IPAddress.objects.create(
+        IPAddress.objects.create(
             address=IPNetwork("fe80:dead:beef::1/64"),
             dns_name="name2.zone1.example.com",
             custom_field_data={"ipaddress_dns_disabled": True},
@@ -467,10 +462,10 @@ class AutoDNSIPAddressTestCase(TestCase):
         self.assertTrue(Record.objects.filter(ipam_ip_address=ipv4_address).exists())
         self.assertTrue(Record.objects.filter(ipam_ip_address=ipv6_address).exists())
 
-        ipv4_address.address = address = IPNetwork("10.0.0.2/24")
+        ipv4_address.address = IPNetwork("10.0.0.2/24")
         ipv4_address.save()
 
-        ipv6_address.address = address = IPNetwork("fe80:dead:beef::2/64")
+        ipv6_address.address = IPNetwork("fe80:dead:beef::2/64")
         ipv6_address.save()
 
         record4 = Record.objects.get(ipam_ip_address=ipv4_address)
@@ -480,7 +475,7 @@ class AutoDNSIPAddressTestCase(TestCase):
         self.assertEqual(record6.value, str(ipv6_address.address.ip))
 
     def test_update_ip_address_zone(self):
-        new_zone = Zone.objects.create(name="zone2.example.com", **self.zone_data)
+        Zone.objects.create(name="zone2.example.com", **self.zone_data)
 
         ipv4_address = IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"

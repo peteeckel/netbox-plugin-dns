@@ -9,7 +9,6 @@ from ipam.models import IPAddress, Prefix, VRF
 from ipam.choices import IPAddressStatusChoices
 
 from utilities.testing import post_data
-from netbox.choices import CSVDelimiterChoices, ImportFormatChoices
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import (
@@ -18,7 +17,7 @@ from netbox_dns.models import (
     Record,
     NameServer,
 )
-from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+from netbox_dns.choices import RecordTypeChoices
 
 
 class AutoDNSIPAMViewTestCase(ModelViewTestCase):
@@ -118,7 +117,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_create_ipaddress_ttl(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -155,7 +153,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_create_ipaddress_no_ptr(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -192,7 +189,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_create_ipaddress_no_dns(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -272,7 +268,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -313,7 +308,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_existing_inactive(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -354,7 +348,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_new_inactive(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -392,7 +385,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_existing_dns_disabled(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -435,7 +427,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     @override_settings(ENFORCE_GLOBAL_UNIQUE=False)
     def test_create_duplicate_ipaddress_new_dns_disabled(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -596,8 +587,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_update_ipaddress_name_different_zone(self):
         view = self.views[0]
-        zone1 = self.zones[0]
-        zone2 = self.zones[1]
+        zone = self.zones[1]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -634,7 +624,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(record.type, RecordTypeChoices.AAAA)
         self.assertEqual(record.fqdn, f"{name2}.")
         self.assertEqual(record.value, address.split("/")[0])
-        self.assertEqual(record.zone, zone2)
+        self.assertEqual(record.zone, zone)
 
     def test_update_ipaddress_address_different_view(self):
         view1 = self.views[0]
@@ -690,8 +680,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     def test_update_ipaddress_address_no_view(self):
         view1 = self.views[0]
         view2 = self.views[2]
-        zone1 = self.zones[0]
-        zone2 = self.zones[3]
+        zone = self.zones[0]
         prefix1 = self.prefixes[0]
         prefix2 = self.prefixes[1]
 
@@ -711,7 +700,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(record.type, RecordTypeChoices.AAAA)
         self.assertEqual(record.fqdn, f"{name}.")
         self.assertEqual(record.value, address1.split("/")[0])
-        self.assertEqual(record.zone, zone1)
+        self.assertEqual(record.zone, zone)
 
         self.add_permissions("ipam.change_ipaddress")
 
@@ -787,18 +776,15 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(record.zone, zone2)
 
     def test_update_ipaddress_vrf_no_view(self):
-        view1 = self.views[0]
-        view2 = self.views[1]
-        zone1 = self.zones[0]
-        zone2 = self.zones[3]
-        prefix1 = self.prefixes[0]
-        prefix2 = self.prefixes[4]
+        view = self.views[0]
+        zone = self.zones[0]
+        prefix = self.prefixes[0]
         vrf = self.vrfs[0]
 
         address = "2001:db8::1/64"
         name = "name1.zone1.example.com"
 
-        view1.prefixes.add(prefix1)
+        view.prefixes.add(prefix)
 
         ip_address = IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
         self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
@@ -807,7 +793,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(record.type, RecordTypeChoices.AAAA)
         self.assertEqual(record.fqdn, f"{name}.")
         self.assertEqual(record.value, address.split("/")[0])
-        self.assertEqual(record.zone, zone1)
+        self.assertEqual(record.zone, zone)
 
         self.add_permissions("ipam.change_ipaddress")
         self.add_permissions("ipam.view_vrf")
@@ -835,7 +821,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_update_ipaddress_ttl(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address1 = "2001:db8::1/64"
@@ -885,7 +870,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_update_ipaddress_disable_ptr(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -924,7 +908,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
 
     def test_update_ipaddress_disable_autodns(self):
         view = self.views[0]
-        zone = self.zones[0]
         prefix = self.prefixes[0]
 
         address = "2001:db8::1/64"
@@ -1135,7 +1118,6 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
     def test_update_prefix_remove_view(self):
         view = self.views[0]
         prefix = self.prefixes[0]
-        zone = self.zones[0]
 
         view.prefixes.add(prefix)
 

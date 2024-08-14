@@ -13,6 +13,7 @@ from ipam.models import IPAddress, Prefix
 from netbox_dns.models import zone as _zone
 from netbox_dns.models import record as _record
 from netbox_dns.models import view as _view
+from netbox_dns.choices import RecordStatusChoices
 
 
 __all__ = (
