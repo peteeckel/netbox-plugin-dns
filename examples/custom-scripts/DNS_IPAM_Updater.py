@@ -110,7 +110,7 @@ class DNSRecordUpdater(Script):
             address = ip_address.address.ip
             try:
                 fqdn = dns_name.from_text(ip_address.dns_name, origin=dns_name.root)
-            except dns.exception.DNSException as exc:
+            except dns.exception.DNSException:
                 self.log_info(f"{ip_address.dns_name} is not a valid domain name")
 
             zone = fqdn.parent()

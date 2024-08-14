@@ -4,6 +4,8 @@ import strawberry
 import strawberry_django
 
 from netbox.graphql.types import NetBoxObjectType
+from tenancy.graphql.types import TenantType
+from ipam.graphql.types import IPAddressType, PrefixType
 from netbox.graphql.scalars import BigInt
 
 from netbox_dns.models import (

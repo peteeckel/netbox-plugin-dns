@@ -81,7 +81,7 @@ class ZoneTemplateUpdateMixin:
                 else:
                     zone_data = self.cleaned_data.copy()
 
-                    custom_fields = dict()
+                    custom_fields = {}
                     for key, value in zone_data.copy().items():
                         if key.startswith("cf_"):
                             custom_fields[key[3:]] = value
@@ -105,10 +105,7 @@ class ZoneTemplateUpdateMixin:
                 raise RollbackTransaction
 
         except ValidationError as exc:
-            if isinstance(exc, dict):
-                template_error = item.value()
-            else:
-                template_error = [exc]
+            self.add_error("template", exc.messages)
         except RollbackTransaction:
             pass
 

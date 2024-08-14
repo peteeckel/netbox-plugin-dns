@@ -4,7 +4,7 @@ from django.urls import reverse
 from netbox.plugins.utils import get_plugin_config
 from netbox.plugins import PluginTemplateExtension
 
-from netbox_dns.models import Record, Zone, View, NameServer
+from netbox_dns.models import Record
 from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.tables import RelatedRecordTable, RelatedViewTable
 from netbox_dns.utilities import get_views_by_prefix
