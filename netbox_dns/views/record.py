@@ -90,11 +90,11 @@ class RecordView(generic.ObjectView):
                 zone=parent_zone,
             )
             cname_records = cname_records.union(
-                set(
+                {
                     record
                     for record in parent_cname_records
                     if record.value_fqdn == instance.fqdn
-                )
+                }
             )
 
         if cname_records:

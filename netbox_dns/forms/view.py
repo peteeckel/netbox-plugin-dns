@@ -27,7 +27,6 @@ from netbox_dns.models import View
 from netbox_dns.fields import PrefixDynamicModelMultipleChoiceField
 from netbox_dns.utilities import (
     check_dns_records,
-    update_dns_records,
     get_ip_addresses_by_prefix,
     get_views_by_prefix,
 )
