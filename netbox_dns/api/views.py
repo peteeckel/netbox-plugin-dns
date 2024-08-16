@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.routers import APIRootView
 
 from ipam.models import Prefix
+from ipam.filtersets import PrefixFilterSet
 
 from netbox.api.viewsets import NetBoxModelViewSet
 
@@ -132,3 +133,4 @@ class RecordTemplateViewSet(NetBoxModelViewSet):
 class PrefixViewSet(NetBoxModelViewSet):
     queryset = Prefix.objects.all()
     serializer_class = PrefixSerializer
+    filterset_class = PrefixFilterSet
