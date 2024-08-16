@@ -47,7 +47,7 @@ def _get_record_status(ip_address):
         RecordStatusChoices.STATE_ACTIVE
         if ip_address.status
         in settings.PLUGINS_CONFIG["netbox_dns"].get(
-            "autodns_ipaddress_active_status", []
+            "dnssync_ipaddress_active_status", []
         )
         else RecordStatusChoices.STATUS_INACTIVE
     )

@@ -20,20 +20,20 @@ from netbox_dns.utilities import (
     get_ip_addresses_by_prefix,
 )
 
-AUTODNS_CUSTOM_FIELDS = {
+DNSSYNC_CUSTOM_FIELDS = {
     "ipaddress_dns_disabled": False,
     "ipaddress_dns_record_ttl": None,
     "ipaddress_dns_record_disable_ptr": False,
 }
 
 IPADDRESS_ACTIVE_STATUS = settings.PLUGINS_CONFIG["netbox_dns"][
-    "autodns_ipaddress_active_status"
+    "dnssync_ipaddress_active_status"
 ]
 ENFORCE_UNIQUE_RECORDS = settings.PLUGINS_CONFIG["netbox_dns"]["enforce_unique_records"]
 
 
 @receiver(post_clean, sender=IPAddress)
-def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
+def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
     if not isinstance(instance.address, IPNetwork):
         return
 
@@ -81,7 +81,7 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
                     != IPAddress.objects.get(pk=instance.pk).custom_field_data.get(
                         cf, cf_default
                     )
-                    for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
+                    for cf, cf_default in DNSSYNC_CUSTOM_FIELDS.items()
                 )
             )
             and not check_record_permission()
@@ -90,13 +90,13 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
             and any(
                 (
                     cf_data.get(cf, cf_default) != cf_default
-                    for cf, cf_default in AUTODNS_CUSTOM_FIELDS.items()
+                    for cf, cf_default in DNSSYNC_CUSTOM_FIELDS.items()
                 )
             )
             and not check_record_permission(change=False, delete=False)
         ):
             raise ValidationError(
-                f"User '{request.user}' is not allowed to alter AutoDNS custom fields"
+                f"User '{request.user}' is not allowed to alter DNSsync custom fields"
             )
 
     try:
@@ -106,22 +106,22 @@ def ipam_autodns_ipaddress_post_clean(instance, **kwargs):
 
 
 @receiver(pre_delete, sender=IPAddress)
-def ipam_autodns_ipaddress_pre_delete(instance, **kwargs):
+def ipam_dnssync_ipaddress_pre_delete(instance, **kwargs):
     delete_dns_records(instance)
 
 
 @receiver(pre_save, sender=IPAddress)
-def ipam_autodns_ipaddress_pre_save(instance, **kwargs):
+def ipam_dnssync_ipaddress_pre_save(instance, **kwargs):
     check_dns_records(instance)
 
 
 @receiver(post_save, sender=IPAddress)
-def ipam_autodns_ipaddress_post_save(instance, **kwargs):
+def ipam_dnssync_ipaddress_post_save(instance, **kwargs):
     update_dns_records(instance)
 
 
 @receiver(pre_save, sender=Prefix)
-def ipam_autodns_prefix_pre_save(instance, **kwargs):
+def ipam_dnssync_prefix_pre_save(instance, **kwargs):
     """
     Changes that modify the prefix hierarchy cannot be validated properly before
     commiting them. So the solution in this case is to ask the user to deassign
@@ -150,7 +150,7 @@ def ipam_autodns_prefix_pre_save(instance, **kwargs):
 
 
 @receiver(pre_delete, sender=Prefix)
-def ipam_autodns_prefix_pre_delete(instance, **kwargs):
+def ipam_dnssync_prefix_pre_delete(instance, **kwargs):
     parent = instance.get_parents().last()
     request = current_request.get()
 
@@ -194,7 +194,7 @@ def ipam_autodns_prefix_pre_delete(instance, **kwargs):
 
 
 @receiver(m2m_changed, sender=_view.View.prefixes.through)
-def ipam_autodns_view_prefix_changed(**kwargs):
+def ipam_dnssync_view_prefix_changed(**kwargs):
     action = kwargs.get("action")
     request = current_request.get()
 

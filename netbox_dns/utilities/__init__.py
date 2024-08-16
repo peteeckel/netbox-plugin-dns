@@ -1,2 +1,2 @@
 from .conversions import *
-from .ipam_autodns import *
+from .ipam_dnssync import *

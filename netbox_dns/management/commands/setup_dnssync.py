@@ -7,7 +7,7 @@ from ipam.models import IPAddress
 
 
 class Command(BaseCommand):
-    help = "Setup IPAddress custom fields for IPAM AutoDNS"
+    help = "Setup IPAddress custom fields for IPAM DNSsync"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         if options.get("remove"):
             if options.get("verbosity"):
-                self.stdout.write("Trying to remove IPAM AutoDNS custom fields")
+                self.stdout.write("Trying to remove IPAM DNSsync custom fields")
             for cf in (
                 "ipaddress_dns_disabled",
                 "ipaddress_dns_record_ttl",
@@ -54,25 +54,25 @@ class Command(BaseCommand):
                 pass
 
         if options.get("verbosity") >= 2:
-            self.stdout.write("Creating IPAM AutoDNS custom fields")
+            self.stdout.write("Creating IPAM DNSsync custom fields")
 
         if not CustomField.objects.filter(
             name="ipaddress_dns_disabled",
             type=CustomFieldTypeChoices.TYPE_BOOLEAN,
             object_types=ipaddress_object_type,
         ).exists():
-            cf_autodns_disabled = CustomField.objects.create(
+            cf_dnssync_disabled = CustomField.objects.create(
                 name="ipaddress_dns_disabled",
-                label="Disable AutoDNS",
+                label="Disable DNSsync",
                 description="Disable DNS address and pointer record generation for this address",
                 type=CustomFieldTypeChoices.TYPE_BOOLEAN,
                 required=False,
                 default=False,
-                group_name="AutoDNS",
+                group_name="DNSsync",
                 is_cloneable=True,
                 weight=100,
             )
-            cf_autodns_disabled.object_types.set([ipaddress_object_type])
+            cf_dnssync_disabled.object_types.set([ipaddress_object_type])
             if options.get("verbosity"):
                 self.stdout.write("Created custom field 'ipaddress_dns_disabled'")
 
@@ -82,8 +82,8 @@ class Command(BaseCommand):
                 type=CustomFieldTypeChoices.TYPE_INTEGER,
                 object_types=ipaddress_object_type,
             )
-            if cf_ttl.group_name != "AutoDNS":
-                cf_ttl.group_name = "AutoDNS"
+            if cf_ttl.group_name != "DNSsync":
+                cf_ttl.group_name = "DNSsync"
                 cf_ttl.description = ("TTL for DNS records created for this address",)
                 cf_ttl.save()
                 if options.get("verbosity"):
@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 validation_minimum=0,
                 validation_maximum=2147483647,
                 required=False,
-                group_name="AutoDNS",
+                group_name="DNSsync",
                 is_cloneable=True,
                 weight=200,
             )
@@ -111,8 +111,8 @@ class Command(BaseCommand):
                 type=CustomFieldTypeChoices.TYPE_BOOLEAN,
                 object_types=ipaddress_object_type,
             )
-            if cf_disable_ptr.group_name != "AutoDNS":
-                cf_disable_ptr.group_name = "AutoDNS"
+            if cf_disable_ptr.group_name != "DNSsync":
+                cf_disable_ptr.group_name = "DNSsync"
                 cf_disable_ptr.description = (
                     "Disable DNS PTR record generation for this address",
                 )
@@ -129,7 +129,7 @@ class Command(BaseCommand):
                 type=CustomFieldTypeChoices.TYPE_BOOLEAN,
                 required=False,
                 default=False,
-                group_name="AutoDNS",
+                group_name="DNSsync",
                 is_cloneable=True,
                 weight=300,
             )
