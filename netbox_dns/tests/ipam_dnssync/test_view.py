@@ -9,7 +9,7 @@ from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices
 
 
-class AutoDNSViewTestCase(TestCase):
+class DNSsyncViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.zone_data = {
@@ -42,7 +42,7 @@ class AutoDNSViewTestCase(TestCase):
         cls.views[0].prefixes.add(cls.prefixes[0])
         cls.views[1].prefixes.add(cls.prefixes[1])
 
-        management.call_command("setup_autodns", verbosity=0)
+        management.call_command("setup_dnssync", verbosity=0)
 
     def test_create_ip_address(self):
         ip_address1 = IPAddress.objects.create(

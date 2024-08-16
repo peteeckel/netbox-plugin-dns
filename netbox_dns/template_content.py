@@ -114,7 +114,7 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
         )
 
 
-if not settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+if not settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
     template_extensions = [RelatedDNSRecords, RelatedDNSViews]
 else:
     template_extensions = []

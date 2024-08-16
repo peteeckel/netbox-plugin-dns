@@ -10,7 +10,7 @@ from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.utilities import get_views_by_prefix
 
 
-class AutoDNSPrefixTestCase(TestCase):
+class DNSsyncPrefixTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         zone_data = {

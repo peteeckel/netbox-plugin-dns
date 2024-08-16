@@ -8,7 +8,7 @@ from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices
 
 
-class AutoDNSZoneTestCase(TestCase):
+class DNSsyncZoneTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.zone_data = {

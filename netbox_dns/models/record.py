@@ -59,7 +59,7 @@ def record_data_from_ip_address(ip_address, zone):
             RecordStatusChoices.STATUS_ACTIVE
             if ip_address.status
             in settings.PLUGINS_CONFIG["netbox_dns"].get(
-                "autodns_ipaddress_active_status", []
+                "dnssync_ipaddress_active_status", []
             )
             else RecordStatusChoices.STATUS_INACTIVE
         ),
@@ -587,7 +587,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 if not records.filter(
                     ipam_ip_address__isnull=True
                 ).exists() or get_plugin_config(
-                    "netbox_dns", "autodns_conflict_deactivate", False
+                    "netbox_dns", "dnssync_conflict_deactivate", False
                 ):
                     return
 
@@ -601,7 +601,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if self.ipam_ip_address is None or not self.is_active:
             return
 
-        if not get_plugin_config("netbox_dns", "autodns_conflict_deactivate", False):
+        if not get_plugin_config("netbox_dns", "dnssync_conflict_deactivate", False):
             return
 
         records = Record.objects.filter(
