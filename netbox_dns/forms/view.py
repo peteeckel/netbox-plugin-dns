@@ -95,7 +95,7 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+        if settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
             del self.fields["prefixes"]
 
         if request := current_request.get():
@@ -144,7 +144,7 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+        if settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
             del self.fields["prefix_id"]
 
     model = View
@@ -180,7 +180,7 @@ class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
+        if settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
             del self.fields["prefixes"]
 
     prefixes = CSVModelMultipleChoiceField(

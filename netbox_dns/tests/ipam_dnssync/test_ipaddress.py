@@ -14,7 +14,7 @@ from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
-class AutoDNSIPAddressTestCase(TestCase):
+class DNSsyncIPAddressTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.zone_data = {
@@ -34,7 +34,7 @@ class AutoDNSIPAddressTestCase(TestCase):
         view.prefixes.add(prefixes[0])
         view.prefixes.add(prefixes[1])
 
-        management.call_command("setup_autodns", verbosity=0)
+        management.call_command("setup_dnssync", verbosity=0)
 
     def test_create_ip_address(self):
         ipv4_address = IPAddress.objects.create(
@@ -97,7 +97,7 @@ class AutoDNSIPAddressTestCase(TestCase):
 
     def test_create_ip_address_duplicate_record_deactivate(self):
         test_settings = settings.PLUGINS_CONFIG["netbox_dns"].copy()
-        test_settings["autodns_conflict_deactivate"] = True
+        test_settings["dnssync_conflict_deactivate"] = True
 
         with self.settings(PLUGINS_CONFIG={"netbox_dns": test_settings}):
             records = (
@@ -135,7 +135,7 @@ class AutoDNSIPAddressTestCase(TestCase):
                 Record.objects.filter(ipam_ip_address=ipv6_address).exists()
             )
 
-    def test_create_ip_address_duplicate_autodns_record(self):
+    def test_create_ip_address_duplicate_dnssync_record(self):
         IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
         )
@@ -170,7 +170,7 @@ class AutoDNSIPAddressTestCase(TestCase):
             2,
         )
 
-    def test_create_ip_address_autodns_record_rrset_ttl_conflict(self):
+    def test_create_ip_address_dnssync_record_rrset_ttl_conflict(self):
         IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"),
             dns_name="name1.zone1.example.com",
@@ -380,7 +380,7 @@ class AutoDNSIPAddressTestCase(TestCase):
 
     def test_create_ip_address_status_custom_active(self):
         test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
-        test_settings["autodns_ipaddress_active_status"].append(
+        test_settings["dnssync_ipaddress_active_status"].append(
             IPAddressStatusChoices.STATUS_RESERVED
         )
 
@@ -404,7 +404,7 @@ class AutoDNSIPAddressTestCase(TestCase):
 
     def test_create_ip_address_status_custom_inactive(self):
         test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
-        test_settings["autodns_ipaddress_active_status"].remove(
+        test_settings["dnssync_ipaddress_active_status"].remove(
             IPAddressStatusChoices.STATUS_DHCP
         )
 
@@ -790,7 +790,7 @@ class AutoDNSIPAddressTestCase(TestCase):
 
     def test_update_ip_address_status_custom_active(self):
         test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
-        test_settings["autodns_ipaddress_active_status"].append(
+        test_settings["dnssync_ipaddress_active_status"].append(
             IPAddressStatusChoices.STATUS_RESERVED
         )
 
@@ -826,7 +826,7 @@ class AutoDNSIPAddressTestCase(TestCase):
 
     def test_update_ip_address_status_custom_inactive(self):
         test_settings = deepcopy(settings.PLUGINS_CONFIG["netbox_dns"])
-        test_settings["autodns_ipaddress_active_status"].remove(
+        test_settings["dnssync_ipaddress_active_status"].remove(
             IPAddressStatusChoices.STATUS_DHCP
         )
 

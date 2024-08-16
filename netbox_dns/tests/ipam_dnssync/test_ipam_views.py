@@ -20,7 +20,7 @@ from netbox_dns.models import (
 from netbox_dns.choices import RecordTypeChoices
 
 
-class AutoDNSIPAMViewTestCase(ModelViewTestCase):
+class DNSsyncIPAMViewTestCase(ModelViewTestCase):
     @classmethod
     def setUpTestData(cls):
         nameserver = NameServer.objects.create(name="ns1.example.com")
@@ -72,7 +72,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         )
         Prefix.objects.bulk_create(cls.prefixes)
 
-        management.call_command("setup_autodns", verbosity=0)
+        management.call_command("setup_dnssync", verbosity=0)
 
     def test_create_ipaddress(self):
         zone = self.zones[0]
@@ -906,7 +906,7 @@ class AutoDNSIPAMViewTestCase(ModelViewTestCase):
         record = Record.objects.get(ipam_ip_address=ip_address)
         self.assertTrue(record.disable_ptr)
 
-    def test_update_ipaddress_disable_autodns(self):
+    def test_update_ipaddress_disable_dnssync(self):
         view = self.views[0]
         prefix = self.prefixes[0]
 

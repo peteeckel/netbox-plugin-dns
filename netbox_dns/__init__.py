@@ -25,13 +25,13 @@ class DNSConfig(PluginConfig):
         "zone_soa_retry": 7200,
         "zone_soa_expire": 2419200,
         "zone_soa_minimum": 3600,
-        "autodns_disabled": False,
-        "autodns_ipaddress_active_status": [
+        "dnssync_disabled": False,
+        "dnssync_ipaddress_active_status": [
             IPAddressStatusChoices.STATUS_ACTIVE,
             IPAddressStatusChoices.STATUS_DHCP,
             IPAddressStatusChoices.STATUS_SLAAC,
         ],
-        "autodns_conflict_deactivate": False,
+        "dnssync_conflict_deactivate": False,
         "tolerate_characters_in_zone_labels": "",
         "tolerate_underscores_in_labels": False,
         "tolerate_underscores_in_hostnames": False,  # Deprecated, will be removed in 1.2.0
@@ -51,9 +51,9 @@ class DNSConfig(PluginConfig):
     def ready(self):
         super().ready()
 
-        if not settings.PLUGINS_CONFIG["netbox_dns"].get("autodns_disabled"):
-            import netbox_dns.signals.ipam_autodns
-            import netbox_dns.tables.ipam_autodns
+        if not settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
+            import netbox_dns.signals.ipam_dnssync
+            import netbox_dns.tables.ipam_dnssync
 
 
 #

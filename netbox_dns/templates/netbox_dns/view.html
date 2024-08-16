@@ -35,7 +35,7 @@
         </div>
         <div class="col col-md-6">
             {% include 'inc/panels/tags.html' %}
-            {% if not settings.PLUGINS_CONFIG.netbox_dns.autodns_disabled %}
+            {% if not settings.PLUGINS_CONFIG.netbox_dns.dnssync_disabled %}
             <div class="card">
                 <h5 class="card-header">
                     IPAM Prefixes
