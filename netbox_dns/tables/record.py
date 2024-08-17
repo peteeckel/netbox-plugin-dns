@@ -1,4 +1,7 @@
 import django_tables2 as tables
+from django_tables2.utils import Accessor
+from django.utils.html import format_html
+
 
 from netbox.tables import (
     NetBoxTable,
@@ -6,10 +9,15 @@ from netbox.tables import (
     TagColumn,
     ActionsColumn,
 )
+from ipam.lookups import Host, Inet
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import Record
 from netbox_dns.utilities import value_to_unicode
+
+import logging
+
+logger = logging.getLogger("netbox_dns")
 
 
 __all__ = (
@@ -100,6 +108,11 @@ class ManagedRecordTable(RecordBaseTable):
         verbose_name="IPAM IP Address",
         linkify=True,
     )
+    related_ip_address = tables.Column(
+        verbose_name="Related IP Address",
+        empty_values=(),
+        orderable=False,
+    )
     actions = ActionsColumn(actions=("changelog",))
 
     class Meta(NetBoxTable.Meta):
@@ -113,6 +126,7 @@ class ManagedRecordTable(RecordBaseTable):
             "unicode_value",
             "address_record",
             "ipam_ip_address",
+            "related_ip_address",
             "active",
         )
         default_columns = (
@@ -123,6 +137,28 @@ class ManagedRecordTable(RecordBaseTable):
             "value",
             "active",
         )
+
+    def render_related_ip_address(self, record):
+        if record.ipam_ip_address is not None:
+            address = record.ipam_ip_address
+        elif (
+            hasattr(record, "address_record")
+            and record.address_record.ipam_ip_address is not None
+        ):
+            address = record.address_record.ipam_ip_address
+        else:
+            return format_html("&mdash;")
+
+        return format_html(f"<a href='{address.get_absolute_url()}'>{address}</a>")
+
+    def value_related_ip_address(self, record):
+        if record.ipam_ip_address is not None:
+            return record.ipam_ip_address
+        elif (
+            hasattr(record, "address_record")
+            and record.address_record.ipam_ip_address is not None
+        ):
+            return record.address_record.ipam_ip_address
 
 
 class RelatedRecordTable(RecordBaseTable):

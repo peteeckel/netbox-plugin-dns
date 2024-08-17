@@ -1,6 +1,10 @@
 from dns import name as dns_name
 
+from django.db.models import F, Q, Case, When, OuterRef, Subquery
+
 from netbox.views import generic
+from ipam.fields import IPAddressField
+from ipam.models import IPAddress
 
 from netbox_dns.filtersets import RecordFilterSet
 from netbox_dns.forms import (
@@ -37,9 +41,7 @@ class RecordListView(generic.ObjectListView):
 
 
 class ManagedRecordListView(generic.ObjectListView):
-    queryset = Record.objects.filter(managed=True).prefetch_related(
-        "zone", "address_record"
-    )
+    queryset = Record.objects.prefetch_related("ipam_ip_address", "address_record")
     filterset = RecordFilterSet
     filterset_form = RecordFilterForm
     table = ManagedRecordTable
