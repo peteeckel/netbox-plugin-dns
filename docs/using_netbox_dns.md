@@ -47,7 +47,8 @@ NetBox Version | NetBox DNS Version | Comment
 3.5.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
 3.6.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
 3.7.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
-4.0.x          | 1.0.x or later     | Only the latest NetBox DNS version is supported
+4.0.x          | 1.0.x or later     | Only the latest release of 1.0.x or 1.1.x is supported. 1.0.x has IPAM Coupling, 1.1.x IPAM DNSsync
+4.1.x          | 1.0.x or later     | Only the latest release of 1.0.x or 1.1.x is supported. 1.0.x has IPAM Coupling, 1.1.x IPAM DNSsync
 
 For earlier version of NetBox, please use the old version of the PyPI module `netbox-dns`.  Please be aware that this version is no longer supported and will not receive any further updates. We therefore strongly recommend that you move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
