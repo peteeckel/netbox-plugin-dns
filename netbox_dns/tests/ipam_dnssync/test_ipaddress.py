@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from netaddr import IPNetwork
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -12,6 +12,9 @@ from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+
+
+zone_defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
 
 class DNSsyncIPAddressTestCase(TestCase):
@@ -64,6 +67,39 @@ class DNSsyncIPAddressTestCase(TestCase):
         self.assertEqual(record6.disable_ptr, False)
         self.assertEqual(record6.ttl, None)
         self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
+
+    def test_create_ip_address_short_zone(self):
+        Zone.objects.create(name="short", **self.zone_data)
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.short"
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.short",
+        )
+
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.AAAA).exists())
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {**zone_defaults, "dnssync_minimum_zone_labels": 1}
+        }
+    )
+    def test_create_ip_address_short_zone_allow(self):
+        Zone.objects.create(name="short", **self.zone_data)
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.short"
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.short",
+        )
+
+        record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+        self.assertEqual(record4.fqdn.rstrip("."), ipv4_address.dns_name)
+        record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+        self.assertEqual(record6.fqdn.rstrip("."), ipv6_address.dns_name)
 
     def test_create_ip_address_duplicate_record(self):
         records = (

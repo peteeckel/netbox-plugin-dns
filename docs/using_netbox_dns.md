@@ -990,6 +990,23 @@ If all criteria apply, NetBox DNS will refuse to create or update the IP address
 
 ![Duplicate IP Address](images/IPAMDNSsyncDuplicateIPAddressError.png)
 
+## Using short zone names
+Normally, DNSsync does not create address records in zones with less than two labels in their name (TLDs and root zones). In some cases it may be desirable to allow this, e.g. in enterprises where a one-label domain is used internally.
+
+To allow creating names in domains with one label, configure the `dnssync_minimum_zone_labels` option:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'dnssync_minimum_zone_labels': 1,
+        ...
+    },
+}
+```
+
+A setting of `1` allows names like `name.zone` to be created (provided there is a zone named `zone` in NetBox DNS. Please note that this is generally not a good idea. Setting the value to `0` would allow to create address records in the root zone, which is a *very bad* idea.
+
 
 ## UI Customization
 There are limited options to customize the appearance of the NetBox DNS plugin.
