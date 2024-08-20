@@ -943,6 +943,47 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
 
         self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
 
+    def test_update_ipaddress_enable_dnssync(self):
+        view = self.views[0]
+        prefix = self.prefixes[0]
+
+        address = "2001:db8::1/64"
+        name = "name1.zone1.example.com"
+
+        view.prefixes.add(prefix)
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork(address),
+            dns_name=name,
+            custom_field_data={"ipaddress_dns_disabled": True},
+        )
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        self.add_permissions("ipam.change_ipaddress")
+        self.add_permissions("netbox_dns.add_record")
+        self.add_permissions("netbox_dns.change_record")
+        self.add_permissions("netbox_dns.delete_record")
+
+        url = reverse("ipam:ipaddress_edit", kwargs={"pk": ip_address.pk})
+
+        request_data = {
+            "address": address,
+            "dns_name": name,
+            **self.default_ipaddress_data,
+            "cf_ipaddress_dns_disabled": False,
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
     def test_update_ipaddress_name_duplicate_record(self):
         view = self.views[0]
         zone = self.zones[0]
