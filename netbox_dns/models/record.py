@@ -493,32 +493,38 @@ class Record(ObjectModificationMixin, NetBoxModel):
             **data,
         )
 
+    def update_fqdn(self, zone=None):
+        if zone is None:
+            zone = self.zone
+
+        _zone = dns_name.from_text(zone.name, origin=dns_name.root)
+        name = dns_name.from_text(self.name, origin=None)
+        fqdn = dns_name.from_text(self.name, origin=_zone)
+
+        if not fqdn.is_subdomain(_zone):
+            raise ValidationError(
+                {
+                    "name": f"{self.name} is not a name in {zone.name}",
+                }
+            )
+
+        _zone.to_unicode()
+        name.to_unicode()
+
+        self.name = name.relativize(_zone).to_text()
+        self.fqdn = fqdn.to_text()
+
     def validate_name(self, new_zone=None):
         if new_zone is None:
             new_zone = self.zone
 
         try:
-            _zone = dns_name.from_text(new_zone.name, origin=dns_name.root)
-            name = dns_name.from_text(self.name, origin=None)
-            fqdn = dns_name.from_text(self.name, origin=_zone)
-
-            _zone.to_unicode()
-            name.to_unicode()
-
-            self.name = name.relativize(_zone).to_text()
-            self.fqdn = fqdn.to_text()
+            self.update_fqdn(zone=new_zone)
 
         except dns.exception.DNSException as exc:
             raise ValidationError(
                 {
                     "name": str(exc),
-                }
-            )
-
-        if not fqdn.is_subdomain(_zone):
-            raise ValidationError(
-                {
-                    "name": f"{self.name} is not a name in {new_zone.name}",
                 }
             )
 

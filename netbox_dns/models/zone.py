@@ -3,6 +3,7 @@ from math import ceil
 from datetime import datetime
 
 from dns import name as dns_name
+from dns.exception import DNSException
 from dns.rdtypes.ANY import SOA
 from dns.exception import DNSException
 
@@ -79,6 +80,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         super().__init__(*args, **kwargs)
 
         self._soa_serial_dirty = False
+        self._ip_addresses_checked = False
 
     view = models.ForeignKey(
         to="View",
@@ -281,7 +283,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         else:
             try:
                 name = dns_name.from_text(self.name, origin=None).to_unicode()
-            except dns_name.IDNAException:
+            except DNSException:
                 name = self.name
 
         try:
@@ -308,6 +310,14 @@ class Zone(ObjectModificationMixin, NetBoxModel):
     @soa_serial_dirty.setter
     def soa_serial_dirty(self, soa_serial_dirty):
         self._soa_serial_dirty = soa_serial_dirty
+
+    @property
+    def ip_addresses_checked(self):
+        return self._ip_addresses_checked
+
+    @ip_addresses_checked.setter
+    def ip_addresses_checked(self, ip_addresses_checked):
+        self._ip_addresses_checked = ip_addresses_checked
 
     @property
     def display_name(self):
@@ -654,23 +664,25 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                         }
                     )
 
-            if old_zone.name != self.name or old_zone.view != self.view:
-                for ip_address in get_ip_addresses_by_zone(self):
-                    try:
-                        check_dns_records(ip_address, zone=self)
-                    except ValidationError as exc:
-                        raise ValidationError(exc.messages)
-
+            if (
+                not self.ip_addresses_checked
+                and old_zone.name != self.name
+                or old_zone.view != self.view
+            ):
                 ip_addresses = IPAddress.objects.filter(
                     netbox_dns_records__in=self.record_set.filter(
                         ipam_ip_address__isnull=False
                     )
                 )
-                for ip_address in ip_addresses:
+                ip_addresses |= get_ip_addresses_by_zone(self)
+
+                for ip_address in ip_addresses.distinct():
                     try:
                         check_dns_records(ip_address, zone=self)
                     except ValidationError as exc:
                         raise ValidationError(exc.messages)
+
+                self.ip_addresses_checked = True
 
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name
@@ -786,12 +798,13 @@ class Zone(ObjectModificationMixin, NetBoxModel):
 
         elif changed_fields is not None and {"name", "view", "status"} & changed_fields:
             for address_record in self.record_set.filter(
-                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA)
+                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+                ipam_ip_address__isnull=True,
             ):
                 address_record.save(update_fields=["ptr_record"])
 
         if changed_fields is not None and "name" in changed_fields:
-            for _record in self.record_set.all():
+            for _record in self.record_set.filter(ipam_ip_address__isnull=True):
                 _record.save(
                     update_fields=["fqdn"],
                     save_zone_serial=False,
@@ -800,13 +813,14 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                 )
 
         if changed_fields is None or {"name", "view"} & changed_fields:
-            update_ip_addresses = IPAddress.objects.filter(
-                pk__in=self.record_set.filter(
+            ip_addresses = IPAddress.objects.filter(
+                netbox_dns_records__in=self.record_set.filter(
                     ipam_ip_address__isnull=False
-                ).values_list("ipam_ip_address", flat=True)
+                )
             )
-            update_ip_addresses |= get_ip_addresses_by_zone(self)
-            for ip_address in update_ip_addresses:
+            ip_addresses |= get_ip_addresses_by_zone(self)
+
+            for ip_address in ip_addresses.distinct():
                 update_dns_records(ip_address)
 
         self.save_soa_serial()
@@ -849,7 +863,9 @@ class Zone(ObjectModificationMixin, NetBoxModel):
                     netbox_dns_records__in=self.record_set.filter(
                         ipam_ip_address__isnull=False
                     )
-                ).values_list("pk", flat=True)
+                )
+                .distinct()
+                .values_list("pk", flat=True)
             )
 
             super().delete(*args, **kwargs)

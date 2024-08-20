@@ -131,9 +131,7 @@ def check_dns_records(ip_address, zone=None, view=None):
             zones = _zone.Zone.objects.filter(
                 pk__in=[zone.pk for zone in zones]
             ).exclude(
-                pk__in=set(
-                    ip_address.netbox_dns_records.all().values_list("zone", flat=True)
-                )
+                pk__in=set(ip_address.netbox_dns_records.values_list("zone", flat=True))
             )
 
         for zone in zones:
@@ -175,6 +173,7 @@ def update_dns_records(ip_address):
                 record.delete()
                 continue
 
+            record.update_fqdn()
             if not _match_data(ip_address, record):
                 record.update_from_ip_address(ip_address)
 
@@ -272,9 +271,11 @@ def get_ip_addresses_by_zone(zone):
     are the IPAddress objects in prefixes assigned to the same view, if the
     'dns_name' attribute of the IPAddress object ends in the zone's name.
     """
-    queryset = get_ip_addresses_by_view(zone.view)
+    queryset = get_ip_addresses_by_view(zone.view).filter(
+        dns_name__regex=rf"\.{re.escape(zone.name)}\.?$"
+    )
 
-    return queryset.filter(dns_name__regex=rf"\.{re.escape(zone.name)}\.?$")
+    return queryset
 
 
 def check_record_permission(add=True, change=True, delete=True):
