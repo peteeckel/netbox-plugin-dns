@@ -977,7 +977,7 @@ PLUGINS_CONFIG = {
 ```
 This will disable the DNSsync functionality and the GUI elements required to use it completely, but will not delete any data already present in the database.
 
-## Handling duplicate IP addresses
+### Handling duplicate IP addresses
 Depending on the NetBox configuration and the settings for individual VRFs, it can be permitted to create identical IP addresses multiple times. Since the standard settings for NetBox DNS prevent creating duplicate records (which would be a consequence of having duplicate IP addresses with the same DNS name), this creates a potential conflict.
 
 When a duplicate IP address is created with the  same DNS name as an existing one, the following criteria are checked:
@@ -990,7 +990,7 @@ If all criteria apply, NetBox DNS will refuse to create or update the IP address
 
 ![Duplicate IP Address](images/IPAMDNSsyncDuplicateIPAddressError.png)
 
-## Using short zone names
+### Using short zone names
 Normally, DNSsync does not create address records in zones with less than two labels in their name (TLDs and root zones). In some cases it may be desirable to allow this, e.g. in enterprises where a one-label domain is used internally.
 
 To allow creating names in domains with one label, configure the `dnssync_minimum_zone_labels` option:
@@ -1007,6 +1007,14 @@ PLUGINS_CONFIG = {
 
 A setting of `1` allows names like `name.zone` to be created (provided there is a zone named `zone` in NetBox DNS. Please note that this is generally not a good idea. Setting the value to `0` would allow to create address records in the root zone, which is a *very bad* idea.
 
+### Rebuilding DNSsync relations
+In some cases it can happen that there are stale managed records or the connection between IP addresses and their related DNS records gets into an inconsistent state. This is also possible when moving from IPAM Coupling to IPAM DNSsync, where linked DNS address records may be left lying around despite not having a relation with an IP address via a Prefix to View assignment.
+
+The management command `rebuild_dnssync` can be used to clean up the relations and remove orphaned DNS records.
+
+```
+/opt/netbox/netbox/manage.py rebuild_dnssync
+```
 
 ## UI Customization
 There are limited options to customize the appearance of the NetBox DNS plugin.
