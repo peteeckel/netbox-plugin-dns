@@ -215,6 +215,10 @@ def ipam_dnssync_view_prefix_changed(**kwargs):
         return
 
     check_view = action != "post_remove"
+
+    ip_addresses = IPAddress.objects.none()
     for prefix in Prefix.objects.filter(pk__in=kwargs.get("pk_set")):
-        for ip_address in get_ip_addresses_by_prefix(prefix, check_view=check_view):
-            update_dns_records(ip_address)
+        ip_addresses |= get_ip_addresses_by_prefix(prefix, check_view=check_view)
+
+    for ip_address in ip_addresses.distinct():
+        update_dns_records(ip_address)
