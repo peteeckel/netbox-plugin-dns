@@ -59,6 +59,20 @@ def _valid_entry(ip_address, zone):
     ).is_subdomain(dns_name.from_text(zone.name))
 
 
+def _match_data(ip_address, record):
+    cf_disable_ptr = ip_address.custom_field_data.get(
+        "ipaddress_dns_record_disable_ptr"
+    )
+
+    return (
+        record.fqdn.rstrip(".") == ip_address.dns_name.rstrip(".")
+        and record.value == str(ip_address.address.ip)
+        and record.status == _get_record_status(ip_address)
+        and record.ttl == ip_address.custom_field_data.get("ipaddress_dns_record_ttl")
+        and (cf_disable_ptr is None or record.disable_ptr == cf_disable_ptr)
+    )
+
+
 def get_zones(ip_address, view=None, old_zone=None):
     if view is None:
         views = _get_assigned_views(ip_address)
@@ -108,11 +122,7 @@ def check_dns_records(ip_address, zone=None, view=None):
 
         if ip_address.pk is not None:
             for record in ip_address.netbox_dns_records.filter(zone__in=zones):
-                if (
-                    record.fqdn != ip_address.dns_name
-                    or record.value != ip_address.address.ip
-                    or record.status != _get_record_status(ip_address)
-                ):
+                if not _match_data(ip_address, record):
                     record.update_from_ip_address(ip_address)
 
                     if record is not None:
@@ -159,22 +169,13 @@ def update_dns_records(ip_address):
 
     if ip_address.pk is not None:
         for record in ip_address.netbox_dns_records.all():
-            if record.zone not in zones:
+            if record.zone not in zones or ip_address.custom_field_data.get(
+                "ipaddress_dns_disabled"
+            ):
                 record.delete()
                 continue
 
-            cf_disable_ptr = ip_address.custom_field_data.get(
-                "ipaddress_dns_record_disable_ptr"
-            )
-
-            if (
-                record.fqdn.rstrip(".") != ip_address.dns_name.rstrip(".")
-                or record.value != str(ip_address.address.ip)
-                or record.status != _get_record_status(ip_address)
-                or record.ttl
-                != ip_address.custom_field_data.get("ipaddress_dns_record_ttl")
-                or (cf_disable_ptr is not None and record.disable_ptr != cf_disable_ptr)
-            ):
+            if not _match_data(ip_address, record):
                 record.update_from_ip_address(ip_address)
 
                 if record is not None:
