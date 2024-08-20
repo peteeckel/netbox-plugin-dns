@@ -228,7 +228,9 @@ def get_ip_addresses_by_prefix(prefix, check_view=True):
         vrf=prefix.vrf, address__net_host_contained=prefix.prefix
     )
 
-    for exclude_child in prefix.get_children().filter(netbox_dns_views__isnull=False):
+    for exclude_child in (
+        prefix.get_children().filter(netbox_dns_views__isnull=False).distinct()
+    ):
         queryset = queryset.exclude(
             vrf=exclude_child.vrf,
             address__net_host_contained=exclude_child.prefix,
