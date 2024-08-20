@@ -44,7 +44,7 @@ def _get_assigned_views(ip_address):
 
 def _get_record_status(ip_address):
     return (
-        RecordStatusChoices.STATE_ACTIVE
+        RecordStatusChoices.STATUS_ACTIVE
         if ip_address.status
         in settings.PLUGINS_CONFIG["netbox_dns"].get(
             "dnssync_ipaddress_active_status", []
@@ -163,10 +163,17 @@ def update_dns_records(ip_address):
                 record.delete()
                 continue
 
+            cf_disable_ptr = ip_address.custom_field_data.get(
+                "ipaddress_dns_record_disable_ptr"
+            )
+
             if (
-                record.fqdn != ip_address.dns_name
-                or record.value != ip_address.address.ip
+                record.fqdn.rstrip(".") != ip_address.dns_name.rstrip(".")
+                or record.value != str(ip_address.address.ip)
                 or record.status != _get_record_status(ip_address)
+                or record.ttl
+                != ip_address.custom_field_data.get("ipaddress_dns_record_ttl")
+                or (cf_disable_ptr is not None and record.disable_ptr != cf_disable_ptr)
             ):
                 record.update_from_ip_address(ip_address)
 
