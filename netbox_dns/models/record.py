@@ -630,6 +630,11 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
             return
 
+        if self.ipam_ip_address is not None and get_plugin_config(
+            "netbox_dns", "dnssync_conflict_deactivate", False
+        ):
+            return
+
         if self.type == RecordTypeChoices.PTR and self.managed:
             return
 
