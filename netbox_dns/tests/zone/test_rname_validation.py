@@ -13,6 +13,8 @@ class ZoneRNameValidationTestCase(TestCase):
         rnames = (
             "hostmaster.example.com",
             "hostmaster.example.com.",
+            r"host\.master.example.com",
+            r"host\.master.example.com.",
         )
 
         for index, rname in enumerate(rnames):
@@ -27,6 +29,7 @@ class ZoneRNameValidationTestCase(TestCase):
         rnames = (
             "hostmaster",  # Not an FQDN
             "hostmaster@example.com",  # E-Mail address not converted to FQDN
+            r"host\.master.example",  # Too few zone labels after mailbox name
         )
 
         for index, rname in enumerate(rnames):

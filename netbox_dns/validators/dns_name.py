@@ -7,6 +7,7 @@ from netbox.plugins.utils import get_plugin_config
 
 __all__ = (
     "validate_fqdn",
+    "validate_rname",
     "validate_generic_name",
     "validate_domain_name",
 )
@@ -55,6 +56,14 @@ def validate_fqdn(name, always_tolerant=False):
 
     if not re.match(regex, name, flags=re.IGNORECASE) or _has_invalid_double_dash(name):
         raise ValidationError(f"{name} is not a valid fully qualified DNS host name")
+
+
+def validate_rname(name, always_tolerant=False):
+    label, zone_label = _get_label(always_tolerant=always_tolerant)
+    regex = rf"^(\*|{label})(\\\.{label})*(\.{zone_label}){{2,}}\.?$"
+
+    if not re.match(regex, name, flags=re.IGNORECASE) or _has_invalid_double_dash(name):
+        raise ValidationError(f"{name} is not a valid RNAME")
 
 
 def validate_generic_name(

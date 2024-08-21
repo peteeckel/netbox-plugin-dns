@@ -34,6 +34,7 @@ from netbox_dns.utilities import (
 )
 from netbox_dns.validators import (
     validate_fqdn,
+    validate_rname,
     validate_domain_name,
 )
 from netbox_dns.mixins import ObjectModificationMixin
@@ -618,7 +619,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             raise ValidationError("soa_rname not set and no default value defined")
         try:
             dns_name.from_text(self.soa_rname, origin=dns_name.root)
-            validate_fqdn(self.soa_rname)
+            validate_rname(self.soa_rname)
         except (DNSException, ValidationError) as exc:
             raise ValidationError(
                 {
