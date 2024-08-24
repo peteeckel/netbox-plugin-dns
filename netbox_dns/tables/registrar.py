@@ -19,13 +19,11 @@ class RegistrarTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Registrar
         fields = (
-            "name",
             "description",
             "iana_id",
             "referral_url",
             "whois_server",
             "abuse_email",
             "abuse_phone",
-            "tags",
         )
         default_columns = ("name", "iana_id", "referral_url")

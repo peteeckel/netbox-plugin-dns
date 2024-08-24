@@ -58,26 +58,11 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Zone
         fields = (
-            "name",
-            "view",
-            "status",
             "description",
-            "tags",
-            "default_ttl",
-            "soa_mname",
             "soa_rname",
             "soa_serial",
-            "rfc2317_prefix",
             "rfc2317_parent_managed",
-            "rfc2317_parent_zone",
-            "registrar",
             "registry_domain_id",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            "tenant",
-            "tenant_group",
         )
         default_columns = (
             "name",
