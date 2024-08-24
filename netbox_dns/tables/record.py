@@ -23,6 +23,10 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     zone = tables.Column(
         linkify=True,
     )
+    view = tables.Column(
+        accessor="zone__view",
+        linkify=True,
+    )
     type = tables.Column()
     name = tables.Column(
         verbose_name="FQDN",
@@ -72,6 +76,7 @@ class RecordTable(RecordBaseTable):
             "name",
             "zone",
             "fqdn",
+            "view",
             "ttl",
             "type",
             "value",
@@ -113,6 +118,7 @@ class ManagedRecordTable(RecordBaseTable):
             "name",
             "zone",
             "fqdn",
+            "view",
             "ttl",
             "type",
             "value",
