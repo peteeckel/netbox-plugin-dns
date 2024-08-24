@@ -37,18 +37,7 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = ZoneTemplate
-        fields = (
-            "name",
-            "description",
-            "tags",
-            "registrar",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            "tenant",
-            "tenant_group",
-        )
+        fields = ("description",)
         default_columns = (
             "name",
             "tags",
@@ -60,10 +49,7 @@ class ZoneTemplateDisplayTable(ZoneTemplateTable):
 
     class Meta(NetBoxTable.Meta):
         model = ZoneTemplate
-        fields = (
-            "name",
-            "description",
-        )
+        fields = ("description",)
         default_columns = (
             "name",
             "description",

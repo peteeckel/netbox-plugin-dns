@@ -43,18 +43,8 @@ class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = RecordTemplate
         fields = (
-            "name",
-            "record_name",
-            "ttl",
-            "type",
-            "value",
-            "unicode_value",
             "status",
-            "disable_ptr",
-            "tags",
             "description",
-            "tenant",
-            "tenant_group",
         )
         default_columns = (
             "name",
@@ -72,14 +62,7 @@ class RecordTemplateDisplayTable(RecordTemplateTable):
     class Meta(NetBoxTable.Meta):
         model = RecordTemplate
         fields = (
-            "name",
-            "record_name",
-            "ttl",
-            "type",
-            "value",
-            "unicode_value",
             "status",
-            "disable_ptr",
             "description",
         )
         default_columns = (

@@ -19,7 +19,6 @@ class ContactTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Contact
         fields = (
-            "contact_id",
             "name",
             "description",
             "organization",

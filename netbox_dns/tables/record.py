@@ -73,22 +73,8 @@ class RecordTable(RecordBaseTable):
     class Meta(NetBoxTable.Meta):
         model = Record
         fields = (
-            "name",
-            "zone",
-            "fqdn",
-            "view",
-            "ttl",
-            "type",
-            "value",
-            "unicode_value",
             "status",
-            "disable_ptr",
-            "ptr_record",
-            "tags",
-            "active",
             "description",
-            "tenant",
-            "tenant_group",
         )
         default_columns = (
             "name",
@@ -114,19 +100,6 @@ class ManagedRecordTable(RecordBaseTable):
 
     class Meta(NetBoxTable.Meta):
         model = Record
-        fields = (
-            "name",
-            "zone",
-            "fqdn",
-            "view",
-            "ttl",
-            "type",
-            "value",
-            "unicode_value",
-            "address_record",
-            "ipam_ip_address",
-            "active",
-        )
         default_columns = (
             "name",
             "zone",
@@ -142,13 +115,6 @@ class RelatedRecordTable(RecordBaseTable):
 
     class Meta(NetBoxTable.Meta):
         model = Record
-        fields = (
-            "name",
-            "zone",
-            "type",
-            "value",
-            "unicode_value",
-        )
         default_columns = (
             "name",
             "zone",

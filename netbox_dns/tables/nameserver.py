@@ -22,13 +22,7 @@ class NameServerTable(TenancyColumnsMixin, NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = NameServer
-        fields = (
-            "name",
-            "description",
-            "tags",
-            "tenant",
-            "tenant_group",
-        )
+        fields = ("description",)
         default_columns = (
             "name",
             "tags",
