@@ -25,10 +25,10 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     )
     type = tables.Column()
     name = tables.Column(
-        verbose_name="FQDN",
         linkify=True,
     )
     fqdn = tables.Column(
+        verbose_name="FQDN",
         linkify=True,
     )
     value = tables.TemplateColumn(
