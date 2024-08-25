@@ -87,5 +87,6 @@ class RecordSerializer(NetBoxModelSerializer):
             "status",
             "ttl",
             "description",
+            "managed",
             "active",
         )

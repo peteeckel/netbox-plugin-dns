@@ -59,6 +59,22 @@ class NestedZoneSerializer(WritableNestedSerializer):
         ]
 
 
+class NestedZoneTemplateSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:zonetemplate-detail"
+    )
+
+    class Meta:
+        model = ZoneTemplate
+        fields = (
+            "id",
+            "url",
+            "name",
+            "display",
+            "description",
+        )
+
+
 class NestedRecordSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:record-detail"
@@ -86,6 +102,7 @@ class NestedRecordSerializer(WritableNestedSerializer):
             "status",
             "ttl",
             "zone",
+            "managed",
             "active",
         ]
 
@@ -107,21 +124,5 @@ class NestedRecordTemplateSerializer(WritableNestedSerializer):
             "value",
             "status",
             "ttl",
-            "description",
-        )
-
-
-class NestedZoneTemplateSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:zonetemplate-detail"
-    )
-
-    class Meta:
-        model = ZoneTemplate
-        fields = (
-            "id",
-            "url",
-            "name",
-            "display",
             "description",
         )

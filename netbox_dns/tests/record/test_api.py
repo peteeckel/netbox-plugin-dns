@@ -26,6 +26,7 @@ class RecordAPITestCase(
         "display",
         "fqdn",
         "id",
+        "managed",
         "name",
         "status",
         "ttl",
