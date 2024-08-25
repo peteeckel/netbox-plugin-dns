@@ -31,10 +31,11 @@ class ZoneAPITestCase(
     @classmethod
     def setUpTestData(cls):
         nameservers = (
-            NameServer.objects.create(name="ns1.example.com"),
-            NameServer.objects.create(name="ns2.example.com"),
-            NameServer.objects.create(name="ns3.example.com"),
+            NameServer(name="ns1.example.com"),
+            NameServer(name="ns2.example.com"),
+            NameServer(name="ns3.example.com"),
         )
+        NameServer.objects.bulk_create(nameservers)
 
         zone_data = {
             **Zone.get_defaults(),
