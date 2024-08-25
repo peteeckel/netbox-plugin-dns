@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -43,14 +45,17 @@ class NetBoxDNSRootView(APIRootView):
 
 
 class ViewViewSet(NetBoxModelViewSet):
-    queryset = View.objects.all()
+    queryset = View.objects.prefetch_related("zone_set")
     serializer_class = ViewSerializer
     filterset_class = ViewFilterSet
 
-    @action(detail=True, methods=["get"])
-    def views(self, request, pk=None):
-        views = View.objects.filter(zone=pk)
-        serializer = ViewSerializer(views, many=True, context={"request": request})
+    @action(detail=True, methods=["get"], url_path="zones")
+    def zones(self, request, pk=None):
+        view = get_object_or_404(self.queryset, pk=pk)
+        zones = view.zone_set.restrict(request.user, "view")
+        serializer = ZoneSerializer(
+            zones, nested=True, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
 
@@ -66,30 +71,37 @@ class ZoneViewSet(NetBoxModelViewSet):
     serializer_class = ZoneSerializer
     filterset_class = ZoneFilterSet
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get"], url_path="records")
     def records(self, request, pk=None):
-        records = Record.objects.filter(zone=pk)
-        serializer = RecordSerializer(records, many=True, context={"request": request})
-        return Response(serializer.data)
-
-    @action(detail=True, methods=["get"])
-    def nameservers(self, request, pk=None):
-        nameservers = NameServer.objects.filter(zones__id=pk)
-        serializer = NameServerSerializer(
-            nameservers, many=True, context={"request": request}
+        zone = get_object_or_404(self.queryset, pk=pk)
+        records = zone.record_set.restrict(request.user, "view")
+        serializer = RecordSerializer(
+            records, nested=True, many=True, context={"request": request}
         )
         return Response(serializer.data)
 
 
 class NameServerViewSet(NetBoxModelViewSet):
-    queryset = NameServer.objects.prefetch_related("zones", "tenant")
+    queryset = NameServer.objects.prefetch_related("zones", "zones_soa", "tenant")
     serializer_class = NameServerSerializer
     filterset_class = NameServerFilterSet
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get"], url_path="zones")
     def zones(self, request, pk=None):
-        zones = Zone.objects.filter(nameservers__id=pk)
-        serializer = ZoneSerializer(zones, many=True, context={"request": request})
+        nameserver = get_object_or_404(self.queryset, pk=pk)
+        zones = nameserver.zones.restrict(request.user, "view")
+        serializer = ZoneSerializer(
+            zones, nested=True, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"], url_path="soa-zones")
+    def soa_zones(self, request, pk=None):
+        nameserver = get_object_or_404(self.queryset, pk=pk)
+        zones = nameserver.zones_soa.restrict(request.user, "view")
+        serializer = ZoneSerializer(
+            zones, nested=True, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
 
