@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 
 from netbox.api.viewsets import NetBoxModelViewSet
@@ -47,12 +45,6 @@ class ViewViewSet(NetBoxModelViewSet):
     serializer_class = ViewSerializer
     filterset_class = ViewFilterSet
 
-    @action(detail=True, methods=["get"])
-    def views(self, request, pk=None):
-        views = View.objects.filter(zone=pk)
-        serializer = ViewSerializer(views, many=True, context={"request": request})
-        return Response(serializer.data)
-
 
 class ZoneViewSet(NetBoxModelViewSet):
     queryset = Zone.objects.prefetch_related(
@@ -66,31 +58,11 @@ class ZoneViewSet(NetBoxModelViewSet):
     serializer_class = ZoneSerializer
     filterset_class = ZoneFilterSet
 
-    @action(detail=True, methods=["get"])
-    def records(self, request, pk=None):
-        records = Record.objects.filter(zone=pk)
-        serializer = RecordSerializer(records, many=True, context={"request": request})
-        return Response(serializer.data)
-
-    @action(detail=True, methods=["get"])
-    def nameservers(self, request, pk=None):
-        nameservers = NameServer.objects.filter(zones__id=pk)
-        serializer = NameServerSerializer(
-            nameservers, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
-
 
 class NameServerViewSet(NetBoxModelViewSet):
     queryset = NameServer.objects.prefetch_related("zones", "tenant")
     serializer_class = NameServerSerializer
     filterset_class = NameServerFilterSet
-
-    @action(detail=True, methods=["get"])
-    def zones(self, request, pk=None):
-        zones = Zone.objects.filter(nameservers__id=pk)
-        serializer = ZoneSerializer(zones, many=True, context={"request": request})
-        return Response(serializer.data)
 
 
 class RecordViewSet(NetBoxModelViewSet):
