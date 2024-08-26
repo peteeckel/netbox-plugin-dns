@@ -100,6 +100,7 @@ class ManagedRecordTable(RecordBaseTable):
 
     class Meta(NetBoxTable.Meta):
         model = Record
+        fields = ()
         default_columns = (
             "name",
             "zone",
@@ -115,6 +116,7 @@ class RelatedRecordTable(RecordBaseTable):
 
     class Meta(NetBoxTable.Meta):
         model = Record
+        fields = ()
         default_columns = (
             "name",
             "zone",
