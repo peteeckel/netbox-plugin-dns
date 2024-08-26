@@ -155,7 +155,7 @@ class Record(ObjectModificationMixin, NetBoxModel):
     objects = RecordManager()
     raw_objects = RestrictedQuerySet.as_manager()
 
-    clone_fields = [
+    clone_fields = (
         "zone",
         "type",
         "name",
@@ -164,10 +164,20 @@ class Record(ObjectModificationMixin, NetBoxModel):
         "ttl",
         "disable_ptr",
         "description",
-    ]
+    )
 
     class Meta:
-        ordering = ("zone", "name", "type", "value", "status")
+        verbose_name = "Record"
+        verbose_name_plural = "Records"
+
+        ordering = (
+            "fqdn",
+            "zone",
+            "name",
+            "type",
+            "value",
+            "status",
+        )
 
     def __str__(self):
         try:

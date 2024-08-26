@@ -43,12 +43,16 @@ class NameServer(ObjectModificationMixin, NetBoxModel):
         null=True,
     )
 
-    clone_fields = ["name", "description"]
+    clone_fields = (
+        "name",
+        "description",
+    )
 
     class Meta:
-        ordering = ("name",)
         verbose_name = "Nameserver"
         verbose_name_plural = "Nameservers"
+
+        ordering = ("name",)
 
     def __str__(self):
         try:

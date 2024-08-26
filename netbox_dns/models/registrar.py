@@ -59,7 +59,13 @@ class Registrar(NetBoxModel):
         return str(self.name)
 
     class Meta:
-        ordering = ("name", "iana_id")
+        verbose_name = "Registrar"
+        verbose_name_plural = "Registrars"
+
+        ordering = (
+            "name",
+            "iana_id",
+        )
 
 
 @register_search

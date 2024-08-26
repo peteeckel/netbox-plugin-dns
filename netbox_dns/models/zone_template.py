@@ -82,7 +82,7 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
 
-    clone_fields = [
+    clone_fields = (
         "description",
         "nameservers",
         "record_templates",
@@ -92,19 +92,22 @@ class ZoneTemplate(NetBoxModel):
         "admin_c",
         "tech_c",
         "billing_c",
-    ]
+    )
 
-    template_fields = [
+    template_fields = (
         "tenant",
         "registrar",
         "registrant",
         "admin_c",
         "tech_c",
         "billing_c",
-    ]
+    )
 
     class Meta:
-        ordering = ["name"]
+        verbose_name = "Zone Template"
+        verbose_name_plural = "Zone Templates"
+
+        ordering = ("name",)
 
     def __str__(self):
         return str(self.name)
