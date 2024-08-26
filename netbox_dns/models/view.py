@@ -36,7 +36,10 @@ class View(ObjectModificationMixin, NetBoxModel):
         null=True,
     )
 
-    clone_fields = ["name", "description"]
+    clone_fields = (
+        "name",
+        "description",
+    )
 
     @classmethod
     def get_default_view(cls):
@@ -49,6 +52,9 @@ class View(ObjectModificationMixin, NetBoxModel):
         return str(self.name)
 
     class Meta:
+        verbose_name = "View"
+        verbose_name_plural = "Views"
+
         ordering = ("name",)
 
     def delete(self, *args, **kwargs):

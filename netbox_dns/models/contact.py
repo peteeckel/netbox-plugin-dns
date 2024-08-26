@@ -87,7 +87,7 @@ class Contact(NetBoxModel):
         related_name="netbox_dns_contact_set",
     )
 
-    clone_fields = [
+    clone_fields = (
         "name",
         "description",
         "organization",
@@ -102,7 +102,7 @@ class Contact(NetBoxModel):
         "fax_ext",
         "email",
         "tags",
-    ]
+    )
 
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:contact", kwargs={"pk": self.pk})
@@ -114,7 +114,13 @@ class Contact(NetBoxModel):
         return self.contact_id
 
     class Meta:
-        ordering = ("name", "contact_id")
+        verbose_name = "Contact"
+        verbose_name_plural = "Contacts"
+
+        ordering = (
+            "name",
+            "contact_id",
+        )
 
     @property
     def zones(self):

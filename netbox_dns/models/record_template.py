@@ -85,7 +85,10 @@ class RecordTemplate(NetBoxModel):
     )
 
     class Meta:
-        ordering = ["name"]
+        verbose_name = "Record Template"
+        verbose_name_plural = "Record Templates"
+
+        ordering = ("name",)
 
     def __str__(self):
         return str(self.name)

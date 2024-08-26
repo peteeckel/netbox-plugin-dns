@@ -246,7 +246,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
 
     objects = ZoneManager()
 
-    clone_fields = [
+    clone_fields = (
         "view",
         "name",
         "status",
@@ -260,9 +260,12 @@ class Zone(ObjectModificationMixin, NetBoxModel):
         "soa_expire",
         "soa_minimum",
         "description",
-    ]
+    )
 
     class Meta:
+        verbose_name = "Zone"
+        verbose_name_plural = "Zones"
+
         ordering = (
             "view",
             "name",
