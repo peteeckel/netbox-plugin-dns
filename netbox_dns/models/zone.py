@@ -642,7 +642,7 @@ class Zone(ObjectModificationMixin, NetBoxModel):
             old_zone = Zone.objects.get(pk=self.pk)
             if not self.soa_serial_auto:
                 self.check_soa_serial_increment(old_zone.soa_serial, self.soa_serial)
-            else:
+            elif not old_zone.soa_serial_auto:
                 try:
                     self.check_soa_serial_increment(
                         old_zone.soa_serial, self.get_auto_serial()
