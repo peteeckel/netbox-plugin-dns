@@ -1,4 +1,4 @@
-from .contact import contact_urlpatterns
+from .registration_contact import contact_urlpatterns
 from .nameserver import nameserver_urlpatterns
 from .record import record_urlpatterns
 from .record_template import recordtemplate_urlpatterns

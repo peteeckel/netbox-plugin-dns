@@ -2,7 +2,7 @@ from .view import *
 from .zone import *
 from .nameserver import *
 from .record import *
-from .contact import *
+from .registration_contact import *
 from .registrar import *
 
 from .zone_template import *

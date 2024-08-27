@@ -8,7 +8,7 @@ from netbox_dns.api.nested_serializers import NestedRecordTemplateSerializer
 
 from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
-from .contact import ContactSerializer
+from .registration_contact import ContactSerializer
 
 
 __all__ = ("ZoneTemplateSerializer",)

@@ -6,7 +6,7 @@ from tenancy.api.serializers import TenantSerializer
 from .view import ViewSerializer
 from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
-from .contact import ContactSerializer
+from .registration_contact import ContactSerializer
 from .zone_template import ZoneTemplateSerializer
 
 from ..nested_serializers import NestedZoneSerializer
