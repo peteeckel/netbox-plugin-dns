@@ -9,6 +9,7 @@ from django.db.models import Q, ExpressionWrapper, BooleanField, Min
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
+from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
@@ -61,8 +62,7 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
             )
         )
 
-
-class Record(ObjectModificationMixin, NetBoxModel):
+class Record(ContactsMixin, ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (RecordStatusChoices.STATUS_ACTIVE,)
 
     unique_ptr_qs = Q(

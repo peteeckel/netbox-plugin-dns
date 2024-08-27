@@ -1,0 +1,77 @@
+#
+# This ansible example task does not do:
+#  Any lookup of the contact ID's.
+#  Any lookup of the object ID to be linked to the contact.
+#
+# That exercise is left to you.
+#
+# You must have a working ansible netbox collection installed.
+# You must also have set in your environment the NETBOX_API url
+# and the NETBOX_TOKEN values.
+#
+# Simply run as `ansible-playbook ./assign-contacts`
+#
+---
+
+- name: assign contacts to objects.
+  hosts:
+    - localhost
+
+  gather_facts: false
+
+  vars:
+    cid:
+      nobody@gmail.com: 243
+
+    assignments:
+      - contact:
+          email: nobody@gmail.com
+        role:
+          slug: zone-admin
+        object_type: netbox_dns.zone
+        object_id: 1
+      - contact:
+          email: nobody@gmail.com
+        role:
+          slug: dns-record
+        object_type: netbox_dns.record
+        object_id: 1459
+
+  pre_tasks:
+    - name: get netbox url/token from 1password
+      ansible.builtin.set_fact:
+        netbox_url: "{{ lookup('env', 'NETBOX_API') }}"
+        netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+      run_once: true
+      no_log: true
+
+  tasks:
+    - name: Contact assignment test.
+      ansible.builtin.uri:
+        url: "{{ uri_url }}"
+        method: "{{ uri_method }}"
+        headers:
+          Authorization: "Token {{ netbox_token }}"
+        body_format: json
+        body:
+          contact:
+            email: "{{ item.contact.email }}"
+          role:
+            slug: "{{ item.role.slug }}"
+          object_type: "{{ item.object_type }}"
+          object_id: "{{ item.object_id }}"
+        status_code:
+          - 200
+          - 201
+      loop: "{{ assignments }}"
+      vars:
+        q_filter: "object_id={{ item.object_id }} object_type={{ item.object_type }} contact_id={{ cid[item.contact.email] }}"
+        q: "{{ query('netbox.netbox.nb_lookup',
+            'contact-assignments',
+            api_endpoint=netbox_url,
+            api_filter=q_filter,
+            raw_data=true,
+            token=netbox_token) }}"
+        c_id: "{{ q | map(attribute='id') | first | default(0) }}"
+        uri_method: "{% if c_id | int > 0 %}PATCH{% else %}POST{% endif %}"
+        uri_url: "{{ netbox_url }}/api/tenancy/contact-assignments/{% if c_id | int > 0 %}{{ c_id }}/{% endif %}"

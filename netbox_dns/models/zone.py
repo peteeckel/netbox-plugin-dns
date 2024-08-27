@@ -19,10 +19,12 @@ from django.dispatch import receiver
 from django.conf import settings
 
 from netbox.models import NetBoxModel
+from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 from ipam.models import IPAddress
+
 
 from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
@@ -67,7 +69,7 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
         )
 
 
-class Zone(ObjectModificationMixin, NetBoxModel):
+class Zone(ContactsMixin, ObjectModificationMixin, NetBoxModel):
     ACTIVE_STATUS_LIST = (ZoneStatusChoices.STATUS_ACTIVE,)
 
     def __init__(self, *args, **kwargs):
