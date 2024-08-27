@@ -8,7 +8,7 @@ from netbox_dns.api.nested_serializers import NestedRecordTemplateSerializer
 
 from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
-from .registration_contact import ContactSerializer
+from .registration_contact import RegistrationContactSerializer
 
 
 __all__ = ("ZoneTemplateSerializer",)
@@ -38,28 +38,28 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
         required=False,
         help_text="The registrar the domain is registered with",
     )
-    registrant = ContactSerializer(
+    registrant = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The owner of the domain",
     )
-    admin_c = ContactSerializer(
+    admin_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The administrative contact for the domain",
     )
-    tech_c = ContactSerializer(
+    tech_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The technical contact for the domain",
     )
-    billing_c = ContactSerializer(
+    billing_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,

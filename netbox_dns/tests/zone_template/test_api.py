@@ -5,7 +5,7 @@ from netbox_dns.models import (
     ZoneTemplate,
     RecordTemplate,
     NameServer,
-    Contact,
+    RegistrationContact,
     Registrar,
 )
 from netbox_dns.choices import RecordTypeChoices
@@ -48,14 +48,14 @@ class ZoneTemplateAPITestCase(
         Registrar.objects.bulk_create(registrars)
 
         contacts = (
-            Contact(contact_id="contact.0001"),
-            Contact(contact_id="contact.0002"),
-            Contact(contact_id="contact.0003"),
-            Contact(contact_id="contact.0004"),
-            Contact(contact_id="contact.0005"),
-            Contact(contact_id="contact.0006"),
+            RegistrationContact(contact_id="contact.0001"),
+            RegistrationContact(contact_id="contact.0002"),
+            RegistrationContact(contact_id="contact.0003"),
+            RegistrationContact(contact_id="contact.0004"),
+            RegistrationContact(contact_id="contact.0005"),
+            RegistrationContact(contact_id="contact.0006"),
         )
-        Contact.objects.bulk_create(contacts)
+        RegistrationContact.objects.bulk_create(contacts)
 
         record_templates = (
             RecordTemplate(

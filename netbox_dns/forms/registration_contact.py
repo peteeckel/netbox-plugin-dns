@@ -9,18 +9,18 @@ from netbox.forms import (
 from utilities.forms.fields import TagFilterField
 from utilities.forms.rendering import FieldSet
 
-from netbox_dns.models import Contact
+from netbox_dns.models import RegistrationContact
 
 
 __all__ = (
-    "ContactForm",
-    "ContactFilterForm",
-    "ContactImportForm",
-    "ContactBulkEditForm",
+    "RegistrationContactForm",
+    "RegistrationContactFilterForm",
+    "RegistrationContactImportForm",
+    "RegistrationContactBulkEditForm",
 )
 
 
-class ContactForm(NetBoxModelForm):
+class RegistrationContactForm(NetBoxModelForm):
     fieldsets = (
         FieldSet(
             "name",
@@ -37,13 +37,13 @@ class ContactForm(NetBoxModelForm):
             "fax",
             "fax_ext",
             "email",
-            name="Contact",
+            name="RegistrationContact",
         ),
         FieldSet("tags", name="Tags"),
     )
 
     class Meta:
-        model = Contact
+        model = RegistrationContact
         fields = (
             "name",
             "description",
@@ -63,8 +63,8 @@ class ContactForm(NetBoxModelForm):
         )
 
 
-class ContactFilterForm(NetBoxModelFilterSetForm):
-    model = Contact
+class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
+    model = RegistrationContact
 
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
@@ -89,7 +89,7 @@ class ContactFilterForm(NetBoxModelFilterSetForm):
     )
     contact_id = forms.CharField(
         required=False,
-        label="Contact ID",
+        label="RegistrationContact ID",
     )
     organization = forms.CharField(
         required=False,
@@ -128,12 +128,12 @@ class ContactFilterForm(NetBoxModelFilterSetForm):
     email = forms.CharField(
         required=False,
     )
-    tag = TagFilterField(Contact)
+    tag = TagFilterField(RegistrationContact)
 
 
-class ContactImportForm(NetBoxModelImportForm):
+class RegistrationContactImportForm(NetBoxModelImportForm):
     class Meta:
-        model = Contact
+        model = RegistrationContact
         fields = (
             "name",
             "description",
@@ -153,8 +153,8 @@ class ContactImportForm(NetBoxModelImportForm):
         )
 
 
-class ContactBulkEditForm(NetBoxModelBulkEditForm):
-    model = Contact
+class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
+    model = RegistrationContact
 
     name = forms.CharField(
         required=False,

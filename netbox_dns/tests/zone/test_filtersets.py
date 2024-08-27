@@ -3,7 +3,7 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import Zone, View, NameServer, Registrar, Contact
+from netbox_dns.models import Zone, View, NameServer, Registrar, RegistrationContact
 from netbox_dns.choices import ZoneStatusChoices
 
 from netbox_dns.filtersets import ZoneFilterSet
@@ -51,11 +51,11 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         Registrar.objects.bulk_create(cls.registrars)
 
         cls.contacts = (
-            Contact(name="Paul Example", contact_id="4242"),
-            Contact(name="Fred Example", contact_id="2323"),
-            Contact(name="Jack Example", contact_id="0815"),
+            RegistrationContact(name="Paul Example", contact_id="4242"),
+            RegistrationContact(name="Fred Example", contact_id="2323"),
+            RegistrationContact(name="Jack Example", contact_id="0815"),
         )
-        Contact.objects.bulk_create(cls.contacts)
+        RegistrationContact.objects.bulk_create(cls.contacts)
 
         cls.zones = (
             Zone(

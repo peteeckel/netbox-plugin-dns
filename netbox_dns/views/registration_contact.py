@@ -4,72 +4,72 @@ from netbox.views import generic
 
 from utilities.views import ViewTab, register_model_view
 
-from netbox_dns.models import Contact, Zone
-from netbox_dns.filtersets import ContactFilterSet, ZoneFilterSet
+from netbox_dns.models import RegistrationContact, Zone
+from netbox_dns.filtersets import RegistrationContactFilterSet, ZoneFilterSet
 from netbox_dns.forms import (
-    ContactForm,
-    ContactFilterForm,
-    ContactImportForm,
-    ContactBulkEditForm,
+    RegistrationContactForm,
+    RegistrationContactFilterForm,
+    RegistrationContactImportForm,
+    RegistrationContactBulkEditForm,
 )
-from netbox_dns.tables import ContactTable, ZoneTable
+from netbox_dns.tables import RegistrationContactTable, ZoneTable
 
 
 __all__ = (
-    "ContactView",
-    "ContactEditView",
-    "ContactListView",
-    "ContactDeleteView",
-    "ContactBulkImportView",
-    "ContactBulkEditView",
-    "ContactBulkDeleteView",
+    "RegistrationContactView",
+    "RegistrationContactEditView",
+    "RegistrationContactListView",
+    "RegistrationContactDeleteView",
+    "RegistrationContactBulkImportView",
+    "RegistrationContactBulkEditView",
+    "RegistrationContactBulkDeleteView",
 )
 
 
-class ContactView(generic.ObjectView):
-    queryset = Contact.objects.all()
+class RegistrationContactView(generic.ObjectView):
+    queryset = RegistrationContact.objects.all()
 
 
-class ContactListView(generic.ObjectListView):
-    queryset = Contact.objects.all()
-    table = ContactTable
-    filterset = ContactFilterSet
-    filterset_form = ContactFilterForm
+class RegistrationContactListView(generic.ObjectListView):
+    queryset = RegistrationContact.objects.all()
+    table = RegistrationContactTable
+    filterset = RegistrationContactFilterSet
+    filterset_form = RegistrationContactFilterForm
 
 
-class ContactEditView(generic.ObjectEditView):
-    queryset = Contact.objects.all()
-    form = ContactForm
-    default_return_url = "plugins:netbox_dns:contact_list"
+class RegistrationContactEditView(generic.ObjectEditView):
+    queryset = RegistrationContact.objects.all()
+    form = RegistrationContactForm
+    default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
-class ContactDeleteView(generic.ObjectDeleteView):
-    queryset = Contact.objects.all()
-    default_return_url = "plugins:netbox_dns:contact_list"
+class RegistrationContactDeleteView(generic.ObjectDeleteView):
+    queryset = RegistrationContact.objects.all()
+    default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
-class ContactBulkImportView(generic.BulkImportView):
-    queryset = Contact.objects.all()
-    model_form = ContactImportForm
-    table = ContactTable
-    default_return_url = "plugins:netbox_dns:contact_list"
+class RegistrationContactBulkImportView(generic.BulkImportView):
+    queryset = RegistrationContact.objects.all()
+    model_form = RegistrationContactImportForm
+    table = RegistrationContactTable
+    default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
-class ContactBulkEditView(generic.BulkEditView):
-    queryset = Contact.objects.all()
-    filterset = ContactFilterSet
-    table = ContactTable
-    form = ContactBulkEditForm
+class RegistrationContactBulkEditView(generic.BulkEditView):
+    queryset = RegistrationContact.objects.all()
+    filterset = RegistrationContactFilterSet
+    table = RegistrationContactTable
+    form = RegistrationContactBulkEditForm
 
 
-class ContactBulkDeleteView(generic.BulkDeleteView):
-    queryset = Contact.objects.all()
-    table = ContactTable
+class RegistrationContactBulkDeleteView(generic.BulkDeleteView):
+    queryset = RegistrationContact.objects.all()
+    table = RegistrationContactTable
 
 
-@register_model_view(Contact, "zones")
-class ContactZoneListView(generic.ObjectChildrenView):
-    queryset = Contact.objects.all().prefetch_related(
+@register_model_view(RegistrationContact, "zones")
+class RegistrationContactZoneListView(generic.ObjectChildrenView):
+    queryset = RegistrationContact.objects.all().prefetch_related(
         "zone_set", "admin_c_zones", "tech_c_zones", "billing_c_zones"
     )
     child_model = Zone

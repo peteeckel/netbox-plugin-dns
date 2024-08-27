@@ -8,7 +8,7 @@ from netbox_dns.models import (
     View,
     Zone,
     Record,
-    Contact,
+    RegistrationContact,
     Registrar,
     ZoneTemplate,
     RecordTemplate,
@@ -18,7 +18,7 @@ from .types import (
     NetBoxDNSViewType,
     NetBoxDNSZoneType,
     NetBoxDNSRecordType,
-    NetBoxDNSContactType,
+    NetBoxDNSRegistrationContactType,
     NetBoxDNSRegistrarType,
     NetBoxDNSZoneTemplateType,
     NetBoxDNSRecordTemplateType,
@@ -52,9 +52,13 @@ class NetBoxDNSRecordQuery:
 
 
 @strawberry.type(name="Query")
-class NetBoxDNSContactQuery:
-    netbox_dns_contact: NetBoxDNSContactType = strawberry_django.field()
-    netbox_dns_contact_list: List[NetBoxDNSContactType] = strawberry_django.field()
+class NetBoxDNSRegistrationContactQuery:
+    netbox_dns_registration_contact: NetBoxDNSRegistrationContactType = (
+        strawberry_django.field()
+    )
+    netbox_dns_registration_contact_list: List[NetBoxDNSRegistrationContactType] = (
+        strawberry_django.field()
+    )
 
 
 @strawberry.type(name="Query")

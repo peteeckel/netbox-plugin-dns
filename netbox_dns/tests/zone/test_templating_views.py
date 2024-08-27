@@ -8,7 +8,7 @@ from netbox_dns.models import (
     Zone,
     Record,
     NameServer,
-    Contact,
+    RegistrationContact,
     Registrar,
     ZoneTemplate,
     RecordTemplate,
@@ -55,13 +55,13 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         Registrar.objects.bulk_create(cls.registrars)
 
         cls.contacts = (
-            Contact(contact_id="contact-1"),
-            Contact(contact_id="contact-2"),
-            Contact(contact_id="contact-3"),
-            Contact(contact_id="contact-4"),
-            Contact(contact_id="contact-5"),
+            RegistrationContact(contact_id="contact-1"),
+            RegistrationContact(contact_id="contact-2"),
+            RegistrationContact(contact_id="contact-3"),
+            RegistrationContact(contact_id="contact-4"),
+            RegistrationContact(contact_id="contact-5"),
         )
-        Contact.objects.bulk_create(cls.contacts)
+        RegistrationContact.objects.bulk_create(cls.contacts)
 
         cls.tenants = (
             Tenant(name="Peter", slug="peter"),
@@ -199,7 +199,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_view",
             "netbox_dns.view_nameserver",
             "netbox_dns.view_registrar",
-            "netbox_dns.view_contact",
+            "netbox_dns.view_registrationcontact",
             "extras.view_tag",
             "tenancy.view_tenant",
         )
@@ -440,7 +440,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_zonetemplate",
             "netbox_dns.view_view",
             "netbox_dns.view_nameserver",
-            "netbox_dns.view_contact",
+            "netbox_dns.view_registrationcontact",
         )
 
         zone = Zone.objects.create(name="test.example.com", **self.zone_data)
@@ -481,7 +481,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_zonetemplate",
             "netbox_dns.view_view",
             "netbox_dns.view_nameserver",
-            "netbox_dns.view_contact",
+            "netbox_dns.view_registrationcontact",
         )
 
         zone = Zone.objects.create(name="test.example.com", **self.zone_data)
@@ -522,7 +522,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_zonetemplate",
             "netbox_dns.view_view",
             "netbox_dns.view_nameserver",
-            "netbox_dns.view_contact",
+            "netbox_dns.view_registrationcontact",
         )
 
         zone = Zone.objects.create(name="test.example.com", **self.zone_data)
@@ -563,7 +563,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_zonetemplate",
             "netbox_dns.view_view",
             "netbox_dns.view_nameserver",
-            "netbox_dns.view_contact",
+            "netbox_dns.view_registrationcontact",
         )
 
         zone = Zone.objects.create(name="test.example.com", **self.zone_data)

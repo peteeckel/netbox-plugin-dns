@@ -8,12 +8,12 @@ from taggit.managers import TaggableManager
 
 
 __all__ = (
-    "Contact",
-    "ContactIndex",
+    "RegistrationContact",
+    "RegistrationContactIndex",
 )
 
 
-class Contact(NetBoxModel):
+class RegistrationContact(NetBoxModel):
     # +
     # Data fields according to https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en
     # -
@@ -105,7 +105,7 @@ class Contact(NetBoxModel):
     )
 
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:contact", kwargs={"pk": self.pk})
+        return reverse("plugins:netbox_dns:registrationcontact", kwargs={"pk": self.pk})
 
     def __str__(self):
         if self.name is not None:
@@ -114,8 +114,8 @@ class Contact(NetBoxModel):
         return self.contact_id
 
     class Meta:
-        verbose_name = "Contact"
-        verbose_name_plural = "Contacts"
+        verbose_name = "Registration Contact"
+        verbose_name_plural = "Registration Contacts"
 
         ordering = (
             "name",
@@ -133,8 +133,8 @@ class Contact(NetBoxModel):
 
 
 @register_search
-class ContactIndex(SearchIndex):
-    model = Contact
+class RegistrationContactIndex(SearchIndex):
+    model = RegistrationContact
     fields = (
         ("name", 100),
         ("contact_id", 100),

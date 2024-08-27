@@ -2,15 +2,15 @@ from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
 
-from netbox_dns.models import Contact
+from netbox_dns.models import RegistrationContact
 
 
-__all__ = ("ContactFilterSet",)
+__all__ = ("RegistrationContactFilterSet",)
 
 
-class ContactFilterSet(NetBoxModelFilterSet):
+class RegistrationContactFilterSet(NetBoxModelFilterSet):
     class Meta:
-        model = Contact
+        model = RegistrationContact
         fields = (
             "id",
             "name",
