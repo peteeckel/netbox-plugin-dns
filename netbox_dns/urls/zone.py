@@ -11,6 +11,7 @@ from netbox_dns.views import (
     ZoneBulkImportView,
     ZoneBulkEditView,
     ZoneBulkDeleteView,
+    ZoneContactsView,
     ZoneRecordListView,
     ZoneManagedRecordListView,
     ZoneRegistrationView,
@@ -27,6 +28,7 @@ zone_urlpatterns = [
     path("zones/<int:pk>/", ZoneView.as_view(), name="zone"),
     path("zones/<int:pk>/delete/", ZoneDeleteView.as_view(), name="zone_delete"),
     path("zones/<int:pk>/edit/", ZoneEditView.as_view(), name="zone_edit"),
+    path("zones/<int:pk>/contacts/", ZoneContactsView.as_view(), name="zone_contacts"),
     path("zones/<int:pk>/records/", ZoneRecordListView.as_view(), name="zone_records"),
     path(
         "zones/<int:pk>/managedrecords/",

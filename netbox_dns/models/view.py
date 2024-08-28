@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 
 from netbox.models import NetBoxModel
+from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.context import current_request
 from utilities.exceptions import AbortRequest
@@ -16,7 +17,7 @@ __all__ = (
 )
 
 
-class View(ObjectModificationMixin, NetBoxModel):
+class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
         unique=True,
         max_length=255,

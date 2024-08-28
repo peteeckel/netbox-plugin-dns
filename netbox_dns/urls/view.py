@@ -11,6 +11,7 @@ from netbox_dns.views import (
     ViewBulkImportView,
     ViewBulkEditView,
     ViewBulkDeleteView,
+    ViewContactsView,
     ViewZoneListView,
 )
 
@@ -23,6 +24,7 @@ view_urlpatterns = [
     path("views/<int:pk>/", ViewView.as_view(), name="view"),
     path("views/<int:pk>/edit/", ViewEditView.as_view(), name="view_edit"),
     path("views/<int:pk>/delete/", ViewDeleteView.as_view(), name="view_delete"),
+    path("views/<int:pk>/contacts/", ViewContactsView.as_view(), name="view_contacts"),
     path("views/<int:pk>/zones/", ViewZoneListView.as_view(), name="view_zones"),
     path(
         "views/<int:pk>/journal/",

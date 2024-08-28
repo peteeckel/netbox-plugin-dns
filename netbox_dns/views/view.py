@@ -1,6 +1,8 @@
 from utilities.views import ViewTab, register_model_view
 
 from netbox.views import generic
+from utilities.views import register_model_view
+from tenancy.views import ObjectContactsView
 
 from netbox_dns.models import View, Zone
 from netbox_dns.filtersets import ViewFilterSet, ZoneFilterSet
@@ -16,6 +18,7 @@ __all__ = (
     "ViewBulkImportView",
     "ViewBulkEditView",
     "ViewBulkDeleteView",
+    "ViewContactsView",
     "ViewZoneListView",
 )
 
@@ -79,3 +82,8 @@ class ViewZoneListView(generic.ObjectChildrenView):
 
     def get_children(self, request, parent):
         return parent.zone_set
+
+
+@register_model_view(View, "contacts")
+class ViewContactsView(ObjectContactsView):
+    queryset = View.objects.all()
