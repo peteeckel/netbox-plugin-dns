@@ -1,6 +1,8 @@
 from dns import name as dns_name
 
 from netbox.views import generic
+from utilities.views import register_model_view
+from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import RecordFilterSet
 from netbox_dns.forms import (
@@ -24,6 +26,7 @@ __all__ = (
     "RecordBulkImportView",
     "RecordBulkEditView",
     "RecordBulkDeleteView",
+    "RecordContactsView",
 )
 
 
@@ -155,3 +158,8 @@ class RecordBulkEditView(generic.BulkEditView):
 class RecordBulkDeleteView(generic.BulkDeleteView):
     queryset = Record.objects.filter(managed=False)
     table = RecordTable
+
+
+@register_model_view(Record, "contacts")
+class RecordContactsView(ObjectContactsView):
+    queryset = Record.objects.all()

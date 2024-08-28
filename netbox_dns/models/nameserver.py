@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
+from netbox.models.features import ContactsMixin
 
 from netbox_dns.utilities import (
     name_to_unicode,
@@ -26,7 +27,7 @@ __all__ = (
 )
 
 
-class NameServer(ObjectModificationMixin, NetBoxModel):
+class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
         unique=True,
         max_length=255,

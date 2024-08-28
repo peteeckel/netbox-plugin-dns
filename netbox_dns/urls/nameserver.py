@@ -13,6 +13,7 @@ from netbox_dns.views import (
     NameServerBulkDeleteView,
     NameServerZoneListView,
     NameServerSOAZoneListView,
+    NameServerContactsView,
 )
 
 nameserver_urlpatterns = [
@@ -43,6 +44,11 @@ nameserver_urlpatterns = [
         "nameservers/<int:pk>/delete",
         NameServerDeleteView.as_view(),
         name="nameserver_delete",
+    ),
+    path(
+        "nameservers/<int:pk>/contacts/",
+        NameServerContactsView.as_view(),
+        name="nameserver_contacts",
     ),
     path(
         "nameservers/<int:pk>/journal/",

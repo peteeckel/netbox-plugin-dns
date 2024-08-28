@@ -11,6 +11,7 @@ from netbox_dns.views import (
     RecordBulkImportView,
     RecordBulkEditView,
     RecordBulkDeleteView,
+    RecordContactsView,
     ManagedRecordListView,
 )
 
@@ -23,6 +24,11 @@ record_urlpatterns = [
     path("records/<int:pk>/", RecordView.as_view(), name="record"),
     path("records/<int:pk>/edit/", RecordEditView.as_view(), name="record_edit"),
     path("records/<int:pk>/delete/", RecordDeleteView.as_view(), name="record_delete"),
+    path(
+        "records/<int:pk>/contacts/",
+        RecordContactsView.as_view(),
+        name="record_contacts",
+    ),
     path(
         "records/<int:pk>/journal/",
         ObjectJournalView.as_view(),
