@@ -44,6 +44,6 @@ record_urlpatterns = [
         "records/<int:pk>/contacts/",
         RecordContactView.as_view(),
         name="record_contacts",
-        kwargs={"contact": Record},
+        kwargs={"contacts": Record},
     ),
 ]
