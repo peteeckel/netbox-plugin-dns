@@ -38,4 +38,10 @@ record_urlpatterns = [
     path(
         "managedrecords/", ManagedRecordListView.as_view(), name="managed_record_list"
     ),
+    path(
+        "records/<int:pk>/contacts/",
+        ObjectContactsView.as_view(),
+        name="record_contacts",
+        kwargs={"model": Record},
+    ),
 ]
