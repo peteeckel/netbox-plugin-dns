@@ -27,6 +27,7 @@ __all__ = (
     "RecordBulkImportView",
     "RecordBulkEditView",
     "RecordBulkDeleteView",
+    "RecordContactView",
 )
 
 

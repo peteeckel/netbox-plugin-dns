@@ -42,7 +42,7 @@ record_urlpatterns = [
     ),
     path(
         "records/<int:pk>/contacts/",
-        RecordContactsView.as_view(),
+        RecordContactView.as_view(),
         name="record_contacts",
         kwargs={"model": Record},
     ),
