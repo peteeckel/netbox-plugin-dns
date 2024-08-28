@@ -162,5 +162,5 @@ class RecordBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(Record, 'contacts')
 class RecordContactsView(ObjectContactsView):
-    queryset = Recrod.objects.all()
+    queryset = Record.objects.all()
 
