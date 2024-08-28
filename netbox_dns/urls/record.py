@@ -1,7 +1,7 @@
 from django.urls import path
 
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
-from tenancy.views import ObjectContactsView
+from tenancy.views import ObjectContactsView, ContactListView
 
 from netbox_dns.models import Record
 from netbox_dns.views import (
@@ -41,7 +41,7 @@ record_urlpatterns = [
     ),
     path(
         "records/<int:pk>/contacts/",
-        ObjectContactsView.as_view(),
+        ContactListView.as_view(),
         name="record_contacts",
         kwargs={"model": Record},
     ),
