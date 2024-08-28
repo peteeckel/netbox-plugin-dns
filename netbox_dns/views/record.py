@@ -50,7 +50,7 @@ class ManagedRecordListView(generic.ObjectListView):
     template_name = "netbox_dns/record/managed.html"
 
 @register_model_view(Record)
-class RecordView(GetRelatedModelMixin, generic.ObjectView):
+class RecordView(GetRelatedModelsMixin, generic.ObjectView):
     queryset = Record.objects.all().prefetch_related("zone", "ptr_record")
 
     def get_value_records(self, instance):
