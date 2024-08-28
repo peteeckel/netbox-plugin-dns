@@ -1,6 +1,9 @@
 from dns import name as dns_name
 
 from netbox.views import generic
+from tenancy.views import ObjectContactsView
+from utilities.views import GetRelatedModelsMixin, ViewTab, register_model_view
+
 
 from netbox_dns.filtersets import RecordFilterSet
 from netbox_dns.forms import (
@@ -46,7 +49,7 @@ class ManagedRecordListView(generic.ObjectListView):
     actions = {"export": {"view"}}
     template_name = "netbox_dns/record/managed.html"
 
-
+@register_model_view(Record)
 class RecordView(generic.ObjectView):
     queryset = Record.objects.all().prefetch_related("zone", "ptr_record")
 
@@ -122,7 +125,7 @@ class RecordView(generic.ObjectView):
 
         return context
 
-
+@register_model_view(Record, 'edit')
 class RecordEditView(generic.ObjectEditView):
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"
@@ -131,6 +134,7 @@ class RecordEditView(generic.ObjectEditView):
     default_return_url = "plugins:netbox_dns:record_list"
 
 
+@register_model_view(Record, 'delete')
 class RecordDeleteView(generic.ObjectDeleteView):
     queryset = Record.objects.filter(managed=False)
     default_return_url = "plugins:netbox_dns:record_list"
@@ -155,3 +159,8 @@ class RecordBulkEditView(generic.BulkEditView):
 class RecordBulkDeleteView(generic.BulkDeleteView):
     queryset = Record.objects.filter(managed=False)
     table = RecordTable
+
+@register_model_view(Record, 'contacts')
+class RecordContactsView(ObjectContactsView):
+    queryset = Recrod.objects.all()
+
