@@ -1,7 +1,7 @@
 from django.urls import path
 
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
-from tenants.views.generic import ObjectContactsView
+from tenancy.views.generic import ObjectContactsView
 
 from netbox_dns.models import Record
 from netbox_dns.views import (
