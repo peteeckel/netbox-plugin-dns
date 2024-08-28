@@ -12,7 +12,7 @@ from netbox_dns.views import (
     RecordBulkImportView,
     RecordBulkEditView,
     RecordBulkDeleteView,
-    RecrodContactsView,
+    RecordContactView,
     ManagedRecordListView,
 )
 
