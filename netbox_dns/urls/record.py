@@ -12,6 +12,7 @@ from netbox_dns.views import (
     RecordBulkImportView,
     RecordBulkEditView,
     RecordBulkDeleteView,
+    RecrodContactsView,
     ManagedRecordListView,
 )
 
@@ -41,7 +42,7 @@ record_urlpatterns = [
     ),
     path(
         "records/<int:pk>/contacts/",
-        ContactListView.as_view(),
+        RecordContactsView.as_view(),
         name="record_contacts",
         kwargs={"model": Record},
     ),
