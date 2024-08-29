@@ -1,5 +1,6 @@
 from netbox.views import generic
 
+from netbox_dns.models import ZoneTemplate
 from netbox_dns.filtersets import ZoneTemplateFilterSet
 from netbox_dns.forms import (
     ZoneTemplateImportForm,
@@ -7,13 +8,12 @@ from netbox_dns.forms import (
     ZoneTemplateFilterForm,
     ZoneTemplateBulkEditForm,
 )
-from netbox_dns.models import ZoneTemplate
 from netbox_dns.tables import ZoneTemplateTable, RecordTemplateDisplayTable
 
 
 __all__ = (
-    "ZoneTemplateListView",
     "ZoneTemplateView",
+    "ZoneTemplateListView",
     "ZoneTemplateEditView",
     "ZoneTemplateDeleteView",
     "ZoneTemplateBulkImportView",

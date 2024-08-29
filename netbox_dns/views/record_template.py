@@ -15,8 +15,8 @@ from netbox_dns.utilities import value_to_unicode
 
 
 __all__ = (
-    "RecordTemplateListView",
     "RecordTemplateView",
+    "RecordTemplateListView",
     "RecordTemplateEditView",
     "RecordTemplateDeleteView",
     "RecordTemplateBulkImportView",
