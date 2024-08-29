@@ -20,19 +20,13 @@ from netbox_dns.tables import (
 
 
 __all__ = (
-    "ZoneListView",
     "ZoneView",
+    "ZoneListView",
     "ZoneEditView",
     "ZoneDeleteView",
     "ZoneBulkImportView",
     "ZoneBulkEditView",
     "ZoneBulkDeleteView",
-    "ZoneContactsView",
-    "ZoneRegistrationView",
-    "ZoneRecordListView",
-    "ZoneManagedRecordListView",
-    "ZoneRFC2317ChildZoneListView",
-    "ZoneChildZoneListView",
 )
 
 

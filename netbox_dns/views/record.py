@@ -18,15 +18,14 @@ from netbox_dns.utilities import value_to_unicode
 
 
 __all__ = (
-    "RecordListView",
-    "ManagedRecordListView",
     "RecordView",
+    "RecordListView",
     "RecordEditView",
     "RecordDeleteView",
     "RecordBulkImportView",
     "RecordBulkEditView",
     "RecordBulkDeleteView",
-    "RecordContactsView",
+    "ManagedRecordListView",
 )
 
 

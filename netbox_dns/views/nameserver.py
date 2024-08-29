@@ -16,16 +16,13 @@ from netbox_dns.tables import NameServerTable, ZoneTable
 
 
 __all__ = (
-    "NameServerListView",
     "NameServerView",
+    "NameServerListView",
     "NameServerEditView",
     "NameServerDeleteView",
     "NameServerBulkEditView",
     "NameServerBulkImportView",
     "NameServerBulkDeleteView",
-    "NameServerZoneListView",
-    "NameServerSOAZoneListView",
-    "NameServerContactsView",
 )
 
 

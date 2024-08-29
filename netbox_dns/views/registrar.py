@@ -21,7 +21,6 @@ __all__ = (
     "RegistrarBulkImportView",
     "RegistrarBulkEditView",
     "RegistrarBulkDeleteView",
-    "RegistrarZoneListView",
 )
 
 

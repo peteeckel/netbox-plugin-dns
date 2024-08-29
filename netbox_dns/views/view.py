@@ -1,7 +1,6 @@
 from utilities.views import ViewTab, register_model_view
 
 from netbox.views import generic
-from utilities.views import register_model_view
 from tenancy.views import ObjectContactsView
 
 from netbox_dns.models import View, Zone
@@ -18,8 +17,6 @@ __all__ = (
     "ViewBulkImportView",
     "ViewBulkEditView",
     "ViewBulkDeleteView",
-    "ViewContactsView",
-    "ViewZoneListView",
 )
 
 

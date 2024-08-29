@@ -1,11 +1,10 @@
-from django.urls import path
+from django.urls import include, path
 
-from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
+from utilities.urls import get_model_urls
 
-from netbox_dns.models import RecordTemplate
 from netbox_dns.views import (
-    RecordTemplateListView,
     RecordTemplateView,
+    RecordTemplateListView,
     RecordTemplateEditView,
     RecordTemplateDeleteView,
     RecordTemplateBulkImportView,
@@ -15,12 +14,25 @@ from netbox_dns.views import (
 
 recordtemplate_urlpatterns = [
     path(
+        "recordtemplates/<int:pk>/", RecordTemplateView.as_view(), name="recordtemplate"
+    ),
+    path(
         "recordtemplates/", RecordTemplateListView.as_view(), name="recordtemplate_list"
     ),
     path(
         "recordtemplates/add/",
         RecordTemplateEditView.as_view(),
         name="recordtemplate_add",
+    ),
+    path(
+        "recordtemplates/<int:pk>/edit/",
+        RecordTemplateEditView.as_view(),
+        name="recordtemplate_edit",
+    ),
+    path(
+        "recordtemplates/<int:pk>/delete/",
+        RecordTemplateDeleteView.as_view(),
+        name="recordtemplate_delete",
     ),
     path(
         "recordtemplates/import/",
@@ -38,28 +50,7 @@ recordtemplate_urlpatterns = [
         name="recordtemplate_bulk_delete",
     ),
     path(
-        "recordtemplates/<int:pk>/", RecordTemplateView.as_view(), name="recordtemplate"
-    ),
-    path(
-        "recordtemplates/<int:pk>/edit/",
-        RecordTemplateEditView.as_view(),
-        name="recordtemplate_edit",
-    ),
-    path(
-        "recordtemplates/<int:pk>/delete/",
-        RecordTemplateDeleteView.as_view(),
-        name="recordtemplate_delete",
-    ),
-    path(
-        "recordtemplates/<int:pk>/journal/",
-        ObjectJournalView.as_view(),
-        name="recordtemplate_journal",
-        kwargs={"model": RecordTemplate},
-    ),
-    path(
-        "recordtemplates/<int:pk>/changelog/",
-        ObjectChangeLogView.as_view(),
-        name="recordtemplate_changelog",
-        kwargs={"model": RecordTemplate},
+        "recordtemplates/<int:pk>/",
+        include(get_model_urls("netbox_dns", "recordtemplate")),
     ),
 ]
