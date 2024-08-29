@@ -4,7 +4,7 @@ The NetBox DNS plugin enables NetBox to manage operational DNS data such as name
 ## Objectives
 NetBox DNS is designed to be the 'DNS Source of Truth' analogous to NetBox being the 'Network Source of Truth'.
 
-The plugin stores information about DNS name servers, DNS views and zones, and DNS records, making it a data source for automatic provisioning of DNS instances. Registration information about DNS registrars and contacts for DNS domains can also be stored and associated with zones.
+The plugin stores information about DNS name servers, DNS views and zones, and DNS records, making it a data source for automatic provisioning of DNS instances. Registration information about DNS registrars and registratiob contacts for DNS domains can also be stored and associated with zones.
 
 The main focus of the plugin is to ensure the quality of the data stored in it. To achieve this, there are many validation and automation mechanisms in place:
 
@@ -133,7 +133,7 @@ NetBox 3.5.0 up to NetBox 3.7.x are not supported by the latest version of NetBo
 ```
 
 ## Object types
-Currently NetBox DNS can manage six different object types: Views, Name Servers, Zones, and Records, Contacts and Registrars.
+Currently NetBox DNS can manage eight different object types: Views, Name Servers, Zone Templates, Zones, Record Templates, Records, Registration Contacts and Registrars.
 
 ### Views
 Views are a concept that allows the DNS namespace to be partitioned into groups of zones that are isolated from each other. They are mainly used in split horizon DNS setups, for example in cases where there is a different DNS resolution requirement for external and internal clients, where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
@@ -465,22 +465,22 @@ If there are zones registered for the registrar, a second tab shows a list of th
 
 ![Registrar DetailZones](images/RegistrarDetailZones.png)
 
-### Contacts
+### Registration Contacts
 
 #### Permissions
-The following Django permissions are applicable to Contact objects:
+The following Django permissions are applicable to RegistrationContact objects:
 
-Permission                  | Action
-----------                  | ------
-`netbox_dns.add_contact`    | Create new contact objects
-`netbox_dns.change_contact` | Edit contact information
-`netbox_dns.delete_contact` | Delete a contact object
-`netbox_dns.view_contact`   | View contact information
+Permission                              | Action
+----------                              | ------
+`netbox_dns.add_registrationcontact`    | Create new registration contact objects
+`netbox_dns.change_registrationcontact` | Edit registration contact information
+`netbox_dns.delete_registrationcontact` | Delete a registration contact object
+`netbox_dns.view_registrationcontact`   | View registration contact information
 
 To use tags, the `extras.view_tag` permission is required as well.
 
 #### Fields
-The following fields are defined for contacts:
+The following fields are defined for registration contacts:
 
 Field               | Required | Explanation
 -----               | -------- | -----------
@@ -500,7 +500,7 @@ Field               | Required | Explanation
 
 The fields are closely related to the WHOIS fields for the registrant, admin contact, tech contact and billing contact for a domain. More information can be found on the [ICANN web site](https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en)
 
-#### Displaying Contacts
+#### Displaying Registration Contacts
 A contact in detail view:
 
 ![Contact Detail](images/ContactDetail.png)
@@ -534,7 +534,7 @@ Permission             			  | Action
 `netbox_dns.delete_zonetemplate`  | Delete a zone template object
 `netbox_dns.view_zonetemplate`    | View zone template information
 
-To use tags, the `extras.view_tag` permission is required as well. Additionally, for NameServer, Registrar and Contact type objects the associated view permission is required to create a zone template, but not to apply it.
+To use tags, the `extras.view_tag` permission is required as well. Additionally, for Nameserver, Registrar and RegistrationContact type objects the associated view permission is required to create a zone template, but not to apply it.
 
 #### Fields
 The following fields are defined for zone templates:
