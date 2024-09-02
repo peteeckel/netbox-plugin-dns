@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("netbox_dns", "0007_alter_ordering_options"),
+        ("netbox_dns", "0008_view_prefixes"),
     ]
 
     operations = [
