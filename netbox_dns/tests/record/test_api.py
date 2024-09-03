@@ -35,6 +35,9 @@ class RecordAPITestCase(
         "value",
         "zone",
     ]
+    user_permissions = [
+        "netbox_dns.view_zone",
+    ]
     bulk_update_data = {
         "ttl": 19200,
     }

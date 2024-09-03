@@ -27,6 +27,10 @@ class ZoneAPITestCase(
         "url",
         "view",
     ]
+    user_permissions = [
+        "netbox_dns.view_view",
+        "netbox_dns.view_nameserver",
+    ]
 
     @classmethod
     def setUpTestData(cls):
