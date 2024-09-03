@@ -2,11 +2,19 @@ from utilities.views import ViewTab, register_model_view
 
 from netbox.views import generic
 from tenancy.views import ObjectContactsView
+from ipam.models import Prefix
 
 from netbox_dns.models import View, Zone
 from netbox_dns.filtersets import ViewFilterSet, ZoneFilterSet
-from netbox_dns.forms import ViewForm, ViewFilterForm, ViewImportForm, ViewBulkEditForm
+from netbox_dns.forms import (
+    ViewForm,
+    ViewFilterForm,
+    ViewImportForm,
+    ViewBulkEditForm,
+    ViewPrefixEditForm,
+)
 from netbox_dns.tables import ViewTable, ZoneTable
+from netbox_dns.utilities import get_views_by_prefix
 
 
 __all__ = (
@@ -17,6 +25,7 @@ __all__ = (
     "ViewBulkImportView",
     "ViewBulkEditView",
     "ViewBulkDeleteView",
+    "ViewPrefixEditView",
 )
 
 
@@ -59,6 +68,22 @@ class ViewBulkEditView(generic.BulkEditView):
 class ViewBulkDeleteView(generic.BulkDeleteView):
     queryset = View.objects.all()
     table = ViewTable
+
+
+class ViewPrefixEditView(generic.ObjectEditView):
+    queryset = Prefix.objects.all()
+    form = ViewPrefixEditForm
+    template_name = "netbox_dns/view/prefix.html"
+
+    def get_extra_context(self, request, instance):
+        parents = instance.get_parents()
+        if parents:
+            return {
+                "inherited_views": get_views_by_prefix(parents.last()),
+                "inherited_from": parents.filter(netbox_dns_views__isnull=False).last(),
+            }
+
+        return {}
 
 
 @register_model_view(View, "zones")

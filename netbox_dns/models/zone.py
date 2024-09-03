@@ -3,9 +3,8 @@ from math import ceil
 from datetime import datetime
 
 from dns import name as dns_name
-from dns.rdtypes.ANY import SOA
 from dns.exception import DNSException
-
+from dns.rdtypes.ANY import SOA
 from django.core.validators import (
     MinValueValidator,
     MaxValueValidator,
@@ -28,13 +27,15 @@ from ipam.models import IPAddress
 from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
+    update_dns_records,
+    check_dns_records,
+    get_ip_addresses_by_zone,
     arpa_to_prefix,
     name_to_unicode,
     normalize_name,
     NameFormatError,
 )
 from netbox_dns.validators import (
-    validate_fqdn,
     validate_rname,
     validate_domain_name,
 )
@@ -77,6 +78,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         super().__init__(*args, **kwargs)
 
         self._soa_serial_dirty = False
+        self._ip_addresses_checked = False
 
     view = models.ForeignKey(
         to="View",
@@ -282,7 +284,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         else:
             try:
                 name = dns_name.from_text(self.name, origin=None).to_unicode()
-            except dns_name.IDNAException:
+            except DNSException:
                 name = self.name
 
         try:
@@ -309,6 +311,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @soa_serial_dirty.setter
     def soa_serial_dirty(self, soa_serial_dirty):
         self._soa_serial_dirty = soa_serial_dirty
+
+    @property
+    def ip_addresses_checked(self):
+        return self._ip_addresses_checked
+
+    @ip_addresses_checked.setter
+    def ip_addresses_checked(self, ip_addresses_checked):
+        self._ip_addresses_checked = ip_addresses_checked
 
     @property
     def display_name(self):
@@ -655,6 +665,26 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                         }
                     )
 
+            if (
+                not self.ip_addresses_checked
+                and old_zone.name != self.name
+                or old_zone.view != self.view
+            ):
+                ip_addresses = IPAddress.objects.filter(
+                    netbox_dns_records__in=self.record_set.filter(
+                        ipam_ip_address__isnull=False
+                    )
+                )
+                ip_addresses |= get_ip_addresses_by_zone(self)
+
+                for ip_address in ip_addresses.distinct():
+                    try:
+                        check_dns_records(ip_address, zone=self)
+                    except ValidationError as exc:
+                        raise ValidationError(exc.messages)
+
+                self.ip_addresses_checked = True
+
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name
 
@@ -769,29 +799,30 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         elif changed_fields is not None and {"name", "view", "status"} & changed_fields:
             for address_record in self.record_set.filter(
-                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA)
+                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+                ipam_ip_address__isnull=True,
             ):
                 address_record.save(update_fields=["ptr_record"])
 
-            # Fix name in IP Address when zone name is changed
-            if (
-                get_plugin_config("netbox_dns", "feature_ipam_coupling")
-                and "name" in changed_fields
-            ):
-                for ip in IPAddress.objects.filter(
-                    custom_field_data__ipaddress_dns_zone_id=self.pk
-                ):
-                    ip.dns_name = f'{ip.custom_field_data["ipaddress_dns_record_name"]}.{self.name}'
-                    ip.save(update_fields=["dns_name"])
-
         if changed_fields is not None and "name" in changed_fields:
-            for _record in self.record_set.all():
+            for _record in self.record_set.filter(ipam_ip_address__isnull=True):
                 _record.save(
                     update_fields=["fqdn"],
                     save_zone_serial=False,
                     update_rrset_ttl=False,
                     update_rfc2317_cname=False,
                 )
+
+        if changed_fields is None or {"name", "view"} & changed_fields:
+            ip_addresses = IPAddress.objects.filter(
+                netbox_dns_records__in=self.record_set.filter(
+                    ipam_ip_address__isnull=False
+                )
+            )
+            ip_addresses |= get_ip_addresses_by_zone(self)
+
+            for ip_address in ip_addresses.distinct():
+                update_dns_records(ip_address)
 
         self.save_soa_serial()
         self.update_soa_record()
@@ -828,14 +859,15 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_child_zones.all().values_list("pk", flat=True)
             )
 
-            if get_plugin_config("netbox_dns", "feature_ipam_coupling"):
-                for ip in IPAddress.objects.filter(
-                    custom_field_data__ipaddress_dns_zone_id=self.pk
-                ):
-                    ip.dns_name = ""
-                    ip.custom_field_data["ipaddress_dns_record_name"] = None
-                    ip.custom_field_data["ipaddress_dns_zone_id"] = None
-                    ip.save(update_fields=["dns_name", "custom_field_data"])
+            ipam_ip_addresses = list(
+                IPAddress.objects.filter(
+                    netbox_dns_records__in=self.record_set.filter(
+                        ipam_ip_address__isnull=False
+                    )
+                )
+                .distinct()
+                .values_list("pk", flat=True)
+            )
 
             super().delete(*args, **kwargs)
 
@@ -848,6 +880,10 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         for address_zone in {address_record.zone for address_record in address_records}:
             address_zone.save_soa_serial()
             address_zone.update_soa_record()
+
+        ip_addresses = IPAddress.objects.filter(pk__in=ipam_ip_addresses)
+        for ip_address in ip_addresses:
+            update_dns_records(ip_address)
 
         rfc2317_child_zones = Zone.objects.filter(pk__in=rfc2317_child_zones)
         if rfc2317_child_zones:

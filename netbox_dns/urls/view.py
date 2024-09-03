@@ -10,6 +10,7 @@ from netbox_dns.views import (
     ViewBulkImportView,
     ViewBulkEditView,
     ViewBulkDeleteView,
+    ViewPrefixEditView,
 )
 
 view_urlpatterns = [
@@ -22,4 +23,9 @@ view_urlpatterns = [
     path("views/edit/", ViewBulkEditView.as_view(), name="view_bulk_edit"),
     path("views/delete/", ViewBulkDeleteView.as_view(), name="view_bulk_delete"),
     path("views/<int:pk>/", include(get_model_urls("netbox_dns", "view"))),
+    path(
+        "prefixes/<int:pk>/assign-views/",
+        ViewPrefixEditView.as_view(),
+        name="prefix_views",
+    ),
 ]

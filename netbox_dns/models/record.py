@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
 from django.urls import reverse
+from django.conf import settings
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
@@ -34,6 +35,43 @@ __all__ = (
 
 def min_ttl(*ttl_list):
     return min((ttl for ttl in ttl_list if ttl is not None), default=None)
+
+
+def record_data_from_ip_address(ip_address, zone):
+    cf_data = ip_address.custom_field_data
+
+    if cf_data.get("ipaddress_dns_disabled"):
+        return None
+
+    data = {
+        "name": (
+            dns_name.from_text(ip_address.dns_name)
+            .relativize(dns_name.from_text(zone.name))
+            .to_text()
+        ),
+        "type": (
+            RecordTypeChoices.A
+            if ip_address.address.version == 4
+            else RecordTypeChoices.AAAA
+        ),
+        "value": str(ip_address.address.ip),
+        "status": (
+            RecordStatusChoices.STATUS_ACTIVE
+            if ip_address.status
+            in settings.PLUGINS_CONFIG["netbox_dns"].get(
+                "dnssync_ipaddress_active_status", []
+            )
+            else RecordStatusChoices.STATUS_INACTIVE
+        ),
+    }
+
+    if "ipaddress_dns_record_ttl" in cf_data:
+        data["ttl"] = cf_data.get("ipaddress_dns_record_ttl")
+
+    if (disable_ptr := cf_data.get("ipaddress_dns_record_disable_ptr")) is not None:
+        data["disable_ptr"] = disable_ptr
+
+    return data
 
 
 class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
@@ -434,29 +472,70 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_cname_record.delete(save_zone_serial=save_zone_serial)
                 self.rfc2317_cname_record = None
 
-    def validate_name(self):
+    def update_from_ip_address(self, ip_address, zone=None):
+        if zone is None:
+            zone = self.zone
+
+        data = record_data_from_ip_address(ip_address, zone)
+
+        if data is None:
+            self.delete()
+            return
+
+        if all((getattr(self, attr) == data[attr] for attr in data.keys())):
+            return
+
+        for attr, value in data.items():
+            setattr(self, attr, value)
+
+        return self
+
+    @classmethod
+    def create_from_ip_address(cls, ip_address, zone):
+        data = record_data_from_ip_address(ip_address, zone)
+
+        if data is None:
+            return
+
+        return Record(
+            zone=zone,
+            managed=True,
+            ipam_ip_address=ip_address,
+            **data,
+        )
+
+    def update_fqdn(self, zone=None):
+        if zone is None:
+            zone = self.zone
+
+        _zone = dns_name.from_text(zone.name, origin=dns_name.root)
+        name = dns_name.from_text(self.name, origin=None)
+        fqdn = dns_name.from_text(self.name, origin=_zone)
+
+        if not fqdn.is_subdomain(_zone):
+            raise ValidationError(
+                {
+                    "name": f"{self.name} is not a name in {zone.name}",
+                }
+            )
+
+        _zone.to_unicode()
+        name.to_unicode()
+
+        self.name = name.relativize(_zone).to_text()
+        self.fqdn = fqdn.to_text()
+
+    def validate_name(self, new_zone=None):
+        if new_zone is None:
+            new_zone = self.zone
+
         try:
-            _zone = dns_name.from_text(self.zone.name, origin=dns_name.root)
-            name = dns_name.from_text(self.name, origin=None)
-            fqdn = dns_name.from_text(self.name, origin=_zone)
-
-            _zone.to_unicode()
-            name.to_unicode()
-
-            self.name = name.relativize(_zone).to_text()
-            self.fqdn = fqdn.to_text()
+            self.update_fqdn(zone=new_zone)
 
         except dns.exception.DNSException as exc:
             raise ValidationError(
                 {
                     "name": str(exc),
-                }
-            )
-
-        if not fqdn.is_subdomain(_zone):
-            raise ValidationError(
-                {
-                    "name": f"{self.name} is not a name in {self.zone.name}",
                 }
             )
 
@@ -488,15 +567,18 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         except ValidationError as exc:
             raise ValidationError({"value": exc}) from None
 
-    def check_unique_record(self):
+    def check_unique_record(self, new_zone=None):
         if not get_plugin_config("netbox_dns", "enforce_unique_records", False):
             return
 
         if not self.is_active:
             return
 
+        if new_zone is None:
+            new_zone = self.zone
+
         records = Record.objects.filter(
-            zone=self.zone,
+            zone=new_zone,
             name=self.name,
             type=self.type,
             value=self.value,
@@ -506,18 +588,51 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if self.pk is not None:
             records = records.exclude(pk=self.pk)
 
-        if len(records):
+        if records.exists():
+            if self.ipam_ip_address is not None:
+                if not records.filter(
+                    ipam_ip_address__isnull=True
+                ).exists() or get_plugin_config(
+                    "netbox_dns", "dnssync_conflict_deactivate", False
+                ):
+                    return
+
             raise ValidationError(
                 {
                     "value": f"There is already an active {self.type} record for name {self.name} in zone {self.zone} with value {self.value}."
                 }
             ) from None
 
+    def handle_conflicting_address_records(self):
+        if self.ipam_ip_address is None or not self.is_active:
+            return
+
+        if not get_plugin_config("netbox_dns", "dnssync_conflict_deactivate", False):
+            return
+
+        records = Record.objects.filter(
+            zone=self.zone,
+            name=self.name,
+            type=self.type,
+            value=self.value,
+            status__in=Record.ACTIVE_STATUS_LIST,
+            ipam_ip_address__isnull=True,
+        )
+
+        for record in records:
+            record.status = RecordStatusChoices.STATUS_INACTIVE
+            record.save(update_fields=["status"])
+
     def check_unique_rrset_ttl(self):
         if self.pk is not None:
             return
 
         if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
+            return
+
+        if self.ipam_ip_address is not None and get_plugin_config(
+            "netbox_dns", "dnssync_conflict_deactivate", False
+        ):
             return
 
         if self.type == RecordTypeChoices.PTR and self.managed:
@@ -534,10 +649,13 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             .exclude(status=RecordStatusChoices.STATUS_INACTIVE)
         )
 
+        if self.ipam_ip_address is not None:
+            records = records.exclude(ipam_ip_address__isnull=False)
+
         if not records.exists():
             return
 
-        conflicting_ttls = ", ".join(set(str(record.ttl) for record in records))
+        conflicting_ttls = ", ".join({str(record.ttl) for record in records})
         raise ValidationError(
             {
                 "ttl": f"There is at least one active {self.type} record for name {self.name} in zone {self.zone} and TTL is different ({conflicting_ttls})."
@@ -577,10 +695,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self.type = self.type.upper()
         super().clean_fields(*args, **kwargs)
 
-    def clean(self, *args, **kwargs):
-        self.validate_name()
+    def clean(self, *args, new_zone=None, **kwargs):
+        self.validate_name(new_zone=new_zone)
         self.validate_value()
-        self.check_unique_record()
+        self.check_unique_record(new_zone=new_zone)
         if self.pk is None:
             self.check_unique_rrset_ttl()
 
@@ -686,6 +804,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             self.ip_address = None
 
         if self.is_address_record:
+            self.handle_conflicting_address_records()
             self.update_ptr_record(
                 update_rfc2317_cname=update_rfc2317_cname,
                 save_zone_serial=save_zone_serial,

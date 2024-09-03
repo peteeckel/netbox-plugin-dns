@@ -13,7 +13,7 @@ from netbox_dns.models import (
     Zone,
     Record,
 )
-from netbox_dns.choices import RecordStatusChoices, RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices
 
 
 class ZoneTemplatingAPITestCase(APITestCase):

@@ -14,6 +14,7 @@ The main focus of the plugin is to ensure the quality of the data stored in it. 
 * Validation of changs to the SOA SERIAL number, whether they are done automatically or manually
 * Validation of record types such as CNAME and singletons, to ensure DNS zone validity
 * Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
+* Automatic creation of address records and the corresponding pointer records for IPAM IP addresses (IPAM DNSsync)
 
 Other main features include:
 
@@ -46,7 +47,8 @@ NetBox Version | NetBox DNS Version | Comment
 3.5.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
 3.6.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
 3.7.x          | 0.22.x or earlier  | Only NetBox DNS 0.22.x is supported
-4.0.x          | 1.0.x or later     | Only the latest NetBox DNS version is supported
+4.0.x          | 1.0.x or later     | Only the latest release of 1.0.x or 1.1.x is supported. 1.0.x has IPAM Coupling, 1.1.x IPAM DNSsync
+4.1.x          | 1.0.x or later     | Only the latest release of 1.0.x or 1.1.x is supported. 1.0.x has IPAM Coupling, 1.1.x IPAM DNSsync
 
 For earlier version of NetBox, please use the old version of the PyPI module `netbox-dns`.  Please be aware that this version is no longer supported and will not receive any further updates. We therefore strongly recommend that you move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
@@ -70,7 +72,6 @@ If the local requirements file does not exist, this command will create it.
 This will guarantee that NetBox DNS will be updated every time the update script provided with NetBox is executed.
 
 ### Enabling the Plugin
-
 In configuration.py, add `netbox_dns` to the PLUGINS list:
 
 ```
@@ -260,7 +261,6 @@ Field           | Required | Default  | Explanation
 **Tenant**      | No       |          | The tenant the zone is assigned to
 
 ##### Zones without name servers
-
 While the "Nameservers" list for a zone is not strictly required, zones without any name server records cannot be loaded by DNS servers. The detail view of a zone without any name servers displays an error message to inform users of this fact.
 
 ![Zone Name Server Error](images/ZoneNameserverError.png)
@@ -268,7 +268,6 @@ While the "Nameservers" list for a zone is not strictly required, zones without 
 This will make zone data exported from NetBox DNS unusable unless name servers are added before trying to load that zone.
 
 ##### Zones with unresolved name servers
-
 Similarly, if a zone has nameservers defined, the name servers have domain names within a zone managed by NetBox DNS, and the name of the name server cannot be resolved within that zone, a warning message will be displayed in the zone detail view for every name server affected.
 
 ![Zone Name Server Warning](images/ZoneNameserverWarning.png)
@@ -308,7 +307,6 @@ Field                      | Required | Explanation
 All fields are optional.
 
 If there is registration information for a zone, the zone's detail view contains an additional 'Registration' tab showing that information.
-
 
 ### Automatic SOA SERIAL generation
 SOA SERIAL fields are crucial for the propagation of zone data from primary name servers to secondaries, as the process involves checking the zone's serial number on the secondary against the serial number on the primary and only performing the update when the primary has a higher serial number or the interval specified in the SOA EXPIRE field has passed.
@@ -512,7 +510,6 @@ If there are zones registered for the contact, a second tab shows a list of thes
 ![Contact DetailZones](images/ContactDetailZones.png)
 
 ### Zone Templates
-
 Zone templates can be used to add common sets objects to zones. As an example, there are often groups of zones that are using the same set of name servers, the same tenant or the same registration information. Template records provide another functionality that makes it possible to comfortably assign common objects to zones.
 
 Zone templates can be used interactively at zone creation time, or for existing zones using the edit view. It is also possible to assign a zone template while importing zones via CSV, JSON or YAML, both for new and existing zones, and via the REST API. Assigning zone templates in Bulk Edit operations is currently not supported.
@@ -559,7 +556,6 @@ Field                | Required | Template Field | Explanation
 Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each remplate will be created in the target zone if there is no record with the same name, type and value yet.
 
 ### Record Templates
-
 Record templates are used to create records in zones to which zone templates are applied. A record template is very similar to a record without a zone. When it is applied to a zone, it defines a record to be created in that zone.
 
 Record templates undergo a basic name validation when they are created, but without a zone object it is not possible to fully validate a record template. This is done when assignment to a zone takes place. Therefore it can happen that a perfectly valid record template creates an invalid record when assigned to a zone. One possible reason are conflicts with an existing record, e.g. a CNAME with the same name, or violated length restrictions when the FQDN is created from the record and zone names.
@@ -613,7 +609,6 @@ The names of Name Servers, Zones and Records are all used as RR names in DNS, so
 ![Record Validation Error](images/RecordValidationError.png)
 
 ### Validation options
-
 There are some special cases that need to be taken care of:
 
 * Some non-free operating systems accept underscores in host names, which are not permitted according to RFC1035 and rejected by default e.g. by BIND.
@@ -628,7 +623,6 @@ To take care of these cases, there are three configuration variables for NetBox 
 * `tolerate_non_rfc1035_types` contains a list of record types that allow characters outside the set defined in RFC1035 to be used in RR names. Record types in this list are exempt from validation.
 
 #### <a name="validation_defaults"></a>Name validation default settings
-
 Variable                            | Factory Default
 --------                            | ---------------
 `tolerate_underscores_in_labels`    | `False`
@@ -667,7 +661,6 @@ In this case, the serial number must first be adjusted manually so that the auto
 
 
 ## International Domain Names (IDNs)
-
 NetBox DNS supports International Domain Names (IDNs) in resource records. IDNs are domain names containing Unicode characters such as special characters in Latin scripts (e.g. 'ä', 'ö', 'ü', 'ç', 'å'), non-Latin scripts such as Arabic, Kyrillian or Kanji, or even Emoji. Since DNS does not support any of these, [RFC3492](https://www.rfc-editor.org/rfc/rfc3492) defines a mapping to so-called 'Punycode' that allows to translate between the limited character set supported by DNS and Unicode.
 
 For instance, the IDN `exämple.com` is represented in Punycode as `xn--exmple-cua.com`, and `👁🐝m.com` as `xn--m-w22scd.com`. The Punycode representation of these names conforms to the validation rules enforced by NetBox DNS name validation. Since the Punycode representation cannot be parsed by most humans, NetBox DNS displays and accepts the Unicode representation where it is possible and necessary.
@@ -677,7 +670,6 @@ For instance, the IDN `exämple.com` is represented in Punycode as `xn--exmple-c
 Internally, all IDNs are handled in a normalised form as Punycode. This ensures that the data coming from NetBox DNS can be handled by any tool and easily exported to name servers without any need for conversion to the standard format.
 
 ## Root Zones
-
 NetBox DNS provides experimental support for managing root zones. Root zones are usually maintained by the ICANN, but there are special cases in which it may make sense to use internal root name servers. Normally the root zone, designated by the name `.`, cannot be used in NetBox DNS as the name fails validation, but if necessary this can be enabled by setting the configuration flag `enable_root_zones` in the file `/opt/netbox/netbox/netbox/configuration.py` as follows:
 
 ```
@@ -692,8 +684,7 @@ PLUGINS_CONFIG = {
 
 This feature is disabled by default.
 
-## Uniqueness of Records
-
+## <a name="record_uniqueness"></a>Uniqueness of Records
 There is no standard requiring that records within a zone must be unique. Therefore, it is permissible to create records with the same name, type and value to a zone where the same record already exists. However, in the majority of cases, this is not a sensible approach and is not aligned with expectations. There are very few use cases for this approach. On the other hand, allowing duplicate records can cause problems with bulk imports and automated updates to zones.
 
 For this reason NetBox DNS enforces uniqueness of records by default in a way that no record can be created with a given name, type and value in a zone where an active record with the same values already exists. This enforcement can be disabled by setting the configuration variable `enforce_unique_records` to `False`:
@@ -738,7 +729,6 @@ RRSet cleanup completed.
 This modifies the TTL value for all records included in an RRSet to either the minimum or the maximum TTL value for all records in the RRSet. This can be specified by using either the `--min` or the `--max` option for the command. The default is to use the minimum TTL value.
 
 ## Tenancy
-
 With NetBox DNS 0.19.0 support for the NetBox tenancy feature was added. It is possible to assign all NetBox DNS objects with the exception of managed records to a tenant, making it easier to filter DNS resources by criteria like their assignment to a customer or department.
 
 Tenancy does not have any impact on uniqueness constraints within NetBox DNS.
@@ -755,7 +745,6 @@ RFC 2317 provides a solution to the issue of delegation of reverse zones for IPv
 The solution works is to define specific zones that hold the PTR records for such a subnet, and then insert CNAME records for these PTR records in the `in-addr.arpa` zone containing it. NetBox DNS release 0.22.0 and later support creating these RFC2317 zones and the automatic insertion of PTR records within them and, optionally, CNAME records in the containing `in-addr.arpa` zone that point to the PTR records.
 
 ### Designating a Zone as an RFC2317 Zone
-
 ![RFC2317 Zone Configuration](images/RFC2317ZoneConfiguration.png)
 
 The 'RFC2317 Prefix' specifies an IPv4 prefix with a network mask length of 25 or longer. If an address record is created for an address in this prefix, the PTR record will be created in the zone the prefix has been specified for.
@@ -765,7 +754,6 @@ If the checkbox labelled 'RFC2317 Parent Managed' is selected and there is an `i
 If the zone name is selected in a way that makes the zone is a sub-zone of the corresponding `in-addr.arpa` zone such as `32-63.0.168.192.in-addr.arpa`, the parent zone must delegate the zone to the name servers responsible for it if the authoritative name servers are not the same.
 
 ### RFC2317 Zones and Managed Parent
-
 If an RFC2317 zone has a managed parent zone in NetBox DNS, the detail view of the RFC2317 zone has a link to the parent zone.
 
 ![RFC2317 Child Zone](images/RFC2317ChildZoneDetail.png)
@@ -775,13 +763,11 @@ The parent zone, on the other hand, has a tab showing all RFC2317 child zones.
 ![RFC2317 Parent Zone](images/RFC2317ParentZoneDetail.png)
 
 ### RFC2317 CNAME Record Detail View
-
 For CNAME records created in RFC2317 parent zones, the detail view shows the A and PTR record(s) the RFC2317 CNAME record relates to in the card 'RFC2317 Targets':
 
 ![RFC2317 CNAME Record](images/RFC2317CNAMERecordDetail.png)
 
 ### Limitations
-
 The following limitations exist for RFC2317 zones:
 
 * An RFC2317 prefix must have a length of 25 or longer. Shorter prefixes are not covered by RFC 2317.
@@ -790,103 +776,250 @@ The following limitations exist for RFC2317 zones:
 * The RFC2317 CNAME records in parent zones are created on demand when a PTR in a child zone is created. Pre-creating them on creation of an RFC2317 zone is currently not supported.
 * The RFC2317 CNAME records are managed records and can not be edited manually. In normal operation this should never be necessary.
 
-## IPAM Coupling
+## IPAM DNSsync
+IPAM DNSsync is a new feature introduced with NetBox DNS 1.1 and replaces the experimental IPAM Coupling feature. The functionality of IPAM DNSsync builds upon the IPAM Coupling functionality, but extends it in several ways, providing a much more powerful solution in larger environments.
 
-Starting with NetBox DNS 0.20.0, a new experimental feature that enables coupling between NetBox DNS and NetBox IPAM data is available. This feature allows users to link IP addresses in IPAM to NetBox DNS address records. The old IPAM integration feature was discontinued in favour of the new and improved functionality.
+**This solution totally replaces IPAM Coupling.** It is not possible to continue to use IPAM Coupling starting from NetBox DNS version 1.1. IPAM Coupling has always been labelled an experimental feature which was bound to change significantly, and with the release of NetBox DNS 1.1 this change is taking place.
 
-Thanks to Jean Benoît for this contribution!
+### Basic functionality
+The functionality of IPAM DNSsync is based on mapping IPAM Prefix objects to NetBox DNS View objects. An IPAM prefix can be assigned to one or multiple DNS views via the edit view for View objects.
 
-### Enabling IPAM Coupling
+If a prefix is assigned to one or more views, NetBox DNS checks all IP addresses in the prefix for their 'DNS Name' field. If the DNS name ends in the zone name of any zone within the view, an address record within that zone is created so that the records's FQDN matches the DNS name of the IP address.
 
-The new experimental feature needs to be enabled in the NetBox configuration file by setting its flag:
+If there are multiple matching zones within the view, the one with the longest name is chosen. For example, if the DNS name is `name1.zone1.example.com` and there are zones `example.com` and `zone1.example.com` in the view, the resulting DNS record will be `name1` in zone `zone1.example.com` rather than `name1.zone1` in zone `example.com`.
+
+If there is no matching zone, no record will be created.
+
+### Differences from IPAM Coupling
+The main differences between IPAM DNSsync and IPAM Coupling are the much higher degree of automation of the interaction between IPAM and NetBox DNS, and the extended functionality the new feature provides compared to IPAM Coupling. In more detail:
+
+* IPAM DNSsync does not require manual interaction when an IP address is created or updated. Particularly it ist not necessary to manually define the name and the zone of the address record for an IP address, but only a value in the 'DNS Name' field and a mapping from prefixes to DNS views
+* IPAM DNSsync does not require any custom fields on IPAddress objects, but supports the relevant part of the IPAM Coupling custom fields ('Disable PTR' and 'TTL') and adds a new field 'Disable DNSsync' to make it possible to exempt IP addresses from record generation
+* IPAM DNSsync is not limited to one DNS record per IP address, which was a major limitation in split horizon DNS settings. It is now possible to create multiple records in zones in different views for the same IP address
+* With IPAM Coupling it was possible to create inconsistent date, i.e. by first adding a record `name1.zone1` in zone `example.com` and then adding a new zone `zone1.example.com` to the DNS model. This creates a situation where the old address record can no longer be found due to the zone hierarchy. IPAM DNSsync automatically migrates the record(s) in such cases.
+* An IPAM Coupling functionality that is lost in IPAM DNSsync is the observance of NetBox DNS permissions in IPAM operations, and especially object-level permissions. The operation of DNSsync is a pretty complicated thing, where just creating an IP address may result in
+	* the creation of an address record
+	* the update of the zone SOA SERIAL for the address record zone
+	* the creation of a new SOA record for the address record zone
+	* the creation of a PTR record for the address record
+	* the update of the zone SOA SERIAL for the PTR record zone
+	* the creation of a new SOA record for the PTR record zone
+	* the creation of an RFC2317 CNAME record
+	* the update of the zone SOA SERIAL for the RFC2317 CNAME record zone
+	* the creation of a new SOA record for the RFC2317 CNAME record zone
+
+	and that is the simplest case. Updating records, changing view assignments, renaming zones etc. can each create the same operations for multiple records, and whether or not these actions are performed is depending on not only the operation itself, but also the data that is changed. This is a nightmare to validate, and a squared nightmare to test. Maintaining object permission validation was just impractical as long as Django's functionality does not change, so the functionality was dropped. If necessary, restrictions can be implemented using NetBox custom validators, but that is out of scope for this plugin.
+* IPAM DNSsync no longer overwrites the 'DNS Name' field of IP addresses but uses it to create DNS records. There is one downside to this, which is that IDNs cannot be entered directly but have to be formulated in Punycode, but on the upside the 'DNS Name' field is now properly validated.
+
+### Multiple assigned views per prefix
+If there is more than one view assigned, the zone matching takes place for each view independently, and if there are matching zones in two or more views, an address record will be created in each of the zones. That way, a record can be added to more than one zone in a split horizon DNS setup.
+
+### Prefix hierarchy
+When determining the views that will be searched for matching zones, NetBox DNS uses the longest prefix containing the IP address that is assigned to one or more views. That way, hierarchical matching is possible. Take the following example:
+
+Prefix                              | Views
+--------                            | ---------------
+`10.0.0.0/8`                        | `View 1`
+`10.1.0.0/16`                       | `View 2`
+`10.1.1.0/24`                       | `View 1, View 2`
+
+In this example, the whole prefix `10.0.0.0/8` is assigned to `View 1`. All sub-prefixes of `10.0.0.0/8` inherit that assignment except for `10.1.0.0/16`, which is assigned to `View 2` (and only `View 2`, as inheritance is not cumulative). There is, however, a sub-prefix `10.1.1.0/24` that is assigned to both `View 1` and `View 2`.
+
+Sub-prefixes that are not assigned to a view inherit their views from their parent prefix, so in this example the prefix `10.0.1.0/24` would be assigned to `View 1` by inheritance, `10.1.1.0/24` to `View 2`, and `10.1.1.128/25` to `View 1` and `View 2`.
+
+If it should become necessary to explicitly disable DNS record generation for a given prefix that otherwise inherits a view assignment from its parents, the solution is to create a view (e.g. named 'NoDNS') that doesn't contain any zones and assign the prefix to that view.
+
+The mechanism is exactly the same for IPv4 and IPv6 prefixes.
+
+### Assigning views to prefixes
+Apart from the standard mechanism of configuring the prefixes assigned to a view in the edit view for the view, it is sometimes easier to assign views to prefixes. This can be done using the 'DNS Views' button in the prefix detail view:
+
+![DNS Views Button](images/IPAMDNSsyncDNSViewsButton.png)
+
+This button opens a form that allows to add views to a prefix instead of vice versa:
+
+![DNS Views Button](images/IPAMDNSsyncPrefixViews.png)
+
+If there are any inherited views for the prefix there is a table showing the parent they were inherited from and the inherited views. If any views are assigned to a prefix, that list of views will override the inherited views.
+
+### DNS records
+The records created by IPAM DNSsync are managed records, i.e. they cannot be modified manually. There are, however, some ways in which record creation can be influenced.
+
+#### Record status
+The status of an automatically generated address record is controlled by the status of the IP address object the record is created for. If the address object has one of the statuses `Active`, `DHCP` or `SLAAC`, the address record created will be `Active`, otherwise `Inactive`.
+
+This mapping can be controlled via the plugin configuration by setting the variable `dnssync_ipaddress_active_status`. The Variable is a list of IP address statuses that result in an active address record and can be overridden in `confguration.py` like in the following example:
 
 ```
+from ipam.choices import IPAddressStatusChoices
+
+...
+
 PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
-        'feature_ipam_coupling': True,
+        'dnssync_ipaddress_active_status': [
+            IPAddressStatusChoices.STATUS_ACTIVE,
+            IPAddressStatusChoices.STATUS_RESERVED,
+            IPAddressStatusChoices.STATUS_DHCP,
+        ]
         ...
     },
 }
 ```
 
-Furthermore, a number of custom fields on `ipam.IPAddress` objects are required for the feature to function correctly. These custom fields need to be created using the Django management command `setup_coupling`:
+This makes IP addresses with the status `Active`, `Reserved` and `DHCP` create active address records, while all other IP address statuses result in inactive address records.
+
+Please note that changing this setting will not result in immediate changes to the address record statuses, but only be observed when the IP address is saved or updated.
+
+#### Creating the IPAM DNSsync custom fields
+For the next settings, the optional custom fields for IPAM DNSsync need to be created. This can be done by running the manage command `setup_dnssync` from the command line:
 
 ```
-/opt/netbox/netbox/manage.py setup_coupling
+/opt/netbox/netbox/manage.py setup_dnssync
 ```
 
-In order to remove the custom fields and all related data, the same command can be used with the option `--remove`.
+This comamnd creates three custom fields and removes old custom fields formerly used by the experimental `IPAM Coupling` feature except for 'TTL' and 'Disable PTR'. The function of these fields has been retained from IPAM Coupling for convenience, so the settings made for individual IP addresses will not be lost.
 
-After these steps, a restart of NetBox is required.
+Unlike with IPAM Coupling, the custom fields are optional. They are required to make use of the three settings described below, but the general DNSsync functionality does not require them.
 
-### Using IPAM Coupling
+#### Record TTL
+To explicitly set the TTL for an address record, the optional custom fields need to be set up. Then it is possible to specify the TTL by using the 'TTL' custom field for the IP address. The value entered in this field will then be used for the address record being created.
 
-The new custom fields allow for the automatic generation of a DNS address record for an IP address. To do this, define a name for the record in the 'Name' custom field and select a zone in the 'Zone' custom field in the DNS group.
+#### Disable PTR
+Normally, NetBox DNS automatically creates PTR records for address records if the PTR zone is present. To disable that functionality for a record, the 'Disable PTR' flag can be set.
 
-It is also possible to set a TTL value for the records created via IPAM coupling, and the 'Disable PTR' option can be set as well. The 'Disable PTR' option is set to 'False' by default, which results in the creation of pointer records for address records associated with IP addresses.
+To set the flag for an address record created by IPAM DNSsync, the optional custom field `Disable PTR` can be used on the IP address. If set, it results in the corresponding flag being set for the IP address, so no PTR record will be created even if the reverse zone is defined in the view.
 
-![Custom Fields for IPAM Coupling](images/IPAMCouplingCustomFields.png)
+#### Disable address record creation
+To disable the creation of an address record altogether, either leave the 'DNS Name' field empty or check the optional custom field `Disable DNSsync`. No address record will be created if that field is checked.
 
-Once the IP address has been saved, NetBox DNS will automatically create a managed address record for it in the selected zone, using the name from the 'Name' custom field. The 'DNS Name' field for the IP address will be set to the FQDN of the resulting address record.
+### Conflicts
+When IPAM DNSsync creates address records there may be conflicts caused by duplicate address records (which are by defauld not allowed) or address records that otherwise violate DNS restrictions like having the same name as a CNAME in the same zone, which DNS does not allow.
 
-If the TTL field was filled in, the TTL value for the newly created or updated address record will be set to that value.
+Conflicts like these can happen on several levels, for example when IP addresses are created or updated, or when prefixes are assigned to deassigned from views or deleted (all of these operations can change the inheritance by which prefixes and IP addresses are assigned to zones, so they may result in new conflicts. The current solution to handle that kind of conflict is to report it and refuse to execute the operation that would cause the DNS misconfiguration.
 
-If the 'Disable PTR' checkbox is selected, the resulting address record will have that option set as well and no pointer record will be created for the address.
+An example of a conflict at IP address level:
+![DNS Conflict for IPAddress](images/IPAMDNSsyncIPAddressConflict.png)
 
-The IP address is now linked to the address record in the following ways:
+Another example shows a conflict at View level when assigning a prefix:
+![DNS Conflict for View Prefix Assignment](images/IPAMDNSsyncPrefixConflict.png)
 
-* When one of the custom fields for the IP address is updated, the DNS record is updated as well. This includes changing the name as well as moving it to a different DNS zone
-* When the IP address is deleted, the managed DNS record is deleted as well
-* When the DNS zone is renamed, the 'DNS Name' for the IP address is updated to reflect the zone's new name
-* When the DNS zone is deleted, the address record is deleted and the connection from the IP address object is cleared
-
-#### Record Status set by IPAM Coupling
-
-The status of the address record created for an IP address depends on the status of the IP address. By default, address records for IP addresses in the statuses 'Active', 'DHCP' and 'SLAAC' are set to 'Active', while the status of the address record will be 'Inactive' in all other cases.
-
-This mapping can be configured using the configuration variable `ipam_coupling_ip_active_status_list` in the plugin configuration. This variable contains an array of status names. The default setting for the status list is `None`, which is equivalent to
-
-```
-PLUGINS_CONFIG = {
-    'netbox_dns': {
-        ...
-        'ipam_coupling_ip_address_status_list': [
-            'active',
-            'dhcp',
-            'slaac',
-        ],
-        ...
-    },
-}
-```
+The solution is to either disable automatic DNS record configuration for the affected IP addresses (which retains the original DNS records) or to remove or deactivate the existing address records and try again.
 
 ### Additional Information for IP Addresses and DNS Records
-
 When a link between an IP address and a DNS address record is present, additional panes will appear in the IPAM IP address and NetBox DNS record view, as well as in the detail views for NetBox DNS managed records.
 
-#### IP Address Information
+#### IPAM IP Address Information
+For each IP address with DNS address records created by IPAM DNSsync, the detail view has a pane showing a list of the addresses created for it.
 
-If a DNS address record is linked to an IP address, the detail view for the IP address will show an additional pane displaying that address record.
+![Related DNS Address Record](images/IPAMDNSsyncRelatedAddressRecords.png)
 
-![Related DNS Address Record](images/IPAMCouplingRelatedAddressRecord.png)
+If NetBox DNS also PTR records for the created DNS address record, the detail view for the IP address will contain a second pane showing these pointer records.
 
-If NetBox DNS also created a PTR record for the linked DNS address record, the detail view for the IP address will contain an a second additional pane showing that pointer record.
+![Related DNS Address Record](images/IPAMDNSsyncRelatedPointerRecords.png)
 
-![Related DNS Address Record](images/IPAMCouplingRelatedPointerRecord.png)
+#### IPAM Prefix Information
+For each prefix assigned to one or more DNS views, the detail view has a pane showing a list of the views it is assiged to.
+
+![Assigned DNS Views](images/IPAMDNSsyncPrefixAssignedViews.png)
+
+If the prefix does not have any views directly assigned to it, but inherits view from a parent prefix, the pane shows the list of inherited views instead:
+
+![Inherited DNS Views](images/IPAMDNSsyncPrefixInheritedViews.png)
+
+#### DNS View Information
+For each DNS view with one or more assigned prefixes, the detail view has a pane showing a list of the prefixes assigned to it.
+
+![Related DNS Address Record](images/IPAMDNSsyncViewRelatedPrefixes.png)
 
 #### DNS Record Information
-
 The detail views for the address and pointer records created for a coupled IP address include a link to that IP address, which can be used to navigate to the address.
 
-![Record Detail View for Coupled IP Address](images/IPAMCouplingRecordDetailView.png)
+![Record Detail View for Coupled IP Address](images/IPAMDNSsyncRecordDetailView.png)
+
+### Conflict remediation
+In the standard configuration, NetBox DNS checks records for uniqueness and does not allow to have two records with the same name, type and value in the same zone (see [Uniqueness of Records](#record_uniqueness)).
+
+For records automatically generated by DNSsync, this is not generally the desired behaviour:
+
+* It cannot be taken for granted that IP addresses are unique, not even within a VRF
+* When an existing environment is migrated to NetBox DNS, there may be existing address records that conflict with the autogenerated ones
+
+For this reason, NetBox DNS does not check uniqueness for address records automatically generated by DNSsync, and there is an option to deactivate other conflicting address records automatically. This is not enabled by default, but it can be switched on with the configuration variable `dnssync_conflict_deactivate`:
+
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'dnssync_conflict_deactivate': True,
+        ...
+    },
+}
+```
+
+If this flag is set to `True`, NetBox DNS deactivates existing address records if there is a conflict with an address record automatically generated by IPAM DNSsync. This generally makes it much easier to transition from manually created address records to IPAM DNSsync.
+
+This only affects address records, other records that may cause conflicts with automatically generated address records (such as `CNAME` records with the same name) still must be manually cleaned up. Please also note that the address records are only deactivated, not deleted. Reviewing the changes and deleting records that are no longer needed is left to the user.
+
+### Disabling DNSsync
+IPAM DNSsync modifies the core functionality for IPAM `Prefix` and `IPAddress` objects in some ways by modifying the functionality of saving and deleting objects of these classes. If the functionality of IPAM DNSsync is not required and the impact of having NetBox DNS installed on systems where this is the case needs to be minimized, these mechanisms can be disabled by setting the `dnssync_disabled` variable in `configuration.py`:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'dnssync_disabled': True,
+        ...
+    },
+}
+```
+This will disable the DNSsync functionality and the GUI elements required to use it completely, but will not delete any data already present in the database.
+
+### Handling duplicate IP addresses
+Depending on the NetBox configuration and the settings for individual VRFs, it can be permitted to create identical IP addresses multiple times. Since the standard settings for NetBox DNS prevent creating duplicate records (which would be a consequence of having duplicate IP addresses with the same DNS name), this creates a potential conflict.
+
+When a duplicate IP address is created with the  same DNS name as an existing one, the following criteria are checked:
+
+* NetBox DNS is set to `enforce_unique_records = True`
+* Both IP addresses are in an active state, defined by the NetBox DNS setting `dnssync_ipaddress_active_status`
+* Neither IP address has the custom field `ipaddress_dns_disabled` set to True
+
+If all criteria apply, NetBox DNS will refuse to create or update the IP address with the following error message:
+
+![Duplicate IP Address](images/IPAMDNSsyncDuplicateIPAddressError.png)
+
+### Using short zone names
+Normally, DNSsync does not create address records in zones with less than two labels in their name (TLDs and root zones). In some cases it may be desirable to allow this, e.g. in enterprises where a one-label domain is used internally.
+
+To allow creating names in domains with one label, configure the `dnssync_minimum_zone_labels` option:
+
+```
+PLUGINS_CONFIG = {
+    'netbox_dns': {
+        ...
+        'dnssync_minimum_zone_labels': 1,
+        ...
+    },
+}
+```
+
+A setting of `1` allows names like `name.zone` to be created (provided there is a zone named `zone` in NetBox DNS. Please note that this is generally not a good idea. Setting the value to `0` would allow to create address records in the root zone, which is a *very bad* idea.
+
+### Rebuilding DNSsync relations
+In some cases it can happen that there are stale managed records or the connection between IP addresses and their related DNS records gets into an inconsistent state. This is also possible when moving from IPAM Coupling to IPAM DNSsync, where linked DNS address records may be left lying around despite not having a relation with an IP address via a Prefix to View assignment.
+
+The management command `rebuild_dnssync` can be used to clean up the relations and remove orphaned DNS records.
+
+```
+/opt/netbox/netbox/manage.py rebuild_dnssync
+```
 
 ## UI Customization
-
 There are limited options to customize the appearance of the NetBox DNS plugin.
 
 ### Name of the Main Menu Item
-
 The default name of the submenu NetBox DNS uses in the NetBox sidebar is 'NetBox DNS'. Using the configuration variable `menu_name` in the plugin configuration this can be changed to a different value, e.g. 'DNS':
 
 ```
@@ -900,7 +1033,6 @@ PLUGINS_CONFIG = {
 ```
 
 ### Use a Submenu of the 'Plugins' Menu
-
 In some cases it might be desired not to provide a main menu item for NetBox DNS but use a submenu of NetBox' standard 'Plugins' menu instead. This can be achieved by setting the configuration variable `top_level_menu` to `False` (the default value is `True`):
 
 ```

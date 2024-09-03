@@ -34,6 +34,15 @@ class ViewAPITestCase(
     def _get_queryset(self):
         return self.model.objects.filter(default_view=False)
 
+    @classmethod
+    def setUpTestData(cls):
+        views = (
+            View(name="test1"),
+            View(name="test2"),
+            View(name="test3"),
+        )
+        View.objects.bulk_create(views)
+
     @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
     def test_list_objects_anonymous(self):
         url = f"{self._get_list_url()}?default_view=false"
@@ -53,12 +62,3 @@ class ViewAPITestCase(
 
         self.assertEqual(len(response.data["results"]), self._get_queryset().count())
         self.assertEqual(sorted(response.data["results"][0]), self.brief_fields)
-
-    @classmethod
-    def setUpTestData(cls):
-        views = (
-            View(name="test1"),
-            View(name="test2"),
-            View(name="test3"),
-        )
-        View.objects.bulk_create(views)

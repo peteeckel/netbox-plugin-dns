@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
-from tenancy.api.serializers_.tenants import TenantSerializer
+from tenancy.api.serializers import TenantSerializer
+from ipam.api.serializers import PrefixSerializer
 
 from netbox_dns.models import View
 
@@ -16,8 +17,38 @@ class ViewSerializer(NetBoxModelSerializer):
     default_view = serializers.BooleanField(
         read_only=True,
     )
+    prefixes = PrefixSerializer(
+        many=True,
+        nested=True,
+        read_only=False,
+        required=False,
+        help_text="IPAM Prefixes assigned to the View",
+    )
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )
 
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
+    def create(self, validated_data):
+        prefixes = validated_data.pop("prefixes", None)
+
+        view = super().create(validated_data)
+
+        if prefixes is not None:
+            view.prefixes.set(prefixes)
+
+        return view
+
+    def update(self, instance, validated_data):
+        prefixes = validated_data.pop("prefixes", None)
+
+        view = super().update(instance, validated_data)
+
+        if prefixes is not None:
+            view.prefixes.set(prefixes)
+
+        return view
 
     class Meta:
         model = View
@@ -33,5 +64,6 @@ class ViewSerializer(NetBoxModelSerializer):
             "last_updated",
             "custom_fields",
             "tenant",
+            "prefixes",
         )
         brief_fields = ("id", "url", "display", "name", "default_view", "description")

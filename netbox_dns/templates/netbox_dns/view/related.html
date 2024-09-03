@@ -1,0 +1,17 @@
+{% load perms %}
+
+{% if perms.netbox_dns.view_view %}
+    {% if assigned_views %}
+        {% if assigned_views.rows|length == 1 %}
+            {% include 'inc/panel_table.html' with table=assigned_views heading='Assigned DNS View' %}
+        {% else %}
+            {% include 'inc/panel_table.html' with table=assigned_views heading='Assigned DNS Views' %}
+        {% endif %}
+    {% elif inherited_views %}
+        {% if inherited_views.rows|length == 1 %}
+            {% include 'inc/panel_table.html' with table=inherited_views heading='Inherited DNS View' %}
+        {% else %}
+            {% include 'inc/panel_table.html' with table=inherited_views heading='Inherited DNS Views' %}
+        {% endif %}
+    {% endif %}
+{% endif %}
