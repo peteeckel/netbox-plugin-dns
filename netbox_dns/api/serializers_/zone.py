@@ -6,7 +6,7 @@ from tenancy.api.serializers import TenantSerializer
 from .view import ViewSerializer
 from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
-from .contact import ContactSerializer
+from .registration_contact import RegistrationContactSerializer
 from .zone_template import ZoneTemplateSerializer
 
 from ..nested_serializers import NestedZoneSerializer
@@ -62,28 +62,28 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text="The registrar the domain is registered with",
     )
-    registrant = ContactSerializer(
+    registrant = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The owner of the domain",
     )
-    admin_c = ContactSerializer(
+    admin_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The administrative contact for the domain",
     )
-    tech_c = ContactSerializer(
+    tech_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
         help_text="The technical contact for the domain",
     )
-    billing_c = ContactSerializer(
+    billing_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,

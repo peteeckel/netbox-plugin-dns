@@ -1,7 +1,7 @@
 from .schema import (
     NetBoxDNSViewQuery,
     NetBoxDNSNameServerQuery,
-    NetBoxDNSContactQuery,
+    NetBoxDNSRegistrationContactQuery,
     NetBoxDNSRegistrarQuery,
     NetBoxDNSZoneQuery,
     NetBoxDNSRecordQuery,
@@ -14,7 +14,7 @@ schema = [
     NetBoxDNSViewQuery,
     NetBoxDNSZoneQuery,
     NetBoxDNSRecordQuery,
-    NetBoxDNSContactQuery,
+    NetBoxDNSRegistrationContactQuery,
     NetBoxDNSRegistrarQuery,
     NetBoxDNSZoneTemplateQuery,
     NetBoxDNSRecordTemplateQuery,

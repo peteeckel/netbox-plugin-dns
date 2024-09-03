@@ -151,21 +151,21 @@ registrar_menu_item = PluginMenuItem(
 )
 
 contact_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:contact_list",
-    link_text="Contacts",
-    permissions=["netbox_dns.view_contact"],
+    link="plugins:netbox_dns:registrationcontact_list",
+    link_text="Registration Contacts",
+    permissions=["netbox_dns.view_registrationcontact"],
     buttons=(
         PluginMenuButton(
-            "plugins:netbox_dns:contact_add",
+            "plugins:netbox_dns:registrationcontact_add",
             "Add",
             "mdi mdi-plus-thick",
-            permissions=["netbox_dns.add_contact"],
+            permissions=["netbox_dns.add_registrationcontact"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:contact_import",
+            "plugins:netbox_dns:registrationcontact_import",
             "Import",
             "mdi mdi-upload",
-            permissions=["netbox_dns.add_contact"],
+            permissions=["netbox_dns.add_registrationcontact"],
         ),
     ),
 )

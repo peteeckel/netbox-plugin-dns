@@ -13,7 +13,7 @@ from netbox_dns.models import (
     View,
     Zone,
     Record,
-    Contact,
+    RegistrationContact,
     Registrar,
     ZoneTemplate,
     RecordTemplate,
@@ -23,7 +23,7 @@ from .filters import (
     NetBoxDNSViewFilter,
     NetBoxDNSZoneFilter,
     NetBoxDNSRecordFilter,
-    NetBoxDNSContactFilter,
+    NetBoxDNSRegistrationContactFilter,
     NetBoxDNSRegistrarFilter,
     NetBoxDNSZoneTemplateFilter,
     NetBoxDNSRecordTemplateFilter,
@@ -77,19 +77,31 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     )
     registry_domain_id: str | None
     registrant: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     admin_c: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     tech_c: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     billing_c: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     rfc2317_prefix: str | None
@@ -126,8 +138,10 @@ class NetBoxDNSRecordType(NetBoxObjectType):
     )
 
 
-@strawberry_django.type(Contact, fields="__all__", filters=NetBoxDNSContactFilter)
-class NetBoxDNSContactType(NetBoxObjectType):
+@strawberry_django.type(
+    RegistrationContact, fields="__all__", filters=NetBoxDNSRegistrationContactFilter
+)
+class NetBoxDNSRegistrationContactType(NetBoxObjectType):
     name: str
     contact_id: str
     description: str
@@ -178,19 +192,31 @@ class NetBoxDNSZoneTemplateType(NetBoxObjectType):
         | None
     )
     registrant: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     admin_c: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     tech_c: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
     billing_c: (
-        Annotated["NetBoxDNSContactType", strawberry.lazy("netbox_dns.graphql.types")]
+        Annotated[
+            "NetBoxDNSRegistrationContactType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
         | None
     )
 

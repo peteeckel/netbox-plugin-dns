@@ -192,7 +192,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     registrant = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         verbose_name="Registrant",
         help_text="The owner of the domain",
@@ -200,7 +200,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     admin_c = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         verbose_name="Admin Contact",
         related_name="admin_c_zones",
@@ -209,16 +209,16 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     tech_c = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Tech Contact",
+        verbose_name="Technical Contact",
         related_name="tech_c_zones",
         help_text="The technical contact for the domain",
         blank=True,
         null=True,
     )
     billing_c = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         verbose_name="Billing Contact",
         related_name="billing_c_zones",

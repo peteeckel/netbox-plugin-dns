@@ -1,10 +1,10 @@
 from utilities.testing import APIViewTestCases
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
-from netbox_dns.models import Contact
+from netbox_dns.models import RegistrationContact
 
 
-class ContactAPITestCase(
+class RegistrationContactAPITestCase(
     APITestCase,
     APIViewTestCases.GetObjectViewTestCase,
     APIViewTestCases.ListObjectsViewTestCase,
@@ -14,7 +14,7 @@ class ContactAPITestCase(
     NetBoxDNSGraphQLMixin,
     APIViewTestCases.GraphQLTestCase,
 ):
-    model = Contact
+    model = RegistrationContact
     brief_fields = ["contact_id", "description", "display", "id", "name", "url"]
 
     create_data = [
@@ -30,8 +30,8 @@ class ContactAPITestCase(
     @classmethod
     def setUpTestData(cls):
         contacts = (
-            Contact(name="John Doe", contact_id="COM-REG-JOHNDOE-23"),
-            Contact(name="John Doe", contact_id="ORG-REG-JOHNDOE-23"),
-            Contact(name="Jane Doe", contact_id="COM-REG-JANEDOE-23"),
+            RegistrationContact(name="John Doe", contact_id="COM-REG-JOHNDOE-23"),
+            RegistrationContact(name="John Doe", contact_id="ORG-REG-JOHNDOE-23"),
+            RegistrationContact(name="Jane Doe", contact_id="COM-REG-JANEDOE-23"),
         )
-        Contact.objects.bulk_create(contacts)
+        RegistrationContact.objects.bulk_create(contacts)

@@ -8,7 +8,7 @@ from netbox_dns.models import (
     RecordTemplate,
     NameServer,
     Registrar,
-    Contact,
+    RegistrationContact,
 )
 from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.filtersets import ZoneTemplateFilterSet
@@ -50,11 +50,11 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         Registrar.objects.bulk_create(cls.registrars)
 
         cls.contacts = (
-            Contact(name="Paul Example", contact_id="4242"),
-            Contact(name="Fred Example", contact_id="2323"),
-            Contact(name="Jack Example", contact_id="0815"),
+            RegistrationContact(name="Paul Example", contact_id="4242"),
+            RegistrationContact(name="Fred Example", contact_id="2323"),
+            RegistrationContact(name="Jack Example", contact_id="0815"),
         )
-        Contact.objects.bulk_create(cls.contacts)
+        RegistrationContact.objects.bulk_create(cls.contacts)
 
         cls.record_templates = [
             RecordTemplate(

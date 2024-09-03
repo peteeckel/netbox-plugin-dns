@@ -2,18 +2,18 @@ from django.test import TestCase
 
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import Contact
-from netbox_dns.filtersets import ContactFilterSet
+from netbox_dns.models import RegistrationContact
+from netbox_dns.filtersets import RegistrationContactFilterSet
 
 
-class ContactFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
-    queryset = Contact.objects.all()
-    filterset = ContactFilterSet
+class RegistrationContactFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
+    queryset = RegistrationContact.objects.all()
+    filterset = RegistrationContactFilterSet
 
     @classmethod
     def setUpTestData(cls):
         cls.contacts = (
-            Contact(
+            RegistrationContact(
                 name="Paul Example",
                 contact_id=4242,
                 organization="Example Corp.",
@@ -28,7 +28,7 @@ class ContactFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 fax_ext="23",
                 email="paul@example.com",
             ),
-            Contact(
+            RegistrationContact(
                 name="Fred Example",
                 contact_id=2323,
                 organization="Example Corp.",
@@ -43,7 +43,7 @@ class ContactFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 fax_ext="24",
                 email="fred@example.com",
             ),
-            Contact(
+            RegistrationContact(
                 name="Jack Example",
                 contact_id=4223,
                 organization="Example Trust",
@@ -59,7 +59,7 @@ class ContactFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 email="jack@example.org",
             ),
         )
-        Contact.objects.bulk_create(cls.contacts)
+        RegistrationContact.objects.bulk_create(cls.contacts)
 
     def test_name(self):
         params = {"name": ["Fred Example", "Paul Example"]}

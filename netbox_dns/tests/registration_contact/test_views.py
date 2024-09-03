@@ -1,10 +1,10 @@
 from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import Contact
+from netbox_dns.models import RegistrationContact
 
 
-class ContactViewTestCase(
+class RegistrationContactViewTestCase(
     ModelViewTestCase,
     ViewTestCases.GetObjectViewTestCase,
     ViewTestCases.GetObjectChangelogViewTestCase,
@@ -16,17 +16,17 @@ class ContactViewTestCase(
     ViewTestCases.BulkEditObjectsViewTestCase,
     ViewTestCases.BulkDeleteObjectsViewTestCase,
 ):
-    model = Contact
+    model = RegistrationContact
 
     @classmethod
     def setUpTestData(cls):
         cls.contacts = (
-            Contact(name="John Doe", contact_id="COM-REG-JOHNDOE-23"),
-            Contact(name="John Doe", contact_id="ORG-REG-JOHNDOE-23"),
-            Contact(name="Jane Doe", contact_id="COM-REG-JANEDOE-23"),
+            RegistrationContact(name="John Doe", contact_id="COM-REG-JOHNDOE-23"),
+            RegistrationContact(name="John Doe", contact_id="ORG-REG-JOHNDOE-23"),
+            RegistrationContact(name="Jane Doe", contact_id="COM-REG-JANEDOE-23"),
         )
 
-        Contact.objects.bulk_create(cls.contacts)
+        RegistrationContact.objects.bulk_create(cls.contacts)
 
         tags = create_tags("Alpha", "Bravo", "Charlie")
 

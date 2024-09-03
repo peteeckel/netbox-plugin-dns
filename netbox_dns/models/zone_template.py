@@ -47,7 +47,7 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
     registrant = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="+",
         help_text="The owner of the domain",
@@ -55,7 +55,7 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
     admin_c = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         verbose_name="Admin contact",
         related_name="+",
@@ -64,7 +64,7 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
     tech_c = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         verbose_name="Tech contact",
         related_name="+",
@@ -73,7 +73,7 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
     billing_c = models.ForeignKey(
-        to="Contact",
+        to="RegistrationContact",
         on_delete=models.SET_NULL,
         verbose_name="Billing contact",
         related_name="+",

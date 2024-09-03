@@ -7,7 +7,7 @@ from netbox_dns.models import (
     View,
     Zone,
     Record,
-    Contact,
+    RegistrationContact,
     Registrar,
     ZoneTemplate,
     RecordTemplate,
@@ -17,7 +17,7 @@ from netbox_dns.filtersets import (
     ViewFilterSet,
     ZoneFilterSet,
     RecordFilterSet,
-    ContactFilterSet,
+    RegistrationContactFilterSet,
     RegistrarFilterSet,
     ZoneTemplateFilterSet,
     RecordTemplateFilterSet,
@@ -60,9 +60,9 @@ class NetBoxDNSRecordTemplateFilter(BaseFilterMixin):
     pass
 
 
-@strawberry_django.filter(Contact, lookups=True)
-@autotype_decorator(ContactFilterSet)
-class NetBoxDNSContactFilter(BaseFilterMixin):
+@strawberry_django.filter(RegistrationContact, lookups=True)
+@autotype_decorator(RegistrationContactFilterSet)
+class NetBoxDNSRegistrationContactFilter(BaseFilterMixin):
     pass
 
 

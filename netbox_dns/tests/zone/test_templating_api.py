@@ -7,7 +7,7 @@ from tenancy.models import Tenant
 from netbox_dns.models import (
     NameServer,
     Registrar,
-    Contact,
+    RegistrationContact,
     RecordTemplate,
     ZoneTemplate,
     Zone,
@@ -44,13 +44,13 @@ class ZoneTemplatingAPITestCase(APITestCase):
         Registrar.objects.bulk_create(cls.registrars)
 
         cls.contacts = (
-            Contact(contact_id="contact-1"),
-            Contact(contact_id="contact-2"),
-            Contact(contact_id="contact-3"),
-            Contact(contact_id="contact-4"),
-            Contact(contact_id="contact-5"),
+            RegistrationContact(contact_id="contact-1"),
+            RegistrationContact(contact_id="contact-2"),
+            RegistrationContact(contact_id="contact-3"),
+            RegistrationContact(contact_id="contact-4"),
+            RegistrationContact(contact_id="contact-5"),
         )
-        Contact.objects.bulk_create(cls.contacts)
+        RegistrationContact.objects.bulk_create(cls.contacts)
 
         cls.record_templates = (
             RecordTemplate(

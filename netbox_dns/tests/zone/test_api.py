@@ -1,7 +1,7 @@
 from utilities.testing import APIViewTestCases, create_tags
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
-from netbox_dns.models import View, Zone, NameServer, Registrar, Contact
+from netbox_dns.models import View, Zone, NameServer, Registrar, RegistrationContact
 
 
 class ZoneAPITestCase(
@@ -62,12 +62,12 @@ class ZoneAPITestCase(
         Registrar.objects.bulk_create(registrars)
 
         contacts = (
-            Contact(contact_id="contact-1"),
-            Contact(contact_id="contact-2"),
-            Contact(contact_id="contact-3"),
-            Contact(contact_id="contact-4"),
+            RegistrationContact(contact_id="contact-1"),
+            RegistrationContact(contact_id="contact-2"),
+            RegistrationContact(contact_id="contact-3"),
+            RegistrationContact(contact_id="contact-4"),
         )
-        Contact.objects.bulk_create(contacts)
+        RegistrationContact.objects.bulk_create(contacts)
 
         zones = (
             Zone(

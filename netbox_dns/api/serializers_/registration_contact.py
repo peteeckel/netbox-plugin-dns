@@ -2,19 +2,19 @@ from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
 
-from netbox_dns.models import Contact
+from netbox_dns.models import RegistrationContact
 
 
-__all__ = ("ContactSerializer",)
+__all__ = ("RegistrationContactSerializer",)
 
 
-class ContactSerializer(NetBoxModelSerializer):
+class RegistrationContactSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:contact-detail"
+        view_name="plugins-api:netbox_dns-api:registrationcontact-detail"
     )
 
     class Meta:
-        model = Contact
+        model = RegistrationContact
         fields = (
             "id",
             "url",

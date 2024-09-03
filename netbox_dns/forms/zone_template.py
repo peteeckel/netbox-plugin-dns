@@ -22,7 +22,7 @@ from netbox_dns.models import (
     RecordTemplate,
     NameServer,
     Registrar,
-    Contact,
+    RegistrationContact,
 )
 
 
@@ -117,22 +117,22 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         label="Registrar",
     )
     registrant_id = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Registrant",
     )
     admin_c_id = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Admin-C",
     )
     tech_c_id = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Tech-C",
     )
     billing_c_id = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Billing-C",
     )
@@ -162,7 +162,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         },
     )
     registrant = CSVModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
         help_text="Owner of the domain",
@@ -171,7 +171,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         },
     )
     admin_c = CSVModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
         help_text="Administrative contact for the domain",
@@ -180,7 +180,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         },
     )
     tech_c = CSVModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
         help_text="Technical contact for the domain",
@@ -189,7 +189,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         },
     )
     billing_c = CSVModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
         help_text="Billing contact for the domain",
@@ -237,21 +237,21 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
     )
     registrant = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
     )
     admin_c = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Administrative Contact",
     )
     tech_c = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Technical Contact",
     )
     billing_c = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
+        queryset=RegistrationContact.objects.all(),
         required=False,
         label="Billing Contact",
     )
