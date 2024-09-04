@@ -68,6 +68,20 @@ class DNSsyncIPAddressTestCase(TestCase):
         self.assertEqual(record6.ttl, None)
         self.assertEqual(record6.status, RecordStatusChoices.STATUS_ACTIVE)
 
+    def test_create_ip_address_empty_label(self):
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="zone1.example.com"
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="zone1.example.com",
+        )
+
+        record4 = Record.objects.get(ipam_ip_address=ipv4_address)
+        self.assertEqual(record4.name, "@")
+        record6 = Record.objects.get(ipam_ip_address=ipv6_address)
+        self.assertEqual(record6.name, "@")
+
     def test_create_ip_address_short_zone(self):
         Zone.objects.create(name="short", **self.zone_data)
         IPAddress.objects.create(
