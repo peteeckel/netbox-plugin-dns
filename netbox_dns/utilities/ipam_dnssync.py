@@ -88,7 +88,7 @@ def get_zones(ip_address, view=None, old_zone=None):
     fqdn = dns_name.from_text(ip_address.dns_name)
     zone_name_candidates = [
         fqdn.split(i)[1].to_text().rstrip(".")
-        for i in range(min_labels + 1, len(fqdn.labels))
+        for i in range(min_labels + 1, len(fqdn.labels) + 1)
     ]
 
     zones = _zone.Zone.objects.filter(
