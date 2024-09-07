@@ -1025,6 +1025,24 @@ The management command `rebuild_dnssync` can be used to clean up the relations a
 /opt/netbox/netbox/manage.py rebuild_dnssync
 ```
 
+### Migration from IPAM Coupling
+The former experimental feature linking IPAM IP addresses to NetBox DNS address records, IPAM Coupling, has been replaced with IPAM DNSsync in version 1.1.0.
+
+There is no direct migration path from IPAM Coupling to IPAM DNSsync because the mechanism is vastly different, moving from manually assigning an address record to an IP addess to automatic assignment by prefix/DNS view. When designing the new feature, however, effort was taken to keep it as compatible to the old mechanism as possible. To migrate from using IPAM Coupling to IPAM DNSsync, the following steps are recommended:
+
+* Upgrade NetBox DNS from the 1.0 version installed to the latest 1.1 version. This will result in all DNS records created by IPAM Coupling being retained, but changes to the IP addresses they were created for will no longer result in upgrades to the records.
+* Run the management command to set up the DNSsync custom fields:
+
+ ```/opt/netbox/netbox/manage.py setup_dnssync```
+
+  This command removes the old, obsolete 'Zone' and 'Name' custom fields, modify the retained fields 'TTL' and 'Disable PTR', and create the new 'Disable DNSsync' custom field. The values of the retained fields will be kept.
+
+* Set the timeout for the reverse proxy server for NetBox to at least 300 seconds. The timeout is set in the configuration variable `uwsgi_read_timeout` for Nginx with `uwsgi`, `proxy-timeout` for Apache with `mod_proxy`. This is highly depending on your specific configuration, so check your settings.
+* Assign the views of the domains where the address records should be created to the prefix in which the IP addresses are contained. If the prefixes are very large and contain many IP addresses with prefixes, consider creating (temporary) smaller prefixes for the migration as migrating a prefix with thousands of addresses takes longer than the timeout of the reverse proxy server for NetBox.
+* After the migration of one prefix and zone is completed (this may take a couple of minutes), repeat the process until all IP addresses have been assigned. This can be verified in the GUI by checking the 'Related DNS Address Records' table in the addresses' detail view.
+
+After these steps have been completed, creating, deleting or updating IP addresses will be synchronised with the related DNS records as before.
+
 ## UI Customization
 There are limited options to customize the appearance of the NetBox DNS plugin.
 
