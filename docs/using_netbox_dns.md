@@ -52,6 +52,15 @@ NetBox Version | NetBox DNS Version | Comment
 
 For earlier version of NetBox, please use the old version of the PyPI module `netbox-dns`.  Please be aware that this version is no longer supported and will not receive any further updates. We therefore strongly recommend that you move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
+#### NetBox Branching Compatibility
+
+**As a result of some issues with NetBox Branching still under investigation,
+NetBox DNS is currently not compatible with the new NetBox Branching plugin.**
+
+This affects multiple aspects of the branching functionality, and currently (`netboxlabs-branching-plugin` version 0.4.0) there is no workaround. Do not try to use NetBox Branching together with NetBox DNS until these issues are resolved.
+
+This warning will be updated as soon as the situation is resolved.
+
 ### Installation of NetBox DNS
 NetBox DNS is available as a PyPi module and can be installed using pip:
 
