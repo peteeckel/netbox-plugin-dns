@@ -5,13 +5,12 @@ on:
         types:
           - published
 
-permissions:
-    contents: read
-
 jobs:
     publish:
         runs-on: ubuntu-latest
         environment: NetBox DNS Deployment
+        permissions:
+            id-token: write
 
         steps:
           - name: Checkout code
@@ -34,6 +33,4 @@ jobs:
             uses: pypa/gh-action-pypi-publish@release/v1
             with:
                 verbose: true
-                repository_url: ${{ vars.REPOSITORY_URL }}
-                user: ${{ vars.USER }}
-                password: ${{ secrets.PYPI_TOKEN }}
+                repository-url: ${{ vars.REPOSITORY_URL }}
