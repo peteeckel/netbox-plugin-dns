@@ -1,13 +1,18 @@
 name: Lint
 
-on: [push]
+on:
+  - push
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - uses: psf/black@stable
-        with:
-          options: "--check"
-          src: "netbox_dns"
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@main
+
+          - name: Check conformance to Black standards
+            uses: psf/black@stable
+            with:
+                options: "--check"
+                src: "netbox_dns"

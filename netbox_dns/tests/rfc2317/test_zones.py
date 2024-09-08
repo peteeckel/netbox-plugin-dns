@@ -23,7 +23,7 @@ class RFC2317ZoneTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
-            rfc2317_prefix="10.0.0.0/28"
+            rfc2317_prefix="10.0.0.0/28",
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -35,7 +35,7 @@ class RFC2317ZoneTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
-            rfc2317_prefix="10.0.0.0/28"
+            rfc2317_prefix="10.0.0.0/28",
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -47,7 +47,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -60,7 +60,7 @@ class RFC2317ZoneTestCase(TestCase):
             Zone.objects.create(
                 name="0-255.0.0.10.in-addr.arpa",
                 **self.zone_data,
-                rfc2317_prefix="10.0.0.0/24"
+                rfc2317_prefix="10.0.0.0/24",
             )
 
     def test_create_rfc2317_zone_invalid_prefix_no_network(self):
@@ -68,7 +68,7 @@ class RFC2317ZoneTestCase(TestCase):
             Zone.objects.create(
                 name="0-15.0.0.10.in-addr.arpa",
                 **self.zone_data,
-                rfc2317_prefix="10.0.0.1/28"
+                rfc2317_prefix="10.0.0.1/28",
             )
 
     def test_create_rfc2317_zone_parent_managed_no_parent(self):
@@ -77,7 +77,7 @@ class RFC2317ZoneTestCase(TestCase):
                 name="0-15.0.0.10.in-addr.arpa",
                 **self.zone_data,
                 rfc2317_prefix="10.0.0.0/28",
-                rfc2317_parent_managed=True
+                rfc2317_parent_managed=True,
             )
 
     def test_create_rfc2317_zone_parent_managed_arpa_zone(self):
@@ -87,7 +87,7 @@ class RFC2317ZoneTestCase(TestCase):
                 name="0.0.10.in-addr.arpa",
                 **self.zone_data,
                 rfc2317_prefix="10.0.0.0/28",
-                rfc2317_parent_managed=True
+                rfc2317_parent_managed=True,
             )
 
     def test_create_rfc2317_zone_parent_managed_no_view(self):
@@ -99,7 +99,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -119,7 +119,7 @@ class RFC2317ZoneTestCase(TestCase):
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
             rfc2317_parent_managed=True,
-            view=self.views[0]
+            view=self.views[0],
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -141,7 +141,7 @@ class RFC2317ZoneTestCase(TestCase):
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
             rfc2317_parent_managed=True,
-            view=self.views[0]
+            view=self.views[0],
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -162,7 +162,7 @@ class RFC2317ZoneTestCase(TestCase):
                 **self.zone_data,
                 rfc2317_prefix="10.0.0.0/28",
                 rfc2317_parent_managed=True,
-                view=self.views[0]
+                view=self.views[0],
             )
 
     def test_create_rfc2317_zone_parent_managed_different_no_null_view(self):
@@ -177,7 +177,7 @@ class RFC2317ZoneTestCase(TestCase):
                 name="0-15.0.0.10.in-addr.arpa",
                 **self.zone_data,
                 rfc2317_prefix="10.0.0.0/28",
-                rfc2317_parent_managed=True
+                rfc2317_parent_managed=True,
             )
 
     def test_modify_rfc2317_zone_parent_managed_change_prefix(self):
@@ -187,7 +187,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -217,7 +217,7 @@ class RFC2317ZoneTestCase(TestCase):
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
             rfc2317_parent_managed=True,
-            view=self.views[0]
+            view=self.views[0],
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -241,7 +241,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -260,7 +260,7 @@ class RFC2317ZoneTestCase(TestCase):
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
-            rfc2317_prefix="10.0.0.0/28"
+            rfc2317_prefix="10.0.0.0/28",
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -281,7 +281,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -299,7 +299,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -321,7 +321,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)
@@ -343,7 +343,7 @@ class RFC2317ZoneTestCase(TestCase):
             name="0-15.0.0.10.in-addr.arpa",
             **self.zone_data,
             rfc2317_prefix="10.0.0.0/28",
-            rfc2317_parent_managed=True
+            rfc2317_parent_managed=True,
         )
 
         self.assertIsNotNone(rfc2317_zone.pk)

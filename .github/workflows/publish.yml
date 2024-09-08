@@ -1,38 +1,39 @@
 name: PyPI Publish
 
 on:
-  release:
-    types:
-      - published
+    release:
+        types:
+          - published
+
+permissions:
+    contents: read
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    environment: NetBox DNS Deployment
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
-      - name: Setup Python
-        uses: actions/setup-python@main
-        with:
-          python-version: "3.10"
-      - name: Install latest version of Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-      - name: Add Poetry to $PATH
-        run: |
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-      - name: Get Poetry version
-        run: poetry --version
-      - name: Check pyproject.toml validity
-        run: poetry check --no-interaction
-      - name: Install deps
-        run: |
-          poetry config virtualenvs.in-project true
-          poetry install --no-interaction
-      - name: Publish to PyPI
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          poetry config pypi-token.pypi $PYPI_TOKEN
-          poetry publish --build
+    publish:
+        runs-on: ubuntu-latest
+        environment: NetBox DNS Deployment
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@main
+
+          - name: Setup Python
+            uses: actions/setup-python@main
+            with:
+              python-version: "3.12"
+
+          - name: Install build dependencies
+            run: |
+                python -m pip install --upgrade pip
+                pip install build
+
+          - name: Build package
+            run: python -m build
+
+          - name: Publish to PyPI
+            uses: pypa/gh-action-pypi-publish@release/v1
+            with:
+                verbose: true
+                repository_url: ${{ vars.REPOSITORY_URL }}
+                user: ${{ vars.USER }}
+                password: ${{ secrets.PYPI_TOKEN }}
