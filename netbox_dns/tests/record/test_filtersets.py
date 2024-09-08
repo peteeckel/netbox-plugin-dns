@@ -39,7 +39,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             Zone(
                 name="zone2.example.com",
                 **cls.zone_data,
-                status=ZoneStatusChoices.STATUS_DEPRECATED
+                status=ZoneStatusChoices.STATUS_DEPRECATED,
             ),
         )
         for zone in cls.zones:
@@ -184,7 +184,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             name="0-31.1.0.10.in-addr.arpa",
             rfc2317_prefix="10.0.1.0/27",
             rfc2317_parent_managed=True,
-            **self.zone_data
+            **self.zone_data,
         )
 
         address_record = Record.objects.create(

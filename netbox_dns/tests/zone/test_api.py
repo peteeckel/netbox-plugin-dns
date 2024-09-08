@@ -77,7 +77,7 @@ class ZoneAPITestCase(
                 registrant=contacts[0],
                 admin_c=contacts[1],
                 tech_c=contacts[2],
-                billing_c=contacts[3]
+                billing_c=contacts[3],
             ),
             Zone(name="zone2.example.com", **zone_data, registrar=registrars[0]),
             Zone(
@@ -88,13 +88,13 @@ class ZoneAPITestCase(
                 registrant=contacts[0],
                 admin_c=contacts[0],
                 tech_c=contacts[0],
-                billing_c=contacts[0]
+                billing_c=contacts[0],
             ),
             Zone(
                 name="zone4.example.com",
                 **zone_data,
                 view=views[1],
-                registrar=registrars[1]
+                registrar=registrars[1],
             ),
             Zone(name="zone5.example.com", **zone_data, view=views[2]),
         )
