@@ -1,27 +1,33 @@
-[tool.poetry]
+[project]
 name = "netbox-plugin-dns"
 version = "1.1.0"
 description = "NetBox DNS is a NetBox plugin for managing DNS data."
-authors = ["Peter Eckel <pete@netbox-dns.org>"]
-homepage = "https://github.com/peteeckel/netbox-plugin-dns"
-repository = "https://github.com/peteeckel/netbox-plugin-dns"
-license = "MIT"
+authors = [
+    {name="Peter Eckel", email="pete@netbox-dns.org"},
+]
+license = {file="LICENCE"}
 readme = "README.md"
-packages = [{include = "netbox_dns"}]
-exclude = ["netbox_dns/tests/*"]
 keywords = ["netbox", "netbox-plugin", "dns"]
 classifiers = [
     "Development Status :: 5 - Production/Stable"
 ]
+dependencies = [
+    "dnspython",
+]
+requires-python = ">=3.10"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-dnspython = "^2.6.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=8.2.0"
-black = ">24"
+[project.urls]
+Homepage = "https://github.com/peteeckel/netbox-plugin-dns"
+Documentation = "https://github.com/peteeckel/netbox-plugin-dns/blob/main/docs/using_netbox_dns.md"
+Repository = "https://github.com/peteeckel/netbox-plugin-dns"
+Issues = "https://github.com/peteeckel/netbox-plugin-dns/issues"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools.packages.find]
+exclude = ["examples*", "media*", "*.tests*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.html"]

@@ -1,64 +1,70 @@
-name: Test NetBox Latest
-on: [push]
+name: Test with all supported NetBox versions
+
+on:
+  - push
+
 jobs:
-  test-netbox-latest:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: netbox
-          POSTGRES_PASSWORD: netbox
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    test-netbox:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@main
-        with:
-          path: netbox-plugin-dns
+        strategy:
+          matrix:
+            python-version: ["3.10", "3.11", "3.12"]
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@main
-        with:
-          python-version: ${{ matrix.python-version }}
+        services:
+            redis:
+                image: redis
+                ports:
+                  - 6379:6379
 
-      - name: Checkout netbox
-        uses: actions/checkout@main
-        with:
-          repository: "netbox-community/netbox"
-          path: netbox
-          ref: master
+            postgres:
+                image: postgres
+                env:
+                    POSTGRES_USER: netbox
+                    POSTGRES_PASSWORD: netbox
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+                ports:
+                  - 5432:5432
 
-      - name: install netbox_dns
-        working-directory: netbox-plugin-dns
-        run: |
-          # include tests directory for test
-          sed -i 's/exclude/#exclude/g' pyproject.toml
-          pip install .
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@main
+            with:
+                path: netbox-plugin-dns
 
-      - name: Install dependencies & set up configuration
-        working-directory: netbox
-        run: |
-          ln -s $(pwd)/../netbox-plugin-dns/media/configuration.testing.py netbox/netbox/configuration.py
+          - name: Set up Python ${{ matrix.python-version }}
+            uses: actions/setup-python@main
+            with:
+                python-version: ${{ matrix.python-version }}
 
-          python -m pip install --upgrade pip
-          python -m pip install tblib
-          pip install -r requirements.txt -U
+          - name: Checkout NetBox
+            uses: actions/checkout@main
+            with:
+                repository: "netbox-community/netbox"
+                path: netbox
+                ref: master
 
-      - name: Run tests
-        working-directory: netbox
-        run: |
-          python netbox/manage.py test netbox_dns.tests --parallel -v 2
+          - name: Install NetBox DNS
+            working-directory: netbox-plugin-dns
+            run: |
+                # include tests directory for test
+                sed -i 's/exclude/#exclude/g' pyproject.toml
+                pip install .
+
+          - name: Install dependencies and set up configuration
+            working-directory: netbox
+            run: |
+                ln -s $(pwd)/../netbox-plugin-dns/media/configuration.testing.py netbox/netbox/configuration.py
+
+                python -m pip install --upgrade pip
+                python -m pip install tblib
+                pip install -r requirements.txt -U
+
+          - name: Run tests
+            working-directory: netbox
+            run: |
+                python netbox/manage.py test netbox_dns.tests --parallel -v2
