@@ -13,10 +13,6 @@ from tenancy.tables import TenancyColumnsMixin
 from netbox_dns.models import Record
 from netbox_dns.utilities import value_to_unicode
 
-import logging
-
-logger = logging.getLogger("netbox_dns")
-
 
 __all__ = (
     "RecordTable",
