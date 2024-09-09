@@ -1,4 +1,12 @@
-from django.db import migrations
+from django.db import migrations, connection
+
+
+def remove_object_changes(apps, schema_editor):
+    if "objectchange" in apps.all_models.get("core"):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM core_objectchange WHERE changed_object_type_id in (SELECT id FROM django_content_type WHERE app_label='netbox_dns' AND model='contact')"
+            )
 
 
 class Migration(migrations.Migration):
@@ -24,7 +32,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             "ALTER INDEX netbox_dns_contact_contact_id_key RENAME TO netbox_dns_contact_registrationcontact_id_key"
         ),
-        migrations.RunSQL(
-            "DELETE FROM core_objectchange WHERE changed_object_type_id in (SELECT id FROM django_content_type WHERE app_label='netbox_dns' AND model='contact')"
-        ),
+        migrations.RunPython(remove_object_changes),
     ]
