@@ -17,15 +17,37 @@ class ObjectModificationMixin:
 
             self.__class__.check_fields.add("custom_field_data")
 
+        self._save_field_values()
+
+    def _save_field_values(self):
+        for field in self.check_fields:
+            if f"{field}_id" in self.__dict__:
+                setattr(self, f"_saved_{field}_id", self.__dict__.get(f"{field}_id"))
+            else:
+                setattr(self, f"_saved_{field}", self.__dict__.get(field))
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        self._save_field_values()
+
     @property
     def changed_fields(self):
         if self.pk is None:
             return None
 
-        saved = self.__class__.objects.get(pk=self.pk)
+        _changed_fields = set()
+        for field in self.check_fields:
+            if f"_saved_{field}_id" in self.__dict__:
+                if self.__dict__.get(f"_saved_{field}_id") != self.__dict__.get(
+                    f"{field}_id"
+                ):
+                    _changed_fields.add(field)
+            else:
+                if self.__dict__.get(f"_saved_{field}") != self.__dict__.get(field):
+                    _changed_fields.add(field)
 
-        return {
-            field
-            for field in self.check_fields
-            if getattr(self, field) != getattr(saved, field)
-        }
+        return _changed_fields
+
+    def get_saved_value(self, field):
+        return self.__dict__.get(f"_saved_{field}")
