@@ -621,7 +621,7 @@ The names of Name Servers, Zones and Records are all used as RR names in DNS, so
 There are some special cases that need to be taken care of:
 
 * Some non-free operating systems accept underscores in host names, which are not permitted according to RFC1035 and rejected by default e.g. by BIND.
-* Record types such as SRV and TXT can contain underscores as the first character of a label even in more standard-conforming implementations
+* Record types such as SRV, TLSA and TXT can contain underscores as the first character of a label even in more standard-conforming implementations
 * Given the large number of defined RR types, there might be other exceptions to the rules given in the RFCs
 
 To take care of these cases, there are three configuration variables for NetBox DNS that adjust the validation of record names:
@@ -636,7 +636,7 @@ Variable                            | Factory Default
 --------                            | ---------------
 `tolerate_underscores_in_labels`    | `False`
 `tolerate_characters_in_zone_labels`| `''`
-`tolerate_leading_underscore_types` | `["TXT", "SRV"]`
+`tolerate_leading_underscore_types` | `["TXT", "SRV", "TLSA"]`
 `tolerate_non_rfc1035_types`        | `[]`
 
 The settings can be set or overridden in the file `/opt/netbox/netbox/netbox/configuration.py` by defining new values in `PLUGINS_CONFIG` as follows:
@@ -647,7 +647,7 @@ PLUGINS_CONFIG = {
         ...
         'tolerate_underscores_in_labels': True,
         'tolerate_characters_in_zone_labels': "/",
-        'tolerate_leading_underscore_types': ["TXT", "SRV", "CNAME"]
+        'tolerate_leading_underscore_types': ["TXT", "SRV", "TLSA", "CNAME"]
         'tolerate_non_rfc1035_types': ["X25"]
     },
 }

@@ -61,6 +61,15 @@ class RecordNameValidationTestCase(TestCase):
                 name=record.get("name"), zone=record.get("zone"), **self.record_data
             )
 
+    def test_tlsa_validation_ok(self):
+        record = Record.objects.create(
+            name="_25._tcp.mx1",
+            zone=self.zones[0],
+            type=RecordTypeChoices.TLSA,
+            value="3 1 1 4048c63a12234d9edf4d28113929cab21f8307a6c26732c2f5d103a322b612e1",
+        )
+        self.assertEqual(record.name, "_25._tcp.mx1")
+
     def test_srv_validation_ok(self):
         record = Record.objects.create(
             name="_ldaps._tcp",
