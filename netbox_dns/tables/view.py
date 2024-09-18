@@ -23,7 +23,7 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = View
-        fields = ("description",)
+        fields = ("description", "ip_address_filter")
         default_columns = ("name", "default_view")
 
 

@@ -65,5 +65,6 @@ class ViewSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
             "prefixes",
+            "ip_address_filter",
         )
         brief_fields = ("id", "url", "display", "name", "default_view", "description")

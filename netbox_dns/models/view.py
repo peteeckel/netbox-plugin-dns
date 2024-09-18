@@ -34,6 +34,11 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         related_name="netbox_dns_views",
         blank=True,
     )
+    ip_address_filter = models.JSONField(
+        verbose_name="IP Address Filter",
+        blank=True,
+        null=True,
+    )
     tenant = models.ForeignKey(
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
