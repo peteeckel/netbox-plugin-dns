@@ -1,6 +1,6 @@
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldError
 from django.db.models import Q, Count
 
 from netbox.forms import (
@@ -21,7 +21,7 @@ from utilities.forms.rendering import FieldSet
 from utilities.forms.fields import JSONField
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
-from ipam.models import Prefix
+from ipam.models import Prefix, IPAddress
 from netbox.context import current_request
 
 from netbox_dns.models import View
@@ -30,6 +30,7 @@ from netbox_dns.utilities import (
     check_dns_records,
     get_ip_addresses_by_prefix,
     get_views_by_prefix,
+    get_query_from_filter,
 )
 
 
@@ -109,12 +110,6 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
                     "placeholder"
                 ] = "You do not have permission to modify assigned prefixes"
 
-    def clean_prefixes(self):
-        if hasattr(self, "_saved_prefixes"):
-            return self._saved_prefixes
-
-        return self.cleaned_data["prefixes"]
-
     prefixes = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         required=False,
@@ -146,6 +141,22 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
             "prefixes",
             "ip_address_filter",
         )
+
+    def clean_prefixes(self):
+        if hasattr(self, "_saved_prefixes"):
+            return self._saved_prefixes
+
+        return self.cleaned_data["prefixes"]
+
+    def clean_ip_address_filter(self):
+        ip_address_filter = self.cleaned_data.get("ip_address_filter")
+
+        try:
+            IPAddress.objects.filter(get_query_from_filter(ip_address_filter)).exists()
+        except (FieldError, ValueError) as exc:
+            self.add_error("ip_address_filter", f"Invalid filter for IPAddress: {exc}")
+
+        return ip_address_filter
 
 
 class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
