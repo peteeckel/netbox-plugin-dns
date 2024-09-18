@@ -43,6 +43,7 @@ class NetBoxDNSViewType(NetBoxObjectType):
     description: str
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
     prefixes: List[Annotated["PrefixType", strawberry.lazy("ipam.graphql.types")]]
+    ip_address_filter: str | None
 
 
 @strawberry_django.type(Zone, fields="__all__", filters=NetBoxDNSZoneFilter)

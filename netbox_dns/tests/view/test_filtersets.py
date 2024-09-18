@@ -11,6 +11,7 @@ from netbox_dns.filtersets import ViewFilterSet
 class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = View.objects.all()
     filterset = ViewFilterSet
+    ignore_fields = ("ip_address_filter",)
 
     @classmethod
     def setUpTestData(cls):

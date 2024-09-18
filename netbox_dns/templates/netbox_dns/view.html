@@ -42,6 +42,7 @@
                 </h5>
                 <div class="card-body">
                     <table class="table table-hover attr-table">
+                        {% if object.prefixes.exists %}
                         {% for prefix in object.prefixes.all %}
                         <tr>
                             <td>
@@ -56,7 +57,22 @@
                             {% endif %}
                         </tr>
                         {% endfor %}
+                        {% else %}
+                            <span class="text-muted">No prefixes assigned</span>
+                        {% endif %}
                     </table>
+                </div>
+            </div>
+            <div class="card">
+                <h5 class="card-header">
+                    IP Address Filters
+                </h5>
+                <div class="card-body">
+                    {% if object.ip_address_filter %}
+                        <pre>{{ object.ip_address_filter|json }}</pre>
+                    {% else %}
+                        <span class="text-muted">No filters defined</span>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}

@@ -18,6 +18,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.rendering import FieldSet
+from utilities.forms.fields import JSONField
 from tenancy.models import Tenant
 from tenancy.forms import TenancyForm, TenancyFilterForm
 from ipam.models import Prefix
@@ -97,6 +98,7 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
 
         if settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
             del self.fields["prefixes"]
+            del self.fields["ip_address_filter"]
 
         if request := current_request.get():
             if not request.user.has_perm("ipam.view_prefix"):
@@ -121,10 +123,15 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
             "depth": None,
         },
     )
+    ip_address_filter = JSONField(
+        label="IP Address Filter",
+        required=False,
+        help_text="Specify criteria for address record creation in JSON form",
+    )
 
     fieldsets = (
         FieldSet("name", "default_view", "description", "tags", name="View"),
-        FieldSet("prefixes"),
+        FieldSet("prefixes", "ip_address_filter"),
         FieldSet("tenant_group", "tenant", name="Tenancy"),
     )
 
@@ -137,6 +144,7 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
             "tags",
             "tenant",
             "prefixes",
+            "ip_address_filter",
         )
 
 
