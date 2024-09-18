@@ -26,6 +26,7 @@ __all__ = (
     "get_ip_addresses_by_view",
     "get_ip_addresses_by_zone",
     "check_record_permission",
+    "get_query_from_filter",
 )
 
 
@@ -293,3 +294,18 @@ def check_record_permission(add=True, change=True, delete=True):
             if check
         )
     )
+
+
+def get_query_from_filter(ip_address_filter):
+    query = Q()
+
+    if not isinstance(ip_address_filter, list):
+        ip_address_filter = [ip_address_filter]
+
+    for condition in ip_address_filter:
+        if condition:
+            query |= Q(**{key: value for key, value in condition.items()})
+        else:
+            return Q()
+
+    return query
