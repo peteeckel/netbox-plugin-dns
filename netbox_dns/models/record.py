@@ -10,13 +10,14 @@ from django.urls import reverse
 from django.conf import settings
 
 from netbox.models import NetBoxModel
+from ipam.models import IPAddress
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 
 from netbox_dns.fields import AddressField
-from netbox_dns.utilities import arpa_to_prefix, name_to_unicode
+from netbox_dns.utilities import arpa_to_prefix, name_to_unicode, get_query_from_filter
 from netbox_dns.validators import validate_generic_name, validate_record_value
 from netbox_dns.mixins import ObjectModificationMixin
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
@@ -41,6 +42,20 @@ def record_data_from_ip_address(ip_address, zone):
     cf_data = ip_address.custom_field_data
 
     if cf_data.get("ipaddress_dns_disabled"):
+        # +
+        # DNS record creation disabled for this address
+        # -
+        return None
+
+    if (
+        zone.view.ip_address_filter is not None
+        and not IPAddress.objects.filter(
+            Q(pk=ip_address.pk), get_query_from_filter(zone.view.ip_address_filter)
+        ).exists()
+    ):
+        # +
+        # IP address does not match the filter
+        # -
         return None
 
     data = {
@@ -473,22 +488,29 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_cname_record = None
 
     def update_from_ip_address(self, ip_address, zone=None):
+        """
+        Update an address record according to data from an IPAddress object.
+
+        Returns a tuple of two booleans: (update, delete).
+
+        update: The record was updated and needs to be cleaned and/or saved
+        delete: The record is no longer needed and needs to be deleted
+        """
         if zone is None:
             zone = self.zone
 
         data = record_data_from_ip_address(ip_address, zone)
 
         if data is None:
-            self.delete()
-            return
+            return False, True
 
         if all((getattr(self, attr) == data[attr] for attr in data.keys())):
-            return
+            return False, False
 
         for attr, value in data.items():
             setattr(self, attr, value)
 
-        return self
+        return True, False
 
     @classmethod
     def create_from_ip_address(cls, ip_address, zone):

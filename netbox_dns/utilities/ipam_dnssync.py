@@ -125,14 +125,12 @@ def check_dns_records(ip_address, zone=None, view=None):
         if ip_address.pk is not None:
             for record in ip_address.netbox_dns_records.filter(zone__in=zones):
                 if not _match_data(ip_address, record):
-                    record.update_from_ip_address(ip_address)
+                    updated = record.update_from_ip_address(ip_address)
 
-                    if record is not None:
+                    if updated:
                         record.clean()
 
-            zones = Zone.objects.filter(
-                pk__in=[zone.pk for zone in zones]
-            ).exclude(
+            zones = Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
                 pk__in=set(ip_address.netbox_dns_records.values_list("zone", flat=True))
             )
 
@@ -154,9 +152,9 @@ def check_dns_records(ip_address, zone=None, view=None):
         return
 
     for record in ip_address.netbox_dns_records.filter(zone=zone):
-        record.update_from_ip_address(ip_address, new_zone)
+        updated = record.update_from_ip_address(ip_address, new_zone)
 
-        if record is not None:
+        if updated:
             record.clean(new_zone=new_zone)
 
 
@@ -179,9 +177,11 @@ def update_dns_records(ip_address):
 
             record.update_fqdn()
             if not _match_data(ip_address, record):
-                record.update_from_ip_address(ip_address)
+                updated, deleted = record.update_from_ip_address(ip_address)
 
-                if record is not None:
+                if deleted:
+                    record.delete()
+                elif updated:
                     record.save()
 
         zones = Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
