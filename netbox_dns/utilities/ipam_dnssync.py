@@ -309,7 +309,7 @@ def get_query_from_filter(ip_address_filter):
 
     for condition in ip_address_filter:
         if condition:
-            query |= Q(**{key: value for key, value in condition.items()})
+            query |= Q(**condition)
         else:
             return Q()
 

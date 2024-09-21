@@ -2,6 +2,7 @@ from netaddr import IPNetwork
 
 from django.test import TestCase
 from django.core import management
+from django.core.exceptions import ValidationError
 
 from ipam.models import IPAddress, Prefix
 
@@ -274,3 +275,440 @@ class DNSsyncViewTestCase(TestCase):
         ip_address.delete()
 
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
+
+    def test_create_ip_address_matching_filter(self):
+        view = self.views[0]
+
+        view.ip_address_filter = {"dns_name__startswith": "name1."}
+        view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+
+        record = Record.objects.get(
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+            fqdn="name1.zone1.example.com.",
+            zone=self.zones[0],
+        )
+
+        self.assertEqual(Record.objects.filter(type=RecordTypeChoices.A).count(), 1)
+        self.assertEqual(record.ipam_ip_address, ip_address)
+
+    def test_create_ip_address_not_matching_filter(self):
+        view = self.views[0]
+
+        view.ip_address_filter = {"dns_name__startswith": "name1."}
+        view.save()
+
+        IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"), dns_name="name2.zone1.example.com"
+        )
+
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
+
+    def test_update_ip_address_matching_filter(self):
+        view = self.views[0]
+
+        view.ip_address_filter = {"dns_name__startswith": "name1."}
+        view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name2.zone1.example.com"
+        )
+
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
+
+        ip_address.dns_name = "name1.zone1.example.com"
+        ip_address.save()
+
+        record = Record.objects.get(
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+            fqdn="name1.zone1.example.com.",
+            zone=self.zones[0],
+        )
+
+        self.assertEqual(Record.objects.filter(type=RecordTypeChoices.A).count(), 1)
+        self.assertEqual(record.ipam_ip_address, ip_address)
+
+    def test_update_ip_address_not_matching_filter(self):
+        view = self.views[0]
+
+        view.ip_address_filter = {"dns_name__startswith": "name1."}
+        view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+
+        record = Record.objects.get(
+            type=RecordTypeChoices.A,
+            value="10.0.0.1",
+            fqdn="name1.zone1.example.com.",
+            zone=self.zones[0],
+        )
+
+        self.assertEqual(Record.objects.filter(type=RecordTypeChoices.A).count(), 1)
+        self.assertEqual(record.ipam_ip_address, ip_address)
+
+        ip_address.dns_name = "name2.zone1.example.com"
+        ip_address.save()
+
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
+
+    def test_add_address_filter(self):
+        view1 = self.views[0]
+        view2 = self.views[1]
+
+        view2.prefixes.add(self.prefixes[0])
+
+        zone1 = self.zones[0]
+        zone2 = self.zones[1]
+
+        ip_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ip_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"), dns_name="name2.zone1.example.com"
+        )
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+
+        view1.ip_address_filter = {"dns_name__startswith": "name1"}
+        view1.save()
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 1
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+
+    def test_delete_address_filter(self):
+        view1 = self.views[0]
+        view2 = self.views[1]
+
+        view2.prefixes.add(self.prefixes[0])
+
+        zone1 = self.zones[0]
+        zone2 = self.zones[1]
+
+        view1.ip_address_filter = {"dns_name__startswith": "name1"}
+        view1.save()
+
+        ip_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ip_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"), dns_name="name2.zone1.example.com"
+        )
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 1
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+
+        view1.ip_address_filter = None
+        view1.save()
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+
+    def test_modify_address_filter_tighten_condition(self):
+        view1 = self.views[0]
+        view2 = self.views[1]
+
+        view2.prefixes.add(self.prefixes[0])
+
+        zone1 = self.zones[0]
+        zone2 = self.zones[1]
+
+        view1.ip_address_filter = {"dns_name__startswith": "name1"}
+        view1.save()
+
+        ip_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ip_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"), dns_name="name2.zone1.example.com"
+        )
+        ip_address3 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.11/24"), dns_name="name11.zone1.example.com"
+        )
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 3
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address3).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address3).exists()
+        )
+
+        view1.ip_address_filter = {"dns_name__startswith": "name1."}
+        view1.save()
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 1
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 3
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address3).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address3).exists()
+        )
+
+    def test_modify_address_filter_loosen_condition(self):
+        view1 = self.views[0]
+        view2 = self.views[1]
+
+        view2.prefixes.add(self.prefixes[0])
+
+        zone1 = self.zones[0]
+        zone2 = self.zones[1]
+
+        view1.ip_address_filter = {"dns_name__startswith": "name1."}
+        view1.save()
+
+        ip_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ip_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"), dns_name="name2.zone1.example.com"
+        )
+        ip_address3 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.11/24"), dns_name="name11.zone1.example.com"
+        )
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 1
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 3
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address3).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address3).exists()
+        )
+
+        view1.ip_address_filter = {"dns_name__startswith": "name1"}
+        view1.save()
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone1, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertEqual(
+            Record.objects.filter(zone=zone2, type=RecordTypeChoices.A).count(), 3
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone1, ipam_ip_address=ip_address3).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone2, ipam_ip_address=ip_address3).exists()
+        )
+
+    def test_delete_address_filter_conflict(self):
+        view = self.views[0]
+        zone = self.zones[0]
+
+        view.ip_address_filter = {"dns_name__startswith": "name1"}
+        view.save()
+
+        record = Record.objects.create(
+            name="name2", zone=zone, type=RecordTypeChoices.A, value="10.0.0.2"
+        )
+
+        ip_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ip_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.2/24"), dns_name="name2.zone1.example.com"
+        )
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertEqual(record.fqdn, f"{ip_address2.dns_name}.")
+
+        view.ip_address_filter = None
+        with self.assertRaises(ValidationError):
+            view.save()
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertEqual(record.fqdn, f"{ip_address2.dns_name}.")
+
+    def test_modify_address_filter_loosen_condition_conflict(self):
+        view = self.views[0]
+        zone = self.zones[0]
+
+        view.ip_address_filter = {"dns_name__startswith": "name1."}
+        view.save()
+
+        record = Record.objects.create(
+            name="name11", zone=zone, type=RecordTypeChoices.A, value="10.0.0.11"
+        )
+
+        ip_address1 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ip_address2 = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.11/24"), dns_name="name11.zone1.example.com"
+        )
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertEqual(record.fqdn, f"{ip_address2.dns_name}.")
+
+        view.ip_address_filter = {"dns_name__startswith": "name1"}
+        with self.assertRaises(ValidationError):
+            view.save()
+
+        self.assertEqual(
+            Record.objects.filter(zone=zone, type=RecordTypeChoices.A).count(), 2
+        )
+        self.assertTrue(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address1).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(zone=zone, ipam_ip_address=ip_address2).exists()
+        )
+        self.assertEqual(record.fqdn, f"{ip_address2.dns_name}.")
