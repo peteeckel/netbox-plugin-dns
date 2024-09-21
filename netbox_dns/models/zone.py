@@ -650,13 +650,15 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 )
 
         if self.pk is not None:
-            old_zone = Zone.objects.get(pk=self.pk)
+            old_soa_serial = self.get_saved_value("soa_serial")
+            old_soa_serial_auto = self.get_saved_value("soa_serial_auto")
+
             if not self.soa_serial_auto:
-                self.check_soa_serial_increment(old_zone.soa_serial, self.soa_serial)
-            elif not old_zone.soa_serial_auto:
+                self.check_soa_serial_increment(old_soa_serial, self.soa_serial)
+            elif not old_soa_serial_auto:
                 try:
                     self.check_soa_serial_increment(
-                        old_zone.soa_serial, self.get_auto_serial()
+                        old_soa_serial, self.get_auto_serial()
                     )
                 except ValidationError:
                     raise ValidationError(
@@ -665,10 +667,13 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                         }
                     )
 
+            old_name = self.get_saved_value("name")
+            old_view_id = self.get_saved_value("view_id")
+
             if (
                 not self.ip_addresses_checked
-                and old_zone.name != self.name
-                or old_zone.view != self.view
+                and old_name != self.name
+                or old_view_id != self.view_id
             ):
                 ip_addresses = IPAddress.objects.filter(
                     netbox_dns_records__in=self.record_set.filter(
