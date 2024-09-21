@@ -10,9 +10,6 @@ from django.db.models import Q
 from netbox.context import current_request
 from ipam.models import IPAddress, Prefix
 
-from netbox_dns.models import zone as _zone
-from netbox_dns.models import record as _record
-from netbox_dns.models import view as _view
 from netbox_dns.choices import RecordStatusChoices
 
 
@@ -75,6 +72,8 @@ def _match_data(ip_address, record):
 
 
 def get_zones(ip_address, view=None, old_zone=None):
+    from netbox_dns.models import Zone
+
     if view is None:
         views = _get_assigned_views(ip_address)
         if not views:
@@ -92,7 +91,7 @@ def get_zones(ip_address, view=None, old_zone=None):
         for i in range(min_labels + 1, len(fqdn.labels) + 1)
     ]
 
-    zones = _zone.Zone.objects.filter(
+    zones = Zone.objects.filter(
         view__in=views,
         name__in=zone_name_candidates,
         active=True,
@@ -115,6 +114,8 @@ def get_zones(ip_address, view=None, old_zone=None):
 
 
 def check_dns_records(ip_address, zone=None, view=None):
+    from netbox_dns.models import Zone, Record
+
     if ip_address.dns_name == "":
         return
 
@@ -129,14 +130,14 @@ def check_dns_records(ip_address, zone=None, view=None):
                     if record is not None:
                         record.clean()
 
-            zones = _zone.Zone.objects.filter(
+            zones = Zone.objects.filter(
                 pk__in=[zone.pk for zone in zones]
             ).exclude(
                 pk__in=set(ip_address.netbox_dns_records.values_list("zone", flat=True))
             )
 
         for zone in zones:
-            record = _record.Record.create_from_ip_address(
+            record = Record.create_from_ip_address(
                 ip_address,
                 zone,
             )
@@ -160,6 +161,8 @@ def check_dns_records(ip_address, zone=None, view=None):
 
 
 def update_dns_records(ip_address):
+    from netbox_dns.models import Zone, Record
+
     if ip_address.dns_name == "":
         delete_dns_records(ip_address)
         return
@@ -181,14 +184,14 @@ def update_dns_records(ip_address):
                 if record is not None:
                     record.save()
 
-        zones = _zone.Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
+        zones = Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
             pk__in=set(
                 ip_address.netbox_dns_records.all().values_list("zone", flat=True)
             )
         )
 
     for zone in zones:
-        record = _record.Record.create_from_ip_address(
+        record = Record.create_from_ip_address(
             ip_address,
             zone,
         )
@@ -203,13 +206,15 @@ def delete_dns_records(ip_address):
 
 
 def get_views_by_prefix(prefix):
+    from netbox_dns.models import View
+
     if (views := prefix.netbox_dns_views.all()).exists():
         return views
 
     if (parent := prefix.get_parents().filter(netbox_dns_views__isnull=False)).exists():
         return parent.last().netbox_dns_views.all()
 
-    return _view.View.objects.none()
+    return View.objects.none()
 
 
 def get_ip_addresses_by_prefix(prefix, check_view=True):
