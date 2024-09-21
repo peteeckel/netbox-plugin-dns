@@ -623,6 +623,27 @@ class DNSsyncIPAddressTestCase(TestCase):
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.AAAA).exists())
 
+    def test_update_ip_address_disable_dnssync(self):
+        ipv4_address = IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+        )
+        ipv6_address = IPAddress.objects.create(
+            address=IPNetwork("fe80:dead:beef::1/64"),
+            dns_name="name2.zone1.example.com",
+        )
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ipv4_address).exists())
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ipv6_address).exists())
+
+        ipv4_address.custom_field_data = {"ipaddress_dns_disabled": True}
+        ipv4_address.save()
+
+        ipv6_address.custom_field_data = {"ipaddress_dns_disabled": True}
+        ipv6_address.save()
+
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.AAAA).exists())
+
     def test_update_ip_address_name_duplicate_record(self):
         records = (
             Record(
