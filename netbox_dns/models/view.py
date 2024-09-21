@@ -9,6 +9,13 @@ from netbox.context import current_request
 from utilities.exceptions import AbortRequest
 
 from netbox_dns.mixins import ObjectModificationMixin
+from netbox_dns.utilities import (
+    get_ip_addresses_by_view,
+    check_dns_records,
+    update_dns_records,
+    delete_dns_records,
+    get_query_from_filter,
+)
 
 
 __all__ = (
@@ -92,6 +99,21 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 }
             )
 
+        if "ip_address_filter" in changed_fields and self.get_saved_value(
+            "ip_address_filter"
+        ):
+            try:
+                for ip_address in get_ip_addresses_by_view(self).filter(
+                    get_query_from_filter(self.ip_address_filter)
+                ):
+                    check_dns_records(ip_address, view=self)
+            except ValidationError as exc:
+                raise ValidationError(
+                    {
+                        "ip_address_filter": exc.messages,
+                    }
+                )
+
         super().clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
@@ -110,6 +132,19 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             for view in other_views:
                 view.default_view = False
                 view.save()
+
+        if changed_fields is not None and "ip_address_filter" in changed_fields:
+            ip_addresses = get_ip_addresses_by_view(self)
+
+            for ip_address in ip_addresses.exclude(
+                get_query_from_filter(self.ip_address_filter)
+            ):
+                delete_dns_records(ip_address, view=self)
+
+            for ip_address in ip_addresses.filter(
+                get_query_from_filter(self.ip_address_filter)
+            ):
+                update_dns_records(ip_address, view=self)
 
 
 @register_search

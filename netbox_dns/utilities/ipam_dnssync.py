@@ -158,17 +158,22 @@ def check_dns_records(ip_address, zone=None, view=None):
             record.clean(new_zone=new_zone)
 
 
-def update_dns_records(ip_address):
+def update_dns_records(ip_address, view=None):
     from netbox_dns.models import Zone, Record
 
     if ip_address.dns_name == "":
         delete_dns_records(ip_address)
         return
 
-    zones = get_zones(ip_address)
+    zones = get_zones(ip_address, view=view)
 
     if ip_address.pk is not None:
-        for record in ip_address.netbox_dns_records.all():
+        if view is None:
+            address_records = ip_address.netbox_dns_records.all()
+        else:
+            address_records = ip_address.netbox_dns_records.filter(zone__view=view)
+
+        for record in address_records:
             if record.zone not in zones or ip_address.custom_field_data.get(
                 "ipaddress_dns_disabled"
             ):
@@ -200,8 +205,14 @@ def update_dns_records(ip_address):
             record.save()
 
 
-def delete_dns_records(ip_address):
-    for record in ip_address.netbox_dns_records.all():
+def delete_dns_records(ip_address, view=None):
+
+    if view is None:
+        address_records = ip_address.netbox_dns_records.all()
+    else:
+        address_records = ip_address.netbox_dns_records.filter(zone__view=view)
+
+    for record in address_records:
         record.delete()
 
 
