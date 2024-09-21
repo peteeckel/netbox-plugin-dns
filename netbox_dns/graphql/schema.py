@@ -3,16 +3,6 @@ from typing import List
 import strawberry
 import strawberry_django
 
-from netbox_dns.models import (
-    NameServer,
-    View,
-    Zone,
-    Record,
-    RegistrationContact,
-    Registrar,
-    ZoneTemplate,
-    RecordTemplate,
-)
 from .types import (
     NetBoxDNSNameServerType,
     NetBoxDNSViewType,
