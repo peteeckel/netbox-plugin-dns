@@ -122,7 +122,7 @@ def check_dns_records(ip_address, zone=None, view=None):
     if zone is None:
         zones = get_zones(ip_address, view=view)
 
-        if ip_address.pk is not None:
+        if not ip_address._state.adding:
             for record in ip_address.netbox_dns_records.filter(zone__in=zones):
                 if not _match_data(ip_address, record):
                     updated = record.update_from_ip_address(ip_address)
@@ -143,7 +143,7 @@ def check_dns_records(ip_address, zone=None, view=None):
             if record is not None:
                 record.clean()
 
-    if ip_address.pk is None:
+    if ip_address._state.adding:
         return
 
     try:
@@ -167,7 +167,7 @@ def update_dns_records(ip_address, view=None):
 
     zones = get_zones(ip_address, view=view)
 
-    if ip_address.pk is not None:
+    if not ip_address._state.adding:
         if view is None:
             address_records = ip_address.netbox_dns_records.all()
         else:

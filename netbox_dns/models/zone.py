@@ -649,7 +649,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     }
                 )
 
-        if self.pk is not None:
+        if not self._state.adding:
             old_soa_serial = self.get_saved_value("soa_serial")
             old_soa_serial_auto = self.get_saved_value("soa_serial_auto")
 
