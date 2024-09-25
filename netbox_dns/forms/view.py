@@ -47,7 +47,7 @@ class ViewPrefixUpdateMixin:
     def clean(self, *args, **kwargs):
         super().clean(*args, **kwargs)
 
-        if self.instance.pk is None or "prefixes" not in self.changed_data:
+        if self.instance._state.adding or "prefixes" not in self.changed_data:
             return
 
         prefixes = self.cleaned_data.get("prefixes")

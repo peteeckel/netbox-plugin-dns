@@ -607,7 +607,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             status__in=Record.ACTIVE_STATUS_LIST,
         )
 
-        if self.pk is not None:
+        if not self._state.adding:
             records = records.exclude(pk=self.pk)
 
         if records.exists():
@@ -646,7 +646,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             record.save(update_fields=["status"])
 
     def check_unique_rrset_ttl(self):
-        if self.pk is not None:
+        if not self._state.adding:
             return
 
         if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
@@ -685,7 +685,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         ) from None
 
     def update_rrset_ttl(self, ttl=None):
-        if self.pk is None:
+        if self._state.adding:
             return
 
         if not get_plugin_config("netbox_dns", "enforce_unique_rrset_ttl", False):
@@ -721,7 +721,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self.validate_name(new_zone=new_zone)
         self.validate_value()
         self.check_unique_record(new_zone=new_zone)
-        if self.pk is None:
+        if self._state.adding:
             self.check_unique_rrset_ttl()
 
         if not self.is_active:
@@ -809,7 +809,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     ):
         self.full_clean()
 
-        if self.pk is not None and update_rrset_ttl:
+        if not self._state.adding and update_rrset_ttl:
             self.update_rrset_ttl()
 
         if self.is_ptr_record:

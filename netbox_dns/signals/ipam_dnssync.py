@@ -52,7 +52,7 @@ def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
         dns_name=instance.dns_name,
         status__in=IPADDRESS_ACTIVE_STATUS,
     )
-    if instance.pk is not None:
+    if not instance._state.adding:
         duplicate_addresses = duplicate_addresses.exclude(pk=instance.pk)
 
     if ENFORCE_UNIQUE_RECORDS and instance.status in IPADDRESS_ACTIVE_STATUS:
@@ -74,7 +74,7 @@ def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
     if (request := current_request.get()) is not None:
         cf_data = instance.custom_field_data
         if (
-            instance.pk is not None
+            not instance._state.adding
             and any(
                 (
                     cf_data.get(cf, cf_default)
@@ -86,7 +86,7 @@ def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
             )
             and not check_record_permission()
         ) or (
-            instance.pk is None
+            instance._state.adding
             and any(
                 (
                     cf_data.get(cf, cf_default) != cf_default
@@ -129,7 +129,7 @@ def ipam_dnssync_prefix_pre_save(instance, **kwargs):
     """
     request = current_request.get()
 
-    if instance.pk is None or not instance.netbox_dns_views.exists():
+    if instance._state.adding or not instance.netbox_dns_views.exists():
         return
 
     saved_prefix = Prefix.objects.prefetch_related("netbox_dns_views").get(

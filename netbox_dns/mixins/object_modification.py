@@ -33,7 +33,7 @@ class ObjectModificationMixin:
 
     @property
     def changed_fields(self):
-        if self.pk is None:
+        if self._state.adding:
             return None
 
         _changed_fields = set()
