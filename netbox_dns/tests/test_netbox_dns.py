@@ -7,7 +7,7 @@ from netbox_dns.tests.custom import APITestCase
 
 class NetBoxDNSVersionTestCase(SimpleTestCase):
     def test_version(self):
-        assert __version__ == "1.1.1"
+        assert __version__ == "1.1.2"
 
 
 class AppTest(APITestCase):
