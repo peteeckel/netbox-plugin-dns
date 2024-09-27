@@ -158,12 +158,13 @@ def check_dns_records(ip_address, zone=None, view=None):
             record.clean(new_zone=new_zone)
 
 
-def update_dns_records(ip_address, view=None):
+def update_dns_records(ip_address, view=None, force=False):
     from netbox_dns.models import Zone, Record
 
+    updated = False
+
     if ip_address.dns_name == "":
-        delete_dns_records(ip_address)
-        return
+        return delete_dns_records(ip_address)
 
     zones = get_zones(ip_address, view=view)
 
@@ -178,16 +179,19 @@ def update_dns_records(ip_address, view=None):
                 "ipaddress_dns_disabled"
             ):
                 record.delete()
+                updated = True
                 continue
 
             record.update_fqdn()
-            if not _match_data(ip_address, record):
+            if not _match_data(ip_address, record) or force:
                 updated, deleted = record.update_from_ip_address(ip_address)
 
                 if deleted:
                     record.delete()
+                    updated = True
                 elif updated:
                     record.save()
+                    updated = True
 
         zones = Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
             pk__in=set(
@@ -203,9 +207,13 @@ def update_dns_records(ip_address, view=None):
 
         if record is not None:
             record.save()
+            updated = True
+
+    return updated
 
 
 def delete_dns_records(ip_address, view=None):
+    deleted = False
 
     if view is None:
         address_records = ip_address.netbox_dns_records.all()
@@ -214,6 +222,9 @@ def delete_dns_records(ip_address, view=None):
 
     for record in address_records:
         record.delete()
+        deleted = True
+
+    return deleted
 
 
 def get_views_by_prefix(prefix):
