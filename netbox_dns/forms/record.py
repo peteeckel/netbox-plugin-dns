@@ -1,4 +1,6 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -49,7 +51,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
     view = DynamicModelChoiceField(
         queryset=View.objects.all(),
         required=False,
-        label="View",
+        label=_p("DNS", "View"),
     )
     zone = DynamicModelChoiceField(
         queryset=Zone.objects.all(),
@@ -57,16 +59,16 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         query_params={
             "view_id": "$view",
         },
-        label="Zone",
+        label=_("Zone"),
     )
 
     disable_ptr = forms.BooleanField(
-        label="Disable PTR",
         required=False,
+        label=_("Disable PTR"),
     )
     ttl = forms.IntegerField(
         required=False,
-        label="TTL",
+        label=_("TTL"),
     )
 
     fieldsets = (
@@ -82,8 +84,8 @@ class RecordForm(TenancyForm, NetBoxModelForm):
             "description",
             name="Record",
         ),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
-        FieldSet("tags", name="Tags"),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
+        FieldSet("tags", name=_("Tags")),
     )
 
     class Meta:
@@ -116,41 +118,46 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "disable_ptr",
             "status",
             "description",
-            name="Attributes",
+            name=_("Attributes"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
 
     type = forms.MultipleChoiceField(
         choices=RecordTypeChoices,
         required=False,
+        label=_("Type"),
     )
     name = forms.CharField(
         required=False,
+        label=_("Name"),
     )
     fqdn = forms.CharField(
         required=False,
-        label="FQDN",
+        label=_("FQDN"),
     )
     value = forms.CharField(
         required=False,
+        label=_("Value"),
     )
     disable_ptr = forms.NullBooleanField(
         required=False,
-        label="Disable PTR",
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Disable PTR"),
     )
     status = forms.MultipleChoiceField(
         choices=RecordStatusChoices,
         required=False,
+        label=_("Status"),
     )
     zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
-        label="Zone",
+        label=_("Zone"),
     )
     description = forms.CharField(
         required=False,
+        label=_("Description"),
     )
     tag = TagFilterField(Record)
 
@@ -177,38 +184,37 @@ class RecordImportForm(NetBoxModelImportForm):
         queryset=Zone.objects.all(),
         to_field_name="name",
         required=True,
-        help_text="Zone",
+        label=_("Zone"),
     )
     view = CSVModelChoiceField(
         queryset=View.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="View the zone belongs to",
+        label=_p("DNS", "View"),
     )
     type = CSVChoiceField(
         choices=RecordTypeChoices,
         required=True,
-        help_text="Record Type",
+        label=_("Type"),
     )
     status = CSVChoiceField(
         choices=RecordStatusChoices,
         required=False,
-        help_text="Record status",
+        label=_("Status"),
     )
     ttl = forms.IntegerField(
         required=False,
-        help_text="TTL",
+        label=_("TTL"),
     )
     disable_ptr = forms.BooleanField(
         required=False,
-        label="Disable PTR",
-        help_text="Disable generation of a PTR record",
+        label=_("Disable PTR"),
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="Assigned tenant",
+        label=_("Tenant"),
     )
 
     def is_valid(self):
@@ -242,35 +248,40 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
     zone = DynamicModelChoiceField(
         queryset=Zone.objects.all(),
         required=False,
+        label=_("Zone"),
     )
     type = forms.ChoiceField(
         choices=add_blank_choice(RecordTypeChoices),
         required=False,
+        label=_("Type"),
     )
     value = forms.CharField(
         required=False,
-        label="Value",
+        label=_("Value"),
     )
     status = forms.ChoiceField(
         choices=add_blank_choice(RecordStatusChoices),
         required=False,
+        label=_("Status"),
     )
     ttl = forms.IntegerField(
         required=False,
-        label="TTL",
+        label=_("TTL"),
     )
     disable_ptr = forms.NullBooleanField(
         required=False,
-        label="Disable PTR",
         widget=BulkEditNullBooleanSelect(),
+        label=_("Disable PTR"),
     )
     description = forms.CharField(
         max_length=200,
         required=False,
+        label=_("Description"),
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
+        label=_("Tenant"),
     )
 
     fieldsets = (
@@ -282,8 +293,8 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
             "ttl",
             "disable_ptr",
             "description",
-            name="Attributes",
+            name=_("Attributes"),
         ),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
     nullable_fields = ("description", "ttl", "tenant")

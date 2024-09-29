@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -45,18 +46,18 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
     )
 
     fieldsets = (
-        FieldSet("name", "description", "nameservers", name="Zone Template"),
-        FieldSet("record_templates", name="Record Templates"),
+        FieldSet("name", "description", "nameservers", name=_("Zone Template")),
+        FieldSet("record_templates", name=_("Record Templates")),
         FieldSet(
             "registrar",
             "registrant",
             "admin_c",
             "tech_c",
             "billing_c",
-            name="Domain Registration",
+            name=_("Domain Registration"),
         ),
-        FieldSet("tags", name="Tags"),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tags", name=_("Tags")),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
 
     class Meta:
@@ -81,32 +82,32 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = ZoneTemplate
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "nameserver_id", "description", name="Attributes"),
-        FieldSet("record_template_id", name="Record Templates"),
+        FieldSet("name", "nameserver_id", "description", name=_("Attributes")),
+        FieldSet("record_template_id", name=_("Record Templates")),
         FieldSet(
             "registrar_id",
             "registrant_id",
             "admin_c_id",
             "tech_c_id",
             "billing_c_id",
-            name="Registration",
+            name=_("Registration"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
 
     name = forms.CharField(
         required=False,
-        label="Template name",
+        label=_("Template Name"),
     )
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
-        label="Nameservers",
+        label=_("Nameservers"),
     )
     record_template_id = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
-        label="Record templates",
+        label=_("Record Templates"),
     )
     description = forms.CharField(
         required=False,
@@ -114,27 +115,27 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
-        label="Registrar",
+        label=_("Registrar"),
     )
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Registrant",
+        label=_("Registrant"),
     )
     admin_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Admin-C",
+        label=_("Administrative Contact"),
     )
     tech_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Tech-C",
+        label=_("Technical Contact"),
     )
     billing_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Billing-C",
+        label=_("Billing Contact"),
     )
     tag = TagFilterField(ZoneTemplate)
 
@@ -144,64 +145,64 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         queryset=NameServer.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="Name servers for the zone template",
+        label=_("Nameservers"),
     )
     record_templates = CSVModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="Record templates used by this zone template",
+        label=_("Record Remplates"),
     )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
         to_field_name="name",
-        help_text="Registrar the domain is registered with",
         error_messages={
-            "invalid_choice": "Registrar not found.",
+            "invalid_choice": _("Registrar not found."),
         },
+        label=_("Registrar"),
     )
     registrant = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Owner of the domain",
         error_messages={
-            "invalid_choice": "Registrant contact ID not found",
+            "invalid_choice": _("Registrant contact ID not found"),
         },
+        label=_("Registrant"),
     )
     admin_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Administrative contact for the domain",
         error_messages={
-            "invalid_choice": "Administrative contact ID not found",
+            "invalid_choice": _("Administrative contact ID not found"),
         },
+        label=_("Administrative Contact"),
     )
     tech_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Technical contact for the domain",
         error_messages={
-            "invalid_choice": "Technical contact ID not found",
+            "invalid_choice": _("Technical contact ID not found"),
         },
+        label=_("Technical Contact"),
     )
     billing_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Billing contact for the domain",
         error_messages={
-            "invalid_choice": "Billing contact ID not found",
+            "invalid_choice": _("Billing contact ID not found"),
         },
+        label=_("Billing Contact"),
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
         to_field_name="name",
-        help_text="Assigned tenant",
+        label=_("Tenant"),
     )
 
     class Meta:
@@ -226,42 +227,44 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        label=_("Nameservers"),
     )
     record_templates = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
+        label=_("Record Templates"),
     )
     description = forms.CharField(max_length=200, required=False)
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
+        label=_("Registrar"),
     )
     registrant = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        label=_("Registrant"),
     )
     admin_c = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Administrative Contact",
+        label=_("Administrative Contact"),
     )
     tech_c = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Technical Contact",
+        label=_("Technical Contact"),
     )
     billing_c = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Billing Contact",
+        label=_("Billing Contact"),
     )
-    tenant = CSVModelChoiceField(
+    tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
-        to_field_name="name",
-        help_text="Assigned tenant",
+        label=_("Tenant"),
     )
-    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
 
     model = ZoneTemplate
 
@@ -269,11 +272,11 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         FieldSet(
             "nameservers",
             "description",
-            name="Attributes",
+            name=_("Attributes"),
         ),
         FieldSet(
             "record_templates",
-            name="Record Templates",
+            name=_("Record Templates"),
         ),
         FieldSet(
             "registrar",
@@ -281,9 +284,9 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
             "admin_c",
             "tech_c",
             "billing_c",
-            name="Domain Registration",
+            name=_("Domain Registration"),
         ),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tenant", name=_("Tenancy")),
     )
 
     nullable_fields = (
