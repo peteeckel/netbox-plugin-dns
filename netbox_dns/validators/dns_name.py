@@ -1,6 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 from netbox.plugins.utils import get_plugin_config
 
@@ -55,7 +56,9 @@ def validate_fqdn(name, always_tolerant=False):
     regex = rf"^(\*|{label})(\.{zone_label})+\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or _has_invalid_double_dash(name):
-        raise ValidationError(f"{name} is not a valid fully qualified DNS host name")
+        raise ValidationError(
+            _("{name} is not a valid fully qualified DNS host name").format(name=name)
+        )
 
 
 def validate_rname(name, always_tolerant=False):
@@ -63,7 +66,7 @@ def validate_rname(name, always_tolerant=False):
     regex = rf"^(\*|{label})(\\\.{label})*(\.{zone_label}){{2,}}\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or _has_invalid_double_dash(name):
-        raise ValidationError(f"{name} is not a valid RNAME")
+        raise ValidationError(_("{name} is not a valid RName").format(name=name))
 
 
 def validate_generic_name(
@@ -76,7 +79,9 @@ def validate_generic_name(
     regex = rf"^([*@]|(\*\.)?{label}(\.{zone_label})*\.?)$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or _has_invalid_double_dash(name):
-        raise ValidationError(f"{name} is not a valid DNS host name")
+        raise ValidationError(
+            _("{name} is not a valid DNS host name").format(name=name)
+        )
 
 
 def validate_domain_name(
@@ -97,4 +102,6 @@ def validate_domain_name(
         regex = rf"^{label}(\.{zone_label})*\.?$"
 
     if not re.match(regex, name, flags=re.IGNORECASE) or _has_invalid_double_dash(name):
-        raise ValidationError(f"{name} is not a valid DNS domain name")
+        raise ValidationError(
+            _("{name} is not a valid DNS domain name").format(name=name)
+        )
