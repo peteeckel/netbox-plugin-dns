@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.routers import APIRootView
 
@@ -80,7 +81,7 @@ class RecordViewSet(NetBoxModelViewSet):
             data = [data]
 
         if any(record.get("managed") for record in data):
-            raise serializers.ValidationError("'managed' is True, refusing create")
+            raise serializers.ValidationError(_("'managed' is True, refusing create"))
 
         return super().create(request, *args, **kwargs)
 
@@ -88,7 +89,7 @@ class RecordViewSet(NetBoxModelViewSet):
         v_object = self.get_object()
         if v_object.managed:
             raise serializers.ValidationError(
-                f"{v_object} is managed, refusing deletion"
+                _("{object} is managed, refusing deletion").format(object=v_object)
             )
 
         return super().destroy(request, *args, **kwargs)
@@ -96,11 +97,15 @@ class RecordViewSet(NetBoxModelViewSet):
     def update(self, request, *args, **kwargs):
         v_object = self.get_object()
         if v_object.managed:
-            raise serializers.ValidationError(f"{v_object} is managed, refusing update")
+            raise serializers.ValidationError(
+                _("{object} is managed, refusing update").format(object=v_object)
+            )
 
         if request.data.get("managed"):
             raise serializers.ValidationError(
-                f"{v_object} is unmanaged, refusing update to managed"
+                _("{object} is unmanaged, refusing update to managed").format(
+                    object=v_object
+                )
             )
 
         return super().update(request, *args, **kwargs)

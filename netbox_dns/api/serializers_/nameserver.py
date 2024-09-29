@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
@@ -20,7 +21,7 @@ class NameServerSerializer(NetBoxModelSerializer):
         read_only=True,
         required=False,
         default=None,
-        help_text="Zones served by the authoritative nameserver",
+        help_text=_("Zones served by the authoritative nameserver"),
     )
     tenant = TenantSerializer(required=False, allow_null=True)
 

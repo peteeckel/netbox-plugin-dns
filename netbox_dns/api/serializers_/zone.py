@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
@@ -27,75 +28,75 @@ class ZoneSerializer(NetBoxModelSerializer):
         read_only=False,
         required=False,
         default=None,
-        help_text="View the zone belongs to",
+        help_text=_("View the zone belongs to"),
     )
     nameservers = NameServerSerializer(
         nested=True,
         many=True,
         read_only=False,
         required=False,
-        help_text="Nameservers for the zone",
+        help_text=_("Nameservers for the zone"),
     )
     soa_mname = NameServerSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="Primary nameserver for the zone",
+        help_text=_("Primary nameserver for the zone"),
     )
     rfc2317_parent_zone = NestedZoneSerializer(
         many=False,
         read_only=True,
         required=False,
-        help_text="RFC2317 arent zone for the zone",
+        help_text=_("RFC2317 parent zone of the zone"),
     )
     rfc2317_child_zones = NestedZoneSerializer(
         many=True,
         read_only=True,
         required=False,
-        help_text="RFC2317 child zones of the zone",
+        help_text=_("RFC2317 child zones of the zone"),
     )
     registrar = RegistrarSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The registrar the domain is registered with",
+        help_text=_("Registrar the domain is registered with"),
     )
     registrant = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The owner of the domain",
+        help_text=_("Registrant of the domain"),
     )
     admin_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The administrative contact for the domain",
+        help_text=_("Administrative contact for the domain"),
     )
     tech_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The technical contact for the domain",
+        help_text=_("Technical contact for the domain"),
     )
     billing_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The billing contact for the domain",
+        help_text=_("Billing contact for the domain"),
     )
     template = ZoneTemplateSerializer(
         nested=True,
         write_only=True,
         required=False,
         default=None,
-        help_text="Template to apply to the zone",
+        help_text=_("Template to apply to the zone"),
     )
     active = serializers.BooleanField(
         required=False,

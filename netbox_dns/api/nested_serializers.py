@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
@@ -37,7 +38,7 @@ class NestedZoneSerializer(WritableNestedSerializer):
         many=False,
         required=False,
         read_only=True,
-        help_text="View the zone belongs to",
+        help_text=_("View the zone belongs to"),
     )
     active = serializers.BooleanField(
         required=False,
@@ -82,7 +83,7 @@ class NestedRecordSerializer(WritableNestedSerializer):
     zone = NestedZoneSerializer(
         many=False,
         required=False,
-        help_text="Zone the record belongs to",
+        help_text=_("Zone the record belongs to"),
     )
     active = serializers.BooleanField(
         required=False,
