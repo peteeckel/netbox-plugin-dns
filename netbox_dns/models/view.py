@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
@@ -26,23 +28,27 @@ __all__ = (
 
 class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
+        verbose_name=_("Name"),
         unique=True,
         max_length=255,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         max_length=200,
         blank=True,
     )
     default_view = models.BooleanField(
+        verbose_name=_("Default View"),
         default=False,
     )
     prefixes = models.ManyToManyField(
+        verbose_name=_("IPAM Prefixes"),
         to="ipam.Prefix",
         related_name="netbox_dns_views",
         blank=True,
     )
     ip_address_filter = models.JSONField(
-        verbose_name="IP Address Filter",
+        verbose_name=_("IP Address Filter"),
         blank=True,
         null=True,
     )
@@ -70,17 +76,17 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         return str(self.name)
 
     class Meta:
-        verbose_name = "View"
-        verbose_name_plural = "Views"
+        verbose_name = _p("DNS", "View")
+        verbose_name_plural = _p("DNS", "Views")
 
         ordering = ("name",)
 
     def delete(self, *args, **kwargs):
         if self.default_view:
             if current_request.get() is not None:
-                raise AbortRequest("The default view cannot be deleted")
+                raise AbortRequest(_("The default view cannot be deleted"))
 
-            raise ValidationError("The default view cannot be deleted")
+            raise ValidationError(_("The default view cannot be deleted"))
 
         super().delete(*args, **kwargs)
 
@@ -95,7 +101,9 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         ):
             raise ValidationError(
                 {
-                    "default_view": "Please select a different view as default view to change this setting!"
+                    "default_view": _(
+                        "Please select a different view as default view to change this setting!"
+                    )
                 }
             )
 

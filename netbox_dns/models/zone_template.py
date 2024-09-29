@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -13,20 +14,23 @@ __all__ = (
 
 class ZoneTemplate(NetBoxModel):
     name = models.CharField(
-        verbose_name="Template name",
+        verbose_name=_("Template Name"),
         unique=True,
         max_length=200,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         max_length=200,
         blank=True,
     )
     nameservers = models.ManyToManyField(
+        verbose_name=_("Nameservers"),
         to="NameServer",
         related_name="+",
         blank=True,
     )
     record_templates = models.ManyToManyField(
+        verbose_name=_("Record Templates"),
         to="RecordTemplate",
         related_name="zone_templates",
         blank=True,
@@ -39,45 +43,47 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
     registrar = models.ForeignKey(
+        verbose_name=_("Registrar"),
         to="Registrar",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="The external registrar the domain is registered with",
+        help_text=_("Registrar the domain is registered with"),
         blank=True,
         null=True,
     )
     registrant = models.ForeignKey(
+        verbose_name=_("Registrant"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="The owner of the domain",
+        help_text=_("Registrar of the domain"),
         blank=True,
         null=True,
     )
     admin_c = models.ForeignKey(
+        verbose_name=_("Administrative Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Admin contact",
         related_name="+",
-        help_text="The administrative contact for the domain",
+        help_text=_("Administrative contact for the domain"),
         blank=True,
         null=True,
     )
     tech_c = models.ForeignKey(
+        verbose_name=_("Technical Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Tech contact",
         related_name="+",
-        help_text="The technical contact for the domain",
+        help_text=_("Technical contact for the domain"),
         blank=True,
         null=True,
     )
     billing_c = models.ForeignKey(
+        verbose_name=_("Billing Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Billing contact",
         related_name="+",
-        help_text="The billing contact for the domain",
+        help_text=_("Billing contact for the domain"),
         blank=True,
         null=True,
     )
@@ -104,7 +110,7 @@ class ZoneTemplate(NetBoxModel):
     )
 
     class Meta:
-        verbose_name = "Zone Template"
+        verbose_name = _("Zone Template")
         verbose_name_plural = "Zone Templates"
 
         ordering = ("name",)

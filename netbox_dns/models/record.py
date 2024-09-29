@@ -8,6 +8,7 @@ from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
 from django.urls import reverse
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
 from ipam.models import IPAddress
@@ -125,54 +126,62 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     )
 
     name = models.CharField(
+        verbose_name=_("Name"),
         max_length=255,
     )
     zone = models.ForeignKey(
-        "Zone",
+        verbose_name=_("Zone"),
+        to="Zone",
         on_delete=models.CASCADE,
     )
     fqdn = models.CharField(
+        verbose_name=_("FQDN"),
         max_length=255,
         null=True,
         blank=True,
         default=None,
     )
     type = models.CharField(
+        verbose_name=_("Type"),
         choices=RecordTypeChoices,
         max_length=10,
     )
     value = models.CharField(
+        verbose_name=_("Value"),
         max_length=65535,
     )
     status = models.CharField(
+        verbose_name=_("Status"),
         max_length=50,
         choices=RecordStatusChoices,
         default=RecordStatusChoices.STATUS_ACTIVE,
         blank=False,
     )
     ttl = models.PositiveIntegerField(
-        verbose_name="TTL",
+        verbose_name=_("TTL"),
         null=True,
         blank=True,
     )
     managed = models.BooleanField(
+        verbose_name=_("Managed"),
         null=False,
         default=False,
     )
     ptr_record = models.OneToOneField(
-        "self",
+        verbose_name="PTR Record",
+        to="self",
         on_delete=models.SET_NULL,
         related_name="address_record",
-        verbose_name="PTR record",
         null=True,
         blank=True,
     )
     disable_ptr = models.BooleanField(
-        verbose_name="Disable PTR",
-        help_text="Disable PTR record creation",
+        verbose_name=_("Disable PTR"),
+        help_text=_("Disable PTR record creation"),
         default=False,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         max_length=200,
         blank=True,
     )
@@ -184,13 +193,13 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     ip_address = AddressField(
-        verbose_name="Related IP Address",
-        help_text="IP address related to an address (A/AAAA) or PTR record",
+        verbose_name=_("Related IP Address"),
+        help_text=_("IP address related to an address (A/AAAA) or PTR record"),
         blank=True,
         null=True,
     )
     ipam_ip_address = models.ForeignKey(
-        verbose_name="IPAM IP Address",
+        verbose_name=_("IPAM IP Address"),
         to="ipam.IPAddress",
         on_delete=models.CASCADE,
         related_name="netbox_dns_records",
@@ -198,10 +207,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     rfc2317_cname_record = models.ForeignKey(
-        "self",
+        verbose_name=_("RFC2317 CNAME Record"),
+        to="self",
         on_delete=models.SET_NULL,
         related_name="rfc2317_ptr_records",
-        verbose_name="RFC2317 CNAME record",
         null=True,
         blank=True,
     )
@@ -221,8 +230,8 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     )
 
     class Meta:
-        verbose_name = "Record"
-        verbose_name_plural = "Records"
+        verbose_name = _("Record")
+        verbose_name_plural = _("Records")
 
         ordering = (
             "fqdn",
@@ -537,7 +546,9 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if not fqdn.is_subdomain(_zone):
             raise ValidationError(
                 {
-                    "name": f"{self.name} is not a name in {zone.name}",
+                    "name": _("{name} is not a name in {zone}").format(
+                        name=self.name, zone=zone.name
+                    ),
                 }
             )
 
@@ -581,13 +592,13 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     {
                         "name": exc,
                     }
-                ) from None
+                )
 
     def validate_value(self):
         try:
             validate_record_value(self.type, self.value)
         except ValidationError as exc:
-            raise ValidationError({"value": exc}) from None
+            raise ValidationError({"value": exc})
 
     def check_unique_record(self, new_zone=None):
         if not get_plugin_config("netbox_dns", "enforce_unique_records", False):
@@ -621,9 +632,13 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
             raise ValidationError(
                 {
-                    "value": f"There is already an active {self.type} record for name {self.name} in zone {self.zone} with value {self.value}."
+                    "value": _(
+                        "There is already an active {type} record for name {name} in zone {zone} with value {value}."
+                    ).format(
+                        type=self.type, name=self.name, zone=self.zone, value=self.value
+                    )
                 }
-            ) from None
+            )
 
     def handle_conflicting_address_records(self):
         if self.ipam_ip_address is None or not self.is_active:
@@ -680,9 +695,16 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         conflicting_ttls = ", ".join({str(record.ttl) for record in records})
         raise ValidationError(
             {
-                "ttl": f"There is at least one active {self.type} record for name {self.name} in zone {self.zone} and TTL is different ({conflicting_ttls})."
+                "ttl": _(
+                    "There is at least one active {type} record for name {name} in zone {zone} and TTL is different ({ttls})."
+                ).format(
+                    type=self.type,
+                    name=self.name,
+                    zone=self.zone,
+                    ttls=conflicting_ttls,
+                )
             }
-        ) from None
+        )
 
     def update_rrset_ttl(self, ttl=None):
         if self._state.adding:
@@ -760,24 +782,30 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 ):
                     raise ValidationError(
                         {
-                            "value": f"There is already an active record for name {ptr_cname_name} in zone {ptr_cname_zone}, RFC2317 CNAME is not allowed."
+                            "value": _(
+                                "There is already an active record for name {name} in zone {zone}, RFC2317 CNAME is not allowed."
+                            ).format(name=ptr_cname_name, zone=ptr_cname_zone)
                         }
-                    ) from None
+                    )
 
         if self.type == RecordTypeChoices.SOA and self.name != "@":
             raise ValidationError(
                 {
-                    "name": "SOA records are only allowed with name @ and are created automatically by NetBox DNS"
+                    "name": _(
+                        "SOA records are only allowed with name @ and are created automatically by NetBox DNS"
+                    )
                 }
-            ) from None
+            )
 
         if self.type == RecordTypeChoices.CNAME:
             if records.exclude(type=RecordTypeChoices.NSEC).exists():
                 raise ValidationError(
                     {
-                        "type": f"There is already an active record for name {self.name} in zone {self.zone}, CNAME is not allowed."
+                        "type": _(
+                            "There is already an active record for name {name} in zone {zone}, CNAME is not allowed."
+                        ).format(name=self.name, zone=self.zone)
                     }
-                ) from None
+                )
 
         elif (
             records.filter(type=RecordTypeChoices.CNAME).exists()
@@ -785,17 +813,21 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         ):
             raise ValidationError(
                 {
-                    "type": f"There is already an active CNAME record for name {self.name} in zone {self.zone}, no other record allowed."
+                    "type": _(
+                        "There is already an active CNAME record for name {name} in zone {zone}, no other record allowed."
+                    ).format(name=self.name, zone=self.zone)
                 }
-            ) from None
+            )
 
         elif self.type in RecordTypeChoices.SINGLETONS:
             if records.filter(type=self.type).exists():
                 raise ValidationError(
                     {
-                        "type": f"There is already an active {self.type} record for name {self.name} in zone {self.zone}, more than one are not allowed."
+                        "type": _(
+                            "There is already an active {type} record for name {name} in zone {zone}, more than one are not allowed."
+                        ).format(type=self.type, name=self.name, zone=self.zone)
                     }
-                ) from None
+                )
 
         super().clean(*args, **kwargs)
 

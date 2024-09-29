@@ -16,6 +16,8 @@ from django.urls import reverse
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
@@ -81,82 +83,86 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self._ip_addresses_checked = False
 
     view = models.ForeignKey(
+        verbose_name=_p("DNS", "View"),
         to="View",
         on_delete=models.PROTECT,
         null=False,
     )
     name = models.CharField(
+        verbose_name=_("Name"),
         max_length=255,
     )
     status = models.CharField(
+        verbose_name=_("Status"),
         max_length=50,
         choices=ZoneStatusChoices,
         default=ZoneStatusChoices.STATUS_ACTIVE,
         blank=True,
     )
     nameservers = models.ManyToManyField(
+        verbose_name=_("Nameserver"),
         to="NameServer",
         related_name="zones",
         blank=True,
     )
     default_ttl = models.PositiveIntegerField(
+        verbose_name=_("Default TTL"),
         blank=True,
-        verbose_name="Default TTL",
         validators=[MinValueValidator(1)],
     )
     soa_ttl = models.PositiveIntegerField(
+        verbose_name=_("SOA TTL"),
         blank=False,
         null=False,
-        verbose_name="SOA TTL",
         validators=[MinValueValidator(1)],
     )
     soa_mname = models.ForeignKey(
+        verbose_name=_("SOA MName"),
         to="NameServer",
         related_name="zones_soa",
-        verbose_name="SOA MName",
         on_delete=models.PROTECT,
         blank=False,
         null=False,
     )
     soa_rname = models.CharField(
+        verbose_name=_("SOA RName"),
         max_length=255,
         blank=False,
         null=False,
-        verbose_name="SOA RName",
     )
     soa_serial = models.BigIntegerField(
+        verbose_name=_("SOA Serial"),
         blank=True,
         null=True,
-        verbose_name="SOA Serial",
         validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
     )
     soa_refresh = models.PositiveIntegerField(
+        verbose_name=_("SOA Refresh"),
         blank=False,
         null=False,
-        verbose_name="SOA Refresh",
         validators=[MinValueValidator(1)],
     )
     soa_retry = models.PositiveIntegerField(
+        verbose_name=_("SOA Retry"),
         blank=False,
         null=False,
-        verbose_name="SOA Retry",
         validators=[MinValueValidator(1)],
     )
     soa_expire = models.PositiveIntegerField(
+        verbose_name=_("SOA Expire"),
         blank=False,
         null=False,
-        verbose_name="SOA Expire",
         validators=[MinValueValidator(1)],
     )
     soa_minimum = models.PositiveIntegerField(
+        verbose_name=_("SOA Minimum TTL"),
         blank=False,
         null=False,
-        verbose_name="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
     )
     soa_serial_auto = models.BooleanField(
-        verbose_name="Generate SOA Serial",
-        help_text="Automatically generate the SOA Serial field",
+        verbose_name=_("Generate SOA Serial"),
+        help_text=_("Automatically generate the SOA serial number"),
         default=True,
     )
     description = models.CharField(
@@ -164,8 +170,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
     )
     arpa_network = NetworkField(
-        verbose_name="ARPA Network",
-        help_text="Network related to a reverse lookup zone (.arpa)",
+        verbose_name=_("ARPA Network"),
+        help_text=_("Network related to a reverse lookup zone (.arpa)"),
         blank=True,
         null=True,
     )
@@ -179,70 +185,70 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     registrar = models.ForeignKey(
         to="Registrar",
         on_delete=models.SET_NULL,
-        verbose_name="Registrar",
-        help_text="The external registrar the domain is registered with",
+        verbose_name=_("Registrar"),
+        help_text=_("Registrar the domain is registered with"),
         blank=True,
         null=True,
     )
     registry_domain_id = models.CharField(
-        verbose_name="Registry Domain ID",
-        help_text="The ID of the domain assigned by the registry",
+        verbose_name=_("Registry Domain ID"),
+        help_text=_("ID of the domain assigned by the registry"),
         max_length=50,
         blank=True,
         null=True,
     )
     registrant = models.ForeignKey(
+        verbose_name=_("Registrant"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Registrant",
-        help_text="The owner of the domain",
+        help_text=_("Registrant of the domain"),
         blank=True,
         null=True,
     )
     admin_c = models.ForeignKey(
+        verbose_name="Administrative Contact",
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Admin Contact",
         related_name="admin_c_zones",
-        help_text="The administrative contact for the domain",
+        help_text=_("Administrative contact for the domain"),
         blank=True,
         null=True,
     )
     tech_c = models.ForeignKey(
+        verbose_name=_("Technical Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Technical Contact",
         related_name="tech_c_zones",
-        help_text="The technical contact for the domain",
+        help_text=_("Technical contact for the domain"),
         blank=True,
         null=True,
     )
     billing_c = models.ForeignKey(
+        verbose_name=_("Billing Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        verbose_name="Billing Contact",
         related_name="billing_c_zones",
-        help_text="The billing contact for the domain",
+        help_text=_("Billing contact for the domain"),
         blank=True,
         null=True,
     )
     rfc2317_prefix = RFC2317NetworkField(
-        verbose_name="RCF2317 Prefix",
-        help_text="RFC2317 IPv4 prefix prefix with a length of at least 25 bits",
+        verbose_name=_("RFC2317 Prefix"),
+        help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
         blank=True,
         null=True,
     )
     rfc2317_parent_managed = models.BooleanField(
-        verbose_name="RFC2317 Parent Managed",
-        help_text="The parent zone for the RFC2317 zone is managed by NetBox DNS",
+        verbose_name=_("RFC2317 Parent Managed"),
+        help_text=_("The parent zone for the RFC2317 zone is managed by NetBox DNS"),
         default=False,
     )
     rfc2317_parent_zone = models.ForeignKey(
+        verbose_name=_("RFC2317 Parent Zone"),
         to="self",
         on_delete=models.SET_NULL,
-        verbose_name="RFC2317 Parent Zone",
         related_name="rfc2317_child_zones",
-        help_text="Parent zone for RFC2317 reverse zones",
+        help_text=_("Parent zone for RFC2317 reverse zones"),
         blank=True,
         null=True,
     )
@@ -266,8 +272,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     )
 
     class Meta:
-        verbose_name = "Zone"
-        verbose_name_plural = "Zones"
+        verbose_name = _("Zone")
+        verbose_name_plural = _("Zones")
 
         ordering = (
             "view",
@@ -453,7 +459,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         ns_errors = []
 
         if not nameservers:
-            ns_errors.append(f"No nameservers are configured for zone {self}")
+            ns_errors.append(
+                _("No nameservers are configured for zone {zone}").format(zone=self)
+            )
 
         for _nameserver in nameservers:
             name = dns_name.from_text(_nameserver.name, origin=None)
@@ -477,7 +485,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
             if not address_records:
                 ns_warnings.append(
-                    f"Nameserver {_nameserver.name} does not have an active address record in zone {ns_zone}"
+                    _(
+                        "Nameserver {nameserver} does not have an active address record in zone {zone}"
+                    ).format(nameserver=_nameserver.name, zone=ns_zone)
                 )
 
         return ns_warnings, ns_errors
@@ -491,7 +501,11 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         if (new_serial - old_serial) % SOA_SERIAL_WRAP > MAX_SOA_SERIAL_INCREMENT:
             raise ValidationError(
-                {"soa_serial": f"soa_serial must not decrease for zone {self.name}."}
+                {
+                    "soa_serial": _(
+                        "soa_serial must not decrease for zone {zone}."
+                    ).format(zone=self.name)
+                }
             )
 
     def get_auto_serial(self):
@@ -602,7 +616,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.soa_mname = NameServer.objects.get(name=default_soa_mname)
             except NameServer.DoesNotExist:
                 raise ValidationError(
-                    f"Default soa_mname instance {default_soa_mname} does not exist"
+                    _("Default soa_mname instance {nameserver} does not exist").format(
+                        nameserver=default_soa_mname
+                    )
                 )
 
         super().clean_fields(exclude=exclude)
@@ -630,7 +646,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             ) from None
 
         if self.soa_rname in (None, ""):
-            raise ValidationError("soa_rname not set and no default value defined")
+            raise ValidationError(_("soa_rname not set and no default value defined"))
         try:
             dns_name.from_text(self.soa_rname, origin=dns_name.root)
             validate_rname(self.soa_rname)
@@ -645,7 +661,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             if self.soa_serial is None:
                 raise ValidationError(
                     {
-                        "soa_serial": f"soa_serial is not defined and soa_serial_auto is disabled for zone {self.name}."
+                        "soa_serial": _(
+                            "soa_serial is not defined and soa_serial_auto is disabled for zone {zone}."
+                        ).format(zone=self.name)
                     }
                 )
 
@@ -663,7 +681,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 except ValidationError:
                     raise ValidationError(
                         {
-                            "soa_serial_auto": f"Enabling soa_serial_auto would decrease soa_serial for zone {self.name}."
+                            "soa_serial_auto": _(
+                                "Enabling soa_serial_auto would decrease soa_serial for zone {zone}."
+                            ).format(zone=self.name)
                         }
                     )
 
@@ -697,7 +717,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             if self.arpa_network is not None:
                 raise ValidationError(
                     {
-                        "rfc2317_prefix": "A regular reverse zone can not be used as an RFC2317 zone."
+                        "rfc2317_prefix": _(
+                            "A regular reverse zone can not be used as an RFC2317 zone."
+                        )
                     }
                 )
 
@@ -707,7 +729,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 if rfc2317_parent_zone is None:
                     raise ValidationError(
                         {
-                            "rfc2317_parent_managed": f"Parent zone not found in view {self.view}."
+                            "rfc2317_parent_managed": _(
+                                "Parent zone not found in view {view}."
+                            ).format(view=self.view)
                         }
                     )
 
@@ -724,7 +748,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             if overlapping_zones.exists():
                 raise ValidationError(
                     {
-                        "rfc2317_prefix": f"RFC2317 prefix overlaps with zone {overlapping_zones.first()}."
+                        "rfc2317_prefix": _(
+                            "RFC2317 prefix overlaps with zone {zone}."
+                        ).format(zone=overlapping_zones.first())
                     }
                 )
 
