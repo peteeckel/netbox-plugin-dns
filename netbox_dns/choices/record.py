@@ -1,5 +1,7 @@
 from dns import rdatatype, rdataclass
 
+from django.utils.translation import gettext_lazy as _
+
 from utilities.choices import ChoiceSet
 
 
@@ -44,6 +46,6 @@ class RecordStatusChoices(ChoiceSet):
     STATUS_INACTIVE = "inactive"
 
     CHOICES = [
-        (STATUS_ACTIVE, "Active", "blue"),
-        (STATUS_INACTIVE, "Inactive", "red"),
+        (STATUS_ACTIVE, _("Active"), "blue"),
+        (STATUS_INACTIVE, _("Inactive"), "red"),
     ]
