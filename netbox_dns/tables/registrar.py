@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, TagColumn
 
@@ -10,6 +11,7 @@ __all__ = ("RegistrarTable",)
 
 class RegistrarTable(NetBoxTable):
     name = tables.Column(
+        verbose_name=_("Name"),
         linkify=True,
     )
     tags = TagColumn(

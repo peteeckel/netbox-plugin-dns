@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, TagColumn, ActionsColumn
 from tenancy.tables import TenancyColumnsMixin
@@ -14,10 +15,11 @@ __all__ = (
 
 class ViewTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
+        verbose_name=_("Name"),
         linkify=True,
     )
     default_view = tables.BooleanColumn(
-        verbose_name="Default View",
+        verbose_name=_("Default View"),
     )
     tags = TagColumn(url_name="plugins:netbox_dns:view_list")
 
