@@ -1,6 +1,7 @@
 import django_filters
 
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -22,75 +23,75 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=RecordTemplate.objects.all(),
         field_name="record_templates",
         to_field_name="id",
-        label="Record Template ID",
+        label=_("Record Template ID"),
     )
     record_template = django_filters.ModelMultipleChoiceFilter(
         queryset=RecordTemplate.objects.all(),
         field_name="record_templates__name",
         to_field_name="name",
-        label="Record Template",
+        label=_("Record Template"),
     )
     nameserver_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers",
         to_field_name="id",
-        label="Nameservers ID",
+        label=_("Nameservers ID"),
     )
     nameserver = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers__name",
         to_field_name="name",
-        label="Nameserver",
+        label=_("Nameserver"),
     )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
-        label="Registrar ID",
+        label=_("Registrar ID"),
     )
     registrar = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
         field_name="registrar__name",
         to_field_name="name",
-        label="Registrar",
+        label=_("Registrar"),
     )
     registrant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label="Registrant ID",
+        label=_("Registrant ID"),
     )
     registrant = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
         field_name="registrant__contact_id",
         to_field_name="contact_id",
-        label="Registrant",
+        label=_("Registrant"),
     )
     admin_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label="Administrative RegistrationContact ID",
+        label=_("Administrative Contact ID"),
     )
     admin_c = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
         field_name="admin_c__contact_id",
         to_field_name="contact_id",
-        label="Administrative RegistrationContact",
+        label=_("Administrative Contact"),
     )
     tech_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label="Technical RegistrationContact ID",
+        label=_("Technical Contact ID"),
     )
     tech_c = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
         field_name="tech_c__contact_id",
         to_field_name="contact_id",
-        label="Technical RegistrationContact",
+        label=_("Technical Contact"),
     )
     billing_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label="Billing RegistrationContact ID",
+        label=_("Billing Contact ID"),
     )
     billing_c = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
         field_name="billing_c__contact_id",
         to_field_name="contact_id",
-        label="Billing RegistrationContact",
+        label=_("Billing Contact"),
     )
 
     class Meta:
