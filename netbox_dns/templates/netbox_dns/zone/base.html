@@ -3,12 +3,13 @@
 {% load helpers %}
 {% load plugins %}
 {% load perms %}
+{% load i18n %}
 
 {% block extra_controls %}
 {% if perms.netbox_dns.add_record %}
 <a href="{% url 'plugins:netbox_dns:record_add' %}?zone={{ object.pk }}&return_url={{ object.get_absolute_url }}">
     <button type="submit" class="btn btn-primary" name="add-record">
-        <i class="mdi mdi-plus-thick" aria-hidden="true"></i>Add Record
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i>{% trans "Add Record" %}
     </button>
 </a>
 {% endif %}
