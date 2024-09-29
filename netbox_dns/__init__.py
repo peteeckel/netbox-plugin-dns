@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from netbox.plugins import PluginConfig
 from ipam.choices import IPAddressStatusChoices
@@ -10,8 +11,8 @@ __version__ = "1.1.2"
 
 class DNSConfig(PluginConfig):
     name = "netbox_dns"
-    verbose_name = "NetBox DNS"
-    description = "NetBox plugin for DNS data"
+    verbose_name = _("NetBox DNS")
+    description = _("NetBox plugin for DNS data")
     min_version = "4.0.0"
     version = __version__
     author = "Peter Eckel"
