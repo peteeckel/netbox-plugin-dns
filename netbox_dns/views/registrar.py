@@ -1,3 +1,5 @@
+from django.utils.translation import gettext as _
+
 from netbox.views import generic
 
 from utilities.views import ViewTab, register_model_view
@@ -75,7 +77,7 @@ class RegistrarZoneListView(generic.ObjectChildrenView):
     hide_if_empty = True
 
     tab = ViewTab(
-        label="Zones",
+        label=_("Zones"),
         permission="netbox_dns.view_zone",
         badge=lambda obj: obj.zone_set.count(),
         hide_if_empty=True,

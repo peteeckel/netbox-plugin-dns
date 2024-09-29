@@ -1,5 +1,7 @@
 from dns import name as dns_name
 
+from django.utils.translation import gettext_lazy as _
+
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 from tenancy.views import ObjectContactsView
@@ -127,7 +129,7 @@ class ZoneRecordListView(generic.ObjectChildrenView):
     hide_if_empty = True
 
     tab = ViewTab(
-        label="Records",
+        label=_("Records"),
         permission="netbox_dns.view_record",
         badge=lambda obj: obj.record_count(managed=False),
         hide_if_empty=True,
@@ -149,7 +151,7 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
     actions = {"changelog": {"view"}}
 
     tab = ViewTab(
-        label="Managed Records",
+        label=_("Managed Records"),
         permission="netbox_dns.view_record",
         badge=lambda obj: obj.record_count(managed=True),
         hide_if_empty=True,
@@ -170,7 +172,7 @@ class ZoneRFC2317ChildZoneListView(generic.ObjectChildrenView):
     template_name = "netbox_dns/zone/rfc2317_child_zone.html"
 
     tab = ViewTab(
-        label="RFC2317 Child Zones",
+        label=_("RFC2317 Child Zones"),
         permission="netbox_dns.view_zone",
         badge=lambda obj: obj.rfc2317_child_zone_count(),
         hide_if_empty=True,
@@ -189,7 +191,7 @@ class ZoneChildZoneListView(generic.ObjectChildrenView):
     template_name = "netbox_dns/zone/child_zone.html"
 
     tab = ViewTab(
-        label="Child Zones",
+        label=_("Child Zones"),
         permission="netbox_dns.view_zone",
         badge=lambda obj: obj.child_zones.count(),
         hide_if_empty=True,

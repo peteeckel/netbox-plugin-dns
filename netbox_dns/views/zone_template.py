@@ -33,13 +33,14 @@ class ZoneTemplateView(generic.ObjectView):
     queryset = ZoneTemplate.objects.all()
 
     def get_extra_context(self, request, instance):
-        record_template_table = RecordTemplateDisplayTable(
-            data=instance.record_templates.all()
-        )
+        if instance.record_templates.exists():
+            return {
+                "record_template_table": RecordTemplateDisplayTable(
+                    data=instance.record_templates.all()
+                )
+            }
 
-        return {
-            "record_template_table": record_template_table,
-        }
+        return {}
 
 
 class ZoneTemplateEditView(generic.ObjectEditView):
