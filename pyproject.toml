@@ -30,4 +30,4 @@ build-backend = 'setuptools.build_meta'
 exclude = ["examples*", "media*", "*.tests*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.html"]
+"netbox_dns" = ["templates/**/*.html", "locale/**/*.mo"]
