@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
@@ -22,7 +23,7 @@ class ViewSerializer(NetBoxModelSerializer):
         nested=True,
         read_only=False,
         required=False,
-        help_text="IPAM Prefixes assigned to the View",
+        help_text=_("IPAM Prefixes assigned to the View"),
     )
     tenant = TenantSerializer(
         nested=True,

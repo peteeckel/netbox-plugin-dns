@@ -1,27 +1,28 @@
 {% extends 'generic/object.html' %}
+{% load i18n %}
 
 {% block content %}
     <div class="row">
         <div class="col col-md-6">
             <div class="card">
-                <h5 class="card-header">View</h5>
+                <h5 class="card-header">{% trans "View" context "DNS" %}</h5>
                 <table class="table table-hover attr-table">
                     <tr>
-                        <th scope="row">Name</th>
+                        <th scope="row">{% trans "Name" %}</th>
                         <td>{{ object.name }}</td>
                     </tr>
                     <tr>
-                        <th scope="row">Default View</th>
+                        <th scope="row">{% trans "Default View" %}</th>
                         <td>{% checkmark object.default_view %}</td>
                     </tr>
                     {% if object.description %}
                     <tr>
-                        <th scope="row">Description</th>
+                        <th scope="row">{% trans "Description" %}</th>
                         <td style="word-break:break-all;">{{ object.description }}</td>
                     </tr>
                     {% endif %}
                     <tr>
-                        <th scope="row">Tenant</th>
+                        <th scope="row">{% trans "Tenant" %}</th>
                         <td>
                             {% if object.tenant.group %}
                                 {{ object.tenant.group|linkify }} /
@@ -37,9 +38,7 @@
             {% include 'inc/panels/tags.html' %}
             {% if not settings.PLUGINS_CONFIG.netbox_dns.dnssync_disabled %}
             <div class="card">
-                <h5 class="card-header">
-                    IPAM Prefixes
-                </h5>
+                <h5 class="card-header">{% trans "IPAM Prefixes" %}</h5>
                 <div class="card-body">
                     <table class="table table-hover attr-table">
                         {% if object.prefixes.exists %}
@@ -53,25 +52,23 @@
                                 {{ prefix.vrf|linkify }}
                             </td>
                             {% else %}
-                            <td>Global</td>
+                            <td>{% trans "Global" %}</td>
                             {% endif %}
                         </tr>
                         {% endfor %}
                         {% else %}
-                            <span class="text-muted">No prefixes assigned</span>
+                            <span class="text-muted">{% trans "No prefixes assigned" %}</span>
                         {% endif %}
                     </table>
                 </div>
             </div>
             <div class="card">
-                <h5 class="card-header">
-                    IP Address Filters
-                </h5>
+                <h5 class="card-header">{% trans "IP Address Filters" %}</h5>
                 <div class="card-body">
                     {% if object.ip_address_filter %}
                         <pre>{{ object.ip_address_filter|json }}</pre>
                     {% else %}
-                        <span class="text-muted">No filters defined</span>
+                        <span class="text-muted">{% trans "No filters defined" %}</span>
                     {% endif %}
                 </div>
             </div>

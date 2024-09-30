@@ -1,5 +1,6 @@
 import django_filters
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -22,13 +23,13 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates__name",
         to_field_name="name",
-        label="Zone Template",
+        label=_("Zone Template"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates",
         to_field_name="id",
-        label="Zone Template ID",
+        label=_("Zone Template ID"),
     )
 
     class Meta:

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
@@ -23,48 +24,48 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
         many=True,
         read_only=False,
         required=False,
-        help_text="Nameservers for the zone",
+        help_text=_("Nameservers for the zone"),
     )
     record_templates = NestedRecordTemplateSerializer(
         many=True,
         read_only=False,
         required=False,
-        help_text="Record templates assigned to the zone",
+        help_text=_("Record templates assigned to the zone template"),
     )
     registrar = RegistrarSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The registrar the domain is registered with",
+        help_text=_("Registrar the domain is registered with"),
     )
     registrant = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The owner of the domain",
+        help_text=_("Registrant of the domain"),
     )
     admin_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The administrative contact for the domain",
+        help_text=_("Administrative contact for the domain"),
     )
     tech_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The technical contact for the domain",
+        help_text=_("Technical contact for the domain"),
     )
     billing_c = RegistrationContactSerializer(
         nested=True,
         many=False,
         read_only=False,
         required=False,
-        help_text="The billing contact for the domain",
+        help_text=_("Billing contact for the domain"),
     )
     active = serializers.BooleanField(
         required=False,

@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from utilities.choices import ChoiceSet
 
 
@@ -13,8 +15,8 @@ class ZoneStatusChoices(ChoiceSet):
     STATUS_PARKED = "parked"
 
     CHOICES = [
-        (STATUS_ACTIVE, "Active", "blue"),
-        (STATUS_RESERVED, "Reserved", "cyan"),
-        (STATUS_DEPRECATED, "Deprecated", "red"),
-        (STATUS_PARKED, "Parked", "gray"),
+        (STATUS_ACTIVE, _("Active"), "blue"),
+        (STATUS_RESERVED, _("Reserved"), "cyan"),
+        (STATUS_DEPRECATED, _("Deprecated"), "red"),
+        (STATUS_PARKED, _("Parked"), "gray"),
     ]

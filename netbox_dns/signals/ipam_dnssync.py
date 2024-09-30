@@ -4,6 +4,7 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, pre_save, post_save, m2m_changed
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 from netbox.context import current_request
 from netbox.signals import post_clean
@@ -60,18 +61,18 @@ def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
             if not ip_address.custom_field_data.get("ipaddress_dns_disabled"):
                 raise ValidationError(
                     {
-                        "dns_name": "Unique DNS records are enforced and there is already "
-                        f"an active IP address {instance.address} with DNS name {instance.dns_name}. "
-                        "Plesase choose a different name or disable record creation for this "
-                        "IP address."
+                        "dns_name": _(
+                            "Unique DNS records are enforced and there is already "
+                            "an active IP address {address} with DNS name {name}. Plesase choose "
+                            "a different name or disable record creation for this IP address."
+                        ).format(address=instance.address, name=instance.dns_name)
                     }
                 )
 
     # +
     # Check NetBox DNS record permission for changes to IPAddress custom fields
-    #
-    # Normally, as the modfication of DNS fields
-    if (request := current_request.get()) is not None:
+    # -
+    if (current_request.get()) is not None:
         cf_data = instance.custom_field_data
         if (
             not instance._state.adding
@@ -96,7 +97,7 @@ def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
             and not check_record_permission(change=False, delete=False)
         ):
             raise ValidationError(
-                f"User '{request.user}' is not allowed to alter DNSsync custom fields"
+                _("You do not have permission to alter DNSsync custom fields")
             )
 
     try:
@@ -139,13 +140,17 @@ def ipam_dnssync_prefix_pre_save(instance, **kwargs):
         dns_views = ", ".join([view.name for view in instance.netbox_dns_views.all()])
         if request is not None:
             raise AbortRequest(
-                f"This prefix is currently assigned to the following DNS views: {dns_views}"
-                f"Please deassign it from these views before making changes to the prefix "
-                f"or VRF."
+                _(
+                    "This prefix is currently assigned to the following DNS views: {views}. "
+                    "Please deassign it from these views before making changes to the prefix "
+                    "or VRF."
+                ).format(views=dns_views)
             )
 
         raise ValidationError(
-            f"Prefix is assigned to DNS views {dns_views}. Prefix and VRF must not be changed"
+            _(
+                "Prefix is assigned to DNS views {views}. Prefix and VRF must not be changed"
+            ).format(views=dns_views)
         )
 
 
@@ -166,8 +171,10 @@ def ipam_dnssync_prefix_pre_delete(instance, **kwargs):
         except ValidationError as exc:
             if request is not None:
                 raise AbortRequest(
-                    f"Prefix deletion would cause DNS errors: {exc.messages[0]} "
-                    "Please review DNS View assignments for this and the parent prefix"
+                    _(
+                        "Prefix deletion would cause DNS errors: {errors}. Please review "
+                        "DNS View assignments for this and the parent prefix"
+                    ).format(errors=exc.messages[0])
                 )
             else:
                 raise exc

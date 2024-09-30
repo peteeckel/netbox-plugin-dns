@@ -2,6 +2,7 @@ from django import forms
 from django.db import models
 from django.db.models import Lookup, Transform, IntegerField
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from netaddr import AddrFormatError, IPNetwork
 
@@ -76,7 +77,7 @@ class NetworkFormField(forms.Field):
 
 
 class NetworkField(models.Field):
-    description = "IPv4/v6 network associated with a reverse lookup zone"
+    description = _("IPv4/v6 network associated with a reverse lookup zone")
 
     def python_type(self):
         return IPNetwork

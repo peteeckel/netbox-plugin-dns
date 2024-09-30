@@ -2,6 +2,8 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError, FieldError
 from django.db.models import Q, Count
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -106,28 +108,28 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
                 self._saved_prefixes = self.initial["prefixes"]
                 self.initial["prefixes"] = []
                 self.fields["prefixes"].disabled = True
-                self.fields["prefixes"].widget.attrs[
-                    "placeholder"
-                ] = "You do not have permission to modify assigned prefixes"
+                self.fields["prefixes"].widget.attrs["placeholder"] = _(
+                    "You do not have permission to modify assigned prefixes"
+                )
 
     prefixes = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         required=False,
-        label="IPAM Prefixes",
         context={
             "depth": None,
         },
+        label=_("IPAM Prefixes"),
     )
     ip_address_filter = JSONField(
-        label="IP Address Filter",
         required=False,
-        help_text="Specify criteria for address record creation in JSON form",
+        help_text=_("Specify criteria for address record creation in JSON form"),
+        label=_("IP Address Filter"),
     )
 
     fieldsets = (
-        FieldSet("name", "default_view", "description", "tags", name="View"),
+        FieldSet("name", "default_view", "description", "tags", name=_p("DNS", "View")),
         FieldSet("prefixes", "ip_address_filter"),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
 
     class Meta:
@@ -154,7 +156,10 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
         try:
             IPAddress.objects.filter(get_query_from_filter(ip_address_filter)).exists()
         except (FieldError, ValueError) as exc:
-            self.add_error("ip_address_filter", f"Invalid filter for IPAddress: {exc}")
+            self.add_error(
+                "ip_address_filter",
+                _("Invalid filter for IPAddress: {error}").format(error=exc),
+            )
 
         return ip_address_filter
 
@@ -169,9 +174,9 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = View
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "default_view", "description", name="Attributes"),
+        FieldSet("name", "default_view", "description", name=_("Attributes")),
         FieldSet("prefix_id"),
-        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
 
     name = forms.CharField(
@@ -187,10 +192,10 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     prefix_id = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
         required=False,
-        label="Prefix",
         context={
             "depth": None,
         },
+        label=_("Prefix"),
     )
     tag = TagFilterField(View)
 
@@ -206,13 +211,14 @@ class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
         queryset=Prefix.objects.all(),
         to_field_name="id",
         required=False,
-        help_text="Prefix IDs assigned to the view",
+        help_text=_("Prefix IDs assigned to the view"),
+        label=_("Prefixes"),
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="Assigned tenant",
+        label=_("Tenant"),
     )
 
     class Meta:
@@ -223,16 +229,23 @@ class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
 class ViewBulkEditForm(NetBoxModelBulkEditForm):
     model = View
 
-    description = forms.CharField(max_length=200, required=False)
-    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
+    description = forms.CharField(
+        max_length=200,
+        required=False,
+        label=_("Description"),
+    )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        required=False,
+        label=_("Tenant"),
+    )
 
     fieldsets = (
         FieldSet(
-            "name",
             "description",
-            name="Attributes",
+            name=_("Attributes"),
         ),
-        FieldSet("tenant", name="Tenancy"),
+        FieldSet("tenant", name=_("Tenancy")),
     )
 
     nullable_fields = ("description", "tenant")
@@ -242,8 +255,10 @@ class ViewPrefixEditForm(forms.ModelForm):
     views = DynamicModelMultipleChoiceField(
         queryset=View.objects.all(),
         required=False,
-        label="Assigned DNS Views",
-        help_text="Explicitly assigning DNS views overrides all inherited views for this prefix",
+        help_text=_(
+            "Explicitly assigning DNS views overrides all inherited views for this prefix"
+        ),
+        label=_("Assigned DNS Views"),
     )
 
     class Meta:
@@ -261,9 +276,9 @@ class ViewPrefixEditForm(forms.ModelForm):
                 self._permission_denied = True
                 self.initial["views"] = []
                 self.fields["views"].disabled = True
-                self.fields["views"].widget.attrs[
-                    "placeholder"
-                ] = "You do not have permission to modify assigned views"
+                self.fields["views"].widget.attrs["placeholder"] = _(
+                    "You do not have permission to modify assigned views"
+                )
 
     def clean(self, *args, **kwargs):
         if self._permission_denied:

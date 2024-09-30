@@ -4,6 +4,7 @@ from dns import name as dns_name
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -23,37 +24,41 @@ __all__ = (
 
 class RecordTemplate(NetBoxModel):
     name = models.CharField(
-        verbose_name="Template name",
+        verbose_name=_("Template Name"),
         unique=True,
         max_length=200,
     )
     record_name = models.CharField(
-        verbose_name="Name",
+        verbose_name=_("Name"),
         max_length=255,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         max_length=200,
         blank=True,
     )
     type = models.CharField(
+        verbose_name=_("Type"),
         choices=RecordTypeChoices,
     )
     value = models.CharField(
+        verbose_name=_("Value"),
         max_length=65535,
     )
     status = models.CharField(
+        verbose_name=_("Status"),
         choices=RecordStatusChoices,
         default=RecordStatusChoices.STATUS_ACTIVE,
         blank=False,
     )
     ttl = models.PositiveIntegerField(
-        verbose_name="TTL",
+        verbose_name=_("TTL"),
         null=True,
         blank=True,
     )
     disable_ptr = models.BooleanField(
-        verbose_name="Disable PTR",
-        help_text="Disable PTR record creation",
+        verbose_name=_("Disable PTR"),
+        help_text=_("Disable PTR record creation"),
         default=False,
     )
     tenant = models.ForeignKey(
@@ -85,8 +90,8 @@ class RecordTemplate(NetBoxModel):
     )
 
     class Meta:
-        verbose_name = "Record Template"
-        verbose_name_plural = "Record Templates"
+        verbose_name = _("Record Template")
+        verbose_name_plural = _("Record Templates")
 
         ordering = ("name",)
 
@@ -155,7 +160,9 @@ class RecordTemplate(NetBoxModel):
             record = Record.objects.create(**record_data)
         except ValidationError as exc:
             raise ValidationError(
-                f"Error while processing record template {self}: {exc.messages[0]}"
+                _("Error while processing record template {template}: {error}").format(
+                    template=self, error=exc.messages[0]
+                )
             )
 
         if tags := self.tags.all():

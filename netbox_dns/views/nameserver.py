@@ -1,5 +1,7 @@
 from dns import name as dns_name
 
+from django.utils.translation import gettext_lazy as _
+
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 from tenancy.views import ObjectContactsView
@@ -91,7 +93,7 @@ class NameServerZoneListView(generic.ObjectChildrenView):
     hide_if_empty = True
 
     tab = ViewTab(
-        label="Zones",
+        label=_("Zones"),
         permission="netbox_dns.view_zone",
         badge=lambda obj: obj.zones.count(),
         hide_if_empty=True,
@@ -111,7 +113,7 @@ class NameServerSOAZoneListView(generic.ObjectChildrenView):
     hide_if_empty = True
 
     tab = ViewTab(
-        label="SOA Zones",
+        label=_("SOA Zones"),
         permission="netbox_dns.view_zone",
         badge=lambda obj: obj.zones_soa.count(),
         hide_if_empty=True,

@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -37,7 +38,7 @@ class RegistrationContactForm(NetBoxModelForm):
             "fax",
             "fax_ext",
             "email",
-            name="RegistrationContact",
+            name=_("Contact"),
         ),
         FieldSet("tags", name="Tags"),
     )
@@ -68,7 +69,7 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
 
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "contact_id", "description", name="Attributes"),
+        FieldSet("name", "contact_id", "description", name=_("Attributes")),
         FieldSet(
             "organization",
             "street",
@@ -76,57 +77,68 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
             "state_province",
             "postal_code",
             "country",
-            name="Address",
+            name=_("Address"),
         ),
-        FieldSet("phone", "phone_ext", "fax", "fax_ext", "email", name="Communication"),
+        FieldSet(
+            "phone", "phone_ext", "fax", "fax_ext", "email", name=_("Communication")
+        ),
     )
 
     name = forms.CharField(
         required=False,
+        label=_("Name"),
     )
     description = forms.CharField(
         required=False,
+        label=_("Description"),
     )
     contact_id = forms.CharField(
         required=False,
-        label="RegistrationContact ID",
+        label=_("Contact ID"),
     )
     organization = forms.CharField(
         required=False,
+        label=_("Organization"),
     )
     street = forms.CharField(
         required=False,
+        label=_("Street"),
     )
     city = forms.CharField(
         required=False,
+        label=_("City"),
     )
     state_province = forms.CharField(
         required=False,
-        label="State/Province",
+        label=_("State/Province"),
     )
     postal_code = forms.CharField(
         required=False,
-        label="Postal Code",
+        label=_("Postal Code"),
     )
     country = forms.CharField(
         required=False,
+        label=_("Country"),
     )
     phone = forms.CharField(
         required=False,
+        label=_("Phone"),
     )
     phone_ext = forms.CharField(
         required=False,
-        label="Phone Extension",
+        label=_("Phone Extension"),
     )
     fax = forms.CharField(
         required=False,
+        label=_("Fax"),
     )
     fax_ext = forms.CharField(
         required=False,
-        label="Fax Extension",
+        label=_("Fax Extension"),
     )
     email = forms.CharField(
         required=False,
+        label=_("Email Address"),
     )
     tag = TagFilterField(RegistrationContact)
 
@@ -158,59 +170,59 @@ class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
 
     name = forms.CharField(
         required=False,
-        label="Name",
+        label=_("Name"),
     )
     description = forms.CharField(
         required=False,
-        label="Description",
+        label=_("Description"),
     )
     organization = forms.CharField(
         required=False,
-        label="Organization",
+        label=_("Organization"),
     )
     street = forms.CharField(
         required=False,
-        label="Street",
+        label=_("Street"),
     )
     city = forms.CharField(
         required=False,
-        label="City",
+        label=_("City"),
     )
     state_province = forms.CharField(
         required=False,
-        label="State/Province",
+        label=_("State/Province"),
     )
     postal_code = forms.CharField(
         required=False,
-        label="Postal Code",
+        label=_("Postal Code"),
     )
     country = forms.CharField(
         required=False,
-        label="Country",
+        label=_("Country"),
     )
     phone = forms.CharField(
         required=False,
-        label="Phone",
+        label=_("Phone"),
     )
     phone_ext = forms.CharField(
         required=False,
-        label="Phone Extension",
+        label=_("Phone Extension"),
     )
     fax = forms.CharField(
         required=False,
-        label="Fax",
+        label=_("Fax"),
     )
     fax_ext = forms.CharField(
         required=False,
-        label="Fax Extension",
+        label=_("Fax Extension"),
     )
     email = forms.CharField(
         required=False,
-        label="Email Address",
+        label=_("Email Address"),
     )
 
     fieldsets = (
-        FieldSet("name", "description", name="Attributes"),
+        FieldSet("name", "description", name=_("Attributes")),
         FieldSet(
             "organization",
             "street",
@@ -218,7 +230,7 @@ class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
             "state_province",
             "postal_code",
             "country",
-            name="Address",
+            name=_("Address"),
         ),
         FieldSet(
             "phone",
@@ -226,7 +238,7 @@ class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
             "fax",
             "fax_ext",
             "email",
-            name="Communication",
+            name=_("Communication"),
         ),
     )
 

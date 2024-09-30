@@ -1,5 +1,7 @@
 import django_tables2 as tables
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 
 from netbox.tables import (
@@ -23,33 +25,39 @@ __all__ = (
 
 class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     zone = tables.Column(
+        verbose_name=_("Zone"),
         linkify=True,
     )
     view = tables.Column(
+        verbose_name=_p("DNS", "View"),
         accessor="zone__view",
         linkify=True,
     )
-    type = tables.Column()
+    type = tables.Column(
+        verbose_name=_("Type"),
+    )
     name = tables.Column(
+        verbose_name=_("Name"),
         linkify=True,
     )
     fqdn = tables.Column(
-        verbose_name="FQDN",
+        verbose_name=_("FQDN"),
         linkify=True,
     )
     value = tables.TemplateColumn(
+        verbose_name=_("Value"),
         template_code="{{ value|truncatechars:64 }}",
     )
     unicode_value = tables.TemplateColumn(
-        verbose_name="Unicode Value",
+        verbose_name=_("Unicode Value"),
         template_code="{{ value|truncatechars:64 }}",
         accessor="value",
     )
     ttl = tables.Column(
-        verbose_name="TTL",
+        verbose_name=_("TTL"),
     )
     active = tables.BooleanColumn(
-        verbose_name="Active",
+        verbose_name=_("Active"),
     )
 
     def render_name(self, value, record):
@@ -60,15 +68,17 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
 
 
 class RecordTable(RecordBaseTable):
-    status = ChoiceFieldColumn()
+    status = ChoiceFieldColumn(
+        verbose_name=_("Status"),
+    )
     disable_ptr = tables.BooleanColumn(
-        verbose_name="Disable PTR",
+        verbose_name=_("Disable PTR"),
     )
     tags = TagColumn(
         url_name="plugins:netbox_dns:record_list",
     )
     ptr_record = tables.Column(
-        verbose_name="PTR Record",
+        verbose_name=_("PTR Record"),
         linkify=True,
     )
 
@@ -91,15 +101,15 @@ class RecordTable(RecordBaseTable):
 
 class ManagedRecordTable(RecordBaseTable):
     address_record = tables.Column(
-        verbose_name="Address Record",
+        verbose_name=_("Address Record"),
         linkify=True,
     )
     ipam_ip_address = tables.Column(
-        verbose_name="IPAM IP Address",
+        verbose_name=_("IPAM IP Address"),
         linkify=True,
     )
     related_ip_address = tables.Column(
-        verbose_name="Related IP Address",
+        verbose_name=_("Related IP Address"),
         empty_values=(),
         orderable=False,
     )

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
@@ -21,19 +22,19 @@ class RecordSerializer(NetBoxModelSerializer):
         read_only=True,
         required=False,
         allow_null=True,
-        help_text="PTR record generated from an address",
+        help_text=_("PTR record generated from an address"),
     )
     address_record = NestedRecordSerializer(
         many=False,
         read_only=True,
         required=False,
         allow_null=True,
-        help_text="Address record defining the PTR",
+        help_text=_("Address record defining the PTR"),
     )
     zone = NestedZoneSerializer(
         many=False,
         required=False,
-        help_text="Zone the record belongs to",
+        help_text=_("Zone the record belongs to"),
     )
     active = serializers.BooleanField(
         required=False,
@@ -45,7 +46,7 @@ class RecordSerializer(NetBoxModelSerializer):
         read_only=True,
         required=False,
         allow_null=True,
-        help_text="IPAddress linked to the record",
+        help_text=_("IPAddress linked to the record"),
     )
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 

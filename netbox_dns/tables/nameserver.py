@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, TagColumn
 from tenancy.tables import TenancyColumnsMixin
@@ -11,6 +12,7 @@ __all__ = ("NameServerTable",)
 
 class NameServerTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
+        verbose_name=_("Name"),
         linkify=True,
     )
     tags = TagColumn(

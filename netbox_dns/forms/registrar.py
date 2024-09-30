@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -33,9 +34,9 @@ class RegistrarForm(NetBoxModelForm):
                 "whois_server",
                 "abuse_email",
                 "abuse_phone",
-                name="Registrar",
+                name=_("Registrar"),
             ),
-            FieldSet("tags", name="Tags"),
+            FieldSet("tags", name=_("Tags")),
         )
         fields = (
             "name",
@@ -54,45 +55,48 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
     model = Registrar
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "iana_id", "description", name="Attributes"),
+        FieldSet("name", "iana_id", "description", name=_("Attributes")),
         FieldSet(
             "address",
             "referral_url",
             "whois_server",
             "abuse_email",
             "abuse_phone",
-            name="Contact",
+            name=_("Contact"),
         ),
     )
 
     name = forms.CharField(
         required=False,
+        label=_("Name"),
     )
     address = forms.CharField(
         required=False,
+        label=_("Address"),
     )
     description = forms.CharField(
         required=False,
+        label=_("Description"),
     )
     iana_id = forms.IntegerField(
         required=False,
-        label="IANA ID",
+        label=_("IANA ID"),
     )
     referral_url = forms.CharField(
         required=False,
-        label="Referral URL",
+        label=_("Referral URL"),
     )
     whois_server = forms.CharField(
         required=False,
-        label="WHOIS Server",
+        label=_("WHOIS Server"),
     )
     abuse_email = forms.CharField(
         required=False,
-        label="Abuse Email",
+        label=_("Abuse Email"),
     )
     abuse_phone = forms.CharField(
         required=False,
-        label="Abuse Phone",
+        label=_("Abuse Phone"),
     )
     tag = TagFilterField(Registrar)
 
@@ -118,31 +122,31 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
 
     iana_id = forms.IntegerField(
         required=False,
-        label="IANA ID",
+        label=_("IANA ID"),
     )
     description = forms.CharField(
         required=False,
-        label="Description",
+        label=_("Description"),
     )
     address = forms.CharField(
         required=False,
-        label="Address",
+        label=_("Address"),
     )
     referral_url = forms.CharField(
         required=False,
-        label="Referral URL",
+        label=_("Referral URL"),
     )
     whois_server = forms.CharField(
         required=False,
-        label="WHOIS Server",
+        label=_("WHOIS Server"),
     )
     abuse_email = forms.CharField(
         required=False,
-        label="Abuse Email",
+        label=_("Abuse Email"),
     )
     abuse_phone = forms.CharField(
         required=False,
-        label="Abuse Phone",
+        label=_("Abuse Phone"),
     )
 
     fieldsets = (
@@ -154,7 +158,7 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
             "whois_server",
             "abuse_email",
             "abuse_phone",
-            name="Attributes",
+            name=_("Attributes"),
         ),
     )
 

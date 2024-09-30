@@ -1,48 +1,49 @@
 {% extends 'generic/object.html' %}
+{% load i18n %}
 
 {% block content %}
     <div class="row">
         <div class="col col-md-6">
             <div class="card">
-                <h5 class="card-header">Registrar</h5>
+                <h5 class="card-header">{% trans "Registrar" %}</h5>
                 <table class="table table-hover attr-table">
                     <tr>
-                        <th scope="row">Name</th>
+                        <th scope="row">{% trans "Name" %}</th>
                         <td>{{ object.name }}</td>
                     </tr>
                     {% if object.description %}
                     <tr>
-                        <th scope="row">Description</th>
+                        <th scope="row">{% trans "Description" %}</th>
                         <td style="word-break:break-all;">{{ object.description }}</td>
                     </tr>
                     {% endif %}
                     <tr>
-                        <th scope="row">IANA ID</th>
+                        <th scope="row">{% trans "IANA ID" %}</th>
                         <td>{{ object.iana_id }}</td>
                     </tr>
                 </table>
             </div>
             <div class="card">
-                <h5 class="card-header">Contact Details</h5>
+                <h5 class="card-header">{% trans "Contact Details" %}</h5>
                 <table class="table table-hover attr-table">
                     <tr>
-                        <th scope="row">Address</th>
+                        <th scope="row">{% trans "Address" %}</th>
                         <td>{{ object.address }}</td>
                     </tr>
                     <tr>
-                        <th scope="row">Referral URL</th>
+                        <th scope="row">{% trans "Referral URL" %}</th>
                         <td><a href="{{ object.referral_url }}">{{ object.referral_url }}</a></td>
                     </tr>
                     <tr>
-                        <th scope="row">WHOIS Server</th>
+                        <th scope="row">{% trans "WHOIS Server" %}</th>
                         <td>{{ object.whois_server }}</td>
                     </tr>
                     <tr>
-                        <th scope="row">Abuse Email</th>
+                        <th scope="row">{% trans "Abuse Email" %}</th>
                         <td>{{ object.abuse_email }}</td>
                     </tr>
                     <tr>
-                        <th scope="row">Abuse Phone</th>
+                        <th scope="row">{% trans "Abuse Phone" %}</th>
                         <td>{{ object.abuse_phone }}</td>
                     </tr>
                 </table>

@@ -1,6 +1,7 @@
 import django_filters
 
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -17,13 +18,13 @@ class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
         queryset=Prefix.objects.all(),
         field_name="prefixes",
         to_field_name="id",
-        label="Prefixes ID",
+        label=_("Prefix ID"),
     )
     prefix = django_filters.ModelMultipleChoiceFilter(
         queryset=Prefix.objects.all(),
         field_name="prefixes__prefix",
         to_field_name="prefix",
-        label="Prefix",
+        label=_("Prefix"),
     )
 
     class Meta:

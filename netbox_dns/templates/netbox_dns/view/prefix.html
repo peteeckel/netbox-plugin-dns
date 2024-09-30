@@ -1,7 +1,10 @@
 {% extends 'generic/_base.html' %}
+{% load i18n %}
 
 {% block title %}
-Configure DNS views for {{ object|meta:"verbose_name" }} {{ object }} {% if object.vrf %}[{{ object.vrf }}]{% endif %}
+{% blocktrans trimmed with type=object|meta:"verbose_name" name=object vrf=object.vrf|default:"" %}
+Configure DNS views for {{ type }} {{ name }} {{ vrf }}
+{% endblocktrans %}
 {% endblock title %}
 
 {% block content %}
@@ -14,7 +17,7 @@ Configure DNS views for {{ object|meta:"verbose_name" }} {{ object }} {% if obje
     {% if inherited_from %}
         <div class="card">
             <table class="table table-hover attr-table">
-                <th>Views inherited from prefix {{ inherited_from }} {% if inherited_from.vrf %}[{{ inherited_from.vrf }}] {% endif %}</th>
+                <th>{% trans "Views inherited from prefix" %} {{ inherited_from }} {% if inherited_from.vrf %}[{{ inherited_from.vrf }}] {% endif %}</th>
                 {% for view in inherited_views %}
                     <tr><td>{{ view|linkify }}</td><td>{{ view.description }}</td></tr>
                 {% endfor %}
@@ -28,8 +31,8 @@ Configure DNS views for {{ object|meta:"verbose_name" }} {{ object }} {% if obje
 
     <div class="text-end my-3">
     {% block buttons %}
-        <a href="{{ return_url }}" class="btn btn-outline-secondary">Cancel</a>
-        <button type="submit" name="_update" class="btn btn-primary">Save</button>
+        <a href="{{ return_url }}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+        <button type="submit" name="_update" class="btn btn-primary">{% trans "Save" %}</button>
     {% endblock buttons %}
     </div>
     </form>

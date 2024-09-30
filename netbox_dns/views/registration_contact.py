@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 
@@ -79,7 +80,7 @@ class RegistrationContactZoneListView(generic.ObjectChildrenView):
     hide_if_empty = True
 
     tab = ViewTab(
-        label="Zones",
+        label=_("Zones"),
         permission="netbox_dns.view_zone",
         badge=lambda obj: len(obj.zones),
         hide_if_empty=True,

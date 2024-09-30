@@ -1,4 +1,6 @@
 import django_tables2 as tables
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 from netbox.tables import (
     ChoiceFieldColumn,
@@ -15,15 +17,20 @@ __all__ = ("ZoneTable",)
 
 class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
+        verbose_name=_("Name"),
         linkify=True,
     )
     view = tables.Column(
+        verbose_name=_p("DNS", "View"),
         linkify=True,
     )
     soa_mname = tables.Column(
+        verbose_name=_("SOA MName"),
         linkify=True,
     )
-    status = ChoiceFieldColumn()
+    status = ChoiceFieldColumn(
+        verbose_name=_("Status"),
+    )
     tags = TagColumn(
         url_name="plugins:netbox_dns:zone_list",
     )
@@ -31,24 +38,30 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name="Default TTL",
     )
     rfc2317_prefix = tables.Column(
-        verbose_name="RFC2317 Prefix",
+        verbose_name=_("RFC2317 Prefix"),
     )
     rfc2317_parent_zone = tables.Column(
+        verbose_name=_("RFC2317 Parent Zone"),
         linkify=True,
     )
     registrar = tables.Column(
+        verbose_name=_("Registrar"),
         linkify=True,
     )
     registrant = tables.Column(
+        verbose_name=_("Registrant"),
         linkify=True,
     )
     admin_c = tables.Column(
+        verbose_name=_("Administrative Contact"),
         linkify=True,
     )
     tech_c = tables.Column(
+        verbose_name=_("Technical Contact"),
         linkify=True,
     )
     billing_c = tables.Column(
+        verbose_name=_("Billing Contact"),
         linkify=True,
     )
 

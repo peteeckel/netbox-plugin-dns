@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
@@ -20,7 +21,7 @@ class RecordTemplateSerializer(NetBoxModelSerializer):
         many=True,
         read_only=True,
         required=False,
-        help_text="Zone templates using the record template",
+        help_text=_("Zone templates using the record template"),
     )
 
     class Meta:

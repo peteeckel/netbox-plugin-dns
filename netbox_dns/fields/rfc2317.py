@@ -3,11 +3,14 @@ from netaddr import IPNetwork, AddrFormatError
 from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
 from .network import NetContains, NetContained, NetOverlap, NetMaskLength
 
-INVALID_RFC2317 = "RFC2317 requires an IPv4 prefix with a length of at least 25 bits."
+INVALID_RFC2317 = _(
+    "RFC2317 requires an IPv4 prefix with a length of at least 25 bits."
+)
 
 
 __all__ = (
@@ -28,7 +31,7 @@ class RFC2317NetworkFormField(forms.Field):
             raise ValidationError(INVALID_RFC2317)
 
         if len(value.split("/")) != 2:
-            raise ValidationError("Please specify the prefix length")
+            raise ValidationError(_("Please specify the prefix length"))
 
         try:
             ip_network = IPNetwork(value)
@@ -42,7 +45,8 @@ class RFC2317NetworkFormField(forms.Field):
 
 
 class RFC2317NetworkField(models.Field):
-    description = "PostgreSQL CIDR field for an RFC2317 prefix"
+    description = _("PostgreSQL CIDR field for an RFC2317 prefix")
+
     default_validators = [validate_ipv4, validate_prefix, validate_rfc2317]
 
     def python_type(self):

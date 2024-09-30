@@ -2,6 +2,7 @@ import dns
 from dns import rdata, name as dns_name
 
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 from netbox_dns.choices import RecordClassChoices, RecordTypeChoices
 from netbox_dns.validators import (
@@ -20,15 +21,19 @@ def validate_record_value(record_type, value):
             name.to_unicode()
         except dns_name.IDNAException as exc:
             raise ValidationError(
-                f"{name.to_text()} is not a valid IDN: {exc}."
-            ) from None
+                "{name} is not a valid IDN: {error}.".format(
+                    name=name.to_text(), error=exc
+                )
+            )
 
     try:
         rr = rdata.from_text(RecordClassChoices.IN, record_type, value)
     except dns.exception.SyntaxError as exc:
         raise ValidationError(
-            f"Record value {value} is not a valid value for a {record_type} record: {exc}."
-        ) from None
+            _(
+                "Record value {value} is not a valid value for a {type} record: {error}."
+            ).format(value=value, type=record_type, error=exc)
+        )
 
     match record_type:
         case RecordTypeChoices.CNAME:

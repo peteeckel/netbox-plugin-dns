@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -18,67 +19,72 @@ class RegistrationContact(NetBoxModel):
     # Data fields according to https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en
     # -
     contact_id = models.CharField(
-        verbose_name="Contact ID",
+        verbose_name=_("Contact ID"),
         max_length=50,
         unique=True,
     )
     name = models.CharField(
+        verbose_name=_("Name"),
         blank=True,
         max_length=100,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         blank=True,
         max_length=200,
     )
     organization = models.CharField(
+        verbose_name=_("Organization"),
         blank=True,
         max_length=200,
     )
     street = models.CharField(
+        verbose_name=_("Street"),
         blank=True,
         max_length=50,
     )
     city = models.CharField(
+        verbose_name=_("City"),
         blank=True,
         max_length=50,
     )
     state_province = models.CharField(
-        verbose_name="State/Province",
+        verbose_name=_("State/Province"),
         blank=True,
         max_length=255,
     )
     postal_code = models.CharField(
-        verbose_name="Postal Code",
+        verbose_name=_("Postal Code"),
         blank=True,
         max_length=20,
     )
     country = models.CharField(
-        verbose_name="Country (ISO 3166)",
+        verbose_name=_("Country (ISO 3166)"),
         blank=True,
         max_length=2,
     )
     phone = models.CharField(
-        verbose_name="Phone",
+        verbose_name=_("Phone"),
         blank=True,
         max_length=50,
     )
     phone_ext = models.CharField(
-        verbose_name="Phone Extension",
+        verbose_name=_("Phone Extension"),
         blank=True,
         max_length=50,
     )
     fax = models.CharField(
-        verbose_name="Fax",
+        verbose_name=_("Fax"),
         blank=True,
         max_length=50,
     )
     fax_ext = models.CharField(
-        verbose_name="Fax Extension",
+        verbose_name=_("Fax Extension"),
         blank=True,
         max_length=50,
     )
     email = models.EmailField(
-        verbose_name="Email",
+        verbose_name=_("Email"),
         blank=True,
     )
 
@@ -114,8 +120,8 @@ class RegistrationContact(NetBoxModel):
         return self.contact_id
 
     class Meta:
-        verbose_name = "Registration Contact"
-        verbose_name_plural = "Registration Contacts"
+        verbose_name = _("Registration Contact")
+        verbose_name_plural = _("Registration Contacts")
 
         ordering = (
             "name",

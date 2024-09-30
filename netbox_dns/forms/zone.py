@@ -3,6 +3,8 @@ from django.db import transaction
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy as _p
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -125,77 +127,93 @@ class ZoneTemplateUpdateMixin:
 
 
 class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
-    nameservers = DynamicModelMultipleChoiceField(
-        queryset=NameServer.objects.all(),
-        required=False,
-    )
-    default_ttl = forms.IntegerField(
-        required=False,
-        label="Default TTL",
-        help_text="Default TTL for new records in this zone",
-        validators=[MinValueValidator(1)],
-    )
-    soa_ttl = forms.IntegerField(
+    name = forms.CharField(
         required=True,
-        label="SOA TTL",
-        help_text="TTL for the SOA record of the zone",
-        validators=[MinValueValidator(1)],
-    )
-    soa_rname = forms.CharField(
-        required=True,
-        label="SOA RName",
-        help_text="Mailbox of the zone's administrator",
-    )
-    soa_serial_auto = forms.BooleanField(
-        required=False,
-        label="Generate SOA Serial",
-        help_text="Automatically generate the SOA Serial",
-    )
-    soa_serial = forms.IntegerField(
-        required=False,
-        label="SOA Serial",
-        help_text="Serial number of the current zone data version",
-        validators=[MinValueValidator(1)],
-    )
-    soa_refresh = forms.IntegerField(
-        required=True,
-        label="SOA Refresh",
-        help_text="Refresh interval for secondary name servers",
-        validators=[MinValueValidator(1)],
-    )
-    soa_retry = forms.IntegerField(
-        required=True,
-        label="SOA Retry",
-        help_text="Retry interval for secondary name servers",
-        validators=[MinValueValidator(1)],
-    )
-    soa_expire = forms.IntegerField(
-        required=True,
-        label="SOA Expire",
-        help_text="Expire time after which the zone is considered unavailable",
-        validators=[MinValueValidator(1)],
-    )
-    soa_minimum = forms.IntegerField(
-        required=True,
-        label="SOA Minimum TTL",
-        help_text="Minimum TTL for negative results, e.g. NXRRSET",
-        validators=[MinValueValidator(1)],
-    )
-    rfc2317_prefix = RFC2317NetworkFormField(
-        label="RFC2317 Prefix",
-        help_text="IPv4 network prefix with a mask length of at least 25 bits",
-        validators=[validate_ipv4, validate_prefix, validate_rfc2317],
-        required=False,
-    )
-    rfc2317_parent_managed = forms.BooleanField(
-        label="RFC2317 Parent Managed",
-        help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
-        required=False,
+        label=_("Name"),
     )
     template = DynamicModelChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
-        label="Template",
+        label=_("Template"),
+    )
+    status = forms.ChoiceField(
+        choices=ZoneStatusChoices,
+        required=False,
+        label=_("Status"),
+    )
+    nameservers = DynamicModelMultipleChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label=_("Nameservers"),
+    )
+    default_ttl = forms.IntegerField(
+        required=False,
+        help_text=_("Default TTL for new records in this zone"),
+        validators=[MinValueValidator(1)],
+        label=_("Default TTL"),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_("Description"),
+    )
+    soa_ttl = forms.IntegerField(
+        required=True,
+        help_text=_("TTL for the SOA record of the zone"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA TTL"),
+    )
+    soa_rname = forms.CharField(
+        required=True,
+        help_text=_("Mailbox of the zone's administrator"),
+        label=_("SOA RName"),
+    )
+    soa_refresh = forms.IntegerField(
+        required=True,
+        help_text=_("Refresh interval for secondary nameservers"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA Refresh"),
+    )
+    soa_retry = forms.IntegerField(
+        required=True,
+        help_text=_("Retry interval for secondary nameservers"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA Retry"),
+    )
+    soa_expire = forms.IntegerField(
+        required=True,
+        validators=[MinValueValidator(1)],
+        help_text=_("Expire time after which the zone is considered unavailable"),
+        label=_("SOA Expire"),
+    )
+    soa_minimum = forms.IntegerField(
+        required=True,
+        help_text=_("Minimum TTL for negative results, e.g. NXRRSET"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA Minimum TTL"),
+    )
+    soa_serial_auto = forms.BooleanField(
+        required=False,
+        help_text=_("Automatically generate the SOA serial number"),
+        label=_("Generate SOA Serial"),
+    )
+    soa_serial = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(1)],
+        label=_("SOA Serial"),
+    )
+
+    rfc2317_prefix = RFC2317NetworkFormField(
+        required=False,
+        validators=[validate_ipv4, validate_prefix, validate_rfc2317],
+        help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
+        label=_("RFC2317 Prefix"),
+    )
+    rfc2317_parent_managed = forms.BooleanField(
+        required=False,
+        help_text=_(
+            "IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS"
+        ),
+        label=_("RFC2317 Parent Managed"),
     )
 
     fieldsets = (
@@ -207,7 +225,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "nameservers",
             "default_ttl",
             "description",
-            name="Zone",
+            name=_("Zone"),
         ),
         FieldSet(
             "soa_ttl",
@@ -219,12 +237,12 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "soa_minimum",
             "soa_serial_auto",
             "soa_serial",
-            name="SOA",
+            name=_("SOA"),
         ),
         FieldSet(
             "rfc2317_prefix",
             "rfc2317_parent_managed",
-            name="RFC 2317",
+            name=_("RFC2317"),
         ),
         FieldSet(
             "registrar",
@@ -233,10 +251,10 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "admin_c",
             "tech_c",
             "billing_c",
-            name="Domain Registration",
+            name=_("Domain Registration"),
         ),
-        FieldSet("tags", name="Tags"),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tags", name=_("Tags")),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
 
     def __init__(self, *args, **kwargs):
@@ -322,8 +340,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "tenant",
         )
         help_texts = {
-            "view": "View the zone belongs to",
-            "soa_mname": "Primary name server for the zone",
+            "view": _("View the zone belongs to"),
+            "soa_mname": _("Primary nameserver for the zone"),
         }
 
 
@@ -337,19 +355,19 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "name",
             "nameserver_id",
             "description",
-            name="Attributes",
+            name=_("Attributes"),
         ),
         FieldSet(
             "soa_mname_id",
             "soa_rname",
             "soa_serial_auto",
-            name="SOA",
+            name=_("SOA"),
         ),
         FieldSet(
             "rfc2317_prefix",
             "rfc2317_parent_managed",
             "rfc2317_parent_zone_id",
-            name="RFC2317",
+            name=_("RFC2317"),
         ),
         FieldSet(
             "registrar_id",
@@ -358,87 +376,90 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "admin_c_id",
             "tech_c_id",
             "billing_c_id",
-            name="Registration",
+            name=_("Registration"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name="Tenancy"),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
 
     view_id = DynamicModelMultipleChoiceField(
         queryset=View.objects.all(),
         required=False,
-        label="View",
+        label=_p("DNS", "View"),
     )
     status = forms.MultipleChoiceField(
         choices=ZoneStatusChoices,
         required=False,
+        label=_("Status"),
     )
     name = forms.CharField(
         required=False,
+        label=_("Name"),
     )
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
-        label="Nameservers",
+        label=_("Nameservers"),
     )
     description = forms.CharField(
         required=False,
+        label=_("Description"),
     )
     soa_mname_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
-        label="MName",
         required=False,
+        label=_("MName"),
     )
     soa_rname = forms.CharField(
         required=False,
-        label="RName",
+        label=_("RName"),
     )
     soa_serial_auto = forms.NullBooleanField(
         required=False,
-        label="Generate Serial",
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Generate SOA Serial"),
     )
     rfc2317_prefix = RFC2317NetworkFormField(
         required=False,
-        label="Prefix",
+        label=_("Prefix"),
     )
     rfc2317_parent_managed = forms.NullBooleanField(
         required=False,
-        label="Parent Managed",
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Parent Managed"),
     )
     rfc2317_parent_zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
-        label="Parent Zone",
+        label=_("Parent Zone"),
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
-        label="Registrar",
+        label=_("Registrar"),
     )
     registry_domain_id = forms.CharField(
         required=False,
-        label="Registry Domain ID",
+        label=_("Registry Domain ID"),
     )
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Registrant",
+        label=_("Registrant"),
     )
     admin_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Admin-C",
+        label=_("Administrative Contact"),
     )
     tech_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Tech-C",
+        label=_("Technical Contact"),
     )
     billing_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Billing-C",
+        label=_("Billing Contact"),
     )
     tag = TagFilterField(Zone)
 
@@ -448,136 +469,153 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         queryset=View.objects.all(),
         required=False,
         to_field_name="name",
-        help_text="View the zone belongs to",
         error_messages={
-            "invalid_choice": "View not found.",
+            "invalid_choice": _("View not found."),
         },
+        label=_("View"),
     )
     status = CSVChoiceField(
         choices=ZoneStatusChoices,
         required=False,
-        help_text="Zone status",
+        label=_("Status"),
     )
     nameservers = CSVModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         to_field_name="name",
         required=False,
-        help_text="Name servers for the zone",
+        label=_("Nameservers"),
     )
     default_ttl = forms.IntegerField(
         required=False,
-        help_text="Default TTL",
+        label=_("Default TTL"),
     )
     soa_ttl = forms.IntegerField(
         required=False,
-        help_text="TTL for the SOA record of the zone",
+        help_text=_("TTL for the SOA record of the zone"),
+        label=_("SOA TTL"),
     )
     soa_mname = CSVModelChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
         to_field_name="name",
-        help_text="Primary name server for the zone",
         error_messages={
-            "invalid_choice": "Nameserver not found.",
+            "invalid_choice": _("Nameserver not found."),
         },
+        help_text=_("Primary nameserver for the zone"),
+        label=_("SOA MName"),
     )
     soa_rname = forms.CharField(
         required=False,
-        help_text="Mailbox of the zone's administrator",
+        help_text=_("Mailbox of the zone's administrator"),
+        label=_("SOA RName"),
     )
     soa_serial_auto = forms.BooleanField(
         required=False,
-        help_text="Generate the SOA serial",
+        label=_("Generate SOA Serial"),
     )
     soa_serial = forms.IntegerField(
         required=False,
-        help_text="Serial number of the current zone data version",
+        label=_("SOA Serial"),
     )
     soa_refresh = forms.IntegerField(
         required=False,
-        help_text="Refresh interval for secondary name servers",
+        help_text=_("Refresh interval for secondary nameservers"),
+        label=_("SOA Refresh"),
     )
     soa_retry = forms.IntegerField(
         required=False,
-        help_text="Retry interval for secondary name servers",
+        help_text=_("Retry interval for secondary nameservers"),
+        label=_("SOA Retry"),
     )
     soa_expire = forms.IntegerField(
         required=False,
-        help_text="Expire time after which the zone is considered unavailable",
+        help_text=_("Expire time after which the zone is considered unavailable"),
+        label=_("SOA Expire"),
     )
     soa_minimum = forms.IntegerField(
         required=False,
-        help_text="Minimum TTL for negative results, e.g. NXRRSET",
+        help_text=_("Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"),
+        label=_("SOA Minimum TTL"),
     )
     rfc2317_prefix = RFC2317NetworkFormField(
         required=False,
-        help_text="RFC2317 IPv4 prefix with a length of at least 25 bits",
+        help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
+        label=_("RFC2317 Prefix"),
     )
     rfc2317_parent_managed = forms.BooleanField(
         required=False,
-        label="RFC2317 Parent Managed",
-        help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
+        help_text=_(
+            "IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS"
+        ),
+        label=_("RFC2317 Parent Managed"),
     )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
         to_field_name="name",
-        help_text="Registrar the domain is registered with",
         error_messages={
-            "invalid_choice": "Registrar not found.",
+            "invalid_choice": _("Registrar not found."),
         },
+        help_text=_("Registrar the domain is registered with"),
+        label=_("Registrar"),
     )
     registry_domain_id = forms.CharField(
         required=False,
-        help_text="Domain ID assigned by the registry",
+        help_text=_("Domain ID assigned by the registry"),
+        label=_("Registry Domain ID"),
     )
     registrant = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Owner of the domain",
         error_messages={
-            "invalid_choice": "Registrant contact ID not found",
+            "invalid_choice": _("Registrant contact ID not found"),
         },
+        help_text=_("Owner of the domain"),
+        label=_("Registrant"),
     )
     admin_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Administrative contact for the domain",
+        help_text=_("Administrative contact for the domain"),
         error_messages={
-            "invalid_choice": "Administrative contact ID not found",
+            "invalid_choice": _("Administrative contact ID not found"),
         },
+        label=_("Administrative Contact"),
     )
     tech_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Technical contact for the domain",
+        help_text=_("Technical contact for the domain"),
         error_messages={
-            "invalid_choice": "Technical contact ID not found",
+            "invalid_choice": _("Technical contact ID not found"),
         },
+        label=_("Technical Contact"),
     )
     billing_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text="Billing contact for the domain",
+        help_text=_("Billing contact for the domain"),
         error_messages={
-            "invalid_choice": "Billing contact ID not found",
+            "invalid_choice": _("Billing contact ID not found"),
         },
+        label=_("Billing Contact"),
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
         to_field_name="name",
-        help_text="Assigned tenant",
+        help_text=_("Assigned tenant"),
+        label=_("Tenant"),
     )
     template = CSVModelChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
         to_field_name="name",
-        label="Template",
+        label=_("Template"),
     )
 
     class Meta:
@@ -638,108 +676,119 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     view = DynamicModelChoiceField(
         queryset=View.objects.all(),
         required=False,
-        label="View",
+        label=_p("DNS", "View"),
     )
     status = forms.ChoiceField(
         choices=add_blank_choice(ZoneStatusChoices),
         required=False,
+        label=_("Status"),
     )
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        label=_("Nameservers"),
     )
     default_ttl = forms.IntegerField(
         required=False,
-        label="Default TTL",
         validators=[MinValueValidator(1)],
+        label=_("Default TTL"),
     )
-    description = forms.CharField(max_length=200, required=False)
+    description = forms.CharField(
+        max_length=200,
+        required=False,
+        label=_("Description"),
+    )
     soa_ttl = forms.IntegerField(
         required=False,
-        label="SOA TTL",
         validators=[MinValueValidator(1)],
+        label=_("SOA TTL"),
     )
     soa_mname = DynamicModelChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
-        label="SOA Primary Nameserver",
+        label=_("SOA MName"),
     )
     soa_rname = forms.CharField(
         required=False,
-        label="SOA RName",
+        label=_("SOA RName"),
     )
     soa_serial_auto = forms.NullBooleanField(
         required=False,
         widget=BulkEditNullBooleanSelect(),
-        label="Generate SOA Serial",
+        label=_("Generate SOA Serial"),
     )
     soa_serial = forms.IntegerField(
         required=False,
-        label="SOA Serial",
         validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
+        label=_("SOA Serial"),
     )
     soa_refresh = forms.IntegerField(
         required=False,
-        label="SOA Refresh",
         validators=[MinValueValidator(1)],
+        label=_("SOA Refresh"),
     )
     soa_retry = forms.IntegerField(
         required=False,
-        label="SOA Retry",
         validators=[MinValueValidator(1)],
+        label=_("SOA Retry"),
     )
     soa_expire = forms.IntegerField(
         required=False,
-        label="SOA Expire",
         validators=[MinValueValidator(1)],
+        label=_("SOA Expire"),
     )
     soa_minimum = forms.IntegerField(
         required=False,
-        label="SOA Minimum TTL",
         validators=[MinValueValidator(1)],
+        label=_("SOA Minimum TTL"),
     )
     rfc2317_prefix = RFC2317NetworkFormField(
         required=False,
-        label="RFC2317 Prefix",
-        help_text="IPv4 network prefix with a mask length of at least 25 bits",
         validators=[validate_ipv4, validate_prefix, validate_rfc2317],
+        help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
+        label=_("RFC2317 Prefix"),
     )
     rfc2317_parent_managed = forms.NullBooleanField(
         required=False,
         widget=BulkEditNullBooleanSelect(),
-        label="RFC2317 Parent Managed",
-        help_text="IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS",
+        help_text=_(
+            "IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS"
+        ),
+        label=_("RFC2317 Parent Managed"),
     )
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
+        label=_("Registrar"),
     )
     registry_domain_id = forms.CharField(
         required=False,
-        label="Registry Domain ID",
+        label=_("Registry Domain ID"),
     )
     registrant = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        label=_("Registrant"),
     )
     admin_c = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Administrative Contact",
+        label=_("Administrative Contact"),
     )
     tech_c = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Technical Contact",
+        label=_("Technical Contact"),
     )
     billing_c = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
-        label="Billing Contact",
+        label=_("Billing Contact"),
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
+        label=_("Tenant"),
     )
 
     model = Zone
@@ -751,7 +800,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
             "nameservers",
             "default_ttl",
             "description",
-            name="Attributes",
+            name=_("Attributes"),
         ),
         FieldSet(
             "soa_ttl",
@@ -763,12 +812,12 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
             "soa_minimum",
             "soa_serial_auto",
             "soa_serial",
-            name="SOA",
+            name=_("SOA"),
         ),
         FieldSet(
             "rfc2317_prefix",
             "rfc2317_parent_managed",
-            name="RFC 2317",
+            name=_("RFC2317"),
         ),
         FieldSet(
             "registrar",
@@ -777,9 +826,9 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
             "admin_c",
             "tech_c",
             "billing_c",
-            name="Domain Registration",
+            name=_("Domain Registration"),
         ),
-        FieldSet("tenant_group", "tenant", name="Tenancy"),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
 
     nullable_fields = (

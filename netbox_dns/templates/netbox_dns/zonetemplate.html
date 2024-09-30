@@ -3,27 +3,26 @@
 {% load plugins %}
 {% load render_table from django_tables2 %}
 {% load perms %}
+{% load i18n %}
 
 {% block content %}
 <div class="row">
     <div class="col col-md-6">
         <div class="card">
-            <h5 class="card-header">
-                Zone Template
-            </h5>
+            <h5 class="card-header">{% trans "Zone Template" %}</h5>
             <table class="table table-hover attr-table">
                 <tr>
-                    <th scope="row">Name</th>
+                    <th scope="row">{% trans "Name" %}</th>
                     <td>{{ object.name }}</td>
                 </tr>
                 {% if object.description %}
                 <tr>
-                    <th scope="row">Description</th>
+                    <th scope="row">{% trans "Description" %}</th>
                     <td style="word-break:break-all;">{{ object.description }}</td>
                 </tr>
                 {% endif %}
                 <tr>
-                    <th scope="row">Tenant</th>
+                    <th scope="row">{% trans "Tenant" %}</th>
                     <td>
                         {% if object.tenant.group %}
                             {{ object.tenant.group|linkify }} /
@@ -32,7 +31,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Nameservers</th>
+                    <th scope="row">{% trans "Nameservers" %}</th>
                     <td>
                         <table>
                             {% for nameserver in object.nameservers.all %}
@@ -42,7 +41,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Description</th>
+                    <th scope="row">{% trans "Description" %}</th>
                     <td>{{ object.description }}</td>
                 </tr>
             </table>
@@ -53,34 +52,45 @@
     </div>
     <div class="col col-md-6">
         <div class="card">
-            <h5 class="card-header">Domain Registration</h5>
+            <h5 class="card-header">{% trans "Domain Registration" %}</h5>
             <table class="table table-hover attr-table">
                 <tr>
-                    <th scope="row">Registrar</th>
+                    <th scope="row">{% trans "Registrar" %}</th>
                     <td>{{ object.registrar|linkify|placeholder }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">Registrant</th>
+                    <th scope="row">{% trans "Registrant" %}</th>
                     <td>{{ object.registrant|linkify|placeholder }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">Administrative Contact</th>
+                    <th scope="row">{% trans "Administrative Contact" %}</th>
                     <td>{{ object.admin_c|linkify|placeholder }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">Technical Contact</th>
+                    <th scope="row">{% trans "Technical Contact" %}</th>
                     <td>{{ object.tech_c|linkify|placeholder }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">Billing Contact</th>
+                    <th scope="row">{% trans "Billing Contact" %}</th>
                     <td>{{ object.billing_c|linkify|placeholder }}</td>
                 </tr>
             </table>
             </div>
         </div>
     </div>
-    <div class="col col-md-12">
-      {% include 'inc/panel_table.html' with table=record_template_table heading="Record Templates" %}
-    </div>
+    {% if record_template_table %}
+        <div class="col col-md-12">
+            <div class="card">
+                {% if record_template_table.rows|length == 1 %}
+                    <h2 class="card-header">{% trans "Record Template" %}</h2>
+                {% else %}
+                    <h2 class="card-header">{% trans "Record Templates" %}</h2>
+                {% endif %}
+                <div class="table-responsive">
+                    {% render_table record_template_table 'inc/table.html' %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

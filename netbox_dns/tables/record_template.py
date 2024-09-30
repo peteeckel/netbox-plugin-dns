@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, TagColumn, ActionsColumn
 from tenancy.tables import TenancyColumnsMixin
@@ -15,23 +16,29 @@ __all__ = (
 
 class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
+        verbose_name=_("Name"),
         linkify=True,
     )
-    record_name = tables.Column()
-    type = tables.Column()
+    record_name = tables.Column(
+        verbose_name=_("Record Name"),
+    )
+    type = tables.Column(
+        verbose_name=_("Type"),
+    )
     value = tables.TemplateColumn(
+        verbose_name=_("Value"),
         template_code="{{ value|truncatechars:64 }}",
     )
     unicode_value = tables.TemplateColumn(
-        verbose_name="Unicode Value",
+        verbose_name=_("Unicode Value"),
         template_code="{{ value|truncatechars:64 }}",
         accessor="value",
     )
     ttl = tables.Column(
-        verbose_name="TTL",
+        verbose_name=_("TTL"),
     )
     disable_ptr = tables.BooleanColumn(
-        verbose_name="Disable PTR",
+        verbose_name=_("Disable PTR"),
     )
     tags = TagColumn(
         url_name="plugins:netbox_dns:recordtemplate_list",

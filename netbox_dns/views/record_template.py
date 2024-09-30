@@ -46,9 +46,10 @@ class RecordTemplateView(generic.ObjectView):
         if instance.value != unicode_value:
             context["unicode_value"] = unicode_value
 
-        context["zone_template_table"] = ZoneTemplateDisplayTable(
-            data=instance.zone_templates.all()
-        )
+        if instance.zone_templates.exists():
+            context["zone_template_table"] = ZoneTemplateDisplayTable(
+                data=instance.zone_templates.all()
+            )
 
         return context
 

@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -29,10 +30,12 @@ __all__ = (
 
 class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
+        verbose_name=_("Name"),
         unique=True,
         max_length=255,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         max_length=200,
         blank=True,
     )
@@ -50,8 +53,8 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     )
 
     class Meta:
-        verbose_name = "Nameserver"
-        verbose_name_plural = "Nameservers"
+        verbose_name = _("Nameserver")
+        verbose_name_plural = _("Nameservers")
 
         ordering = ("name",)
 
