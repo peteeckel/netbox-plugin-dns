@@ -36,6 +36,7 @@ class ZoneTemplate(NetBoxModel):
         blank=True,
     )
     tenant = models.ForeignKey(
+        verbose_name=_("Tenant"),
         to="tenancy.Tenant",
         on_delete=models.SET_NULL,
         related_name="+",
@@ -47,7 +48,6 @@ class ZoneTemplate(NetBoxModel):
         to="Registrar",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text=_("Registrar the domain is registered with"),
         blank=True,
         null=True,
     )
@@ -56,7 +56,6 @@ class ZoneTemplate(NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text=_("Registrar of the domain"),
         blank=True,
         null=True,
     )
@@ -65,7 +64,6 @@ class ZoneTemplate(NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text=_("Administrative contact for the domain"),
         blank=True,
         null=True,
     )
@@ -74,7 +72,6 @@ class ZoneTemplate(NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text=_("Technical contact for the domain"),
         blank=True,
         null=True,
     )
@@ -83,7 +80,6 @@ class ZoneTemplate(NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text=_("Billing contact for the domain"),
         blank=True,
         null=True,
     )

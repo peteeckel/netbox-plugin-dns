@@ -40,6 +40,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
     )
     tenant = models.ForeignKey(
+        verbose_name=_("Tenant"),
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
         related_name="netbox_dns_nameservers",

@@ -166,6 +166,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         default=True,
     )
     description = models.CharField(
+        verbose_name=_("Description"),
         max_length=200,
         blank=True,
     )
@@ -176,6 +177,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     tenant = models.ForeignKey(
+        verbose_name=_("Tenant"),
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
         related_name="netbox_dns_zones",
@@ -183,16 +185,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     registrar = models.ForeignKey(
+        verbose_name=_("Registrar"),
         to="Registrar",
         on_delete=models.SET_NULL,
-        verbose_name=_("Registrar"),
-        help_text=_("Registrar the domain is registered with"),
         blank=True,
         null=True,
     )
     registry_domain_id = models.CharField(
         verbose_name=_("Registry Domain ID"),
-        help_text=_("ID of the domain assigned by the registry"),
         max_length=50,
         blank=True,
         null=True,
@@ -201,7 +201,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Registrant"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
-        help_text=_("Registrant of the domain"),
         blank=True,
         null=True,
     )
@@ -210,7 +209,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="admin_c_zones",
-        help_text=_("Administrative contact for the domain"),
         blank=True,
         null=True,
     )
@@ -219,7 +217,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="tech_c_zones",
-        help_text=_("Technical contact for the domain"),
         blank=True,
         null=True,
     )
@@ -228,7 +225,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="billing_c_zones",
-        help_text=_("Billing contact for the domain"),
         blank=True,
         null=True,
     )

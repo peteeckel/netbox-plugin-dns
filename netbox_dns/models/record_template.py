@@ -62,6 +62,7 @@ class RecordTemplate(NetBoxModel):
         default=False,
     )
     tenant = models.ForeignKey(
+        verbose_name=_("Tenant"),
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
         related_name="+",
