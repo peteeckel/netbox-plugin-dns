@@ -21,7 +21,7 @@ from utilities.forms.fields import (
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.rendering import FieldSet
 from utilities.forms.fields import JSONField
-from tenancy.models import Tenant
+from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 from ipam.models import Prefix, IPAddress
 from netbox.context import current_request
@@ -127,9 +127,10 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
     )
 
     fieldsets = (
-        FieldSet("name", "default_view", "description", "tags", name=_p("DNS", "View")),
+        FieldSet("name", "default_view", "description", name=_p("DNS", "View")),
         FieldSet("prefixes", "ip_address_filter"),
         FieldSet("tenant_group", "tenant", name=_("Tenancy")),
+        FieldSet("tags", name=_("Tags")),
     )
 
     class Meta:
@@ -138,10 +139,11 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
             "name",
             "default_view",
             "description",
-            "tags",
-            "tenant",
             "prefixes",
             "ip_address_filter",
+            "tenant_group",
+            "tenant",
+            "tags",
         )
 
     def clean_prefixes(self):
@@ -234,6 +236,11 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Description"),
     )
+    tenant_group = DynamicModelChoiceField(
+        queryset=TenantGroup.objects.all(),
+        required=False,
+        label=_("Tenant Group"),
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
@@ -245,7 +252,7 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
             "description",
             name=_("Attributes"),
         ),
-        FieldSet("tenant", name=_("Tenancy")),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
 
     nullable_fields = ("description", "tenant")
