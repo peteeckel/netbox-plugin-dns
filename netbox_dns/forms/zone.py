@@ -24,7 +24,7 @@ from utilities.forms.fields import (
 from utilities.forms.widgets import BulkEditNullBooleanSelect
 from utilities.forms.rendering import FieldSet
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
-from tenancy.models import Tenant
+from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import (
@@ -187,7 +187,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
     )
     soa_minimum = forms.IntegerField(
         required=True,
-        help_text=_("Minimum TTL for negative results, e.g. NXRRSET"),
+        help_text=_("Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"),
         validators=[MinValueValidator(1)],
         label=_("SOA Minimum TTL"),
     )
@@ -253,8 +253,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "billing_c",
             name=_("Domain Registration"),
         ),
-        FieldSet("tags", name=_("Tags")),
         FieldSet("tenant_group", "tenant", name=_("Tenancy")),
+        FieldSet("tags", name=_("Tags")),
     )
 
     def __init__(self, *args, **kwargs):
@@ -319,7 +319,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "nameservers",
             "default_ttl",
             "description",
-            "tags",
             "soa_ttl",
             "soa_mname",
             "soa_rname",
@@ -337,10 +336,11 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "admin_c",
             "tech_c",
             "billing_c",
+            "tenant_group",
             "tenant",
+            "tags",
         )
         help_texts = {
-            "view": _("View the zone belongs to"),
             "soa_mname": _("Primary nameserver for the zone"),
         }
 
@@ -556,12 +556,10 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         error_messages={
             "invalid_choice": _("Registrar not found."),
         },
-        help_text=_("Registrar the domain is registered with"),
         label=_("Registrar"),
     )
     registry_domain_id = forms.CharField(
         required=False,
-        help_text=_("Domain ID assigned by the registry"),
         label=_("Registry Domain ID"),
     )
     registrant = CSVModelChoiceField(
@@ -571,14 +569,12 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         error_messages={
             "invalid_choice": _("Registrant contact ID not found"),
         },
-        help_text=_("Owner of the domain"),
         label=_("Registrant"),
     )
     admin_c = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text=_("Administrative contact for the domain"),
         error_messages={
             "invalid_choice": _("Administrative contact ID not found"),
         },
@@ -588,7 +584,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text=_("Technical contact for the domain"),
         error_messages={
             "invalid_choice": _("Technical contact ID not found"),
         },
@@ -598,7 +593,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         queryset=RegistrationContact.objects.all(),
         required=False,
         to_field_name="contact_id",
-        help_text=_("Billing contact for the domain"),
         error_messages={
             "invalid_choice": _("Billing contact ID not found"),
         },
@@ -608,7 +602,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         queryset=Tenant.objects.all(),
         required=False,
         to_field_name="name",
-        help_text=_("Assigned tenant"),
         label=_("Tenant"),
     )
     template = CSVModelChoiceField(
@@ -784,6 +777,11 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         queryset=RegistrationContact.objects.all(),
         required=False,
         label=_("Billing Contact"),
+    )
+    tenant_group = DynamicModelChoiceField(
+        queryset=TenantGroup.objects.all(),
+        required=False,
+        label=_("Tenant"),
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),

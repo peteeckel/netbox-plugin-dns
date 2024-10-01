@@ -17,7 +17,7 @@ from utilities.forms.fields import (
 from utilities.forms.widgets import BulkEditNullBooleanSelect
 from utilities.forms import add_blank_choice
 from utilities.forms.rendering import FieldSet
-from tenancy.models import Tenant
+from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import RecordTemplate, ZoneTemplate
@@ -78,8 +78,9 @@ class RecordTemplateForm(TenancyForm, NetBoxModelForm):
             "ttl",
             "disable_ptr",
             "description",
-            "tags",
+            "tenant_group",
             "tenant",
+            "tags",
         )
 
 
@@ -212,6 +213,11 @@ class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
         max_length=200,
         required=False,
         label=_("Description"),
+    )
+    tenant_group = DynamicModelChoiceField(
+        queryset=TenantGroup.objects.all(),
+        required=False,
+        label=_("Tenant Group"),
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),

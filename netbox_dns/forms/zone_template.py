@@ -15,7 +15,7 @@ from utilities.forms.fields import (
     DynamicModelChoiceField,
 )
 from utilities.forms.rendering import FieldSet
-from tenancy.models import Tenant
+from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import (
@@ -56,8 +56,8 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
             "billing_c",
             name=_("Domain Registration"),
         ),
-        FieldSet("tags", name=_("Tags")),
         FieldSet("tenant_group", "tenant", name=_("Tenancy")),
+        FieldSet("tags", name=_("Tags")),
     )
 
     class Meta:
@@ -68,13 +68,14 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
             "nameservers",
             "record_templates",
             "description",
-            "tags",
             "registrar",
             "registrant",
             "admin_c",
             "tech_c",
             "billing_c",
+            "tenant_group",
             "tenant",
+            "tags",
         )
 
 
@@ -260,6 +261,11 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Billing Contact"),
     )
+    tenant_group = DynamicModelChoiceField(
+        queryset=TenantGroup.objects.all(),
+        required=False,
+        label=_("Tenant Group"),
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
@@ -286,7 +292,7 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
             "billing_c",
             name=_("Domain Registration"),
         ),
-        FieldSet("tenant", name=_("Tenancy")),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
     )
 
     nullable_fields = (
@@ -298,4 +304,5 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         "admin_c",
         "tech_c",
         "billing_c",
+        "tenant",
     )

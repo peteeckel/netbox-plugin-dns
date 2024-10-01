@@ -15,7 +15,7 @@ from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
-from tenancy.models import Tenant
+from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import NameServer, Zone
@@ -51,7 +51,7 @@ class NameServerForm(TenancyForm, NetBoxModelForm):
 
     class Meta:
         model = NameServer
-        fields = ("name", "description", "tags", "tenant")
+        fields = ("name", "description", "tags", "tenant_group", "tenant")
 
 
 class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
@@ -114,6 +114,11 @@ class NameServerBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Description"),
     )
+    tenant_group = DynamicModelChoiceField(
+        queryset=TenantGroup.objects.all(),
+        required=False,
+        label=_("Tenant Group"),
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
@@ -123,6 +128,7 @@ class NameServerBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         FieldSet(
             "description",
+            "tenant_group",
             "tenant",
             "tags",
             name=_("Attributes"),

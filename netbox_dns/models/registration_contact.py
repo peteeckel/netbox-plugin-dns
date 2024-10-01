@@ -88,6 +88,12 @@ class RegistrationContact(NetBoxModel):
         blank=True,
     )
 
+    # +
+    # TODO: Retained for backwards compatibility with older versions where
+    # 'RegistrationContact' was still ambiguously named 'Contact'.
+    #
+    # Removing it requires a data migration.
+    # -
     tags = TaggableManager(
         through="extras.TaggedItem",
         related_name="netbox_dns_contact_set",
