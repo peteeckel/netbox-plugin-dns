@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from netbox.plugins import PluginConfig
 from ipam.choices import IPAddressStatusChoices
 
-from netbox_dns.choices import RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
 __version__ = "1.1.3"
 
@@ -26,6 +26,12 @@ class DNSConfig(PluginConfig):
         "zone_soa_retry": 7200,
         "zone_soa_expire": 2419200,
         "zone_soa_minimum": 3600,
+        "zone_active_status": [
+            ZoneStatusChoices.STATUS_ACTIVE,
+        ],
+        "record_active_status": [
+            RecordStatusChoices.STATUS_ACTIVE,
+        ],
         "dnssync_disabled": False,
         "dnssync_ipaddress_active_status": [
             IPAddressStatusChoices.STATUS_ACTIVE,

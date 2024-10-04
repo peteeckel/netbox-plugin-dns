@@ -53,6 +53,9 @@ __all__ = (
     "ZoneIndex",
 )
 
+ZONE_ACTIVE_STATUS_LIST = get_plugin_config("netbox_dns", "zone_active_status")
+RECORD_ACTIVE_STATUS_LIST = get_plugin_config("netbox_dns", "record_active_status")
+
 
 class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
     """
@@ -65,15 +68,13 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
             .get_queryset()
             .annotate(
                 active=ExpressionWrapper(
-                    Q(status__in=Zone.ACTIVE_STATUS_LIST), output_field=BooleanField()
+                    Q(status__in=ZONE_ACTIVE_STATUS_LIST), output_field=BooleanField()
                 )
             )
         )
 
 
 class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
-    ACTIVE_STATUS_LIST = (ZoneStatusChoices.STATUS_ACTIVE,)
-
     def __init__(self, *args, **kwargs):
         kwargs.pop("template", None)
 
@@ -299,11 +300,21 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @staticmethod
     def get_defaults():
+        default_fields = (
+            "zone_default_ttl",
+            "zone_soa_ttl",
+            "zone_soa_serial",
+            "zone_soa_refresh",
+            "zone_soa_retry",
+            "zone_soa_expire",
+            "zone_soa_minimum",
+            "zone_soa_rname",
+        )
+
         return {
             field[5:]: value
             for field, value in settings.PLUGINS_CONFIG.get("netbox_dns").items()
-            if field.startswith("zone_")
-            and field not in ("zone_soa_mname", "zone_nameservers")
+            if field in default_fields
         }
 
     @property
@@ -337,7 +348,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def is_active(self):
-        return self.status in Zone.ACTIVE_STATUS_LIST
+        return self.status in ZONE_ACTIVE_STATUS_LIST
 
     @property
     def is_reverse_zone(self):
@@ -474,7 +485,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             relative_name = name.relativize(parent).to_text()
             address_records = Record.objects.filter(
                 Q(zone=ns_zone),
-                Q(status__in=Record.ACTIVE_STATUS_LIST),
+                Q(status__in=RECORD_ACTIVE_STATUS_LIST),
                 Q(Q(name=f"{_nameserver.name}.") | Q(name=relative_name)),
                 Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
             )
