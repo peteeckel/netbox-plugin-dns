@@ -28,6 +28,7 @@ class DNSConfig(PluginConfig):
         "zone_soa_minimum": 3600,
         "zone_active_status": [
             ZoneStatusChoices.STATUS_ACTIVE,
+            ZoneStatusChoices.STATUS_DYNAMIC,
         ],
         "record_active_status": [
             RecordStatusChoices.STATUS_ACTIVE,
