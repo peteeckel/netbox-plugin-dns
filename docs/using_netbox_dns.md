@@ -264,7 +264,7 @@ Field           | Required | Default  | Explanation
 -----           | -------- | -------  | -----------
 **Name**        | Yes      |          | The name of the zone. This is an FQDN that represents the DNS domain containing host names to be resolved or one of the special zones `in-addr.arpa` or `ip6.arpa`, which are reserved for the resolution of IPv4 and IPv6 addresses by the DNS infrastructure
 **View**        | No       |          | The name of the view the zone is associated with. If the view is not the default view, the zone name is also prefixed with the view name in brackets to make zones easier to distinguish in lists.
-**Status**      | Yes      | Active   | The zone's status. Possible values are "active", "reserved", "deprecated" or "parked". All zone status except "Active" are considered inactive, which has implications for the records in a zone as well as for PTR records in reverse zones that are automatically generated for address records in the zone
+**Status**      | Yes      | Active   | The zone's status. By default, selectable values are "Active", "Dynamic", "Reserved", "Deprecated" or "Parked". All zone status except "Active" and "Dynamic" are considered inactive by default, which has implications for the records in a zone as well as for PTR records in reverse zones that are automatically generated for address records in the zone. Both the list of statuses for Zone objects and the statuses considered active can be modified. See [Customizing zone status choices](#zone_status_customization)
 **Nameservers** | No       | see [Default Settings](#zone_defaults) | The list of authoritative name servers for the zone
 **Default TTL** | Yes      | see [Default Settings](#zone_defaults) | The default TTL for all records in the zone if none is specified
 **Description** | No       |          | A short textual description of the zone
@@ -301,7 +301,7 @@ SOA Field     | Explanation
 
 The zone's SOA record is assembled from these fields by concatenating them and putting them in parentheses. NetBox DNS automatically creates the SOA record  from the information entered in the fields above.
 
-All SOA fields are required. Default settings can be configured in the Django configuration file, see [Zone Default Settings](#zone_defaults)).
+All SOA fields are required. Default settings can be configured in the Django configuration file, see [Zone Default Settings](#zone_defaults).
 
 #### Domain Registration Fields
 For zones that are registered as public DNS domains, there is a third set of fields available that reflects the domain's registration data.
@@ -402,7 +402,7 @@ Field           | Required | Explanation
 **Disable PTR** | Yes      | A checkbox indicating whether a PTR record should be generated for an A or AAAA record automatically if there is a zone suitable for the PTR in NetBox DNS
 **Name**        | Yes      | The name of the record, e.g. the simple host name for A and AAAA records
 **Value**       | Yes      | The value of the record, e.g. the IPv4 or IPv6 addreess
-**Status**      | No       | The status of a record. Pre-defined choices are "Active" (which is the default) and "Inactive"
+**Status**      | No       | The status of a record. Pre-defined choices are "Active" (which is the default) and "Inactive". Both the list of statuses for Record objects and the statuses considered active can be modified. See [Customizing record status choices](#record_status_customization)
 **TTL**         | No       | The time to live for the record. If empty, the zone's SOA MINIMUM value or an explicitly defined zone default TTL value ($TTL in the master zone file) will be used. See [RFC 2308, Section 4](https://datatracker.ietf.org/doc/html/rfc2308#section-4)
 **Description** | No       | A short textual description of the record
 **Tags**        | No       | NetBox tags assigned to the name server. Tags can be used to categorise name servers by arbitrary criteria such as Production/Test/Development systems
@@ -1067,8 +1067,8 @@ There is no direct migration path from IPAM Coupling to IPAM DNSsync because the
 
 After these steps have been completed, creating, deleting or updating IP addresses will be synchronised with the related DNS records as before.
 
-## UI Customization
-There are limited options to customize the appearance of the NetBox DNS plugin.
+## Customization
+There are limited options to customize the appearance and functionality of the NetBox DNS plugin.
 
 ### Name of the Main Menu Item
 The default name of the submenu NetBox DNS uses in the NetBox sidebar is 'NetBox DNS'. Using the configuration variable `menu_name` in the plugin configuration this can be changed to a different value, e.g. 'DNS':
@@ -1097,3 +1097,64 @@ PLUGINS_CONFIG = {
 ```
 
 The name of the submenu is always 'NETBOX DNS' and cannot be changed by setting `menu_name `. This is hard-coded in NetBox.
+
+### Zone and Record status
+By default there are pre-defined values for the "Status" field of Zone and Record objects, which should fit the general case. For special requirements, both the list of possible statuses and the statuses consisidered active can be modified by editing the NetBox configuration file.
+
+The list of possible choices for the zone and record statuses can be modified by setting the `FIELD_CHOICES` variable in the NetBox configuration file `configuration.py`, the statuses NetBox DNS considers active for zones and records in the `PLUGINS_CONFIG` variable in the same file.
+
+#### <a name="zone_status_customization"></a>Customizing zone status choices
+The key for modifying the list of possible zone statuses in `FIELD_CHOICES` is `netbox_dns.Zone.status`. To add a new status `Planned`, use the following configuration:
+
+```
+FIELD_CHOICES = {
+	'netbox_dns.Zone.status+': [
+		('planned', 'Planned', 'grey'),
+	],
+}
+```
+
+The first element in the tuple is the internal name for the new status (used e.g. in the API), the second is the label used in the GUI, and the optional third element is a colour used to display the status in the GUI. Note the `+` at the end of the key `netbox_dns.Zone.status+`. Without it, it would be necessary to define all standard statuses as well as the one to be added, which is error-prone. Do not remove standard statuses, especialls not the "Active" status!
+
+The list of zone statuses considered active is defined in the `zone_active_status` variable in the plugin configuration for NetBox DNS. The default configuration can be modified by adding a status to that variable:
+
+```
+PLUGINS_CONFIG = {
+	"netbox_dns": {
+		"zone_active_status": [
+			ZoneStatusChoices.STATUS_ACTIVE,
+			ZoneStatusChoices.STATUS_DYNAMIC,
+			"planned",
+		],
+	},
+}
+```
+
+Every status configured here must be one of the pre-defined statuses or have been defined in `FIELD_CHOICES`. Make sure to include the standard statuses as shown above.
+
+#### <a name="record_status_customization"></a>Customizing record status choices
+The key for modifying the list of possible record statuses in `FIELD_CHOICES` is `netbox_dns.Record.status`. To add a new status `Deprecated`, use the following configuration:
+
+```
+FIELD_CHOICES = {
+	'netbox_dns.Record.status+': [
+		('deprecated', 'Deprecated', 'grey'),
+	],
+}
+```
+The meaning of the elements of the status tuples is as described above, and the same admonition about not removing statuses applies.
+
+The list of record statuses considered active is defined in the `record_active_status` variable in the plugin configuration for NetBox DNS. The default configuration can be modified by adding a status to that variable:
+
+```
+PLUGINS_CONFIG = {
+	"netbox_dns": {
+		"record_active_status": [
+			RecordStatusChoices.STATUS_ACTIVE,
+			"deprecated",
+		],
+	},
+}
+```
+
+Every status configured here must be one of the pre-defined statuses or have been defined in `FIELD_CHOICES`. Make sure to include the standard statuses as shown above.
