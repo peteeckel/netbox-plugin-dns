@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-04 20:26+0000\n"
+"POT-Creation-Date: 2024-10-09 06:35+0000\n"
 "PO-Revision-Date: 2024-09-29 12:06+0000\n"
 "Last-Translator: Peter Eckel <pete@netbox-dns.org>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
@@ -483,11 +483,11 @@ msgstr "Attribute"
 #: netbox_dns/forms/record_template.py:166
 #: netbox_dns/forms/record_template.py:225 netbox_dns/forms/view.py:223
 #: netbox_dns/forms/view.py:247 netbox_dns/forms/zone.py:605
-#: netbox_dns/forms/zone.py:784 netbox_dns/forms/zone.py:789
-#: netbox_dns/forms/zone_template.py:206 netbox_dns/forms/zone_template.py:272
-#: netbox_dns/models/nameserver.py:43 netbox_dns/models/record.py:190
-#: netbox_dns/models/record_template.py:65 netbox_dns/models/view.py:56
-#: netbox_dns/models/zone.py:181 netbox_dns/models/zone_template.py:39
+#: netbox_dns/forms/zone.py:789 netbox_dns/forms/zone_template.py:206
+#: netbox_dns/forms/zone_template.py:272 netbox_dns/models/nameserver.py:43
+#: netbox_dns/models/record.py:190 netbox_dns/models/record_template.py:65
+#: netbox_dns/models/view.py:56 netbox_dns/models/zone.py:181
+#: netbox_dns/models/zone_template.py:39
 #: netbox_dns/templates/netbox_dns/nameserver.html:27
 #: netbox_dns/templates/netbox_dns/record.html:62
 #: netbox_dns/templates/netbox_dns/recordtemplate.html:30
@@ -499,7 +499,7 @@ msgstr "Mandant"
 
 #: netbox_dns/forms/nameserver.py:120 netbox_dns/forms/record.py:285
 #: netbox_dns/forms/record_template.py:220 netbox_dns/forms/view.py:242
-#: netbox_dns/forms/zone_template.py:267
+#: netbox_dns/forms/zone.py:784 netbox_dns/forms/zone_template.py:267
 #, fuzzy
 msgid "Tenant Group"
 msgstr "Mandantengruppe"
