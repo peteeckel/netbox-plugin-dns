@@ -781,7 +781,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),
         required=False,
-        label=_("Tenant"),
+        label=_("Tenant Group"),
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),

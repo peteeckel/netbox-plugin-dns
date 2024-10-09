@@ -34,6 +34,9 @@ __all__ = (
     "RecordIndex",
 )
 
+ZONE_ACTIVE_STATUS_LIST = get_plugin_config("netbox_dns", "zone_active_status")
+RECORD_ACTIVE_STATUS_LIST = get_plugin_config("netbox_dns", "record_active_status")
+
 
 def min_ttl(*ttl_list):
     return min((ttl for ttl in ttl_list if ttl is not None), default=None)
@@ -102,14 +105,14 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
             .annotate(
                 active=ExpressionWrapper(
                     Q(
-                        Q(zone__status__in=zone.Zone.ACTIVE_STATUS_LIST)
+                        Q(zone__status__in=ZONE_ACTIVE_STATUS_LIST)
                         & Q(
                             Q(address_record__isnull=True)
                             | Q(
-                                address_record__zone__status__in=zone.Zone.ACTIVE_STATUS_LIST
+                                address_record__zone__status__in=ZONE_ACTIVE_STATUS_LIST
                             )
                         )
-                        & Q(status__in=Record.ACTIVE_STATUS_LIST)
+                        & Q(status__in=RECORD_ACTIVE_STATUS_LIST)
                     ),
                     output_field=BooleanField(),
                 )
@@ -118,8 +121,6 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
 
 
 class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
-    ACTIVE_STATUS_LIST = (RecordStatusChoices.STATUS_ACTIVE,)
-
     unique_ptr_qs = Q(
         Q(disable_ptr=False),
         Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
@@ -295,8 +296,8 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @property
     def is_active(self):
         return (
-            self.status in Record.ACTIVE_STATUS_LIST
-            and self.zone.status in zone.Zone.ACTIVE_STATUS_LIST
+            self.status in RECORD_ACTIVE_STATUS_LIST
+            and self.zone.status in ZONE_ACTIVE_STATUS_LIST
         )
 
     @property
@@ -616,7 +617,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             name=self.name,
             type=self.type,
             value=self.value,
-            status__in=Record.ACTIVE_STATUS_LIST,
+            status__in=RECORD_ACTIVE_STATUS_LIST,
         )
 
         if not self._state.adding:
@@ -653,7 +654,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             name=self.name,
             type=self.type,
             value=self.value,
-            status__in=Record.ACTIVE_STATUS_LIST,
+            status__in=RECORD_ACTIVE_STATUS_LIST,
             ipam_ip_address__isnull=True,
         )
 
