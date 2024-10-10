@@ -76,6 +76,9 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         method="filter_ip_address",
         label=_("IP Address"),
     )
+    active = django_filters.BooleanFilter(
+        label=_("Record is active"),
+    )
 
     managed = django_filters.BooleanFilter()
 
@@ -89,6 +92,7 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "ttl",
             "value",
             "disable_ptr",
+            "active",
             "managed",
         )
 

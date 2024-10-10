@@ -118,6 +118,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "value",
             "disable_ptr",
             "status",
+            "active",
             "description",
             name=_("Attributes"),
         ),
@@ -155,6 +156,11 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         queryset=Zone.objects.all(),
         required=False,
         label=_("Zone"),
+    )
+    active = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Active"),
     )
     description = forms.CharField(
         required=False,
