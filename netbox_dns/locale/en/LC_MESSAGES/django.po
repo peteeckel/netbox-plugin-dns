@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-09 06:35+0000\n"
+"POT-Creation-Date: 2024-10-10 13:17+0000\n"
 "PO-Revision-Date: 2024-09-29 12:06+0000\n"
 "Last-Translator: Peter Eckel <pete@netbox-dns.org>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
@@ -1378,7 +1378,14 @@ msgstr ""
 msgid "{name} is not a valid DNS domain name"
 msgstr ""
 
-#: netbox_dns/validators/dns_value.py:34
+#: netbox_dns/validators/dns_value.py:57
+#, python-brace-format
+msgid ""
+"Record value {value} for a type {type} record is not a printable ASCII "
+"string."
+msgstr ""
+
+#: netbox_dns/validators/dns_value.py:75
 #, python-brace-format
 msgid "Record value {value} is not a valid value for a {type} record: {error}."
 msgstr ""
