@@ -4,7 +4,7 @@ from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_dns.models import Zone, NameServer, Record
-from netbox_dns.choices import ZoneStatusChoices, RecordTypeChoices
+from netbox_dns.choices import ZoneStatusChoices, RecordTypeChoices, RecordStatusChoices
 from netbox_dns.filtersets import RecordFilterSet
 
 
@@ -69,6 +69,13 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 managed=True,
             ),
             Record(
+                name="name5",
+                zone=cls.zones[0],
+                type=RecordTypeChoices.TXT,
+                value="Nothing to see here",
+                status=RecordStatusChoices.STATUS_INACTIVE,
+            ),
+            Record(
                 name="name1",
                 zone=cls.zones[1],
                 type=RecordTypeChoices.AAAA,
@@ -100,7 +107,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     def test_zone(self):
         params = {"zone": [self.zones[0]]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
 
     def test_fqdn(self):
         params = {
@@ -136,7 +143,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     def test_managed(self):
         params = {"managed": False}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
         params = {"managed": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
@@ -159,6 +166,15 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"ip_address": ["fe80::dead:beef"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_active(self):
+        # *
+        # Note: SOA records show up here as well!
+        # -
+        params = {"active": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {"active": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
 
     def test_ptr_record(self):
         Zone.objects.create(name="1.0.10.in-addr.arpa", **self.zone_data)
