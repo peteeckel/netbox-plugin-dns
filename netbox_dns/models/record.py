@@ -598,7 +598,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def validate_value(self):
         try:
-            validate_record_value(self.type, self.value)
+            validate_record_value(self)
         except ValidationError as exc:
             raise ValidationError({"value": exc})
 
