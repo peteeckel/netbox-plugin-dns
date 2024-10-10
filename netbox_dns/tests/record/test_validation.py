@@ -1,8 +1,21 @@
+import re
+import textwrap
+
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from netbox_dns.models import Zone, Record, NameServer
 from netbox_dns.choices import RecordTypeChoices
+
+
+def split_text_value(value):
+    raw_value = "".join(re.findall(r'"([^"]+)"', value))
+    if not raw_value:
+        raw_value = value
+
+    return " ".join(
+        f'"{part}"' for part in textwrap.wrap(raw_value, 255, drop_whitespace=False)
+    )
 
 
 class RecordValidationTestCase(TestCase):
@@ -637,3 +650,114 @@ class RecordValidationTestCase(TestCase):
         for record in records:
             with self.assertRaises(ValidationError):
                 record.save()
+
+    def test_valid_txt_value(self):
+        zone = self.zones[0]
+
+        records = (
+            Record(
+                name="name1",
+                zone=zone,
+                value="test",
+            ),
+            Record(
+                name="name2",
+                zone=zone,
+                value=255 * "x",
+            ),
+            Record(
+                name="name3",
+                zone=zone,
+                value=f"\"{255*'x'}\"",
+            ),
+            Record(
+                name="name4",
+                zone=zone,
+                value="xn--m-w22scd",
+            ),
+        )
+
+        for record in records:
+            saved_value = record.value
+
+            for record_type in (
+                RecordTypeChoices.TXT,
+                RecordTypeChoices.SPF,
+            ):
+                record.type = record_type
+                record.save()
+
+            self.assertEqual(record.value, saved_value)
+
+    def test_valid_txt_long_value(self):
+        zone = self.zones[0]
+
+        records = (
+            Record(
+                name="name1",
+                zone=zone,
+                value=64 * "test",
+            ),
+            Record(
+                name="name2",
+                zone=zone,
+                value=f"\"{64*'test '}\"",
+            ),
+            Record(
+                name="name3",
+                zone=zone,
+                value=f"\"{512*'x'}\"",
+            ),
+            Record(
+                name="name4",
+                zone=zone,
+                value=512 * "x",
+            ),
+            Record(
+                name="name5",
+                zone=zone,
+                value=128 * "xn--m-w22scd",
+            ),
+        )
+
+        for record in records:
+            saved_value = record.value
+
+            for record_type in (
+                RecordTypeChoices.TXT,
+                RecordTypeChoices.SPF,
+            ):
+                record.type = record_type
+                record.save()
+
+            self.assertEqual(record.value, split_text_value(saved_value))
+
+    def test_invalid_txt_value_charset(self):
+        zone = self.zones[0]
+
+        records = (
+            Record(
+                name="name1",
+                zone=zone,
+                value="täst",
+            ),
+            Record(
+                name="name2",
+                zone=zone,
+                value="\000test",
+            ),
+            Record(
+                name="name3",
+                zone=zone,
+                value='"\U0001F595"',
+            ),
+        )
+
+        for record in records:
+            for record_type in (
+                RecordTypeChoices.TXT,
+                RecordTypeChoices.SPF,
+            ):
+                record.type = record_type
+                with self.assertRaises(ValidationError):
+                    record.save()

@@ -354,6 +354,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "status",
             "name",
             "nameserver_id",
+            "active",
             "description",
             name=_("Attributes"),
         ),
@@ -399,6 +400,11 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         queryset=NameServer.objects.all(),
         required=False,
         label=_("Nameservers"),
+    )
+    active = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Active"),
     )
     description = forms.CharField(
         required=False,
