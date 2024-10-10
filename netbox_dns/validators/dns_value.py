@@ -1,5 +1,8 @@
-import dns
+import re
+import textwrap
+
 from dns import rdata, name as dns_name
+from dns.exception import SyntaxError
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -11,11 +14,12 @@ from netbox_dns.validators import (
     validate_generic_name,
 )
 
+MAX_TXT_LENGTH = 255
 
 __all__ = ("validate_record_value",)
 
 
-def validate_record_value(record_type, value):
+def validate_record_value(record):
     def _validate_idn(name):
         try:
             name.to_unicode()
@@ -26,16 +30,53 @@ def validate_record_value(record_type, value):
                 )
             )
 
+    def _split_text_value(value):
+        # +
+        # Text values longer than 255 characters need to be broken up for TXT and
+        # SPF records.
+        # First, in case they had been split into separate strings, reassemble the
+        # original (long) value, then split it into chunks of a maximum length of
+        # 255 (preferably at word boundaries), and then build a sequence of partial
+        # strings enclosed in double quotes and separated by space.
+        #
+        # See https://datatracker.ietf.org/doc/html/rfc4408#section-3.1.3 for details.
+        # -
+        raw_value = "".join(re.findall(r'"([^"]+)"', value))
+        if not raw_value:
+            raw_value = value
+
+        return " ".join(
+            f'"{part}"'
+            for part in textwrap.wrap(raw_value, MAX_TXT_LENGTH, drop_whitespace=False)
+        )
+
+    if record.type in (RecordTypeChoices.TXT, RecordTypeChoices.SPF):
+        if not (record.value.isascii() and record.value.isprintable()):
+            raise ValidationError(
+                _(
+                    "Record value {value} for a type {type} record is not a printable ASCII string."
+                ).format(value=record.value, type=record.type)
+            )
+
+        if len(record.value) <= MAX_TXT_LENGTH:
+            return
+
+        try:
+            rr = rdata.from_text(RecordClassChoices.IN, record.type, record.value)
+        except SyntaxError as exc:
+            if str(exc) == "string too long":
+                record.value = _split_text_value(record.value)
+
     try:
-        rr = rdata.from_text(RecordClassChoices.IN, record_type, value)
-    except dns.exception.SyntaxError as exc:
+        rr = rdata.from_text(RecordClassChoices.IN, record.type, record.value)
+    except SyntaxError as exc:
         raise ValidationError(
             _(
                 "Record value {value} is not a valid value for a {type} record: {error}."
-            ).format(value=value, type=record_type, error=exc)
+            ).format(value=record.value, type=record.type, error=exc)
         )
 
-    match record_type:
+    match record.type:
         case RecordTypeChoices.CNAME:
             _validate_idn(rr.target)
             validate_domain_name(
