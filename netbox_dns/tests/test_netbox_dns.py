@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.test import SimpleTestCase
 
 from netbox_dns import __version__
-from netbox_dns.tests.custom import APITestCase
+from utilities.testing.api import APITestCase
 
 
 class NetBoxDNSVersionTestCase(SimpleTestCase):
