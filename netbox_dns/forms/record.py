@@ -38,12 +38,6 @@ class RecordForm(TenancyForm, NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        initial_zone_id = self.initial.get("zone")
-        if initial_zone_id is not None:
-            self.initial["view"] = Zone.objects.get(pk=initial_zone_id).view
-        else:
-            self.initial["view"] = View.get_default_view()
-
         initial_name = self.initial.get("name")
         if initial_name:
             self.initial["name"] = name_to_unicode(initial_name)
@@ -51,6 +45,9 @@ class RecordForm(TenancyForm, NetBoxModelForm):
     view = DynamicModelChoiceField(
         queryset=View.objects.all(),
         required=False,
+        initial_params={
+            "zone": "$zone",
+        },
         label=_p("DNS", "View"),
     )
     zone = DynamicModelChoiceField(

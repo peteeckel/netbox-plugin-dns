@@ -1,31 +1,13 @@
-from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from netaddr import AddrFormatError, IPAddress
 
-
-__all__ = (
-    "AddressFormField",
-    "AddressField",
-)
+from ipam.formfields import IPAddressFormField
 
 
-class AddressFormField(forms.Field):
-    def to_python(self, value):
-        if not value:
-            return None
-
-        if isinstance(value, IPAddress):
-            return value
-
-        try:
-            ip_address = IPAddress(value)
-        except AddrFormatError as exc:
-            raise ValidationError(exc)
-
-        return ip_address
+__all__ = ("AddressField",)
 
 
 class AddressField(models.Field):
@@ -58,7 +40,7 @@ class AddressField(models.Field):
         return str(self.to_python(value))
 
     def form_class(self):
-        return AddressFormField
+        return IPAddressFormField
 
     def formfield(self, **kwargs):
         defaults = {"form_class": self.form_class()}
