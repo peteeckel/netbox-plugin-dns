@@ -111,6 +111,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet(
+            "view_id",
             "zone_id",
             "name",
             "fqdn",
@@ -152,10 +153,18 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("Status"),
     )
+    view_id = DynamicModelMultipleChoiceField(
+        queryset=View.objects.all(),
+        required=False,
+        label=_("View"),
+    )
     zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
         label=_("Zone"),
+        query_params={
+            "view_id": "$view_id",
+        },
     )
     active = forms.NullBooleanField(
         required=False,
