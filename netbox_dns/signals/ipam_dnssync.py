@@ -63,7 +63,7 @@ def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
                     {
                         "dns_name": _(
                             "Unique DNS records are enforced and there is already "
-                            "an active IP address {address} with DNS name {name}. Plesase choose "
+                            "an active IP address {address} with DNS name {name}. Please choose "
                             "a different name or disable record creation for this IP address."
                         ).format(address=instance.address, name=instance.dns_name)
                     }
