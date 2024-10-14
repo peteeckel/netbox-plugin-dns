@@ -16,7 +16,7 @@ The NetBox DNS plugin enables NetBox to manage operational DNS data such as name
 
 > [!WARNING]
 > **As a result of some issues with NetBox Branching still under investigation, NetBox DNS is currently not compatible with the new NetBox Branching plugin.**
-> This affects multiple aspects of the branching functionality, and currently (netboxlabs-branching-plugin version 0.4.0) there is no workaround. Do not try to use NetBox Branching together with NetBox DNS until these issues are resolved.
+> This affects multiple aspects of the branching functionality, and currently there is no workaround. Do not try to use NetBox Branching together with NetBox DNS until these issues are resolved.
 > This warning will be updated as soon as the situation is resolved.
 
 ## Objectives
