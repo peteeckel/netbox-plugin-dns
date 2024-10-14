@@ -2,6 +2,7 @@ name: Test with all supported NetBox versions
 
 on:
   - push
+  - pull_request
 
 jobs:
     test-netbox:
