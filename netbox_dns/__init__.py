@@ -6,7 +6,7 @@ from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 
 
 class DNSConfig(PluginConfig):
