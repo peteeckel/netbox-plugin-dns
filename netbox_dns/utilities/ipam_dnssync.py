@@ -212,18 +212,18 @@ def update_dns_records(ip_address, view=None, force=False):
 
 
 def delete_dns_records(ip_address, view=None):
-    deleted = False
-
     if view is None:
         address_records = ip_address.netbox_dns_records.all()
     else:
         address_records = ip_address.netbox_dns_records.filter(zone__view=view)
 
+    if not address_records.exists():
+        return False
+
     for record in address_records:
         record.delete()
-        deleted = True
 
-    return deleted
+    return True
 
 
 def get_views_by_prefix(prefix):
