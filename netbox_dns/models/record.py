@@ -105,14 +105,8 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
             .annotate(
                 active=ExpressionWrapper(
                     Q(
-                        Q(zone__status__in=ZONE_ACTIVE_STATUS_LIST)
-                        & Q(
-                            Q(address_record__isnull=True)
-                            | Q(
-                                address_record__zone__status__in=ZONE_ACTIVE_STATUS_LIST
-                            )
-                        )
-                        & Q(status__in=RECORD_ACTIVE_STATUS_LIST)
+                        zone__status__in=ZONE_ACTIVE_STATUS_LIST,
+                        status__in=RECORD_ACTIVE_STATUS_LIST,
                     ),
                     output_field=BooleanField(),
                 )
