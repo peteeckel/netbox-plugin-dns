@@ -12,6 +12,8 @@ from ipam.models import IPAddress, Prefix
 
 from netbox_dns.choices import RecordStatusChoices
 
+from .dns import get_parent_zone_names
+
 
 __all__ = (
     "get_zones",
@@ -85,15 +87,12 @@ def get_zones(ip_address, view=None, old_zone=None):
     min_labels = settings.PLUGINS_CONFIG["netbox_dns"].get(
         "dnssync_minimum_zone_labels", 2
     )
-    fqdn = dns_name.from_text(ip_address.dns_name)
-    zone_name_candidates = [
-        fqdn.split(i)[1].to_text().rstrip(".")
-        for i in range(min_labels + 1, len(fqdn.labels) + 1)
-    ]
 
     zones = Zone.objects.filter(
         view__in=views,
-        name__in=zone_name_candidates,
+        name__in=get_parent_zone_names(
+            ip_address.dns_name, min_labels=min_labels, include_self=True
+        ),
         active=True,
     )
 

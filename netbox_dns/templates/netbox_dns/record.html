@@ -76,6 +76,12 @@
                     <th scope="row">{% trans "Value" %}</th>
                     <td style="word-break:break-all;">{{ object.value }}</td>
                 </tr>
+                {% if cname_warning %}
+                <tr class="text-warning">
+                    <th scope="row">{% trans "Warning" %}</th>
+                    <td>{{ cname_warning }}</td>
+                </tr>
+                {% endif %}
                 {% if unicode_value %}
                 <tr>
                     <th scope="row">{% trans "Unicode Value" %}</th>

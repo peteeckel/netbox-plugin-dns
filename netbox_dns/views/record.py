@@ -1,5 +1,7 @@
 from dns import name as dns_name
 
+from django.utils.translation import gettext_lazy as _
+
 from netbox.views import generic
 from utilities.views import register_model_view
 from tenancy.views import ObjectContactsView
@@ -14,7 +16,7 @@ from netbox_dns.forms import (
 from netbox_dns.models import Record, Zone
 from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.tables import RecordTable, ManagedRecordTable, RelatedRecordTable
-from netbox_dns.utilities import value_to_unicode
+from netbox_dns.utilities import value_to_unicode, get_parent_zone_names
 
 
 __all__ = (
@@ -27,6 +29,10 @@ __all__ = (
     "RecordBulkDeleteView",
     "ManagedRecordListView",
 )
+
+
+class CNAMEWarning(Exception):
+    pass
 
 
 class RecordListView(generic.ObjectListView):
@@ -64,6 +70,18 @@ class RecordView(generic.ObjectView):
                 data=cname_targets,
             )
 
+        if Zone.objects.filter(
+            name__in=get_parent_zone_names(instance.value_fqdn, min_labels=1),
+            view=instance.zone.view,
+        ).exists():
+            raise (
+                CNAMEWarning(
+                    _(
+                        "There is no matching target record for CNAME value {value}"
+                    ).format(value=instance.value_fqdn)
+                )
+            )
+
         return None
 
     def get_cname_records(self, instance):
@@ -75,14 +93,9 @@ class RecordView(generic.ObjectView):
             )
         )
 
-        fqdn = dns_name.from_text(instance.fqdn)
-        parent_zone_names = [
-            fqdn.split(length)[1].to_text().rstrip(".")
-            for length in range(1, len(fqdn) + 1)
-        ]
-
         parent_zones = Zone.objects.filter(
-            view=instance.zone.view, name__in=parent_zone_names
+            view=instance.zone.view,
+            name__in=get_parent_zone_names(instance.fqdn, include_self=True),
         )
 
         for parent_zone in parent_zones:
@@ -118,7 +131,10 @@ class RecordView(generic.ObjectView):
             context["unicode_value"] = unicode_value
 
         if instance.type == RecordTypeChoices.CNAME:
-            context["cname_target_table"] = self.get_value_records(instance)
+            try:
+                context["cname_target_table"] = self.get_value_records(instance)
+            except CNAMEWarning as exc:
+                context["cname_warning"] = str(exc)
         else:
             context["cname_table"] = self.get_cname_records(instance)
 
