@@ -641,7 +641,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 {
                     "name": str(exc),
                 }
-            ) from None
+            )
 
         try:
             validate_domain_name(self.name, zone_name=True)
@@ -650,7 +650,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 {
                     "name": exc,
                 }
-            ) from None
+            )
 
         if self.soa_rname in (None, ""):
             raise ValidationError(_("soa_rname not set and no default value defined"))
@@ -662,7 +662,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 {
                     "soa_rname": exc,
                 }
-            ) from None
+            )
 
         if not self.soa_serial_auto:
             if self.soa_serial is None:
