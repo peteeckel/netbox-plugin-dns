@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from netbox_dns.models import Zone, Record, NameServer
-from netbox_dns.choices import RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
 def split_text_value(value):
@@ -278,7 +278,7 @@ class RecordValidationTestCase(TestCase):
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
         Record.objects.create(
             zone=zone,
@@ -299,7 +299,7 @@ class RecordValidationTestCase(TestCase):
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
         Record.objects.create(
             zone=zone,
@@ -320,7 +320,7 @@ class RecordValidationTestCase(TestCase):
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name2,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
         Record.objects.create(
             zone=zone,
@@ -347,7 +347,7 @@ class RecordValidationTestCase(TestCase):
             name=name1,
             type=RecordTypeChoices.CNAME,
             value=name2,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
     def test_active_cname_and_inactive_name(self):
@@ -368,7 +368,7 @@ class RecordValidationTestCase(TestCase):
             name=name1,
             type=RecordTypeChoices.AAAA,
             value=address,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
     def test_double_singletons_active_inactive(self):
@@ -389,7 +389,7 @@ class RecordValidationTestCase(TestCase):
             name=name1,
             type=RecordTypeChoices.DNAME,
             value=name3,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
     def test_lowercase_type(self):

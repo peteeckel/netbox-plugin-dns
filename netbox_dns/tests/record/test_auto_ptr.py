@@ -4,7 +4,7 @@ from django.test import TestCase
 
 
 from netbox_dns.models import NameServer, Record, Zone
-from netbox_dns.choices import RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
 
 def reverse_name(address, reverse_zone):
@@ -831,7 +831,7 @@ class RecordAutoPTRTestCase(TestCase):
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
         with self.assertRaises(Record.DoesNotExist):
@@ -861,7 +861,7 @@ class RecordAutoPTRTestCase(TestCase):
 
         self.assertEqual(r_record.value, f"{name}.{f_zone.name}.")
 
-        f_record.status = "inactive"
+        f_record.status = RecordStatusChoices.STATUS_INACTIVE
         f_record.save()
 
         with self.assertRaises(Record.DoesNotExist):
@@ -883,7 +883,7 @@ class RecordAutoPTRTestCase(TestCase):
             name=name,
             type=RecordTypeChoices.A,
             value=address,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
         with self.assertRaises(Record.DoesNotExist):
@@ -893,7 +893,7 @@ class RecordAutoPTRTestCase(TestCase):
                 name=reverse_name(address, r_zone),
             )
 
-        f_record.status = "active"
+        f_record.status = RecordStatusChoices.STATUS_ACTIVE
         f_record.save()
 
         r_record = Record.objects.get(
@@ -914,7 +914,7 @@ class RecordAutoPTRTestCase(TestCase):
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
         with self.assertRaises(Record.DoesNotExist):
@@ -924,7 +924,7 @@ class RecordAutoPTRTestCase(TestCase):
                 name=reverse_name(address, r_zone),
             )
 
-        f_record.status = "active"
+        f_record.status = RecordStatusChoices.STATUS_ACTIVE
         f_record.save()
 
         r_record = Record.objects.get(
@@ -953,7 +953,7 @@ class RecordAutoPTRTestCase(TestCase):
 
         self.assertEqual(r_record.value, f"{name}.{f_zone.name}.")
 
-        f_record.status = "inactive"
+        f_record.status = RecordStatusChoices.STATUS_INACTIVE
         f_record.save()
 
         with self.assertRaises(Record.DoesNotExist):
@@ -975,7 +975,7 @@ class RecordAutoPTRTestCase(TestCase):
             name=name,
             type=RecordTypeChoices.AAAA,
             value=address,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
 
         with self.assertRaises(Record.DoesNotExist):
@@ -985,7 +985,7 @@ class RecordAutoPTRTestCase(TestCase):
                 name=reverse_name(address, r_zone),
             )
 
-        f_record.status = "active"
+        f_record.status = RecordStatusChoices.STATUS_ACTIVE
         f_record.save()
 
         r_record = Record.objects.get(
