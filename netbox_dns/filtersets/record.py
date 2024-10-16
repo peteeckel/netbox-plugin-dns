@@ -92,7 +92,6 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "ttl",
             "value",
             "disable_ptr",
-            "active",
             "managed",
         )
 

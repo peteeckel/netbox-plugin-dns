@@ -80,7 +80,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 {
                     "name": str(exc),
                 }
-            ) from None
+            )
 
         try:
             validate_fqdn(self.name)
@@ -89,7 +89,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 {
                     "name": exc,
                 }
-            ) from None
+            )
 
         super().clean(*args, **kwargs)
 

@@ -2,6 +2,7 @@ from utilities.testing import APIViewTestCases, create_tags
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import View, Zone, NameServer, Registrar, RegistrationContact
+from netbox_dns.choices import ZoneStatusChoices
 
 
 class ZoneAPITestCase(
@@ -106,7 +107,7 @@ class ZoneAPITestCase(
         cls.create_data = [
             {
                 "name": "zone6.example.com",
-                "status": "reserved",
+                "status": ZoneStatusChoices.STATUS_RESERVED,
                 "nameservers": [nameserver.pk for nameserver in nameservers[0:2]],
                 **zone_data,
                 "soa_mname": nameservers[0].pk,
@@ -118,14 +119,14 @@ class ZoneAPITestCase(
             },
             {
                 "name": "zone7.example.com",
-                "status": "reserved",
+                "status": ZoneStatusChoices.STATUS_RESERVED,
                 "nameservers": [nameserver.pk for nameserver in nameservers[1:3]],
                 **zone_data,
                 "soa_mname": nameservers[0].pk,
             },
             {
                 "name": "zone8.example.com",
-                "status": "reserved",
+                "status": ZoneStatusChoices.STATUS_RESERVED,
                 "nameservers": [nameserver.pk for nameserver in nameservers[0:3]],
                 **zone_data,
                 "soa_mname": nameservers[0].pk,

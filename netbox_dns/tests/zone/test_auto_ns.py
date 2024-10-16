@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.db.models import ProtectedError
 
 from netbox_dns.models import NameServer, Record, Zone
-from netbox_dns.choices import RecordTypeChoices
+from netbox_dns.choices import RecordTypeChoices, ZoneStatusChoices, RecordStatusChoices
 
 
 class ZoneAutoNSTestCase(TestCase):
@@ -75,7 +75,7 @@ class ZoneAutoNSTestCase(TestCase):
         ns_zone = Zone.objects.create(
             name="example.com",
             **self.zone_data,
-            status="reserved",
+            status=ZoneStatusChoices.STATUS_RESERVED,
         )
         ns_zone.nameservers.add(nameserver)
 
@@ -90,7 +90,7 @@ class ZoneAutoNSTestCase(TestCase):
         ns_zone = Zone.objects.create(
             name="example.com",
             **self.zone_data,
-            status="reserved",
+            status=ZoneStatusChoices.STATUS_RESERVED,
         )
         ns_zone.nameservers.add(nameserver)
 
@@ -111,7 +111,7 @@ class ZoneAutoNSTestCase(TestCase):
         ns_zone = Zone.objects.create(
             name="example.com",
             **self.zone_data,
-            status="reserved",
+            status=ZoneStatusChoices.STATUS_RESERVED,
         )
         ns_zone.nameservers.add(nameserver)
 
@@ -121,7 +121,7 @@ class ZoneAutoNSTestCase(TestCase):
             type="A",
             value="10.0.0.23",
             ttl=86400,
-            status="inactive",
+            status=RecordStatusChoices.STATUS_INACTIVE,
         )
         ns_record.save()
 

@@ -133,13 +133,13 @@ class RecordTemplate(NetBoxModel):
                     {
                         "record_name": exc,
                     }
-                ) from None
+                )
 
     def validate_value(self):
         try:
             validate_record_value(self)
         except ValidationError as exc:
-            raise ValidationError({"value": exc}) from None
+            raise ValidationError({"value": exc})
 
     def matching_records(self, zone):
         return Record.objects.filter(

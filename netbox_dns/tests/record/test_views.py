@@ -87,7 +87,7 @@ class RecordViewTestCase(
             "value": "fe80::dead:beef",
             "ttl": 86230,
             "tags": [t.pk for t in tags],
-            "status": "active",
+            "status": RecordStatusChoices.STATUS_ACTIVE,
         }
 
         cls.bulk_edit_data = {
