@@ -983,7 +983,7 @@ For this use case, it is possible to define filters per DNS view that provide ad
 {
     "dns_name__startswith": "external"
 }
-``` 
+```
 
 As a more practical example, the user can create a boolean custom field named `external`, and define the following IP address filter for the external view:
 
@@ -1071,13 +1071,13 @@ After these steps have been completed, creating, deleting or updating IP address
 There are limited options to customize the appearance and functionality of the NetBox DNS plugin.
 
 ### Name of the Main Menu Item
-The default name of the submenu NetBox DNS uses in the NetBox sidebar is 'NetBox DNS'. Using the configuration variable `menu_name` in the plugin configuration this can be changed to a different value, e.g. 'DNS':
+The default name of the submenu NetBox DNS uses in the NetBox sidebar is 'DNS'. Using the configuration variable `menu_name` in the plugin configuration this can be changed to a different value, e.g. 'NetBox DNS':
 
 ```
 PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
-        menu_name: "DNS",
+        menu_name: "NetBox DNS",
         ...
     },
 }
