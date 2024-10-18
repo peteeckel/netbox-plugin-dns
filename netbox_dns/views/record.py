@@ -144,9 +144,10 @@ class RecordView(generic.ObjectView):
 
         if len(name) > 1 and not instance.is_glue:
             if Zone.objects.filter(
+                active=True,
                 name__in=get_parent_zone_names(
                     instance.fqdn, min_labels=len(fqdn) - len(name)
-                )
+                ),
             ).exists():
                 context["mask_warning"] = _(
                     "Record is masked by a child zone and may not be visible in DNS"
