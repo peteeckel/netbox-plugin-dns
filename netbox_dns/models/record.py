@@ -263,7 +263,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def value_fqdn(self):
-        if self.type != RecordTypeChoices.CNAME:
+        if self.type not in (RecordTypeChoices.CNAME, RecordTypeChoices.NS):
             return None
 
         _zone = dns_name.from_text(self.zone.name)
@@ -345,6 +345,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         )
 
         return ptr_zone
+
+    @property
+    def is_glue(self):
+        return self in self.zone.glue_records
 
     def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone

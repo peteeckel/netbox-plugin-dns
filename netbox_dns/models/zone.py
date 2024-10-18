@@ -12,8 +12,9 @@ from django.core.validators import (
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
 from django.db.models import Q, Max, ExpressionWrapper, BooleanField
-from django.urls import reverse
+from django.db.models.functions import Length
 from django.db.models.signals import m2m_changed
+from django.urls import reverse
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -35,6 +36,7 @@ from netbox_dns.utilities import (
     arpa_to_prefix,
     name_to_unicode,
     normalize_name,
+    get_parent_zone_names,
     NameFormatError,
 )
 from netbox_dns.validators import (
@@ -298,6 +300,10 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         return str(name)
 
+    @property
+    def fqdn(self):
+        return f"{self.name}."
+
     @staticmethod
     def get_defaults():
         default_fields = (
@@ -393,13 +399,54 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def parent_zone(self):
-        parent_name = (
-            dns_name.from_text(self.name).parent().relativize(dns_name.root).to_text()
-        )
         try:
-            return Zone.objects.get(name=parent_name, view=self.view)
-        except Zone.DoesNotExist:
+            return Zone.objects.get(
+                view=self.view, name=get_parent_zone_names(self.name)[-1]
+            )
+        except (Zone.DoesNotExist, IndexError):
             return None
+
+    @property
+    def glue_records(self):
+        ns_records = self.record_set.filter(type=RecordTypeChoices.NS).exclude(
+            fqdn=self.fqdn
+        )
+        ns_values = [record.value_fqdn for record in ns_records]
+
+        return ns_records.union(
+            self.record_set.filter(
+                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+                fqdn__in=ns_values,
+            )
+        )
+
+    @property
+    def ancestor_zones(self):
+        return (
+            Zone.objects.annotate(name_length=Length("name"))
+            .filter(
+                view=self.view,
+                name__in=get_parent_zone_names(self.name),
+            )
+            .order_by("name_length")
+        )
+
+    @property
+    def ancestor_glue_records(self):
+        ancestor_zones = self.ancestor_zones
+
+        ns_records = Record.objects.filter(
+            type=RecordTypeChoices.NS, zone__in=ancestor_zones, fqdn=self.fqdn
+        )
+        ns_values = [record.value_fqdn for record in ns_records]
+
+        return ns_records.union(
+            Record.objects.filter(
+                zone__in=ancestor_zones,
+                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+                fqdn__in=ns_values,
+            )
+        )
 
     def record_count(self, managed=False):
         return Record.objects.filter(zone=self, managed=managed).count()
