@@ -73,6 +73,7 @@ class RecordView(generic.ObjectView):
         if Zone.objects.filter(
             name__in=get_parent_zone_names(instance.value_fqdn, min_labels=1),
             view=instance.zone.view,
+            active=True,
         ).exists():
             raise (
                 CNAMEWarning(
