@@ -43,6 +43,12 @@
                     <th scope="row">{% trans "Name" %}</th>
                     <td style="word-break:break-all;">{{ object.name }}</td>
                 </tr>
+                {% if mask_warning %}
+                <tr class="text-warning">
+                    <th scope="row">{% trans "Warning" %}</th>
+                    <td>{{ mask_warning }}</td>
+                </tr>
+                {% endif %}
                 {% if unicode_name %}
                 <tr>
                     <th scope="row">{% trans "IDN" %}</th>

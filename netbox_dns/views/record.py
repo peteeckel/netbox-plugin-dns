@@ -139,6 +139,19 @@ class RecordView(generic.ObjectView):
         else:
             context["cname_table"] = self.get_cname_records(instance)
 
+        fqdn = dns_name.from_text(instance.fqdn)
+        name = dns_name.from_text(instance.name, origin=None)
+
+        if len(name) > 1 and not instance.is_glue:
+            if Zone.objects.filter(
+                name__in=get_parent_zone_names(
+                    instance.fqdn, min_labels=len(fqdn) - len(name)
+                )
+            ).exists():
+                context["mask_warning"] = _(
+                    "Record is masked by a child zone and may not be visible in DNS"
+                )
+
         return context
 
 
