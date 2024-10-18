@@ -805,7 +805,7 @@ If there is no matching zone, no record will be created.
 The main differences between IPAM DNSsync and IPAM Coupling are the much higher degree of automation of the interaction between IPAM and NetBox DNS, and the extended functionality the new feature provides compared to IPAM Coupling. In more detail:
 
 * IPAM DNSsync does not require manual interaction when an IP address is created or updated. Particularly it ist not necessary to manually define the name and the zone of the address record for an IP address, but only a value in the 'DNS Name' field and a mapping from prefixes to DNS views
-* IPAM DNSsync does not require any custom fields on IPAddress objects, but supports the relevant part of the IPAM Coupling custom fields ('Disable PTR' and 'TTL') and adds a new field 'Disable DNSsync' to make it possible to exempt IP addresses from record generation
+* IPAM DNSsync does not require any custom fields on IPAddress objects, but supports the relevant part of the IPAM Coupling custom fields ('Disable PTR' and 'TTL') and adds a new field 'Disable DNSsync' to make it possible to exempt IP addresses from record generation. To migrate these custom fields from the old IPAM Coupling to the new IPAM DNSSync, the command under “Creating the IPAM DNSSync custom fields” must be executed
 * IPAM DNSsync is not limited to one DNS record per IP address, which was a major limitation in split horizon DNS settings. It is now possible to create multiple records in zones in different views for the same IP address
 * With IPAM Coupling it was possible to create inconsistent date, i.e. by first adding a record `name1.zone1` in zone `example.com` and then adding a new zone `zone1.example.com` to the DNS model. This creates a situation where the old address record can no longer be found due to the zone hierarchy. IPAM DNSsync automatically migrates the record(s) in such cases.
 * An IPAM Coupling functionality that is lost in IPAM DNSsync is the observance of NetBox DNS permissions in IPAM operations, and especially object-level permissions. The operation of DNSsync is a pretty complicated thing, where just creating an IP address may result in
@@ -890,7 +890,7 @@ For the next settings, the optional custom fields for IPAM DNSsync need to be cr
 /opt/netbox/netbox/manage.py setup_dnssync
 ```
 
-This comamnd creates three custom fields and removes old custom fields formerly used by the experimental `IPAM Coupling` feature except for 'TTL' and 'Disable PTR'. The function of these fields has been retained from IPAM Coupling for convenience, so the settings made for individual IP addresses will not be lost.
+This command creates three custom fields and removes old custom fields formerly used by the experimental `IPAM Coupling` feature except for 'TTL' and 'Disable PTR'. The function of these fields has been retained from IPAM Coupling for convenience, so the settings made for individual IP addresses will not be lost.
 
 Unlike with IPAM Coupling, the custom fields are optional. They are required to make use of the three settings described below, but the general DNSsync functionality does not require them.
 
