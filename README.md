@@ -9,6 +9,7 @@ The NetBox DNS plugin enables NetBox to manage operational DNS data such as name
 <a href="https://github.com/peteeckel/netbox-plugin-dns/pulls"><img src="https://img.shields.io/github/issues-pr/peteeckel/netbox-plugin-dns" alt="Pull Requests Badge"/></a>
 <a href="https://github.com/peteeckel/netbox-plugin-dns/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/peteeckel/netbox-plugin-dns?color=2b9348"></a>
 <a href="https://github.com/peteeckel/netbox-plugin-dns/blob/master/LICENSE"><img src="https://img.shields.io/github/license/peteeckel/netbox-plugin-dns?color=2b9348" alt="License Badge"/></a>
+<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code Style Black"/></a>
 <a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads" src="https://static.pepy.tech/badge/netbox-plugin-dns"></a>
 <a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Week" src="https://static.pepy.tech/badge/netbox-plugin-dns/month"></a>
 <a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Month" src="https://static.pepy.tech/badge/netbox-plugin-dns/week"></a>
