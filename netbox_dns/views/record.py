@@ -142,13 +142,15 @@ class RecordView(generic.ObjectView):
         if not instance.managed:
             name = dns_name.from_text(instance.name, origin=None)
 
-            if len(name) > 1 and not instance.is_delegation_record:
+            if not instance.is_delegation_record:
                 fqdn = dns_name.from_text(instance.fqdn)
 
                 if Zone.objects.filter(
                     active=True,
                     name__in=get_parent_zone_names(
-                        instance.fqdn, min_labels=len(fqdn) - len(name)
+                        instance.fqdn,
+                        min_labels=len(fqdn) - len(name),
+                        include_self=True,
                     ),
                 ).exists():
                     context["mask_warning"] = _(
