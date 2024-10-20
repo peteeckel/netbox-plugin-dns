@@ -407,14 +407,18 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             return None
 
     @property
-    def glue_records(self):
+    def delegation_records(self):
         ns_records = self.record_set.filter(type=RecordTypeChoices.NS).exclude(
             fqdn=self.fqdn
         )
         ns_values = [record.value_fqdn for record in ns_records]
 
-        return ns_records.union(
-            self.record_set.filter(
+        ds_records = self.record_set.filter(type=RecordTypeChoices.DS)
+
+        return (
+            ns_records
+            | self.record_set.filter(type=RecordTypeChoices.DS)
+            | self.record_set.filter(
                 type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
                 fqdn__in=ns_values,
             )
@@ -432,7 +436,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         )
 
     @property
-    def ancestor_glue_records(self):
+    def ancestor_delegation_records(self):
         ancestor_zones = self.ancestor_zones
 
         ns_records = Record.objects.filter(
@@ -440,8 +444,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         )
         ns_values = [record.value_fqdn for record in ns_records]
 
-        return ns_records.union(
-            Record.objects.filter(
+        ds_records = Record.objects.filter(
+            type=RecordTypeChoices.DS, zone__in=ancestor_zones, fqdn=self.fqdn
+        )
+
+        return (
+            ns_records
+            | ds_records
+            | Record.objects.filter(
                 zone__in=ancestor_zones,
                 type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
                 fqdn__in=ns_values,

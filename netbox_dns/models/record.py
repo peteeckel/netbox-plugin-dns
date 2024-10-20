@@ -347,8 +347,8 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         return ptr_zone
 
     @property
-    def is_glue(self):
-        return self in self.zone.glue_records
+    def is_delegation_record(self):
+        return self in self.zone.delegation_records
 
     def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone
