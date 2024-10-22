@@ -72,7 +72,7 @@ $TTL {{ zone.default_ttl }}
             return
 
         for view in views:
-            zones = Zone.objects.filter(view=view, status__in=Zone.ACTIVE_STATUS_LIST)
+            zones = Zone.objects.filter(view=view, active=True)
             if len(zones):
                 self.log_info(f"Exporting zones for view '{view.name}'")
                 self.export_zones(zones, view.name, export_path)
@@ -88,7 +88,7 @@ $TTL {{ zone.default_ttl }}
 
         for zone in zones:
             self.log_info(f"Exporting zone {zone}")
-            records = Record.objects.filter(zone=zone, status__in=Record.ACTIVE_STATUS_LIST)
+            records = Record.objects.filter(zone=zone, active=True)
 
             zone_data = self.template.render({"zone": zone, "records": records})
 
