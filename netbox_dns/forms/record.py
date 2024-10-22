@@ -204,6 +204,7 @@ class RecordImportForm(NetBoxModelImportForm):
         to_field_name="name",
         required=False,
         label=_p("DNS", "View"),
+        help_text=_("This field is required if the zone is not in the default view"),
     )
     type = CSVChoiceField(
         choices=RecordTypeChoices,
