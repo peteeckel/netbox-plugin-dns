@@ -198,12 +198,19 @@ class RecordImportForm(NetBoxModelImportForm):
         to_field_name="name",
         required=True,
         label=_("Zone"),
+        error_messages={
+            "invalid_choice": _("Zone %(value)s not found"),
+        },
     )
     view = CSVModelChoiceField(
         queryset=View.objects.all(),
         to_field_name="name",
         required=False,
         label=_p("DNS", "View"),
+        error_messages={
+            "invalid_choice": _("View %(value)s not found"),
+        },
+        help_text=_("This field is required if the zone is not in the default view"),
     )
     type = CSVChoiceField(
         choices=RecordTypeChoices,
