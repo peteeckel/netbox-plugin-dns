@@ -394,6 +394,10 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         )
 
     @property
+    def descendant_zones(self):
+        return self.view.zone_set.filter(name__endswith=f".{self.name}")
+
+    @property
     def parent_zone(self):
         try:
             return self.view.zone_set.get(name=get_parent_zone_names(self.name)[-1])
@@ -401,9 +405,23 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             return None
 
     @property
+    def ancestor_zones(self):
+        return (
+            self.view.zone_set.annotate(name_length=Length("name"))
+            .filter(name__in=get_parent_zone_names(self.name))
+            .order_by("name_length")
+        )
+
+    @property
     def delegation_records(self):
-        ns_records = self.record_set.filter(type=RecordTypeChoices.NS).exclude(
-            fqdn=self.fqdn
+        descendant_zone_names = [
+            f"{name}." for name in self.descendant_zones.values_list("name", flat=True)
+        ]
+
+        ns_records = (
+            self.record_set.filter(type=RecordTypeChoices.NS)
+            .exclude(fqdn=self.fqdn)
+            .filter(fqdn__in=descendant_zone_names)
         )
         ns_values = [record.value_fqdn for record in ns_records]
 
@@ -414,14 +432,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
                 fqdn__in=ns_values,
             )
-        )
-
-    @property
-    def ancestor_zones(self):
-        return (
-            self.view.zone_set.annotate(name_length=Length("name"))
-            .filter(name__in=get_parent_zone_names(self.name))
-            .order_by("name_length")
         )
 
     @property
