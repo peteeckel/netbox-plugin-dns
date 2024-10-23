@@ -121,7 +121,12 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
 address_records = tables.ManyToManyColumn(
     verbose_name="DNS Address Records",
     accessor="netbox_dns_records",
-    linkify=True,
+    linkify_item=True,
+    transform=lambda obj: (
+        obj.fqdn.rstrip(".")
+        if obj.zone.view.default_view
+        else f"[{obj.zone.view.name}] {obj.fqdn.rstrip('.')}"
+    ),
 )
 
 if not settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
