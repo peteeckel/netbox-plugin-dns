@@ -159,7 +159,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         required=False,
         to_field_name="name",
         error_messages={
-            "invalid_choice": _("Registrar not found."),
+            "invalid_choice": _("Registrar %(value)s not found"),
         },
         label=_("Registrar"),
     )
@@ -168,7 +168,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Registrant contact ID not found"),
+            "invalid_choice": _("Registrant contact ID %(value)s not found"),
         },
         label=_("Registrant"),
     )
@@ -177,7 +177,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Administrative contact ID not found"),
+            "invalid_choice": _("Administrative contact ID %(value)s not found"),
         },
         label=_("Administrative Contact"),
     )
@@ -186,7 +186,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Technical contact ID not found"),
+            "invalid_choice": _("Technical contact ID %(value)s not found"),
         },
         label=_("Technical Contact"),
     )
@@ -195,7 +195,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Billing contact ID not found"),
+            "invalid_choice": _("Billing contact ID %(value)s not found"),
         },
         label=_("Billing Contact"),
     )

@@ -476,7 +476,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         to_field_name="name",
         error_messages={
-            "invalid_choice": _("View not found."),
+            "invalid_choice": _("View %(value)s not found"),
         },
         label=_("View"),
     )
@@ -505,7 +505,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         to_field_name="name",
         error_messages={
-            "invalid_choice": _("Nameserver not found."),
+            "invalid_choice": _("Nameserver %(value)s not found"),
         },
         help_text=_("Primary nameserver for the zone"),
         label=_("SOA MName"),
@@ -560,7 +560,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         to_field_name="name",
         error_messages={
-            "invalid_choice": _("Registrar not found."),
+            "invalid_choice": _("Registrar %(value)s not found"),
         },
         label=_("Registrar"),
     )
@@ -573,7 +573,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Registrant contact ID not found"),
+            "invalid_choice": _("Registrant contact ID %(value)s not found"),
         },
         label=_("Registrant"),
     )
@@ -582,7 +582,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Administrative contact ID not found"),
+            "invalid_choice": _("Administrative contact ID %(value)s not found"),
         },
         label=_("Administrative Contact"),
     )
@@ -591,7 +591,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         to_field_name="contact_id",
         error_messages={
-            "invalid_choice": _("Technical contact ID not found"),
+            "invalid_choice": _("Technical contact ID %(value)s not found"),
         },
         label=_("Technical Contact"),
     )
