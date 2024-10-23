@@ -436,6 +436,8 @@ Note that for managed records there are no buttons for deleting, editing or clon
 #### Displaying records
 Records can either be displayed by opening the record list view from the "Records" or "Managed Records" navigation item on the left, or per zone via the respective tabs in the zone defail view. In any case, the tables can be filtered by name, value, zone, or tags to narrow down the set of records displayed.
 
+#### Importing records
+When importing records in bulk, the mandatory fields are `name`, `zone`, `type` and `value`. If the optional `view` field is not specified, NetBox DNS will always look for the zone specified in `zone` in the default view. To address zones in non-default views, the `view` field must also be specified.
 ### Registrars
 Registrar objects relate to the DNS domain registration and represent the registrar information for DNS domains related to zones. A DNS zone does not necessarily need to be registered: Zones that are not available via public DNS or that are sub-zones of registered zones do not require registration. In most cases registration information is only required (and possible) for second-level domains.
 
