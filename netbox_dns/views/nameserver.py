@@ -36,7 +36,7 @@ class NameServerListView(generic.ObjectListView):
 
 
 class NameServerView(generic.ObjectView):
-    queryset = NameServer.objects.all().prefetch_related("zones")
+    queryset = NameServer.objects.prefetch_related("zones")
 
     def get_extra_context(self, request, instance):
         name = dns_name.from_text(instance.name)
@@ -85,7 +85,7 @@ class NameServerContactsView(ObjectContactsView):
 
 @register_model_view(NameServer, "zones")
 class NameServerZoneListView(generic.ObjectChildrenView):
-    queryset = NameServer.objects.all().prefetch_related("zones")
+    queryset = NameServer.objects.prefetch_related("zones")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet
@@ -105,7 +105,7 @@ class NameServerZoneListView(generic.ObjectChildrenView):
 
 @register_model_view(NameServer, "soa_zones")
 class NameServerSOAZoneListView(generic.ObjectChildrenView):
-    queryset = NameServer.objects.all().prefetch_related("zones_soa")
+    queryset = NameServer.objects.prefetch_related("zones_soa")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet

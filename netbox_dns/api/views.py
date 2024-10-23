@@ -71,7 +71,7 @@ class NameServerViewSet(NetBoxModelViewSet):
 
 
 class RecordViewSet(NetBoxModelViewSet):
-    queryset = Record.objects.all().prefetch_related("zone", "zone__view", "tenant")
+    queryset = Record.objects.prefetch_related("zone", "zone__view", "tenant")
     serializer_class = RecordSerializer
     filterset_class = RecordFilterSet
 

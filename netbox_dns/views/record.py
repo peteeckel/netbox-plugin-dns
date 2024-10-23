@@ -56,7 +56,7 @@ class ManagedRecordListView(generic.ObjectListView):
 
 
 class RecordView(generic.ObjectView):
-    queryset = Record.objects.all().prefetch_related("zone", "ptr_record")
+    queryset = Record.objects.prefetch_related("zone", "ptr_record")
 
     def get_value_records(self, instance):
         value_fqdn = dns_name.from_text(instance.value_fqdn)
@@ -70,9 +70,8 @@ class RecordView(generic.ObjectView):
                 data=cname_targets,
             )
 
-        if Zone.objects.filter(
+        if instance.zone.view.zone_set.filter(
             name__in=get_parent_zone_names(instance.value_fqdn, min_labels=1),
-            view=instance.zone.view,
             active=True,
         ).exists():
             raise (
@@ -94,8 +93,7 @@ class RecordView(generic.ObjectView):
             )
         )
 
-        parent_zones = Zone.objects.filter(
-            view=instance.zone.view,
+        parent_zones = instance.zone.view.zone_set.filter(
             name__in=get_parent_zone_names(instance.fqdn, include_self=True),
         )
 

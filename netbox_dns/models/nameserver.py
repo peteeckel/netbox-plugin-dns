@@ -112,10 +112,8 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
-            zones = self.zones.all()
-            for zone in zones:
-                Record.objects.filter(
-                    Q(zone=zone),
+            for zone in self.zones.all():
+                zone.record_set.filter(
                     Q(managed=True),
                     Q(value=f"{self.name}."),
                     Q(type=RecordTypeChoices.NS),

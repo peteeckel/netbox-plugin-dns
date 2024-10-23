@@ -302,7 +302,7 @@ class ViewPrefixEditForm(forms.ModelForm):
 
         if not views.exists():
             if (parent := prefix.get_parents().last()) is not None:
-                check_views = parent.netbox_dns_views.all().difference(old_views)
+                check_views = parent.netbox_dns_views.difference(old_views)
 
         else:
             check_views = views.difference(old_views)

@@ -369,10 +369,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             return None
 
         return (
-            Zone.objects.filter(
-                view=self.view,
-                arpa_network__net_contains=self.rfc2317_prefix,
-            )
+            self.view.zone_set.filter(arpa_network__net_contains=self.rfc2317_prefix)
             .order_by("arpa_network__net_mask_length")
             .last()
         )
@@ -393,16 +390,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def child_zones(self):
-        return Zone.objects.filter(
-            name__iregex=rf"^[^.]+\.{re.escape(self.name)}$", view=self.view
+        return self.view.zone_set.filter(
+            name__iregex=rf"^[^.]+\.{re.escape(self.name)}$"
         )
 
     @property
     def parent_zone(self):
         try:
-            return Zone.objects.get(
-                view=self.view, name=get_parent_zone_names(self.name)[-1]
-            )
+            return self.view.zone_set.get(name=get_parent_zone_names(self.name)[-1])
         except (Zone.DoesNotExist, IndexError):
             return None
 
@@ -425,11 +420,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @property
     def ancestor_zones(self):
         return (
-            Zone.objects.annotate(name_length=Length("name"))
-            .filter(
-                view=self.view,
-                name__in=get_parent_zone_names(self.name),
-            )
+            self.view.zone_set.annotate(name_length=Length("name"))
+            .filter(name__in=get_parent_zone_names(self.name))
             .order_by("name_length")
         )
 
@@ -455,12 +447,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 fqdn__in=ns_values,
             )
         )
-
-    def record_count(self, managed=False):
-        return Record.objects.filter(zone=self, managed=managed).count()
-
-    def rfc2317_child_zone_count(self):
-        return Zone.objects.filter(rfc2317_parent_zone=self).count()
 
     def update_soa_record(self):
         soa_name = "@"
@@ -538,8 +524,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 continue
 
             relative_name = name.relativize(parent).to_text()
-            address_records = Record.objects.filter(
-                Q(zone=ns_zone),
+            address_records = ns_zone.record_set.filter(
                 Q(status__in=RECORD_ACTIVE_STATUS_LIST),
                 Q(Q(name=f"{_nameserver.name}.") | Q(name=relative_name)),
                 Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
@@ -801,8 +786,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             else:
                 self.rfc2317_parent_zone = None
 
-            overlapping_zones = Zone.objects.filter(
-                view=self.view,
+            overlapping_zones = self.view.zone_set.filter(
                 rfc2317_prefix__net_overlap=self.rfc2317_prefix,
                 active=True,
             ).exclude(pk=self.pk)
@@ -835,9 +819,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if (
             changed_fields is None or {"name", "view", "status"} & changed_fields
         ) and self.is_reverse_zone:
-            zones = Zone.objects.filter(
-                view=self.view,
-                arpa_network__net_contains_or_equals=self.arpa_network,
+            zones = self.view.zone_set.filter(
+                arpa_network__net_contains_or_equals=self.arpa_network
             )
             address_records = Record.objects.filter(
                 Q(ptr_record__isnull=True) | Q(ptr_record__zone__in=zones),
@@ -866,9 +849,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             or {"name", "view", "status", "rfc2317_prefix", "rfc2317_parent_managed"}
             & changed_fields
         ) and self.is_rfc2317_zone:
-            zones = Zone.objects.filter(
-                view=self.view,
-                arpa_network__net_contains=self.rfc2317_prefix,
+            zones = self.view.zone_set.filter(
+                arpa_network__net_contains=self.rfc2317_prefix
             )
             address_records = Record.objects.filter(
                 Q(ptr_record__isnull=True)
@@ -949,7 +931,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 cname_zone.update_soa_record()
 
             rfc2317_child_zones = list(
-                self.rfc2317_child_zones.all().values_list("pk", flat=True)
+                self.rfc2317_child_zones.values_list("pk", flat=True)
             )
 
             ipam_ip_addresses = list(

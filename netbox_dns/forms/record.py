@@ -187,11 +187,9 @@ class RecordImportForm(NetBoxModelImportForm):
                 pass
 
         if view is not None:
-            self.fields["zone"].queryset = Zone.objects.filter(view=view)
+            self.fields["zone"].queryset = view.zone_set
         else:
-            self.fields["zone"].queryset = Zone.objects.filter(
-                view=View.get_default_view()
-            )
+            self.fields["zone"].queryset = View.get_default_view().zone_set
 
     zone = CSVModelChoiceField(
         queryset=Zone.objects.all(),
