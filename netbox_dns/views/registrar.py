@@ -69,7 +69,7 @@ class RegistrarBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(Registrar, "zones")
 class RegistrarZoneListView(generic.ObjectChildrenView):
-    queryset = Registrar.objects.all().prefetch_related("zone_set")
+    queryset = Registrar.objects.prefetch_related("zone_set")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet

@@ -70,7 +70,7 @@ class RegistrationContactBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(RegistrationContact, "zones")
 class RegistrationContactZoneListView(generic.ObjectChildrenView):
-    queryset = RegistrationContact.objects.all().prefetch_related(
+    queryset = RegistrationContact.objects.prefetch_related(
         "zone_set", "admin_c_zones", "tech_c_zones", "billing_c_zones"
     )
     child_model = Zone

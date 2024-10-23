@@ -31,7 +31,7 @@ __all__ = (
 
 
 class ViewView(generic.ObjectView):
-    queryset = View.objects.all().prefetch_related("zone_set")
+    queryset = View.objects.prefetch_related("zone_set")
 
 
 class ViewListView(generic.ObjectListView):
@@ -89,7 +89,7 @@ class ViewPrefixEditView(generic.ObjectEditView):
 
 @register_model_view(View, "zones")
 class ViewZoneListView(generic.ObjectChildrenView):
-    queryset = View.objects.all().prefetch_related("zone_set")
+    queryset = View.objects.prefetch_related("zone_set")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet

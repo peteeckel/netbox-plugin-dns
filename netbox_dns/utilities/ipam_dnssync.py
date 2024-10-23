@@ -193,9 +193,7 @@ def update_dns_records(ip_address, view=None, force=False):
                     updated = True
 
         zones = Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
-            pk__in=set(
-                ip_address.netbox_dns_records.all().values_list("zone", flat=True)
-            )
+            pk__in=set(ip_address.netbox_dns_records.values_list("zone", flat=True))
         )
 
     for zone in zones:

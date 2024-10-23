@@ -33,14 +33,14 @@ __all__ = (
 
 
 class ZoneListView(generic.ObjectListView):
-    queryset = Zone.objects.all().prefetch_related("view", "tags")
+    queryset = Zone.objects.prefetch_related("view", "tags")
     filterset = ZoneFilterSet
     filterset_form = ZoneFilterForm
     table = ZoneTable
 
 
 class ZoneView(generic.ObjectView):
-    queryset = Zone.objects.all().prefetch_related(
+    queryset = Zone.objects.prefetch_related(
         "view",
         "tags",
         "nameservers",
@@ -65,9 +65,7 @@ class ZoneView(generic.ObjectView):
 
 
 class ZoneEditView(generic.ObjectEditView):
-    queryset = Zone.objects.all().prefetch_related(
-        "view", "tags", "nameservers", "soa_mname"
-    )
+    queryset = Zone.objects.prefetch_related("view", "tags", "nameservers", "soa_mname")
     form = ZoneForm
     default_return_url = "plugins:netbox_dns:zone_list"
 
@@ -78,18 +76,14 @@ class ZoneDeleteView(generic.ObjectDeleteView):
 
 
 class ZoneBulkImportView(generic.BulkImportView):
-    queryset = Zone.objects.all().prefetch_related(
-        "view", "tags", "nameservers", "soa_mname"
-    )
+    queryset = Zone.objects.prefetch_related("view", "tags", "nameservers", "soa_mname")
     model_form = ZoneImportForm
     table = ZoneTable
     default_return_url = "plugins:netbox_dns:zone_list"
 
 
 class ZoneBulkEditView(generic.BulkEditView):
-    queryset = Zone.objects.all().prefetch_related(
-        "view", "tags", "nameservers", "soa_mname"
-    )
+    queryset = Zone.objects.prefetch_related("view", "tags", "nameservers", "soa_mname")
     filterset = ZoneFilterSet
     table = ZoneTable
     form = ZoneBulkEditForm
@@ -131,14 +125,12 @@ class ZoneRecordListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("Records"),
         permission="netbox_dns.view_record",
-        badge=lambda obj: obj.record_count(managed=False),
+        badge=lambda obj: obj.record_set.filter(managed=False).count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return Record.objects.restrict(request.user, "view").filter(
-            zone=parent, managed=False
-        )
+        return parent.record_set.restrict(request.user, "view").filter(managed=False)
 
 
 @register_model_view(Zone, "managed_records")
@@ -153,14 +145,12 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("Managed Records"),
         permission="netbox_dns.view_record",
-        badge=lambda obj: obj.record_count(managed=True),
+        badge=lambda obj: obj.record_set.filter(managed=True).count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return Record.objects.restrict(request.user, "view").filter(
-            zone=parent, managed=True
-        )
+        return parent.record_set.restrict(request.user, "view").filter(managed=True)
 
 
 @register_model_view(Zone, "rfc2317_child_zones")
@@ -174,7 +164,7 @@ class ZoneRFC2317ChildZoneListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("RFC2317 Child Zones"),
         permission="netbox_dns.view_zone",
-        badge=lambda obj: obj.rfc2317_child_zone_count(),
+        badge=lambda obj: obj.rfc2317_child_zones.count(),
         hide_if_empty=True,
     )
 
