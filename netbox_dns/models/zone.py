@@ -413,8 +413,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         )
         ns_values = [record.value_fqdn for record in ns_records]
 
-        ds_records = self.record_set.filter(type=RecordTypeChoices.DS)
-
         return (
             ns_records
             | self.record_set.filter(type=RecordTypeChoices.DS)
