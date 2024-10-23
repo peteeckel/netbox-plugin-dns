@@ -1,8 +1,12 @@
+import django_tables2 as tables
+
 from django.conf import settings
 from django.urls import reverse
 
 from netbox.plugins.utils import get_plugin_config
 from netbox.plugins import PluginTemplateExtension
+from utilities.tables import register_table_column
+from ipam.tables import IPAddressTable
 
 from netbox_dns.models import Record
 from netbox_dns.choices import RecordTypeChoices
@@ -114,8 +118,15 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
         )
 
 
+address_records = tables.ManyToManyColumn(
+    verbose_name="DNS Address Records",
+    accessor="netbox_dns_records",
+    linkify=True,
+)
+
 if not settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
     template_extensions = [RelatedDNSRecords, RelatedDNSViews]
+    register_table_column(address_records, "address_records", IPAddressTable)
 else:
     template_extensions = []
 
