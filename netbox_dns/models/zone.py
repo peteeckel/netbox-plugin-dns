@@ -18,7 +18,6 @@ from django.urls import reverse
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy as _p
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
@@ -86,7 +85,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self._ip_addresses_checked = False
 
     view = models.ForeignKey(
-        verbose_name=_p("DNS", "View"),
+        verbose_name=_("View"),
         to="View",
         on_delete=models.PROTECT,
         null=False,

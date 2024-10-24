@@ -3,7 +3,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError, FieldError
 from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy as _p
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -127,7 +126,7 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
     )
 
     fieldsets = (
-        FieldSet("name", "default_view", "description", name=_p("DNS", "View")),
+        FieldSet("name", "default_view", "description", name=_("View")),
         FieldSet("prefixes", "ip_address_filter"),
         FieldSet("tenant_group", "tenant", name=_("Tenancy")),
         FieldSet("tags", name=_("Tags")),

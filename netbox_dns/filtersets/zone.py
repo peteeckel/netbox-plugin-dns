@@ -3,7 +3,6 @@ import netaddr
 import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from django.utils.translation import pgettext as _p
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -28,7 +27,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=View.objects.all(),
         field_name="view__name",
         to_field_name="name",
-        label=_p("DNS", "View"),
+        label=_("View"),
     )
     # DEPRECATED: Remove in 1.1
     name_server_id = django_filters.ModelMultipleChoiceFilter(

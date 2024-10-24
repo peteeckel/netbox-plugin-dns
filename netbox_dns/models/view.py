@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy as _p
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
@@ -77,8 +76,8 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         return str(self.name)
 
     class Meta:
-        verbose_name = _p("DNS", "View")
-        verbose_name_plural = _p("DNS", "Views")
+        verbose_name = _("View")
+        verbose_name_plural = _("Views")
 
         ordering = ("name",)
 

@@ -1,6 +1,5 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy as _p
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -48,7 +47,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         initial_params={
             "zone": "$zone",
         },
-        label=_p("DNS", "View"),
+        label=_("View"),
     )
     zone = DynamicModelChoiceField(
         queryset=Zone.objects.all(),
@@ -204,7 +203,7 @@ class RecordImportForm(NetBoxModelImportForm):
         queryset=View.objects.all(),
         to_field_name="name",
         required=False,
-        label=_p("DNS", "View"),
+        label=_("View"),
         error_messages={
             "invalid_choice": _("View %(value)s not found"),
         },
