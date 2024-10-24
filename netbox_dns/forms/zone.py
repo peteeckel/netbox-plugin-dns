@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy as _p
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -385,7 +384,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     view_id = DynamicModelMultipleChoiceField(
         queryset=View.objects.all(),
         required=False,
-        label=_p("DNS", "View"),
+        label=_("View"),
     )
     status = forms.MultipleChoiceField(
         choices=ZoneStatusChoices,
@@ -675,7 +674,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     view = DynamicModelChoiceField(
         queryset=View.objects.all(),
         required=False,
-        label=_p("DNS", "View"),
+        label=_("View"),
     )
     status = forms.ChoiceField(
         choices=add_blank_choice(ZoneStatusChoices),

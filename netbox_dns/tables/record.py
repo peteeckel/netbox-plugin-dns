@@ -1,7 +1,6 @@
 import django_tables2 as tables
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy as _p
 
 
 from netbox.tables import (
@@ -29,7 +28,7 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
         linkify=True,
     )
     view = tables.Column(
-        verbose_name=_p("DNS", "View"),
+        verbose_name=_("View"),
         accessor="zone__view",
         linkify=True,
     )
