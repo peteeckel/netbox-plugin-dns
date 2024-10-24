@@ -18,6 +18,7 @@ from netbox_dns.tables import (
     ZoneTable,
     RecordTable,
     ManagedRecordTable,
+    DelegationRecordTable,
 )
 
 
@@ -151,6 +152,44 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
 
     def get_children(self, request, parent):
         return parent.record_set.restrict(request.user, "view").filter(managed=True)
+
+
+@register_model_view(Zone, "delegation_records")
+class ZoneDelegationRecordListView(generic.ObjectChildrenView):
+    queryset = Zone.objects.all()
+    child_model = Record
+    table = DelegationRecordTable
+    filterset = RecordFilterSet
+    template_name = "netbox_dns/zone/delegation_record.html"
+
+    tab = ViewTab(
+        label=_("Delegation Records"),
+        permission="netbox_dns.view_record",
+        badge=lambda obj: obj.delegation_records.count(),
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        return parent.delegation_records.restrict(request.user, "view")
+
+
+@register_model_view(Zone, "parent_delegation_records")
+class ZoneParentDelegationRecordListView(generic.ObjectChildrenView):
+    queryset = Zone.objects.all()
+    child_model = Record
+    table = DelegationRecordTable
+    filterset = RecordFilterSet
+    template_name = "netbox_dns/zone/delegation_record.html"
+
+    tab = ViewTab(
+        label=_("Parent Delegation Records"),
+        permission="netbox_dns.view_record",
+        badge=lambda obj: obj.ancestor_delegation_records.count(),
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        return parent.ancestor_delegation_records.restrict(request.user, "view")
 
 
 @register_model_view(Zone, "rfc2317_child_zones")

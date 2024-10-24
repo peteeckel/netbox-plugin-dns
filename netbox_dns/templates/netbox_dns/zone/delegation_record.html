@@ -1,0 +1,18 @@
+{% extends 'netbox_dns/zone/base.html' %}
+{% load helpers %}
+{% load render_table from django_tables2 %}
+{% load perms %}
+
+{% block content %}
+    {% include 'inc/table_controls_htmx.html' with table_modal="DelegationRecordTable_config" %}
+    <div class="card">
+        <div class="htmx-container table-responsive" id="object_list">
+            {% include 'htmx/table.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% table_config_form table %}
+{% endblock modals %}

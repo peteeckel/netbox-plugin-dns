@@ -371,6 +371,17 @@ The default value for 'Generate SOA Serial' (`soa_serial_auto`) is `True` and ca
 
 After changing the configuration, NetBox must be restarted for the changes to take effect.
 
+### Information in the Zone detail view
+The detail view for zones can provide additional information tabs about zones, depending on whether there are any objects to display:
+
+Tab name                       | Description
+--------                       | --------           
+**Records**                    | Provides a list of all (non-managed) records in the zone.
+**Managed Records**            | Provides a list of all managed records in the zone.
+**Delegation Records**         | If there are any delegation records (NS, DS or glue address records) for child zones in the zone, this tab lists them.
+**Parent Delegation Records**  | This tab lists delegation records **for** the zone, i.e. delegation records that are located in one of the ancestor zones that apply to the zone. Usually delegation takes place in the direct parent, but there may be exceptions - the tab lists all levels of delegation records for the zone.
+**Child Zones**                | If the zone has **immediate** child zones, they are listed here. Note that zones that are hierarchically below the zone but not immediate clients they are not listed to avoid confusion.
+
 ### Records
 Record objects correspond to resource records (RR) that within zones. NetBox DNS differentiates between records maintained by the user and so-called 'managed records', which are created by NetBox DNS itself and cannot be edited manually. Currently there are three types of managed records:
 

@@ -19,6 +19,7 @@ __all__ = (
     "RecordTable",
     "ManagedRecordTable",
     "RelatedRecordTable",
+    "DelegationRecordTable",
 )
 
 
@@ -152,6 +153,18 @@ class ManagedRecordTable(RecordBaseTable):
 class RelatedRecordTable(RecordBaseTable):
     actions = ActionsColumn(actions=())
 
+    class Meta(NetBoxTable.Meta):
+        model = Record
+        fields = ()
+        default_columns = (
+            "name",
+            "zone",
+            "type",
+            "value",
+        )
+
+
+class DelegationRecordTable(RecordBaseTable):
     class Meta(NetBoxTable.Meta):
         model = Record
         fields = ()

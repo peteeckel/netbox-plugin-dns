@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-24 10:36+0000\n"
+"POT-Creation-Date: 2024-10-24 10:59+0000\n"
 "PO-Revision-Date: 2024-09-29 12:06+0000\n"
 "Last-Translator: Peter Eckel <pete@netbox-dns.org>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
@@ -125,7 +125,7 @@ msgstr ""
 "nicht möglich"
 
 #: choices/record.py:49 choices/zone.py:19 forms/record.py:168
-#: forms/zone.py:406 tables/record.py:59
+#: forms/zone.py:406 tables/record.py:60
 msgid "Active"
 msgstr "Aktiv"
 
@@ -197,7 +197,7 @@ msgstr "ID der Ansicht, zu der die übergeprdnete Zone gehört"
 msgid "View the Parent Zone belongs to"
 msgstr "Ansicht, zu der die übergeordnete Zone gehört"
 
-#: filtersets/record.py:55 tables/record.py:103
+#: filtersets/record.py:55 tables/record.py:104
 #: templates/netbox_dns/record.html:115
 msgid "Address Record"
 msgstr "Adress-Datensatz"
@@ -206,7 +206,7 @@ msgstr "Adress-Datensatz"
 msgid "Pointer Record"
 msgstr "Zeiger-Datensatz"
 
-#: filtersets/record.py:73 models/record.py:198 tables/record.py:107
+#: filtersets/record.py:73 models/record.py:198 tables/record.py:108
 #: templates/netbox_dns/record.html:120 templates/netbox_dns/record.html:127
 msgid "IPAM IP Address"
 msgstr "IPAM-IP-Adresse"
@@ -245,7 +245,7 @@ msgstr "ID der Ansicht"
 
 #: filtersets/zone.py:30 forms/record.py:50 forms/record.py:155
 #: forms/record.py:206 forms/view.py:129 forms/zone.py:387 forms/zone.py:480
-#: forms/zone.py:677 models/view.py:79 models/zone.py:88 tables/record.py:31
+#: forms/zone.py:677 models/view.py:79 models/zone.py:88 tables/record.py:32
 #: tables/zone.py:23 templates/netbox_dns/view.html:8
 #: templates/netbox_dns/zone.html:28
 msgid "View"
@@ -383,7 +383,7 @@ msgstr "ID des Registrars"
 #: forms/zone.py:131 forms/zone.py:396 models/nameserver.py:33
 #: models/record.py:124 models/record_template.py:32 models/registrar.py:20
 #: models/registration_contact.py:27 models/view.py:30 models/zone.py:94
-#: tables/nameserver.py:15 tables/record.py:39 tables/record_template.py:19
+#: tables/nameserver.py:15 tables/record.py:40 tables/record_template.py:19
 #: tables/registrar.py:14 tables/view.py:18 tables/zone.py:19
 #: tables/zone_template.py:18 templates/netbox_dns/nameserver.html:11
 #: templates/netbox_dns/record.html:43
@@ -459,7 +459,7 @@ msgstr "Mandantengruppe"
 
 #: forms/record.py:58 forms/record.py:160 forms/record.py:197
 #: forms/record.py:268 forms/zone.py:227 models/record.py:128
-#: models/zone.py:273 tables/record.py:27 templates/netbox_dns/record.html:59
+#: models/zone.py:273 tables/record.py:28 templates/netbox_dns/record.html:59
 #: templates/netbox_dns/zone.html:9
 msgid "Zone"
 msgstr "Zone"
@@ -467,7 +467,7 @@ msgstr "Zone"
 #: forms/record.py:63 forms/record.py:145 forms/record.py:228
 #: forms/record.py:291 forms/record_template.py:46 forms/record_template.py:129
 #: forms/record_template.py:160 forms/record_template.py:210
-#: models/record.py:174 models/record_template.py:60 tables/record.py:74
+#: models/record.py:174 models/record_template.py:60 tables/record.py:75
 #: tables/record_template.py:41 templates/netbox_dns/record.html:103
 #: templates/netbox_dns/recordtemplate.html:59
 msgid "Disable PTR"
@@ -476,7 +476,7 @@ msgstr "PTR-Erzeugung unterbinden"
 #: forms/record.py:67 forms/record.py:224 forms/record.py:286
 #: forms/record_template.py:50 forms/record_template.py:156
 #: forms/record_template.py:205 models/record.py:156
-#: models/record_template.py:55 tables/record.py:56
+#: models/record_template.py:55 tables/record.py:57
 #: tables/record_template.py:38 templates/netbox_dns/record.html:98
 #: templates/netbox_dns/recordtemplate.html:54
 #: templates/netbox_dns/zone.html:107
@@ -486,19 +486,19 @@ msgstr "TTL"
 #: forms/record.py:128 forms/record.py:215 forms/record.py:273
 #: forms/record_template.py:108 forms/record_template.py:147
 #: forms/record_template.py:192 models/record.py:140
-#: models/record_template.py:41 tables/record.py:36
+#: models/record_template.py:41 tables/record.py:37
 #: tables/record_template.py:26 templates/netbox_dns/record.html:78
 #: templates/netbox_dns/recordtemplate.html:40
 msgid "Type"
 msgstr "Typ"
 
-#: forms/record.py:136 models/record.py:133 tables/record.py:43
+#: forms/record.py:136 models/record.py:133 tables/record.py:44
 msgid "FQDN"
 msgstr "FQDN"
 
 #: forms/record.py:140 forms/record.py:277 forms/record_template.py:120
 #: forms/record_template.py:196 models/record.py:145
-#: models/record_template.py:45 tables/record.py:47
+#: models/record_template.py:45 tables/record.py:48
 #: tables/record_template.py:29 templates/netbox_dns/record.html:82
 #: templates/netbox_dns/recordtemplate.html:44
 msgid "Value"
@@ -508,7 +508,7 @@ msgstr "Wert"
 #: forms/record_template.py:125 forms/record_template.py:152
 #: forms/record_template.py:201 forms/zone.py:141 forms/zone.py:392
 #: forms/zone.py:485 forms/zone.py:682 models/record.py:149
-#: models/record_template.py:49 models/zone.py:98 tables/record.py:71
+#: models/record_template.py:49 models/zone.py:98 tables/record.py:72
 #: tables/zone.py:31 templates/netbox_dns/recordtemplate.html:64
 #: templates/netbox_dns/zone.html:47
 msgid "Status"
@@ -887,7 +887,7 @@ msgstr "Verwaltet"
 msgid "Disable PTR record creation"
 msgstr "Erzeugung eines PTR-Datensatzes unterbinden"
 
-#: models/record.py:192 tables/record.py:111
+#: models/record.py:192 tables/record.py:112
 msgid "Related IP Address"
 msgstr "Zugeordnete IP-Adresse"
 
@@ -905,7 +905,7 @@ msgstr "RCF2317-CNNAME-Datensatz"
 msgid "Record"
 msgstr "Datensatz"
 
-#: models/record.py:230 navigation.py:71 views/zone.py:126
+#: models/record.py:230 navigation.py:71 views/zone.py:127
 msgid "Records"
 msgstr "Datensätze"
 
@@ -1034,34 +1034,34 @@ msgstr "Die übergeordnete Zone einer RFC2317-Zone wird in NetBox DNS verwaltet"
 msgid "Parent zone for RFC2317 reverse zones"
 msgstr "Übergeordnete Zone von RFC2317-Reverse-Lookup-Zonen"
 
-#: models/zone.py:510
+#: models/zone.py:522
 #, python-brace-format
 msgid "No nameservers are configured for zone {zone}"
 msgstr "Für Zone {zone} wurden keine Nameserver konfiguriert"
 
-#: models/zone.py:535
+#: models/zone.py:547
 #, python-brace-format
 msgid ""
 "Nameserver {nameserver} does not have an active address record in zone {zone}"
 msgstr ""
 "Nameserver {nameserver} hat keinen aktiven Adressdatensatz in Zone {zone}"
 
-#: models/zone.py:552
+#: models/zone.py:564
 #, python-brace-format
 msgid "soa_serial must not decrease for zone {zone}."
 msgstr "soa_serial für Zone {zone} darf nicht verringert werden"
 
-#: models/zone.py:665
+#: models/zone.py:677
 #, python-brace-format
 msgid "Default soa_mname instance {nameserver} does not exist"
 msgstr "Standardnameserver für soa_mname {nameserver} existiert nicht"
 
-#: models/zone.py:695
+#: models/zone.py:707
 msgid "soa_rname not set and no default value defined"
 msgstr ""
 "soa_rname wurde nicht angegeben und es ist kein Standardwert konfiguriert"
 
-#: models/zone.py:711
+#: models/zone.py:723
 #, python-brace-format
 msgid ""
 "soa_serial is not defined and soa_serial_auto is disabled for zone {zone}."
@@ -1069,25 +1069,25 @@ msgstr ""
 "soa_serial wurde nicht angegeben und soa_serial_auto ist für Zone {zone} "
 "nicht eingeschaltet."
 
-#: models/zone.py:731
+#: models/zone.py:743
 #, python-brace-format
 msgid "Enabling soa_serial_auto would decrease soa_serial for zone {zone}."
 msgstr ""
 "Das Einschalten von soa_serial_auto würde die SOA-Seriennummer für Zone "
 "{zone} verringern."
 
-#: models/zone.py:767
+#: models/zone.py:779
 msgid "A regular reverse zone can not be used as an RFC2317 zone."
 msgstr ""
 "Eine normale Reverse-Lookup-Zone kann nicht als RFC2317-Zone verwendet "
 "werden."
 
-#: models/zone.py:779
+#: models/zone.py:791
 #, python-brace-format
 msgid "Parent zone not found in view {view}."
 msgstr "Die übergeordnete Zone wurde nicht in Ansicht {view} gefunden."
 
-#: models/zone.py:797
+#: models/zone.py:809
 #, python-brace-format
 msgid "RFC2317 prefix overlaps with zone {zone}."
 msgstr "Das RFC2317-Prefix überlappt mit dem von Zone {zone}."
@@ -1103,7 +1103,7 @@ msgid "Import"
 msgstr "Importieren"
 
 #: navigation.py:91 templates/netbox_dns/record.html:18
-#: templates/netbox_dns/record/managed.html:4 views/zone.py:146
+#: templates/netbox_dns/record/managed.html:4 views/zone.py:147
 msgid "Managed Records"
 msgstr "Verwaltete Datensätze"
 
@@ -1164,13 +1164,13 @@ msgstr ""
 msgid "DNS Views"
 msgstr "DNS-Ansichten"
 
-#: tables/record.py:51 tables/record_template.py:33
+#: tables/record.py:52 tables/record_template.py:33
 #: templates/netbox_dns/record.html:93
 #: templates/netbox_dns/recordtemplate.html:49
 msgid "Unicode Value"
 msgstr "Unicode-Wert"
 
-#: tables/record.py:80 templates/netbox_dns/record.html:109
+#: tables/record.py:81 templates/netbox_dns/record.html:109
 msgid "PTR Record"
 msgstr "PTR-Datensatz"
 
@@ -1382,10 +1382,18 @@ msgstr ""
 "Der Datensatz wird von einer untergeordeten Zone überdeckt und könnte im DNS "
 "nicht sichtbar sein"
 
-#: views/zone.py:165
+#: views/zone.py:166
+msgid "Delegation Records"
+msgstr "Delegations-Datensätze"
+
+#: views/zone.py:185
+msgid "Parent Delegation Records"
+msgstr "Übergeordnete Delegations-Datensätze"
+
+#: views/zone.py:204
 msgid "RFC2317 Child Zones"
 msgstr "Untergeordnete RFC2317-Zonen"
 
-#: views/zone.py:184
+#: views/zone.py:223
 msgid "Child Zones"
 msgstr "Untergeordnete Zonen"
