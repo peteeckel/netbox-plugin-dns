@@ -23,11 +23,6 @@ from netbox_dns.validators import validate_generic_name, validate_record_value
 from netbox_dns.mixins import ObjectModificationMixin
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
-# +
-# This is a hack designed to break cyclic imports between Record and Zone
-# -
-from netbox_dns.models import zone
-
 
 __all__ = (
     "Record",
