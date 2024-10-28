@@ -1,12 +1,18 @@
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ImproperlyConfigured
 
 from netbox.plugins import PluginConfig
+from netbox.plugins.utils import get_plugin_config
 from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
 __version__ = "1.1.4"
+
+
+def _check_list(setting):
+    if not isinstance(get_plugin_config("netbox_dns", setting), list):
+        raise ImproperlyConfigured(f"{setting} must be a list")
 
 
 class DNSConfig(PluginConfig):
@@ -61,9 +67,17 @@ class DNSConfig(PluginConfig):
     def ready(self):
         super().ready()
 
-        if not settings.PLUGINS_CONFIG["netbox_dns"].get("dnssync_disabled"):
+        if not get_plugin_config("netbox_dns", "dnssync_disabled"):
             import netbox_dns.signals.ipam_dnssync  # noqa: F401
             import netbox_dns.tables.ipam_dnssync  # noqa: F401
+
+        for setting in (
+            "zone_active_status",
+            "record_active_status",
+            "dnssync_ipaddress_active_status",
+            "tolerate_leading_underscore_types",
+        ):
+            _check_list(setting)
 
 
 #
