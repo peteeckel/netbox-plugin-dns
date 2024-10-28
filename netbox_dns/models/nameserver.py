@@ -19,8 +19,6 @@ from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.validators import validate_fqdn
 from netbox_dns.mixins import ObjectModificationMixin
 
-from .record import Record
-
 
 __all__ = (
     "NameServer",
