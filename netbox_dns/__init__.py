@@ -7,7 +7,7 @@ from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
 
 def _check_list(setting):
