@@ -35,6 +35,12 @@ class NetBoxDNSNameServerType(NetBoxObjectType):
     name: str
     description: str
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
+    soa_zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
 
 
 @strawberry_django.type(View, fields="__all__", filters=NetBoxDNSViewFilter)
@@ -44,6 +50,9 @@ class NetBoxDNSViewType(NetBoxObjectType):
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
     prefixes: List[Annotated["PrefixType", strawberry.lazy("ipam.graphql.types")]]
     ip_address_filter: str | None
+    zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
 
 
 @strawberry_django.type(Zone, fields="__all__", filters=NetBoxDNSZoneFilter)
@@ -111,6 +120,12 @@ class NetBoxDNSZoneType(NetBoxObjectType):
         Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
         | None
     )
+    records: List[
+        Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
+    rfc2317_child_zones: List[
+        Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
 
 
 @strawberry_django.type(Record, fields="__all__", filters=NetBoxDNSRecordFilter)
@@ -137,6 +152,13 @@ class NetBoxDNSRecordType(NetBoxObjectType):
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
         | None
     )
+    address_record: (
+        Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
+        | None
+    )
+    rfc2317_ptr_records: List[
+        Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
 
 
 @strawberry_django.type(
@@ -157,6 +179,18 @@ class NetBoxDNSRegistrationContactType(NetBoxObjectType):
     fax: str
     fax_ext: str
     email: str
+    registrant_zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
+    admin_c_zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
+    tech_c_zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
+    billing_c_zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
 
 
 @strawberry_django.type(Registrar, fields="__all__", filters=NetBoxDNSRegistrarFilter)
@@ -169,6 +203,9 @@ class NetBoxDNSRegistrarType(NetBoxObjectType):
     address: str
     abuse_email: str
     abuse_phone: str
+    zones: List[
+        Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
+    ]
 
 
 @strawberry_django.type(
