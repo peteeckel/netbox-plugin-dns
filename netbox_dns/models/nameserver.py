@@ -100,7 +100,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             super().save(*args, **kwargs)
 
             if changed_fields is not None and "name" in changed_fields:
-                soa_zones = self.zones_soa.all()
+                soa_zones = self.soa_zones.all()
                 for soa_zone in soa_zones:
                     soa_zone.update_soa_record()
 
@@ -111,7 +111,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def delete(self, *args, **kwargs):
         with transaction.atomic():
             for zone in self.zones.all():
-                zone.record_set.filter(
+                zone.records.filter(
                     Q(managed=True),
                     Q(value=f"{self.name}."),
                     Q(type=RecordTypeChoices.NS),

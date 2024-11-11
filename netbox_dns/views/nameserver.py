@@ -105,7 +105,7 @@ class NameServerZoneListView(generic.ObjectChildrenView):
 
 @register_model_view(NameServer, "soa_zones")
 class NameServerSOAZoneListView(generic.ObjectChildrenView):
-    queryset = NameServer.objects.prefetch_related("zones_soa")
+    queryset = NameServer.objects.prefetch_related("soa_zones")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet
@@ -115,9 +115,9 @@ class NameServerSOAZoneListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("SOA Zones"),
         permission="netbox_dns.view_zone",
-        badge=lambda obj: obj.zones_soa.count(),
+        badge=lambda obj: obj.soa_zones.count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return parent.zones_soa
+        return parent.soa_zones

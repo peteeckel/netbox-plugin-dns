@@ -137,7 +137,7 @@ class RegistrationContact(NetBoxModel):
     @property
     def zones(self):
         return (
-            set(self.zone_set.all())
+            set(self.registrant_zones.all())
             | set(self.admin_c_zones.all())
             | set(self.tech_c_zones.all())
             | set(self.billing_c_zones.all())

@@ -88,6 +88,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("View"),
         to="View",
         on_delete=models.PROTECT,
+        related_name="zones",
         null=False,
     )
     name = models.CharField(
@@ -121,7 +122,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     soa_mname = models.ForeignKey(
         verbose_name=_("SOA MName"),
         to="NameServer",
-        related_name="zones_soa",
+        related_name="soa_zones",
         on_delete=models.PROTECT,
         blank=False,
         null=False,
@@ -190,6 +191,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Registrar"),
         to="Registrar",
         on_delete=models.SET_NULL,
+        related_name="zones",
         blank=True,
         null=True,
     )
@@ -203,6 +205,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Registrant"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
+        related_name="registrant_zones",
         blank=True,
         null=True,
     )
@@ -368,7 +371,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             return None
 
         return (
-            self.view.zone_set.filter(arpa_network__net_contains=self.rfc2317_prefix)
+            self.view.zones.filter(arpa_network__net_contains=self.rfc2317_prefix)
             .order_by("arpa_network__net_mask_length")
             .last()
         )
@@ -389,25 +392,23 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def child_zones(self):
-        return self.view.zone_set.filter(
-            name__iregex=rf"^[^.]+\.{re.escape(self.name)}$"
-        )
+        return self.view.zones.filter(name__iregex=rf"^[^.]+\.{re.escape(self.name)}$")
 
     @property
     def descendant_zones(self):
-        return self.view.zone_set.filter(name__endswith=f".{self.name}")
+        return self.view.zones.filter(name__endswith=f".{self.name}")
 
     @property
     def parent_zone(self):
         try:
-            return self.view.zone_set.get(name=get_parent_zone_names(self.name)[-1])
+            return self.view.zones.get(name=get_parent_zone_names(self.name)[-1])
         except (Zone.DoesNotExist, IndexError):
             return None
 
     @property
     def ancestor_zones(self):
         return (
-            self.view.zone_set.annotate(name_length=Length("name"))
+            self.view.zones.annotate(name_length=Length("name"))
             .filter(name__in=get_parent_zone_names(self.name))
             .order_by("name_length")
         )
@@ -419,7 +420,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         ]
 
         ns_records = (
-            self.record_set.filter(type=RecordTypeChoices.NS)
+            self.records.filter(type=RecordTypeChoices.NS)
             .exclude(fqdn=self.fqdn)
             .filter(fqdn__in=descendant_zone_names)
         )
@@ -427,8 +428,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         return (
             ns_records
-            | self.record_set.filter(type=RecordTypeChoices.DS)
-            | self.record_set.filter(
+            | self.records.filter(type=RecordTypeChoices.DS)
+            | self.records.filter(
                 type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
                 fqdn__in=ns_values,
             )
@@ -473,7 +474,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         )
 
         try:
-            soa_record = self.record_set.get(type=RecordTypeChoices.SOA, name=soa_name)
+            soa_record = self.records.get(type=RecordTypeChoices.SOA, name=soa_name)
 
             if soa_record.ttl != soa_ttl or soa_record.value != soa_rdata.to_text():
                 soa_record.ttl = soa_ttl
@@ -496,7 +497,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         nameservers = [f"{nameserver.name}." for nameserver in self.nameservers.all()]
 
-        self.record_set.filter(type=RecordTypeChoices.NS, managed=True).exclude(
+        self.records.filter(type=RecordTypeChoices.NS, managed=True).exclude(
             value__in=nameservers
         ).delete()
 
@@ -533,7 +534,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 continue
 
             relative_name = name.relativize(parent).to_text()
-            address_records = ns_zone.record_set.filter(
+            address_records = ns_zone.records.filter(
                 Q(status__in=RECORD_ACTIVE_STATUS_LIST),
                 Q(Q(name=f"{_nameserver.name}.") | Q(name=relative_name)),
                 Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
@@ -623,9 +624,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.rfc2317_parent_zone = rfc2317_parent_zone
                 self.save(update_fields=["rfc2317_parent_zone"])
 
-        ptr_records = self.record_set.filter(
-            type=RecordTypeChoices.PTR
-        ).prefetch_related("zone", "rfc2317_cname_record")
+        ptr_records = self.records.filter(type=RecordTypeChoices.PTR).prefetch_related(
+            "zone", "rfc2317_cname_record"
+        )
         ptr_zones = {ptr_record.zone for ptr_record in ptr_records}
 
         if self.rfc2317_parent_managed:
@@ -752,7 +753,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 or old_view_id != self.view_id
             ):
                 ip_addresses = IPAddress.objects.filter(
-                    netbox_dns_records__in=self.record_set.filter(
+                    netbox_dns_records__in=self.records.filter(
                         ipam_ip_address__isnull=False
                     )
                 )
@@ -795,7 +796,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             else:
                 self.rfc2317_parent_zone = None
 
-            overlapping_zones = self.view.zone_set.filter(
+            overlapping_zones = self.view.zones.filter(
                 rfc2317_prefix__net_overlap=self.rfc2317_prefix,
                 active=True,
             ).exclude(pk=self.pk)
@@ -828,7 +829,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if (
             changed_fields is None or {"name", "view", "status"} & changed_fields
         ) and self.is_reverse_zone:
-            zones = self.view.zone_set.filter(
+            zones = self.view.zones.filter(
                 arpa_network__net_contains_or_equals=self.arpa_network
             )
             address_records = Record.objects.filter(
@@ -858,7 +859,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             or {"name", "view", "status", "rfc2317_prefix", "rfc2317_parent_managed"}
             & changed_fields
         ) and self.is_rfc2317_zone:
-            zones = self.view.zone_set.filter(
+            zones = self.view.zones.filter(
                 arpa_network__net_contains=self.rfc2317_prefix
             )
             address_records = Record.objects.filter(
@@ -882,14 +883,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             self.update_rfc2317_parent_zone()
 
         elif changed_fields is not None and {"name", "view", "status"} & changed_fields:
-            for address_record in self.record_set.filter(
+            for address_record in self.records.filter(
                 type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
                 ipam_ip_address__isnull=True,
             ):
                 address_record.save(update_fields=["ptr_record"])
 
         if changed_fields is not None and "name" in changed_fields:
-            for _record in self.record_set.filter(ipam_ip_address__isnull=True):
+            for _record in self.records.filter(ipam_ip_address__isnull=True):
                 _record.save(
                     update_fields=["fqdn"],
                     save_zone_serial=False,
@@ -899,7 +900,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         if changed_fields is None or {"name", "view"} & changed_fields:
             ip_addresses = IPAddress.objects.filter(
-                netbox_dns_records__in=self.record_set.filter(
+                netbox_dns_records__in=self.records.filter(
                     ipam_ip_address__isnull=False
                 )
             )
@@ -913,13 +914,13 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
-            address_records = self.record_set.filter(
+            address_records = self.records.filter(
                 ptr_record__isnull=False
             ).prefetch_related("ptr_record")
             for address_record in address_records:
                 address_record.ptr_record.delete()
 
-            ptr_records = self.record_set.filter(address_record__isnull=False)
+            ptr_records = self.records.filter(address_record__isnull=False)
             update_records = list(
                 Record.objects.filter(ptr_record__in=ptr_records).values_list(
                     "pk", flat=True
@@ -945,7 +946,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
             ipam_ip_addresses = list(
                 IPAddress.objects.filter(
-                    netbox_dns_records__in=self.record_set.filter(
+                    netbox_dns_records__in=self.records.filter(
                         ipam_ip_address__isnull=False
                     )
                 )

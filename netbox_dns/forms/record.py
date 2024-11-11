@@ -45,7 +45,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         queryset=View.objects.all(),
         required=False,
         initial_params={
-            "zone": "$zone",
+            "zones": "$zone",
         },
         label=_("View"),
     )
@@ -186,9 +186,9 @@ class RecordImportForm(NetBoxModelImportForm):
                 pass
 
         if view is not None:
-            self.fields["zone"].queryset = view.zone_set
+            self.fields["zone"].queryset = view.zones
         else:
-            self.fields["zone"].queryset = View.get_default_view().zone_set
+            self.fields["zone"].queryset = View.get_default_view().zones
 
     zone = CSVModelChoiceField(
         queryset=Zone.objects.all(),

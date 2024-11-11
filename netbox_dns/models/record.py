@@ -123,6 +123,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Zone"),
         to="Zone",
         on_delete=models.CASCADE,
+        related_name="records",
     )
     fqdn = models.CharField(
         verbose_name=_("FQDN"),
@@ -320,7 +321,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def ptr_zone(self):
         if self.type == RecordTypeChoices.A:
             ptr_zone = (
-                self.zone.view.zone_set.filter(
+                self.zone.view.zones.filter(
                     rfc2317_prefix__net_contains=self.value,
                 )
                 .order_by("rfc2317_prefix__net_mask_length")
@@ -331,7 +332,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 return ptr_zone
 
         ptr_zone = (
-            self.zone.view.zone_set.filter(arpa_network__net_contains=self.value)
+            self.zone.view.zones.filter(arpa_network__net_contains=self.value)
             .order_by("arpa_network__net_mask_length")
             .last()
         )
@@ -451,7 +452,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
                 self.remove_from_rfc2317_cname_record(save_zone_serial=save_zone_serial)
 
-            rfc2317_cname_record = self.zone.rfc2317_parent_zone.record_set.filter(
+            rfc2317_cname_record = self.zone.rfc2317_parent_zone.records.filter(
                 name=cname_name,
                 type=RecordTypeChoices.CNAME,
                 managed=True,
@@ -601,7 +602,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if new_zone is None:
             new_zone = self.zone
 
-        records = new_zone.record_set.filter(
+        records = new_zone.records.filter(
             name=self.name,
             type=self.type,
             value=self.value,
@@ -637,7 +638,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if not get_plugin_config("netbox_dns", "dnssync_conflict_deactivate", False):
             return
 
-        records = self.zone.record_set.filter(
+        records = self.zone.records.filter(
             name=self.name,
             type=self.type,
             value=self.value,
@@ -665,7 +666,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             return
 
         records = (
-            self.zone.record_set.filter(
+            self.zone.records.filter(
                 name=self.name,
                 type=self.type,
             )
@@ -708,7 +709,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             ttl = self.ttl
 
         records = (
-            self.zone.record_set.filter(
+            self.zone.records.filter(
                 name=self.name,
                 type=self.type,
             )
@@ -736,7 +737,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if not self.is_active:
             return
 
-        records = self.zone.record_set.filter(name=self.name, active=True).exclude(
+        records = self.zone.records.filter(name=self.name, active=True).exclude(
             pk=self.pk
         )
 
@@ -755,7 +756,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 )
 
                 if (
-                    ptr_cname_zone.record_set.filter(
+                    ptr_cname_zone.records.filter(
                         name=ptr_cname_name,
                         active=True,
                     )

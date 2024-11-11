@@ -24,7 +24,7 @@ def zone_cleanup_ns_records(verbose=False):
         nameservers = zone.nameservers.all()
         nameserver_names = [f'{ns.name.rstrip(".")}.' for ns in nameservers]
 
-        delete_ns = zone.record_set.filter(
+        delete_ns = zone.records.filter(
             name=ns_name, type=RecordTypeChoices.NS
         ).exclude(value__in=nameserver_names)
         for record in delete_ns:
@@ -33,7 +33,7 @@ def zone_cleanup_ns_records(verbose=False):
             record.delete()
 
         for ns in nameserver_names:
-            ns_records = zone.record_set.filter(
+            ns_records = zone.records.filter(
                 name=ns_name,
                 type=RecordTypeChoices.NS,
                 value=ns,
@@ -46,7 +46,7 @@ def zone_cleanup_ns_records(verbose=False):
                 record.delete()
 
             try:
-                ns_record = zone.record_set.get(
+                ns_record = zone.records.get(
                     name=ns_name,
                     type=RecordTypeChoices.NS,
                     value=ns,
@@ -76,9 +76,7 @@ def zone_update_soa_records(verbose=False):
     soa_name = "@"
 
     for zone in Zone.objects.all():
-        delete_soa = zone.record_set.filter(name=soa_name, type=RecordTypeChoices.SOA)[
-            1:
-        ]
+        delete_soa = zone.records.filter(name=soa_name, type=RecordTypeChoices.SOA)[1:]
         for record in delete_soa:
             if verbose:
                 print(f"Deleting duplicate SOA record {record}")

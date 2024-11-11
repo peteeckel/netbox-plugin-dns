@@ -21,28 +21,28 @@ class ZoneDefaultViewTestCase(TestCase):
 
         self.view.refresh_from_db()
         self.assertEqual(zone.view, self.view)
-        self.assertIn(zone, self.view.zone_set.all())
+        self.assertIn(zone, self.view.zones.all())
 
     def test_create_zone_default_view(self):
         zone = Zone.objects.create(name="zone1.example.com", **self.zone_data)
 
         self.default_view.refresh_from_db()
         self.assertEqual(zone.view, self.default_view)
-        self.assertIn(zone, self.default_view.zone_set.all())
+        self.assertIn(zone, self.default_view.zones.all())
 
     def test_modify_zone_default_to_explicit_view(self):
         zone = Zone.objects.create(name="zone1.example.com", **self.zone_data)
 
         self.default_view.refresh_from_db()
         self.assertEqual(zone.view, self.default_view)
-        self.assertIn(zone, self.default_view.zone_set.all())
+        self.assertIn(zone, self.default_view.zones.all())
 
         zone.view = self.view
         zone.save()
 
         self.view.refresh_from_db()
         self.assertEqual(zone.view, self.view)
-        self.assertIn(zone, self.view.zone_set.all())
+        self.assertIn(zone, self.view.zones.all())
 
     def test_modify_zone_explicit_to_default_view(self):
         zone = Zone.objects.create(
@@ -51,11 +51,11 @@ class ZoneDefaultViewTestCase(TestCase):
 
         self.view.refresh_from_db()
         self.assertEqual(zone.view, self.view)
-        self.assertIn(zone, self.view.zone_set.all())
+        self.assertIn(zone, self.view.zones.all())
 
         zone.view = None
         zone.save()
 
         self.default_view.refresh_from_db()
         self.assertEqual(zone.view, self.default_view)
-        self.assertIn(zone, self.default_view.zone_set.all())
+        self.assertIn(zone, self.default_view.zones.all())

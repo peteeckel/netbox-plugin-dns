@@ -242,7 +242,7 @@ class RecordAPITestCase(
         response = self.client.patch(url, data, format="json", **self.header)
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
 
-    def test_update_record_set_managed(self):
+    def test_update_records_managed(self):
         record = Record.objects.create(
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )

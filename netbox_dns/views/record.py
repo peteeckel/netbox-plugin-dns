@@ -70,7 +70,7 @@ class RecordView(generic.ObjectView):
                 data=cname_targets,
             )
 
-        if instance.zone.view.zone_set.filter(
+        if instance.zone.view.zones.filter(
             name__in=get_parent_zone_names(instance.value_fqdn, min_labels=1),
             active=True,
         ).exists():
@@ -93,7 +93,7 @@ class RecordView(generic.ObjectView):
             )
         )
 
-        parent_zones = instance.zone.view.zone_set.filter(
+        parent_zones = instance.zone.view.zones.filter(
             name__in=get_parent_zone_names(instance.fqdn, include_self=True),
         )
 
