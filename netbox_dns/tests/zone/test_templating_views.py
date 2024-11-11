@@ -785,7 +785,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             **self.zone_data,
         )
 
-        self.assertEqual(zone.record_set.count(), 1)  # SOA record
+        self.assertEqual(zone.records.count(), 1)  # SOA record
 
         self.add_permissions(
             "netbox_dns.change_zone",
@@ -809,7 +809,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         response = self.client.post(**request)
         self.assertHttpStatus(response, 302)
 
-        self.assertEqual(zone.record_set.filter(managed=False).count(), 4)
+        self.assertEqual(zone.records.filter(managed=False).count(), 4)
 
         zone.refresh_from_db()
 
@@ -851,7 +851,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         for record in existing_records:
             record.save()
 
-        self.assertEqual(zone.record_set.filter(managed=False).count(), 3)
+        self.assertEqual(zone.records.filter(managed=False).count(), 3)
 
         self.add_permissions(
             "netbox_dns.change_zone",
@@ -875,7 +875,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         response = self.client.post(**request)
         self.assertHttpStatus(response, 302)
 
-        self.assertEqual(zone.record_set.filter(managed=False).count(), 4)
+        self.assertEqual(zone.records.filter(managed=False).count(), 4)
 
         zone.refresh_from_db()
         for record_template in test_templates[0:3]:
@@ -905,7 +905,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             value="fe80:dead:beef::42:23",
         ),
 
-        self.assertEqual(zone.record_set.count(), 2)  # SOA record + existing record
+        self.assertEqual(zone.records.count(), 2)  # SOA record + existing record
 
         self.add_permissions(
             "netbox_dns.change_zone",
@@ -928,7 +928,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         response = self.client.post(**request)
         self.assertHttpStatus(response, 200)
-        self.assertEqual(zone.record_set.count(), 2)
+        self.assertEqual(zone.records.count(), 2)
         self.assertRegex(
             response.content.decode(),
             r"There is already an active record .* CNAME is not allowed",

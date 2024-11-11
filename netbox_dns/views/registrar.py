@@ -69,7 +69,7 @@ class RegistrarBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(Registrar, "zones")
 class RegistrarZoneListView(generic.ObjectChildrenView):
-    queryset = Registrar.objects.prefetch_related("zone_set")
+    queryset = Registrar.objects.prefetch_related("zones")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet
@@ -79,9 +79,9 @@ class RegistrarZoneListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("Zones"),
         permission="netbox_dns.view_zone",
-        badge=lambda obj: obj.zone_set.count(),
+        badge=lambda obj: obj.zones.count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return parent.zone_set
+        return parent.zones

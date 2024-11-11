@@ -59,13 +59,13 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertEqual(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).count(), 3
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).count(), 3
         )
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
@@ -106,7 +106,7 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertFalse(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).exists()
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).exists()
         )
         for record in records:
             self.assertIsNone(record.ptr_record)
@@ -143,12 +143,12 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertFalse(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).exists()
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).exists()
         )
         for record in records:
             self.assertIsNone(record.ptr_record)
             self.assertFalse(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
@@ -181,13 +181,13 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertEqual(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).count(), 2
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).count(), 2
         )
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
@@ -236,23 +236,23 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertEqual(
-            rfc2317_zone1.record_set.filter(type=RecordTypeChoices.PTR).count(), 2
+            rfc2317_zone1.records.filter(type=RecordTypeChoices.PTR).count(), 2
         )
         for record in records[0:2]:
-            self.assertIn(record.ptr_record, rfc2317_zone1.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone1.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone1)
             self.assertTrue(
-                rfc2317_zone1.record_set.filter(
+                rfc2317_zone1.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
         for record in records[2:4]:
-            self.assertIn(record.ptr_record, rfc2317_zone2.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone2.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone2)
             self.assertTrue(
-                rfc2317_zone2.record_set.filter(
+                rfc2317_zone2.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
@@ -275,10 +275,10 @@ class RFC2317RecordTestCase(TestCase):
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
 
-        self.assertIn(record.ptr_record, rfc2317_zone1.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone1.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone1)
         self.assertTrue(
-            rfc2317_zone1.record_set.filter(
+            rfc2317_zone1.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
@@ -291,19 +291,19 @@ class RFC2317RecordTestCase(TestCase):
         rfc2317_zone1.refresh_from_db()
         rfc2317_zone2.refresh_from_db()
 
-        self.assertNotIn(record.ptr_record, rfc2317_zone1.record_set.all())
+        self.assertNotIn(record.ptr_record, rfc2317_zone1.records.all())
         self.assertNotEqual(record.ptr_record.zone, rfc2317_zone1)
         self.assertFalse(
-            rfc2317_zone1.record_set.filter(
+            rfc2317_zone1.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
-        self.assertIn(record.ptr_record, rfc2317_zone2.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone2.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone2)
         self.assertTrue(
-            rfc2317_zone2.record_set.filter(
+            rfc2317_zone2.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
@@ -321,10 +321,10 @@ class RFC2317RecordTestCase(TestCase):
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
@@ -336,9 +336,9 @@ class RFC2317RecordTestCase(TestCase):
 
         rfc2317_zone.refresh_from_db()
 
-        self.assertFalse(rfc2317_zone.record_set.filter(pk=record_pk).exists())
+        self.assertFalse(rfc2317_zone.records.filter(pk=record_pk).exists())
         self.assertFalse(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
@@ -378,21 +378,21 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertEqual(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).count(), 3
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).count(), 3
         )
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertEqual(record.ptr_record.rfc2317_cname_record.zone, zone1)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -435,17 +435,17 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertFalse(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).exists()
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).exists()
         )
         for record in records:
             self.assertIsNone(record.ptr_record)
             self.assertFalse(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR, name=record.rfc2317_ptr_name
                 ).exists()
             )
             self.assertFalse(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME, name=record.rfc2317_ptr_cname_name
                 ).exists()
             )
@@ -486,17 +486,17 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertFalse(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).exists()
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).exists()
         )
         for record in records:
             self.assertIsNone(record.ptr_record)
             self.assertFalse(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR, name=record.rfc2317_ptr_name
                 ).exists()
             )
             self.assertFalse(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME, name=record.rfc2317_ptr_cname_name
                 ).exists()
             )
@@ -531,20 +531,20 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertEqual(
-            rfc2317_zone.record_set.filter(type=RecordTypeChoices.PTR).count(), 2
+            rfc2317_zone.records.filter(type=RecordTypeChoices.PTR).count(), 2
         )
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -608,37 +608,37 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         self.assertEqual(
-            rfc2317_zone1.record_set.filter(type=RecordTypeChoices.PTR).count(), 4
+            rfc2317_zone1.records.filter(type=RecordTypeChoices.PTR).count(), 4
         )
         for record in records[0:4]:
-            self.assertIn(record.ptr_record, rfc2317_zone1.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone1.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone1)
             self.assertTrue(
-                rfc2317_zone1.record_set.filter(
+                rfc2317_zone1.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
                 ).exists()
             )
         for record in records[4:6]:
-            self.assertIn(record.ptr_record, rfc2317_zone2.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone2.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone2)
             self.assertTrue(
-                rfc2317_zone2.record_set.filter(
+                rfc2317_zone2.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -687,17 +687,17 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -709,17 +709,17 @@ class RFC2317RecordTestCase(TestCase):
 
         for record in records:
             record.refresh_from_db()
-            self.assertNotIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertNotIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertNotEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertFalse(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertFalse(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -739,17 +739,17 @@ class RFC2317RecordTestCase(TestCase):
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone.record_set.filter(
+            zone.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -765,17 +765,17 @@ class RFC2317RecordTestCase(TestCase):
         rfc2317_zone.refresh_from_db()
         zone.refresh_from_db()
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone.record_set.filter(
+            zone.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -801,17 +801,17 @@ class RFC2317RecordTestCase(TestCase):
             name="name2", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.2"
         )
 
-        self.assertIn(record1.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record1.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record1.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record1.rfc2317_ptr_name,
                 value=record1.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone.record_set.filter(
+            zone.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record1.rfc2317_ptr_cname_name,
                 value=record1.ptr_record.fqdn,
@@ -827,17 +827,17 @@ class RFC2317RecordTestCase(TestCase):
         rfc2317_zone.refresh_from_db()
         zone.refresh_from_db()
 
-        self.assertIn(record1.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record1.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record1.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record1.rfc2317_ptr_name,
                 value=record1.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone.record_set.filter(
+            zone.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record1.rfc2317_ptr_cname_name,
                 value=record1.ptr_record.fqdn,
@@ -863,30 +863,30 @@ class RFC2317RecordTestCase(TestCase):
             name="name2", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
 
-        self.assertIn(record1.ptr_record, rfc2317_zone.record_set.all())
-        self.assertIn(record2.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record1.ptr_record, rfc2317_zone.records.all())
+        self.assertIn(record2.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record1.ptr_record.zone, rfc2317_zone)
         self.assertEqual(record2.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record1.rfc2317_ptr_name,
                 value=record1.fqdn,
             ).exists()
         )
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record2.rfc2317_ptr_name,
                 value=record2.fqdn,
             ).exists()
         )
-        cname_record1 = zone.record_set.filter(
+        cname_record1 = zone.records.filter(
             type=RecordTypeChoices.CNAME,
             name=record1.rfc2317_ptr_cname_name,
             value=record1.ptr_record.fqdn,
         ).first()
-        cname_record2 = zone.record_set.filter(
+        cname_record2 = zone.records.filter(
             type=RecordTypeChoices.CNAME,
             name=record2.rfc2317_ptr_cname_name,
             value=record2.ptr_record.fqdn,
@@ -908,12 +908,12 @@ class RFC2317RecordTestCase(TestCase):
         rfc2317_zone.refresh_from_db()
         zone.refresh_from_db()
 
-        cname_record1 = zone.record_set.filter(
+        cname_record1 = zone.records.filter(
             type=RecordTypeChoices.CNAME,
             name=record1.rfc2317_ptr_cname_name,
             value=record1.ptr_record.fqdn,
         ).first()
-        cname_record2 = zone.record_set.filter(
+        cname_record2 = zone.records.filter(
             type=RecordTypeChoices.CNAME,
             name=record2.rfc2317_ptr_cname_name,
             value=record2.ptr_record.fqdn,
@@ -941,17 +941,17 @@ class RFC2317RecordTestCase(TestCase):
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone1.record_set.filter(
+            zone1.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -964,19 +964,19 @@ class RFC2317RecordTestCase(TestCase):
         zone1.refresh_from_db()
         rfc2317_zone.refresh_from_db()
 
-        self.assertFalse(rfc2317_zone.record_set.filter(pk=record_pk).exists())
+        self.assertFalse(rfc2317_zone.records.filter(pk=record_pk).exists())
         self.assertFalse(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR, name=record.rfc2317_ptr_name
             ).exists()
         )
         self.assertFalse(
-            zone1.record_set.filter(
+            zone1.records.filter(
                 type=RecordTypeChoices.CNAME, name=record.rfc2317_ptr_cname_name
             ).exists()
         )
 
-    def test_record_rfc2317_zone_set_unmanaged(self):
+    def test_record_rfc2317_zones_unmanaged(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
@@ -1018,14 +1018,14 @@ class RFC2317RecordTestCase(TestCase):
         self.assertEqual(rfc2317_zone.rfc2317_parent_zone, zone1)
         for record in records:
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -1041,21 +1041,21 @@ class RFC2317RecordTestCase(TestCase):
         self.assertFalse(zone1.rfc2317_child_zones.exists())
         for record in records:
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertFalse(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
                 ).exists()
             )
 
-    def test_record_rfc2317_zone_set_managed(self):
+    def test_record_rfc2317_zones_managed(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
@@ -1096,14 +1096,14 @@ class RFC2317RecordTestCase(TestCase):
         self.assertFalse(zone1.rfc2317_child_zones.exists())
         for record in records:
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertFalse(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -1122,14 +1122,14 @@ class RFC2317RecordTestCase(TestCase):
             record.refresh_from_db()
 
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -1163,18 +1163,18 @@ class RFC2317RecordTestCase(TestCase):
             record.save()
 
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertEqual(record.ptr_record.rfc2317_cname_record.zone, zone1)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -1187,11 +1187,11 @@ class RFC2317RecordTestCase(TestCase):
 
         self.assertFalse(zone1.rfc2317_child_zones.exists())
         for record in records:
-            self.assertIn(record.ptr_record, zone1.record_set.all())
+            self.assertIn(record.ptr_record, zone1.records.all())
             self.assertEqual(record.ptr_record.zone, zone1)
             self.assertEqual(record.ptr_record.rfc2317_cname_record, None)
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.PTR, name="1", value=record.fqdn
                 ).exists()
             )
@@ -1218,11 +1218,11 @@ class RFC2317RecordTestCase(TestCase):
 
         self.assertFalse(zone1.rfc2317_child_zones.exists())
         for record in records:
-            self.assertIn(record.ptr_record, zone1.record_set.all())
+            self.assertIn(record.ptr_record, zone1.records.all())
             self.assertEqual(record.ptr_record.zone, zone1)
             self.assertEqual(record.ptr_record.rfc2317_cname_record, None)
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.PTR, name="1", value=record.fqdn
                 ).exists()
             )
@@ -1237,18 +1237,18 @@ class RFC2317RecordTestCase(TestCase):
             record.refresh_from_db()
 
         for record in records:
-            self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+            self.assertIn(record.ptr_record, rfc2317_zone.records.all())
             self.assertEqual(record.ptr_record.zone, rfc2317_zone)
             self.assertEqual(record.ptr_record.rfc2317_cname_record.zone, zone1)
             self.assertTrue(
-                rfc2317_zone.record_set.filter(
+                rfc2317_zone.records.filter(
                     type=RecordTypeChoices.PTR,
                     name=record.rfc2317_ptr_name,
                     value=record.fqdn,
                 ).exists()
             )
             self.assertTrue(
-                zone1.record_set.filter(
+                zone1.records.filter(
                     type=RecordTypeChoices.CNAME,
                     name=record.rfc2317_ptr_cname_name,
                     value=record.ptr_record.fqdn,
@@ -1270,18 +1270,18 @@ class RFC2317RecordTestCase(TestCase):
 
         zone1_pk = zone1.pk
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertEqual(record.ptr_record.rfc2317_cname_record.zone, zone1)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone1.record_set.filter(
+            zone1.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -1297,7 +1297,7 @@ class RFC2317RecordTestCase(TestCase):
         self.assertIsNone(rfc2317_zone.rfc2317_parent_zone)
         self.assertIsNone(record.ptr_record.rfc2317_cname_record)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
@@ -1320,18 +1320,18 @@ class RFC2317RecordTestCase(TestCase):
 
         zone1_pk = zone1.pk
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertEqual(record.ptr_record.rfc2317_cname_record.zone, zone1)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone1.record_set.filter(
+            zone1.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -1347,14 +1347,14 @@ class RFC2317RecordTestCase(TestCase):
         self.assertFalse(Zone.objects.filter(pk=zone1_pk).exists())
         self.assertEqual(rfc2317_zone.rfc2317_parent_zone, zone2)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone2.record_set.filter(
+            zone2.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -1374,18 +1374,18 @@ class RFC2317RecordTestCase(TestCase):
             name="name1", zone=self.zones[0], type=RecordTypeChoices.A, value="10.0.0.1"
         )
 
-        self.assertIn(record.ptr_record, rfc2317_zone.record_set.all())
+        self.assertIn(record.ptr_record, rfc2317_zone.records.all())
         self.assertEqual(record.ptr_record.zone, rfc2317_zone)
         self.assertEqual(record.ptr_record.rfc2317_cname_record.zone, zone1)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone1.record_set.filter(
+            zone1.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,
@@ -1400,14 +1400,14 @@ class RFC2317RecordTestCase(TestCase):
         self.assertTrue(rfc2317_zone.rfc2317_parent_managed)
         self.assertEqual(rfc2317_zone.rfc2317_parent_zone, zone2)
         self.assertTrue(
-            rfc2317_zone.record_set.filter(
+            rfc2317_zone.records.filter(
                 type=RecordTypeChoices.PTR,
                 name=record.rfc2317_ptr_name,
                 value=record.fqdn,
             ).exists()
         )
         self.assertTrue(
-            zone2.record_set.filter(
+            zone2.records.filter(
                 type=RecordTypeChoices.CNAME,
                 name=record.rfc2317_ptr_cname_name,
                 value=record.ptr_record.fqdn,

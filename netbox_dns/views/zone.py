@@ -46,7 +46,7 @@ class ZoneView(generic.ObjectView):
         "tags",
         "nameservers",
         "soa_mname",
-        "record_set",
+        "records",
     )
 
     def get_extra_context(self, request, instance):
@@ -126,12 +126,12 @@ class ZoneRecordListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("Records"),
         permission="netbox_dns.view_record",
-        badge=lambda obj: obj.record_set.filter(managed=False).count(),
+        badge=lambda obj: obj.records.filter(managed=False).count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return parent.record_set.restrict(request.user, "view").filter(managed=False)
+        return parent.records.restrict(request.user, "view").filter(managed=False)
 
 
 @register_model_view(Zone, "managed_records")
@@ -146,12 +146,12 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("Managed Records"),
         permission="netbox_dns.view_record",
-        badge=lambda obj: obj.record_set.filter(managed=True).count(),
+        badge=lambda obj: obj.records.filter(managed=True).count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return parent.record_set.restrict(request.user, "view").filter(managed=True)
+        return parent.records.restrict(request.user, "view").filter(managed=True)
 
 
 @register_model_view(Zone, "delegation_records")

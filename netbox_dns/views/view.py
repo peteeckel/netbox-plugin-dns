@@ -31,7 +31,7 @@ __all__ = (
 
 
 class ViewView(generic.ObjectView):
-    queryset = View.objects.prefetch_related("zone_set")
+    queryset = View.objects.prefetch_related("zones")
 
 
 class ViewListView(generic.ObjectListView):
@@ -89,7 +89,7 @@ class ViewPrefixEditView(generic.ObjectEditView):
 
 @register_model_view(View, "zones")
 class ViewZoneListView(generic.ObjectChildrenView):
-    queryset = View.objects.prefetch_related("zone_set")
+    queryset = View.objects.prefetch_related("zones")
     child_model = Zone
     table = ZoneTable
     filterset = ZoneFilterSet
@@ -99,12 +99,12 @@ class ViewZoneListView(generic.ObjectChildrenView):
     tab = ViewTab(
         label=_("Zones"),
         permission="netbox_dns.view_zone",
-        badge=lambda obj: obj.zone_set.count(),
+        badge=lambda obj: obj.zones.count(),
         hide_if_empty=True,
     )
 
     def get_children(self, request, parent):
-        return parent.zone_set
+        return parent.zones
 
 
 @register_model_view(View, "contacts")

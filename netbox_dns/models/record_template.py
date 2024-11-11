@@ -142,7 +142,7 @@ class RecordTemplate(NetBoxModel):
             raise ValidationError({"value": exc})
 
     def matching_records(self, zone):
-        return zone.record_set.filter(
+        return zone.records.filter(
             name=self.record_name, type=self.type, value=self.value
         )
 

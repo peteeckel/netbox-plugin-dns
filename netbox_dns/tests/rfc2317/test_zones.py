@@ -235,7 +235,7 @@ class RFC2317ZoneTestCase(TestCase):
         self.assertNotEqual(rfc2317_zone.rfc2317_parent_zone, zone1)
         self.assertEqual(rfc2317_zone.rfc2317_parent_zone, zone2)
 
-    def test_modify_rfc2317_zone_set_unmanaged(self):
+    def test_modify_rfc2317_zones_unmanaged(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
@@ -255,7 +255,7 @@ class RFC2317ZoneTestCase(TestCase):
         self.assertFalse(rfc2317_zone.rfc2317_parent_managed)
         self.assertFalse(zone1.rfc2317_child_zones.exists())
 
-    def test_modify_rfc2317_zone_set_managed(self):
+    def test_modify_rfc2317_zones_managed(self):
         zone1 = Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
         rfc2317_zone = Zone.objects.create(
             name="0-15.0.0.10.in-addr.arpa",
