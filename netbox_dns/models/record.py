@@ -859,9 +859,8 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if changed_fields is None or changed_fields:
             super().save(*args, **kwargs)
 
-        _zone = self.zone
-        if self.type != RecordTypeChoices.SOA and _zone.soa_serial_auto:
-            _zone.update_serial(save_zone_serial=save_zone_serial)
+            if self.type != RecordTypeChoices.SOA and self.zone.soa_serial_auto:
+                self.zone.update_serial(save_zone_serial=save_zone_serial)
 
     def delete(self, *args, save_zone_serial=True, **kwargs):
         if self.rfc2317_cname_record:
