@@ -1,4 +1,5 @@
 import ipaddress
+import netaddr
 
 import dns
 from dns import name as dns_name
@@ -840,7 +841,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.ip_address = self.address_from_name
 
         elif self.is_address_record:
-            self.ip_address = self.value
+            self.ip_address = netaddr.IPAddress(self.value)
         else:
             self.ip_address = None
 
