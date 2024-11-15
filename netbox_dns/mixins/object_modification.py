@@ -21,6 +21,10 @@ class ObjectModificationMixin:
 
     def _save_field_values(self):
         for field in self.check_fields:
+            if field == "custom_field_data":
+                self._saved_custom_field_data = self.custom_field_data.copy()
+                continue
+
             if f"{field}_id" in self.__dict__:
                 setattr(self, f"_saved_{field}_id", self.__dict__.get(f"{field}_id"))
             else:
