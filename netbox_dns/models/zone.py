@@ -497,9 +497,10 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         nameservers = [f"{nameserver.name}." for nameserver in self.nameservers.all()]
 
-        self.records.filter(type=RecordTypeChoices.NS, managed=True).exclude(
-            value__in=nameservers
-        ).delete()
+        for ns_record in self.records.filter(
+            type=RecordTypeChoices.NS, managed=True
+        ).exclude(value__in=nameservers):
+            ns_record.delete()
 
         for ns in nameservers:
             Record.raw_objects.update_or_create(
