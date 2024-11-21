@@ -875,17 +875,13 @@ The status of an automatically generated address record is controlled by the sta
 This mapping can be controlled via the plugin configuration by setting the variable `dnssync_ipaddress_active_status`. The Variable is a list of IP address statuses that result in an active address record and can be overridden in `confguration.py` like in the following example:
 
 ```
-from ipam.choices import IPAddressStatusChoices
-
-...
-
 PLUGINS_CONFIG = {
     'netbox_dns': {
         ...
         'dnssync_ipaddress_active_status': [
-            IPAddressStatusChoices.STATUS_ACTIVE,
-            IPAddressStatusChoices.STATUS_RESERVED,
-            IPAddressStatusChoices.STATUS_DHCP,
+            'active',
+            'reserved',
+            'dhcp',
         ]
         ...
     },
@@ -1133,11 +1129,11 @@ The list of zone statuses considered active is defined in the `zone_active_statu
 
 ```
 PLUGINS_CONFIG = {
-	"netbox_dns": {
-		"zone_active_status": [
-			ZoneStatusChoices.STATUS_ACTIVE,
-			ZoneStatusChoices.STATUS_DYNAMIC,
-			"planned",
+	'netbox_dns': {
+		'zone_active_status': [
+			'active',
+			'dynamic',
+			'planned',
 		],
 	},
 }
@@ -1161,10 +1157,10 @@ The list of record statuses considered active is defined in the `record_active_s
 
 ```
 PLUGINS_CONFIG = {
-	"netbox_dns": {
-		"record_active_status": [
-			RecordStatusChoices.STATUS_ACTIVE,
-			"deprecated",
+	'netbox_dns': {
+		'record_active_status': [
+			'active',
+			'deprecated',
 		],
 	},
 }
