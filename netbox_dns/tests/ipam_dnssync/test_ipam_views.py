@@ -1094,7 +1094,7 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
             "netbox_dns.view_view",
         )
 
-        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+        url = reverse("ipam:prefix_views", kwargs={"pk": prefix.pk})
 
         request_data = {
             "views": [view.pk],
@@ -1135,7 +1135,7 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
             "netbox_dns.view_view",
         )
 
-        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+        url = reverse("ipam:prefix_views", kwargs={"pk": prefix.pk})
 
         request_data = {
             "views": [view.pk],
@@ -1176,7 +1176,7 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
             "netbox_dns.view_view",
         )
 
-        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+        url = reverse("ipam:prefix_views", kwargs={"pk": prefix.pk})
 
         request_data = {
             "views": [],
@@ -1228,7 +1228,7 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
             "netbox_dns.view_view",
         )
 
-        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix1.pk})
+        url = reverse("ipam:prefix_views", kwargs={"pk": prefix1.pk})
 
         request_data = {
             "views": [],
@@ -1260,7 +1260,7 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
             "ipam.view_prefix", "ipam.change_prefix", "netbox_dns.view_view"
         )
 
-        url = reverse("plugins:netbox_dns:prefix_views", kwargs={"pk": prefix.pk})
+        url = reverse("ipam:prefix_views", kwargs={"pk": prefix.pk})
 
         request_data = {
             "views": [view.pk],

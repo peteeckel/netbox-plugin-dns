@@ -11,7 +11,6 @@ from netbox.signals import post_clean
 from ipam.models import IPAddress, Prefix
 from utilities.exceptions import AbortRequest
 
-from netbox_dns.models import view as _view
 from netbox_dns.utilities import (
     check_dns_records,
     check_record_permission,
@@ -203,26 +202,9 @@ def ipam_dnssync_prefix_pre_delete(instance, **kwargs):
         update_dns_records(ip_address)
 
 
-@receiver(m2m_changed, sender=_view.View.prefixes.through)
+@receiver(m2m_changed, sender=Prefix.netbox_dns_views.through)
 def ipam_dnssync_view_prefix_changed(**kwargs):
     action = kwargs.get("action")
-    request = current_request.get()
-
-    # +
-    # Handle all post_add and post_remove signals except the ones directly
-    # handled by the pre_delete handler for the Prefix model.
-    #
-    # Yes. This IS ugly.
-    # -
-    if action not in ("post_add", "post_remove") or (
-        request is not None
-        and action == "post_remove"
-        and (
-            request.path.startswith("/ipam/prefixes/")
-            or request.path.startswith("/api/ipam/prefixes/")
-        )
-    ):
-        return
 
     check_view = action != "post_remove"
 

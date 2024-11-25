@@ -27,10 +27,7 @@ __all__ = (
 )
 
 
-class RegistrationContactView(generic.ObjectView):
-    queryset = RegistrationContact.objects.all()
-
-
+@register_model_view(RegistrationContact, "list", path="", detail=False)
 class RegistrationContactListView(generic.ObjectListView):
     queryset = RegistrationContact.objects.all()
     table = RegistrationContactTable
@@ -38,17 +35,26 @@ class RegistrationContactListView(generic.ObjectListView):
     filterset_form = RegistrationContactFilterForm
 
 
+@register_model_view(RegistrationContact)
+class RegistrationContactView(generic.ObjectView):
+    queryset = RegistrationContact.objects.all()
+
+
+@register_model_view(RegistrationContact, "add", detail=False)
+@register_model_view(RegistrationContact, "edit")
 class RegistrationContactEditView(generic.ObjectEditView):
     queryset = RegistrationContact.objects.all()
     form = RegistrationContactForm
     default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
+@register_model_view(RegistrationContact, "delete")
 class RegistrationContactDeleteView(generic.ObjectDeleteView):
     queryset = RegistrationContact.objects.all()
     default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
+@register_model_view(RegistrationContact, "bulk_import", detail=False)
 class RegistrationContactBulkImportView(generic.BulkImportView):
     queryset = RegistrationContact.objects.all()
     model_form = RegistrationContactImportForm
@@ -56,6 +62,7 @@ class RegistrationContactBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
+@register_model_view(RegistrationContact, "bulk_edit", path="edit", detail=False)
 class RegistrationContactBulkEditView(generic.BulkEditView):
     queryset = RegistrationContact.objects.all()
     filterset = RegistrationContactFilterSet
@@ -63,6 +70,7 @@ class RegistrationContactBulkEditView(generic.BulkEditView):
     form = RegistrationContactBulkEditForm
 
 
+@register_model_view(RegistrationContact, "bulk_delete", path="delete", detail=False)
 class RegistrationContactBulkDeleteView(generic.BulkDeleteView):
     queryset = RegistrationContact.objects.all()
     table = RegistrationContactTable

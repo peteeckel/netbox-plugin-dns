@@ -1,4 +1,5 @@
 from netbox.views import generic
+from utilities.views import register_model_view
 
 from netbox_dns.models import ZoneTemplate
 from netbox_dns.filtersets import ZoneTemplateFilterSet
@@ -22,6 +23,7 @@ __all__ = (
 )
 
 
+@register_model_view(ZoneTemplate, "list", path="", detail=False)
 class ZoneTemplateListView(generic.ObjectListView):
     queryset = ZoneTemplate.objects.all()
     filterset = ZoneTemplateFilterSet
@@ -29,6 +31,7 @@ class ZoneTemplateListView(generic.ObjectListView):
     table = ZoneTemplateTable
 
 
+@register_model_view(ZoneTemplate)
 class ZoneTemplateView(generic.ObjectView):
     queryset = ZoneTemplate.objects.all()
 
@@ -43,17 +46,21 @@ class ZoneTemplateView(generic.ObjectView):
         return {}
 
 
+@register_model_view(ZoneTemplate, "add", detail=False)
+@register_model_view(ZoneTemplate, "edit")
 class ZoneTemplateEditView(generic.ObjectEditView):
     queryset = ZoneTemplate.objects.all()
     form = ZoneTemplateForm
     default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
+@register_model_view(ZoneTemplate, "delete")
 class ZoneTemplateDeleteView(generic.ObjectDeleteView):
     queryset = ZoneTemplate.objects.all()
     default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
+@register_model_view(ZoneTemplate, "bulk_import", detail=False)
 class ZoneTemplateBulkImportView(generic.BulkImportView):
     queryset = ZoneTemplate.objects.all()
     model_form = ZoneTemplateImportForm
@@ -61,6 +68,7 @@ class ZoneTemplateBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
+@register_model_view(ZoneTemplate, "bulk_edit", path="edit", detail=False)
 class ZoneTemplateBulkEditView(generic.BulkEditView):
     queryset = ZoneTemplate.objects.all()
     filterset = ZoneTemplateFilterSet
@@ -69,6 +77,7 @@ class ZoneTemplateBulkEditView(generic.BulkEditView):
     default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
+@register_model_view(ZoneTemplate, "bulk_delete", path="delete", detail=False)
 class ZoneTemplateBulkDeleteView(generic.BulkDeleteView):
     queryset = ZoneTemplate.objects.all()
     table = ZoneTemplateTable

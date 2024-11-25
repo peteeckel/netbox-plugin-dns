@@ -35,6 +35,7 @@ class CNAMEWarning(Exception):
     pass
 
 
+@register_model_view(Record, "list", path="", detail=False)
 class RecordListView(generic.ObjectListView):
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"
@@ -44,6 +45,7 @@ class RecordListView(generic.ObjectListView):
     table = RecordTable
 
 
+@register_model_view(Record, "list_managed", path="managed", detail=False)
 class ManagedRecordListView(generic.ObjectListView):
     queryset = Record.objects.filter(managed=True).prefetch_related(
         "ipam_ip_address", "address_record"
@@ -55,6 +57,7 @@ class ManagedRecordListView(generic.ObjectListView):
     template_name = "netbox_dns/record/managed.html"
 
 
+@register_model_view(Record)
 class RecordView(generic.ObjectView):
     queryset = Record.objects.prefetch_related("zone", "ptr_record")
 
@@ -158,6 +161,8 @@ class RecordView(generic.ObjectView):
         return context
 
 
+@register_model_view(Record, "add", detail=False)
+@register_model_view(Record, "edit")
 class RecordEditView(generic.ObjectEditView):
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"
@@ -166,11 +171,13 @@ class RecordEditView(generic.ObjectEditView):
     default_return_url = "plugins:netbox_dns:record_list"
 
 
+@register_model_view(Record, "delete")
 class RecordDeleteView(generic.ObjectDeleteView):
     queryset = Record.objects.filter(managed=False)
     default_return_url = "plugins:netbox_dns:record_list"
 
 
+@register_model_view(Record, "bulk_import", detail=False)
 class RecordBulkImportView(generic.BulkImportView):
     queryset = Record.objects.filter(managed=False).prefetch_related(
         "zone", "ptr_record"
@@ -180,6 +187,7 @@ class RecordBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:record_list"
 
 
+@register_model_view(Record, "bulk_edit", path="edit", detail=False)
 class RecordBulkEditView(generic.BulkEditView):
     queryset = Record.objects.filter(managed=False).prefetch_related("zone")
     filterset = RecordFilterSet
@@ -187,6 +195,7 @@ class RecordBulkEditView(generic.BulkEditView):
     form = RecordBulkEditForm
 
 
+@register_model_view(Record, "bulk_delete", path="delete", detail=False)
 class RecordBulkDeleteView(generic.BulkDeleteView):
     queryset = Record.objects.filter(managed=False)
     table = RecordTable
