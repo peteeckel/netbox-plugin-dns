@@ -29,7 +29,7 @@ zonetemplate_urlpatterns = [
     path(
         "zonetemplates/import/",
         ZoneTemplateBulkImportView.as_view(),
-        name="zonetemplate_import",
+        name="zonetemplate_bulk_import",
     ),
     path(
         "zonetemplates/edit/",

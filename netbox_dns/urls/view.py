@@ -19,7 +19,7 @@ view_urlpatterns = [
     path("views/add/", ViewEditView.as_view(), name="view_add"),
     path("views/<int:pk>/edit/", ViewEditView.as_view(), name="view_edit"),
     path("views/<int:pk>/delete/", ViewDeleteView.as_view(), name="view_delete"),
-    path("views/import/", ViewBulkImportView.as_view(), name="view_import"),
+    path("views/import/", ViewBulkImportView.as_view(), name="view_bulk_import"),
     path("views/edit/", ViewBulkEditView.as_view(), name="view_bulk_edit"),
     path("views/delete/", ViewBulkDeleteView.as_view(), name="view_bulk_delete"),
     path("views/<int:pk>/", include(get_model_urls("netbox_dns", "view"))),

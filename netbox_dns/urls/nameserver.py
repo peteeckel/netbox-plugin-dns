@@ -29,7 +29,7 @@ nameserver_urlpatterns = [
     path(
         "nameservers/import/",
         NameServerBulkImportView.as_view(),
-        name="nameserver_import",
+        name="nameserver_bulk_import",
     ),
     path(
         "nameservers/edit/",

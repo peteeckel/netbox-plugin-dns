@@ -25,7 +25,9 @@ registrar_urlpatterns = [
         name="registrar_bulk_delete",
     ),
     path(
-        "registrars/import/", RegistrarBulkImportView.as_view(), name="registrar_import"
+        "registrars/import/",
+        RegistrarBulkImportView.as_view(),
+        name="registrar_bulk_import",
     ),
     path(
         "registrars/edit/", RegistrarBulkEditView.as_view(), name="registrar_bulk_edit"
