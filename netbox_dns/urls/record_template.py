@@ -37,7 +37,7 @@ recordtemplate_urlpatterns = [
     path(
         "recordtemplates/import/",
         RecordTemplateBulkImportView.as_view(),
-        name="recordtemplate_import",
+        name="recordtemplate_bulk_import",
     ),
     path(
         "recordtemplates/edit/",

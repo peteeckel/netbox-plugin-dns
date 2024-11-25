@@ -41,7 +41,7 @@ registrationcontact_urlpatterns = [
     path(
         "registrationcontacts/import/",
         RegistrationContactBulkImportView.as_view(),
-        name="registrationcontact_import",
+        name="registrationcontact_bulk_import",
     ),
     path(
         "registrationcontacts/edit/",
