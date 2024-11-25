@@ -15,7 +15,7 @@ from netbox_dns.utilities import get_views_by_prefix
 
 
 class RelatedDNSRecords(PluginTemplateExtension):
-    models = ("ipam.ipaddress", )
+    models = ("ipam.ipaddress",)
 
     def right_page(self):
         ip_address = self.context.get("object")
@@ -51,7 +51,7 @@ class RelatedDNSRecords(PluginTemplateExtension):
 
 
 class RelatedDNSViews(PluginTemplateExtension):
-    models = ("ipam.prefix", )
+    models = ("ipam.prefix",)
 
     def right_page(self):
         prefix = self.context.get("object")
@@ -73,7 +73,7 @@ class RelatedDNSViews(PluginTemplateExtension):
             "netbox_dns/view/button.html",
             extra_context={
                 "url": reverse(
-                    "plugins:netbox_dns:prefix_views",
+                    "ipam:prefix_views",
                     kwargs={"pk": self.context.get("object").pk},
                 ),
             },
@@ -81,7 +81,7 @@ class RelatedDNSViews(PluginTemplateExtension):
 
 
 class IPRelatedDNSRecords(PluginTemplateExtension):
-    models = ("ipam.ipaddress", )
+    models = ("ipam.ipaddress",)
 
     def right_page(self):
         ip_address = self.context.get("object")

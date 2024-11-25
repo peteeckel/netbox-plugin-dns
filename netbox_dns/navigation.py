@@ -87,7 +87,7 @@ record_menu_item = PluginMenuItem(
 )
 
 managed_record_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:managed_record_list",
+    link="plugins:netbox_dns:record_list_managed",
     link_text=_("Managed Records"),
     permissions=["netbox_dns.view_record"],
 )

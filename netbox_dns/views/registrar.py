@@ -26,10 +26,7 @@ __all__ = (
 )
 
 
-class RegistrarView(generic.ObjectView):
-    queryset = Registrar.objects.all()
-
-
+@register_model_view(Registrar, "list", path="", detail=False)
 class RegistrarListView(generic.ObjectListView):
     queryset = Registrar.objects.all()
     table = RegistrarTable
@@ -37,17 +34,26 @@ class RegistrarListView(generic.ObjectListView):
     filterset_form = RegistrarFilterForm
 
 
+@register_model_view(Registrar)
+class RegistrarView(generic.ObjectView):
+    queryset = Registrar.objects.all()
+
+
+@register_model_view(Registrar, "add", detail=False)
+@register_model_view(Registrar, "edit")
 class RegistrarEditView(generic.ObjectEditView):
     queryset = Registrar.objects.all()
     form = RegistrarForm
     default_return_url = "plugins:netbox_dns:registrar_list"
 
 
+@register_model_view(Registrar, "delete")
 class RegistrarDeleteView(generic.ObjectDeleteView):
     queryset = Registrar.objects.all()
     default_return_url = "plugins:netbox_dns:registrar_list"
 
 
+@register_model_view(Registrar, "bulk_import", detail=False)
 class RegistrarBulkImportView(generic.BulkImportView):
     queryset = Registrar.objects.all()
     model_form = RegistrarImportForm
@@ -55,6 +61,7 @@ class RegistrarBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:registrar_list"
 
 
+@register_model_view(Registrar, "bulk_edit", path="edit", detail=False)
 class RegistrarBulkEditView(generic.BulkEditView):
     queryset = Registrar.objects.all()
     filterset = RegistrarFilterSet
@@ -62,6 +69,7 @@ class RegistrarBulkEditView(generic.BulkEditView):
     form = RegistrarBulkEditForm
 
 
+@register_model_view(Registrar, "bulk_delete", path="delete", detail=False)
 class RegistrarBulkDeleteView(generic.BulkDeleteView):
     queryset = Registrar.objects.all()
     table = RegistrarTable

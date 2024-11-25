@@ -15,7 +15,7 @@
 {% block breadcrumbs %}
 {% if object.managed %}
 <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_dns:managed_record_list' %}">{% trans "Managed Records" %}</a>
+    <a href="{% url 'plugins:netbox_dns:record_list_managed' %}">{% trans "Managed Records" %}</a>
 </li>
 {% else %}
 {{ block.super }}
