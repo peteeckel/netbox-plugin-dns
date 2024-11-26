@@ -35,6 +35,9 @@ ENFORCE_UNIQUE_RECORDS = settings.PLUGINS_CONFIG["netbox_dns"]["enforce_unique_r
 
 @receiver(post_clean, sender=IPAddress)
 def ipam_dnssync_ipaddress_post_clean(instance, **kwargs):
+    if not instance.dns_name:
+        return
+
     if not isinstance(instance.address, IPNetwork):
         return
 
