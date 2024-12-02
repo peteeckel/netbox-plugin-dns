@@ -94,6 +94,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
+        db_collation="natural_sort",
     )
     status = models.CharField(
         verbose_name=_("Status"),

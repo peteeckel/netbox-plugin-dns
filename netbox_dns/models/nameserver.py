@@ -31,6 +31,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Name"),
         unique=True,
         max_length=255,
+        db_collation="natural_sort",
     )
     description = models.CharField(
         verbose_name=_("Description"),
