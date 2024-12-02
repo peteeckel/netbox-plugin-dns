@@ -119,6 +119,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
+        db_collation="natural_sort",
     )
     zone = models.ForeignKey(
         verbose_name=_("Zone"),
@@ -132,6 +133,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
         blank=True,
         default=None,
+        db_collation="natural_sort",
     )
     type = models.CharField(
         verbose_name=_("Type"),

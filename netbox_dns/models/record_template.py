@@ -27,10 +27,12 @@ class RecordTemplate(NetBoxModel):
         verbose_name=_("Template Name"),
         unique=True,
         max_length=200,
+        db_collation="natural_sort",
     )
     record_name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
+        db_collation="natural_sort",
     )
     description = models.CharField(
         verbose_name=_("Description"),
