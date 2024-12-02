@@ -7,7 +7,7 @@ from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
-__version__ = "1.1.6"
+__version__ = "1.2b1"
 
 
 def _check_list(setting):
@@ -19,7 +19,7 @@ class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = _("NetBox DNS")
     description = _("NetBox plugin for DNS data")
-    min_version = "4.0.0"
+    min_version = "4.2.0"
     version = __version__
     author = "Peter Eckel"
     author_email = "pete@netbox-dns.org"
