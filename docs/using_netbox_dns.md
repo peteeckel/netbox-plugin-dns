@@ -814,6 +814,8 @@ If there are multiple matching zones within the view, the one with the longest n
 
 If there is no matching zone, no record will be created.
 
+**Please note that IPAM DNSsync currently does not directly create PTR records. Both the forward zone for the DNS Name and the reverse zone for the IP address need to exist in order for a PTR record to be created.**
+
 ### Differences from IPAM Coupling
 The main differences between IPAM DNSsync and IPAM Coupling are the much higher degree of automation of the interaction between IPAM and NetBox DNS, and the extended functionality the new feature provides compared to IPAM Coupling. In more detail:
 
