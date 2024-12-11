@@ -530,6 +530,18 @@ class RecordValidationTestCase(TestCase):
                 type=RecordTypeChoices.SVCB,
                 value="1 svc.example.com.",
             ),
+            Record(
+                name="_name17",
+                zone=f_zone,
+                type=RecordTypeChoices.DNAME,
+                value="_name17a.example.com.",
+            ),
+            Record(
+                name="_name18",
+                zone=f_zone,
+                type=RecordTypeChoices.CNAME,
+                value="_name18a.example.com.",
+            ),
         )
 
         for record in records:
