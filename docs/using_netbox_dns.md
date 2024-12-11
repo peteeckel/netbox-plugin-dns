@@ -375,7 +375,7 @@ After changing the configuration, NetBox must be restarted for the changes to ta
 The detail view for zones can provide additional information tabs about zones, depending on whether there are any objects to display:
 
 Tab name                       | Description
---------                       | --------           
+--------                       | --------
 **Records**                    | Provides a list of all (non-managed) records in the zone.
 **Managed Records**            | Provides a list of all managed records in the zone.
 **Delegation Records**         | If there are any delegation records (NS, DS or glue address records) for child zones in the zone, this tab lists them.
@@ -651,7 +651,7 @@ Variable                            | Factory Default
 --------                            | ---------------
 `tolerate_underscores_in_labels`    | `False`
 `tolerate_characters_in_zone_labels`| `''`
-`tolerate_leading_underscore_types` | `["TXT", "SRV", "TLSA"]`
+`tolerate_leading_underscore_types` | `["TXT", "SRV", "TLSA", "CNAME", "DNAME"]`
 `tolerate_non_rfc1035_types`        | `[]`
 
 The settings can be set or overridden in the file `/opt/netbox/netbox/netbox/configuration.py` by defining new values in `PLUGINS_CONFIG` as follows:
@@ -662,7 +662,7 @@ PLUGINS_CONFIG = {
         ...
         'tolerate_underscores_in_labels': True,
         'tolerate_characters_in_zone_labels': "/",
-        'tolerate_leading_underscore_types': ["TXT", "SRV", "TLSA", "CNAME"]
+        'tolerate_leading_underscore_types': ["TXT", "SRV", "TLSA", "CNAME", "DNAME", "MX"]
         'tolerate_non_rfc1035_types': ["X25"]
     },
 }

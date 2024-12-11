@@ -51,6 +51,8 @@ class DNSConfig(PluginConfig):
         "tolerate_underscores_in_labels": False,
         "tolerate_underscores_in_hostnames": False,  # Deprecated, will be removed in 1.2.0
         "tolerate_leading_underscore_types": [
+            RecordTypeChoices.CNAME,
+            RecordTypeChoices.DNAME,
             RecordTypeChoices.SRV,
             RecordTypeChoices.TLSA,
             RecordTypeChoices.TXT,
