@@ -47,7 +47,7 @@ jobs:
             with:
                 repository: "netbox-community/netbox"
                 path: netbox
-                ref: v4.1.11
+                ref: main
 
           - name: Install NetBox DNS
             working-directory: netbox-plugin-dns
