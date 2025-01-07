@@ -607,7 +607,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         self.zone_template.nameservers.set(self.nameservers[0:3])
 
-        path = self._get_url("import")
+        path = self._get_url("bulk_import")
         csv_data = (
             "name,soa_mname,soa_rname,template",
             f"test1.example.com,ns1.example.com,hostmaster.example.com,{self.zone_template.name}",
@@ -657,7 +657,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         for zone in zones:
             zone.save()
 
-        path = self._get_url("import")
+        path = self._get_url("bulk_import")
         csv_data = (
             "id,template",
             f"{zones[0].id},{self.zone_template.name}",
@@ -945,7 +945,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         self.zone_template.record_templates.set(test_templates)
 
-        path = self._get_url("import")
+        path = self._get_url("bulk_import")
         csv_data = (
             "name,soa_mname,soa_rname,template",
             f"test1.example.com,ns1.example.com,hostmaster.example.com,{self.zone_template.name}",
@@ -1003,7 +1003,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         for zone in zones:
             zone.save()
 
-        path = self._get_url("import")
+        path = self._get_url("bulk_import")
         csv_data = (
             "id,template",
             f"{zones[0].id},{self.zone_template.name}",

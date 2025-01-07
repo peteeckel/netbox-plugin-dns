@@ -225,21 +225,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"active": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
-    # DEPRECATED: Remove in 1.0
-    def test_name_servers(self):
-        params = {"name_server": [self.nameservers[0].name]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"name_server": [self.nameservers[1].name]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"name_server": [self.nameservers[2].name]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"name_server_id": [self.nameservers[0].pk]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"name_server_id": [self.nameservers[1].pk]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"name_server_id": [self.nameservers[2].pk]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-
     def test_nameserver(self):
         params = {"nameserver": [self.nameservers[0].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)

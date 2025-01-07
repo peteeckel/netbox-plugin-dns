@@ -17,6 +17,7 @@ class ZoneTemplate(NetBoxModel):
         verbose_name=_("Template Name"),
         unique=True,
         max_length=200,
+        db_collation="natural_sort",
     )
     description = models.CharField(
         verbose_name=_("Description"),

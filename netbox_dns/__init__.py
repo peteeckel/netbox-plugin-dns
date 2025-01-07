@@ -7,7 +7,7 @@ from ipam.choices import IPAddressStatusChoices
 
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
-__version__ = "1.1.6"
+__version__ = "1.2.0"
 
 
 def _check_list(setting):
@@ -19,7 +19,7 @@ class DNSConfig(PluginConfig):
     name = "netbox_dns"
     verbose_name = _("NetBox DNS")
     description = _("NetBox plugin for DNS data")
-    min_version = "4.0.0"
+    min_version = "4.2.0"
     version = __version__
     author = "Peter Eckel"
     author_email = "pete@netbox-dns.org"
@@ -49,7 +49,6 @@ class DNSConfig(PluginConfig):
         "dnssync_minimum_zone_labels": 2,
         "tolerate_characters_in_zone_labels": "",
         "tolerate_underscores_in_labels": False,
-        "tolerate_underscores_in_hostnames": False,  # Deprecated, will be removed in 1.2.0
         "tolerate_leading_underscore_types": [
             RecordTypeChoices.CNAME,
             RecordTypeChoices.DNAME,
@@ -80,6 +79,13 @@ class DNSConfig(PluginConfig):
             "tolerate_leading_underscore_types",
         ):
             _check_list(setting)
+
+        # +
+        # TODO: Remove this workaround as soon as it's no longer required
+        #
+        # Force loading views so the register_model_view is run for all views
+        # -
+        import netbox_dns.views  # noqa: F401
 
 
 #

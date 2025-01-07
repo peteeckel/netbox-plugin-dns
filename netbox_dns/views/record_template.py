@@ -1,6 +1,7 @@
 from dns import name as dns_name
 
 from netbox.views import generic
+from utilities.views import register_model_view
 
 from netbox_dns.filtersets import RecordTemplateFilterSet
 from netbox_dns.forms import (
@@ -25,6 +26,7 @@ __all__ = (
 )
 
 
+@register_model_view(RecordTemplate, "list", path="", detail=False)
 class RecordTemplateListView(generic.ObjectListView):
     queryset = RecordTemplate.objects.all()
     filterset = RecordTemplateFilterSet
@@ -32,6 +34,7 @@ class RecordTemplateListView(generic.ObjectListView):
     table = RecordTemplateTable
 
 
+@register_model_view(RecordTemplate)
 class RecordTemplateView(generic.ObjectView):
     queryset = RecordTemplate.objects.all()
 
@@ -54,17 +57,21 @@ class RecordTemplateView(generic.ObjectView):
         return context
 
 
+@register_model_view(RecordTemplate, "add", detail=False)
+@register_model_view(RecordTemplate, "edit")
 class RecordTemplateEditView(generic.ObjectEditView):
     queryset = RecordTemplate.objects.all()
     form = RecordTemplateForm
     default_return_url = "plugins:netbox_dns:recordtemplate_list"
 
 
+@register_model_view(RecordTemplate, "delete")
 class RecordTemplateDeleteView(generic.ObjectDeleteView):
     queryset = RecordTemplate.objects.all()
     default_return_url = "plugins:netbox_dns:recordtemplate_list"
 
 
+@register_model_view(RecordTemplate, "bulk_import", detail=False)
 class RecordTemplateBulkImportView(generic.BulkImportView):
     queryset = RecordTemplate.objects.all()
     model_form = RecordTemplateImportForm
@@ -72,6 +79,7 @@ class RecordTemplateBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:recordtemplate_list"
 
 
+@register_model_view(RecordTemplate, "bulk_edit", path="edit", detail=False)
 class RecordTemplateBulkEditView(generic.BulkEditView):
     queryset = RecordTemplate.objects.all()
     filterset = RecordTemplateFilterSet
@@ -79,6 +87,7 @@ class RecordTemplateBulkEditView(generic.BulkEditView):
     form = RecordTemplateBulkEditForm
 
 
+@register_model_view(RecordTemplate, "bulk_delete", path="delete", detail=False)
 class RecordTemplateBulkDeleteView(generic.BulkDeleteView):
     queryset = RecordTemplate.objects.all()
     table = RecordTemplateTable

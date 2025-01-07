@@ -22,11 +22,13 @@ class RegistrationContact(NetBoxModel):
         verbose_name=_("Contact ID"),
         max_length=50,
         unique=True,
+        db_collation="natural_sort",
     )
     name = models.CharField(
         verbose_name=_("Name"),
         blank=True,
         max_length=100,
+        db_collation="natural_sort",
     )
     description = models.CharField(
         verbose_name=_("Description"),

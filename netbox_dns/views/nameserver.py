@@ -28,6 +28,7 @@ __all__ = (
 )
 
 
+@register_model_view(NameServer, "list", path="", detail=False)
 class NameServerListView(generic.ObjectListView):
     queryset = NameServer.objects.all()
     filterset = NameServerFilterSet
@@ -35,6 +36,7 @@ class NameServerListView(generic.ObjectListView):
     table = NameServerTable
 
 
+@register_model_view(NameServer)
 class NameServerView(generic.ObjectView):
     queryset = NameServer.objects.prefetch_related("zones")
 
@@ -48,17 +50,21 @@ class NameServerView(generic.ObjectView):
         return {}
 
 
+@register_model_view(NameServer, "add", detail=False)
+@register_model_view(NameServer, "edit")
 class NameServerEditView(generic.ObjectEditView):
     queryset = NameServer.objects.all()
     form = NameServerForm
     default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
+@register_model_view(NameServer, "delete")
 class NameServerDeleteView(generic.ObjectDeleteView):
     queryset = NameServer.objects.all()
     default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
+@register_model_view(NameServer, "bulk_import", detail=False)
 class NameServerBulkImportView(generic.BulkImportView):
     queryset = NameServer.objects.all()
     model_form = NameServerImportForm
@@ -66,6 +72,7 @@ class NameServerBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
+@register_model_view(NameServer, "bulk_edit", path="edit", detail=False)
 class NameServerBulkEditView(generic.BulkEditView):
     queryset = NameServer.objects.all()
     filterset = NameServerFilterSet
@@ -73,6 +80,7 @@ class NameServerBulkEditView(generic.BulkEditView):
     form = NameServerBulkEditForm
 
 
+@register_model_view(NameServer, "bulk_delete", path="delete", detail=False)
 class NameServerBulkDeleteView(generic.BulkDeleteView):
     queryset = NameServer.objects.all()
     table = NameServerTable

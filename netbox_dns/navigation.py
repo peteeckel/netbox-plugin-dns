@@ -18,7 +18,7 @@ view_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_view"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:view_import",
+            "plugins:netbox_dns:view_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_view"],
@@ -38,7 +38,7 @@ zone_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_zone"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:zone_import",
+            "plugins:netbox_dns:zone_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_zone"],
@@ -58,7 +58,7 @@ nameserver_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_nameserver"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:nameserver_import",
+            "plugins:netbox_dns:nameserver_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_nameserver"],
@@ -78,7 +78,7 @@ record_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_record"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:record_import",
+            "plugins:netbox_dns:record_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_record"],
@@ -87,7 +87,7 @@ record_menu_item = PluginMenuItem(
 )
 
 managed_record_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:managed_record_list",
+    link="plugins:netbox_dns:record_list_managed",
     link_text=_("Managed Records"),
     permissions=["netbox_dns.view_record"],
 )
@@ -104,7 +104,7 @@ zonetemplate_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_zonetemplate"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:zonetemplate_import",
+            "plugins:netbox_dns:zonetemplate_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_zonetemplate"],
@@ -124,7 +124,7 @@ recordtemplate_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_recordtemplate"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:recordtemplate_import",
+            "plugins:netbox_dns:recordtemplate_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_recordtemplate"],
@@ -144,7 +144,7 @@ registrar_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_registrar"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:registrar_import",
+            "plugins:netbox_dns:registrar_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_registrar"],
@@ -164,7 +164,7 @@ contact_menu_item = PluginMenuItem(
             permissions=["netbox_dns.add_registrationcontact"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:registrationcontact_import",
+            "plugins:netbox_dns:registrationcontact_bulk_import",
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_registrationcontact"],

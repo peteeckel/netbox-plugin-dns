@@ -30,10 +30,7 @@ __all__ = (
 )
 
 
-class ViewView(generic.ObjectView):
-    queryset = View.objects.prefetch_related("zones")
-
-
+@register_model_view(View, "list", path="", detail=False)
 class ViewListView(generic.ObjectListView):
     queryset = View.objects.all()
     table = ViewTable
@@ -41,17 +38,26 @@ class ViewListView(generic.ObjectListView):
     filterset_form = ViewFilterForm
 
 
+@register_model_view(View)
+class ViewView(generic.ObjectView):
+    queryset = View.objects.prefetch_related("zones")
+
+
+@register_model_view(View, "add", detail=False)
+@register_model_view(View, "edit")
 class ViewEditView(generic.ObjectEditView):
     queryset = View.objects.all()
     form = ViewForm
     default_return_url = "plugins:netbox_dns:view_list"
 
 
+@register_model_view(View, "delete")
 class ViewDeleteView(generic.ObjectDeleteView):
     queryset = View.objects.all()
     default_return_url = "plugins:netbox_dns:view_list"
 
 
+@register_model_view(View, "bulk_import", detail=False)
 class ViewBulkImportView(generic.BulkImportView):
     queryset = View.objects.all()
     model_form = ViewImportForm
@@ -59,6 +65,7 @@ class ViewBulkImportView(generic.BulkImportView):
     default_return_url = "plugins:netbox_dns:view_list"
 
 
+@register_model_view(View, "bulk_edit", path="edit", detail=False)
 class ViewBulkEditView(generic.BulkEditView):
     queryset = View.objects.all()
     filterset = ViewFilterSet
@@ -66,11 +73,13 @@ class ViewBulkEditView(generic.BulkEditView):
     form = ViewBulkEditForm
 
 
+@register_model_view(View, "bulk_delete", path="delete", detail=False)
 class ViewBulkDeleteView(generic.BulkDeleteView):
     queryset = View.objects.all()
     table = ViewTable
 
 
+@register_model_view(Prefix, "views", path="assign-views")
 class ViewPrefixEditView(generic.ObjectEditView):
     queryset = Prefix.objects.all()
     form = ViewPrefixEditForm
