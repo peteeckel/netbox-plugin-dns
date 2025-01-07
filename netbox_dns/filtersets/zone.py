@@ -29,20 +29,6 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("View"),
     )
-    # DEPRECATED: Remove in 1.1
-    name_server_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=NameServer.objects.all(),
-        field_name="nameservers",
-        to_field_name="id",
-        label=_("Nameserver IDs"),
-    )
-    # DEPRECATED: Remove in 1.1
-    name_server = django_filters.ModelMultipleChoiceFilter(
-        queryset=NameServer.objects.all(),
-        field_name="nameservers__name",
-        to_field_name="name",
-        label=_("Nameservers"),
-    )
     nameserver_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="nameservers",
