@@ -1,7 +1,7 @@
 import re
 import textwrap
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 
 from netbox_dns.models import Zone, Record, NameServer
@@ -656,6 +656,181 @@ class RecordValidationTestCase(TestCase):
                 zone=f_zone,
                 type=RecordTypeChoices.SVCB,
                 value=r"1 svc.[#^$[¨}!;--_?:.@/\ˇ´%].com.",
+            ),
+        )
+
+        for record in records:
+            with self.assertRaises(ValidationError):
+                record.save()
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "tolerate_underscores_in_labels": False,
+                "tolerate_leading_underscore_types": ["TXT", "SRV", "TLSA"],
+                "tolerate_non_rfc1035_types": [
+                    RecordTypeChoices.CNAME,
+                    RecordTypeChoices.DNAME,
+                    RecordTypeChoices.HTTPS,
+                    RecordTypeChoices.MX,
+                    RecordTypeChoices.NS,
+                    RecordTypeChoices.NAPTR,
+                    RecordTypeChoices.NSEC,
+                    RecordTypeChoices.PTR,
+                    RecordTypeChoices.RP,
+                    RecordTypeChoices.RT,
+                    RecordTypeChoices.PX,
+                    RecordTypeChoices.SRV,
+                    RecordTypeChoices.SVCB,
+                ],
+            }
+        }
+    )
+    def test_tolerate_invalid_name_in_value(self):
+        f_zone = self.zones[0]
+        r_zone = self.zones[2]
+
+        records = (
+            Record(
+                name="name1",
+                zone=f_zone,
+                type=RecordTypeChoices.CNAME,
+                value="_invalid_record_.zone1.example.com.",
+            ),
+            Record(
+                name="name2", zone=f_zone, type=RecordTypeChoices.CNAME, value="aa--bb"
+            ),
+            Record(
+                name="name3",
+                zone=f_zone,
+                type=RecordTypeChoices.DNAME,
+                value="f#ck&&%%.example.com.",
+            ),
+            Record(
+                name="name4",
+                zone=f_zone,
+                type=RecordTypeChoices.HTTPS,
+                value="0 [].example.com.",
+            ),
+            Record(
+                name="name6",
+                zone=f_zone,
+                type=RecordTypeChoices.MX,
+                value="10 bla*.example.com.",
+            ),
+            Record(
+                name="name7",
+                zone=f_zone,
+                type=RecordTypeChoices.NS,
+                value=r"[#^$[¨}!;--_?:.@/\ˇ´%].example.com.",
+            ),
+            Record(
+                name="name8",
+                zone=f_zone,
+                type=RecordTypeChoices.NAPTR,
+                value='100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp._invalid_record_.com.',
+            ),
+            Record(
+                name="name10",
+                zone=f_zone,
+                type=RecordTypeChoices.NSEC,
+                value=r"name11.[#^$[¨}!;--_?:.@/\ˇ´%].example.com.",
+            ),
+            Record(
+                name="1",
+                zone=r_zone,
+                type=RecordTypeChoices.PTR,
+                value=r"name11.[#^$[¨}!;--_?:.@/\ˇ´%].com.",
+            ),
+            Record(
+                name="name12",
+                zone=f_zone,
+                type=RecordTypeChoices.RP,
+                value="admin.aa--bb.example.com. info.zone1.example.com.",
+            ),
+            Record(
+                name="name14",
+                zone=f_zone,
+                type=RecordTypeChoices.RT,
+                value=r"10 name99.[#^$[¨}!;--_?:.@/\ˇ´%].example.com.",
+            ),
+            Record(
+                name="name15",
+                zone=f_zone,
+                type=RecordTypeChoices.PX,
+                value="10 name10.zo--ne1.example.com. name11.zone1.example.com.",
+            ),
+            Record(
+                name="name16",
+                zone=f_zone,
+                type=RecordTypeChoices.PX,
+                value="10 name10.zone1.example.com. na--me11.zone1.example.com.",
+            ),
+            Record(
+                name="name17",
+                zone=f_zone,
+                type=RecordTypeChoices.SRV,
+                value=r"10 60 443 [#^$[¨}!;--_?:.@/\ˇ´%].zone1.example.com.",
+            ),
+            Record(
+                name="name18",
+                zone=f_zone,
+                type=RecordTypeChoices.SVCB,
+                value=r"1 svc.[#^$[¨}!;--_?:.@/\ˇ´%].com.",
+            ),
+        )
+
+        for record in records:
+            record.save()
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {
+                "tolerate_underscores_in_labels": False,
+                "tolerate_leading_underscore_types": ["TXT", "SRV", "TLSA"],
+                "tolerate_non_rfc1035_types": [
+                    RecordTypeChoices.CNAME,
+                    RecordTypeChoices.KX,
+                    RecordTypeChoices.NAPTR,
+                    RecordTypeChoices.NSAP_PTR,
+                    RecordTypeChoices.RP,
+                ],
+            }
+        }
+    )
+    def test_tolerate_invalid_name_in_value_invalid_idn_fail(self):
+        f_zone = self.zones[0]
+
+        records = (
+            Record(
+                name="name1",
+                zone=f_zone,
+                type=RecordTypeChoices.CNAME,
+                value="xn--bb.zone1.example.com.",
+            ),
+            Record(
+                name="name5",
+                zone=f_zone,
+                type=RecordTypeChoices.KX,
+                value="10 xn--bb.example.com.",
+            ),
+            Record(
+                name="name8",
+                zone=f_zone,
+                type=RecordTypeChoices.NAPTR,
+                value='100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.xn--bb.com.',
+            ),
+            Record(
+                name="67894444333322220000",
+                zone=f_zone,
+                type=RecordTypeChoices.NSAP_PTR,
+                value="name1.xn--bb.com.",
+            ),
+            Record(
+                name="name13",
+                zone=f_zone,
+                type=RecordTypeChoices.RP,
+                value="admin.example.com. xn--bb.zone1.example.com.",
             ),
         )
 
