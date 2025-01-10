@@ -7,6 +7,8 @@ from dns.exception import SyntaxError
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
+from netbox.plugins.utils import get_plugin_config
+
 from netbox_dns.choices import RecordClassChoices, RecordTypeChoices
 from netbox_dns.validators import (
     validate_fqdn,
@@ -76,14 +78,19 @@ def validate_record_value(record):
             ).format(value=record.value, type=record.type, error=exc)
         )
 
+    skip_name_validation = record.type in get_plugin_config(
+        "netbox_dns", "tolerate_non_rfc1035_types", default=[]
+    )
+
     match record.type:
         case RecordTypeChoices.CNAME:
             _validate_idn(rr.target)
-            validate_domain_name(
-                rr.target.to_text(),
-                always_tolerant=True,
-                allow_empty_label=True,
-            )
+            if not skip_name_validation:
+                validate_domain_name(
+                    rr.target.to_text(),
+                    always_tolerant=True,
+                    allow_empty_label=True,
+                )
 
         case (
             RecordTypeChoices.NS
@@ -92,38 +99,46 @@ def validate_record_value(record):
             | RecordTypeChoices.SVCB
         ):
             _validate_idn(rr.target)
-            validate_domain_name(rr.target.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_domain_name(rr.target.to_text(), always_tolerant=True)
 
         case RecordTypeChoices.DNAME:
             _validate_idn(rr.target)
-            validate_domain_name(
-                rr.target.to_text(), always_tolerant=True, zone_name=True
-            )
+            if not skip_name_validation:
+                validate_domain_name(
+                    rr.target.to_text(), always_tolerant=True, zone_name=True
+                )
 
         case RecordTypeChoices.PTR | RecordTypeChoices.NSAP_PTR:
             _validate_idn(rr.target)
-            validate_fqdn(rr.target.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_fqdn(rr.target.to_text(), always_tolerant=True)
 
         case RecordTypeChoices.MX | RecordTypeChoices.RT | RecordTypeChoices.KX:
             _validate_idn(rr.exchange)
-            validate_domain_name(rr.exchange.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_domain_name(rr.exchange.to_text(), always_tolerant=True)
 
         case RecordTypeChoices.NSEC:
             _validate_idn(rr.next)
-            validate_domain_name(rr.next.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_domain_name(rr.next.to_text(), always_tolerant=True)
 
         case RecordTypeChoices.RP:
             _validate_idn(rr.mbox)
-            validate_domain_name(rr.mbox.to_text(), always_tolerant=True)
             _validate_idn(rr.txt)
-            validate_domain_name(rr.txt.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_domain_name(rr.mbox.to_text(), always_tolerant=True)
+                validate_domain_name(rr.txt.to_text(), always_tolerant=True)
 
         case RecordTypeChoices.NAPTR:
             _validate_idn(rr.replacement)
-            validate_generic_name(rr.replacement.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_generic_name(rr.replacement.to_text(), always_tolerant=True)
 
         case RecordTypeChoices.PX:
             _validate_idn(rr.map822)
-            validate_domain_name(rr.map822.to_text(), always_tolerant=True)
             _validate_idn(rr.mapx400)
-            validate_domain_name(rr.mapx400.to_text(), always_tolerant=True)
+            if not skip_name_validation:
+                validate_domain_name(rr.map822.to_text(), always_tolerant=True)
+                validate_domain_name(rr.mapx400.to_text(), always_tolerant=True)
