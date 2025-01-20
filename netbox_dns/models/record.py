@@ -3,6 +3,7 @@ import netaddr
 
 import dns
 from dns import name as dns_name
+from dns import rdata
 
 from django.core.exceptions import ValidationError
 from django.db import transaction, models
@@ -22,7 +23,11 @@ from netbox_dns.fields import AddressField
 from netbox_dns.utilities import arpa_to_prefix, name_to_unicode, get_query_from_filter
 from netbox_dns.validators import validate_generic_name, validate_record_value
 from netbox_dns.mixins import ObjectModificationMixin
-from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+from netbox_dns.choices import (
+    RecordTypeChoices,
+    RecordStatusChoices,
+    RecordClassChoices,
+)
 
 
 __all__ = (
@@ -633,6 +638,43 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     )
                 }
             )
+
+    @property
+    def absolute_value(self):
+        zone = dns_name.from_text(self.zone.name)
+        rr = rdata.from_text(RecordClassChoices.IN, self.type, self.value)
+
+        match self.type:
+            case (
+                RecordTypeChoices.CNAME
+                | RecordTypeChoices.DNAME
+                | RecordTypeChoices.NS
+                | RecordTypeChoices.HTTPS
+                | RecordTypeChoices.SRV
+                | RecordTypeChoices.SVCB
+            ):
+                return rr.replace(target=rr.target.derelativize(zone)).to_text()
+
+            case RecordTypeChoices.MX | RecordTypeChoices.RT | RecordTypeChoices.KX:
+                return rr.replace(exchange=rr.exchange.derelativize(zone)).to_text()
+
+            case RecordTypeChoices.RP:
+                return rr.replace(
+                    mbox=rr.mbox.derelativize(zone), txt=rr.txt.derelativize(zone)
+                ).to_text()
+
+            case RecordTypeChoices.NAPTR:
+                return rr.replace(
+                    replacement=rr.replacement.derelativize(zone)
+                ).to_text()
+
+            case RecordTypeChoices.PX:
+                return rr.replace(
+                    map822=rr.map822.derelativize(zone),
+                    mapx400=rr.mapx400.derelativize(zone),
+                ).to_text()
+
+        return self.value
 
     def handle_conflicting_address_records(self):
         if self.ipam_ip_address is None or not self.is_active:
