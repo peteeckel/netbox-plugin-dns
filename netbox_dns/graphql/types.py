@@ -134,6 +134,7 @@ class NetBoxDNSRecordType(NetBoxObjectType):
     zone: Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
     type: str
     value: str
+    absolute_value: str
     status: str
     ttl: BigInt | None
     managed: bool
