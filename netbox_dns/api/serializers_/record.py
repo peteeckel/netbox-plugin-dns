@@ -75,6 +75,7 @@ class RecordSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
             "ipam_ip_address",
+            "absolute_value",
         )
         brief_fields = (
             "id",
