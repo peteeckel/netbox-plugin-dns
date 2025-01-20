@@ -53,6 +53,7 @@ class DNSConfig(PluginConfig):
             RecordTypeChoices.CNAME,
             RecordTypeChoices.DNAME,
             RecordTypeChoices.SRV,
+            RecordTypeChoices.SVCB,
             RecordTypeChoices.TLSA,
             RecordTypeChoices.TXT,
         ],

@@ -651,7 +651,7 @@ Variable                            | Factory Default
 --------                            | ---------------
 `tolerate_underscores_in_labels`    | `False`
 `tolerate_characters_in_zone_labels`| `''`
-`tolerate_leading_underscore_types` | `["TXT", "SRV", "TLSA", "CNAME", "DNAME"]`
+`tolerate_leading_underscore_types` | `["TXT", "SRV", "SVCB", "TLSA", "CNAME", "DNAME"]`
 `tolerate_non_rfc1035_types`        | `[]`
 
 The settings can be set or overridden in the file `/opt/netbox/netbox/netbox/configuration.py` by defining new values in `PLUGINS_CONFIG` as follows:
@@ -662,7 +662,7 @@ PLUGINS_CONFIG = {
         ...
         'tolerate_underscores_in_labels': True,
         'tolerate_characters_in_zone_labels': "/",
-        'tolerate_leading_underscore_types': ["TXT", "SRV", "TLSA", "CNAME", "DNAME", "MX"]
+        'tolerate_leading_underscore_types': ["TXT", "SRV", "SVCB", "TLSA", "CNAME", "DNAME", "MX"]
         'tolerate_non_rfc1035_types': ["X25"]
     },
 }
