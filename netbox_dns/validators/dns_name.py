@@ -28,7 +28,7 @@ def _get_label(tolerate_leading_underscores=False, always_tolerant=False):
 
     tolerate_underscores = get_plugin_config(
         "netbox_dns", "tolerate_underscores_in_labels"
-    ) or get_plugin_config("netbox_dns", "tolerate_underscores_in_hostnames")
+    )
 
     if tolerate_leading_underscores:
         if tolerate_underscores:
