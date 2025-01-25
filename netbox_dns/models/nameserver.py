@@ -50,6 +50,7 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     clone_fields = (
         "name",
         "description",
+        "tenant",
     )
 
     class Meta:

@@ -227,6 +227,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "ttl",
         "disable_ptr",
         "description",
+        "tenant",
     )
 
     class Meta:

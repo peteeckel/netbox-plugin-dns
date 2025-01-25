@@ -64,6 +64,7 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     clone_fields = (
         "name",
         "description",
+        "tenant",
     )
 
     @classmethod
