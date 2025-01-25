@@ -271,6 +271,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "soa_expire",
         "soa_minimum",
         "description",
+        "tenant",
     )
 
     class Meta:
