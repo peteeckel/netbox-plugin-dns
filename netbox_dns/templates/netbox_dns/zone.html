@@ -1,6 +1,8 @@
 {% extends 'netbox_dns/zone/base.html' %}
 {% load helpers %}
 {% load i18n %}
+{% load netbox_dns %}
+{% load tz %}
 
 {% block content %}
 <div class="row">
@@ -118,7 +120,14 @@
                 {% if object.soa_serial_auto %}
                 <tr>
                     <th scope="row">{% trans "Serial (auto-generated)" %}</th>
-                    <td>{{ object.soa_serial }}</td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>{{ object.soa_serial }}</td>
+                                <td align="right" class="text-muted">{{ object.soa_serial|epoch_to_utc|isodatetime }}</td>
+                           </tr>
+                       </table>
+                   </td>
                 </tr>
                 {% else %}
                 <tr>
