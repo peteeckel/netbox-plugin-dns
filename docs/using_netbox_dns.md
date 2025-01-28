@@ -835,7 +835,8 @@ The main differences between IPAM DNSsync and IPAM Coupling are the much higher 
 	* the update of the zone SOA SERIAL for the RFC2317 CNAME record zone
 	* the creation of a new SOA record for the RFC2317 CNAME record zone
 
-	and that is the simplest case. Updating records, changing view assignments, renaming zones etc. can each create the same operations for multiple records, and whether or not these actions are performed is depending on not only the operation itself, but also the data that is changed. This is a nightmare to validate, and a squared nightmare to test. Maintaining object permission validation was just impractical as long as Django's functionality does not change, so the functionality was dropped. If necessary, restrictions can be implemented using NetBox custom validators, but that is out of scope for this plugin.
+	and that is the simplest case. Updating records, changing view assignments, renaming zones etc. can each create the same operations for multiple records, and whether or not these actions are performed is depending on not only the operation itself, but also the data that is changed. This is a nightmare to validate, and a squared nightmare to test. Maintaining object permission validation was just impractical as long as Django's functionality does not change, so the functionality was dropped. If necessary, restrictions can be implemented using NetBox custom validators (see [examples/custom-validation/dnssync_dns_permission_validation.py](examples/custom-validation/dnssync_dns_permission_validation.py)), but that is out of scope for this plugin.
+
 * IPAM DNSsync no longer overwrites the 'DNS Name' field of IP addresses but uses it to create DNS records. There is one downside to this, which is that IDNs cannot be entered directly but have to be formulated in Punycode, but on the upside the 'DNS Name' field is now properly validated.
 
 ### Multiple assigned views per prefix
