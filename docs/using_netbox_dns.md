@@ -410,7 +410,7 @@ For records the following fields are defined:
 Field           | Required | Explanation
 -----           | -------- | -----------
 **Zone**        | Yes      | The zone in which the record is to be defined
-**Type**        | Yes      | The type of the resource record. This can be one of a list of record types derived from [RFC 1035, Section 3.3](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3), e.g. A or AAAA
+**Type**        | Yes      | The type of the resource record. This can be one of a list of record types derived from [RFC 1035, Section 3.3](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3), e.g. A or AAAA. The list of record types can be limited using the configuration variable `filter_record_types`.
 **Disable PTR** | Yes      | A checkbox indicating whether a PTR record should be generated for an A or AAAA record automatically if there is a zone suitable for the PTR in NetBox DNS
 **Name**        | Yes      | The name of the record, e.g. the simple host name for A and AAAA records
 **Value**       | Yes      | The value of the record, e.g. the IPv4 or IPv6 addreess
@@ -450,6 +450,20 @@ Records can either be displayed by opening the record list view from the "Record
 
 #### Importing records
 When importing records in bulk, the mandatory fields are `name`, `zone`, `type` and `value`. If the optional `view` field is not specified, NetBox DNS will always look for the zone specified in `zone` in the default view. To address zones in non-default views, the `view` field must also be specified.
+
+#### Configuration options
+The configuration variable `filter_record_types` can be used to limit the list of record types that are available in the GUI forms. For example if you are tired of IPv4 the creation of `A` records can be disabled by setting
+
+```
+PLUGINS_CONFIG = {
+    "netbox_dns": {
+        ...
+        "filter_record_types": [ "A" ],
+        ...
+    }
+}
+```
+
 ### Registrars
 Registrar objects relate to the DNS domain registration and represent the registrar information for DNS domains related to zones. A DNS zone does not necessarily need to be registered: Zones that are not available via public DNS or that are sub-zones of registered zones do not require registration. In most cases registration information is only required (and possible) for second-level domains.
 

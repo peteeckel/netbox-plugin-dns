@@ -21,7 +21,7 @@ from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import RecordTemplate, ZoneTemplate
-from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+from netbox_dns.choices import RecordSelectableTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
 
@@ -41,6 +41,11 @@ class RecordTemplateForm(TenancyForm, NetBoxModelForm):
         if initial_record_name:
             self.initial["record_name"] = name_to_unicode(initial_record_name)
 
+    type = forms.ChoiceField(
+        choices=add_blank_choice(RecordSelectableTypeChoices),
+        required=True,
+        label=_("Type"),
+    )
     disable_ptr = forms.BooleanField(
         required=False,
         label=_("Disable PTR"),
@@ -103,7 +108,7 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
 
     type = forms.MultipleChoiceField(
-        choices=RecordTypeChoices,
+        choices=RecordSelectableTypeChoices,
         required=False,
         label=_("Type"),
     )
@@ -142,7 +147,7 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 class RecordTemplateImportForm(NetBoxModelImportForm):
     type = CSVChoiceField(
-        choices=RecordTypeChoices,
+        choices=RecordSelectableTypeChoices,
         required=True,
         label=_("Type"),
     )
@@ -187,7 +192,7 @@ class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
     model = RecordTemplate
 
     type = forms.ChoiceField(
-        choices=add_blank_choice(RecordTypeChoices),
+        choices=add_blank_choice(RecordSelectableTypeChoices),
         required=False,
         label=_("Type"),
     )
