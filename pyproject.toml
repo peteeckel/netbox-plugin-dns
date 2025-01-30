@@ -1,6 +1,6 @@
 [project]
 name = "netbox-plugin-dns"
-version = "1.2.1"
+version = "1.2.2"
 description = "NetBox DNS is a NetBox plugin for managing DNS data."
 authors = [
     {name="Peter Eckel", email="pete@netbox-dns.org"},
