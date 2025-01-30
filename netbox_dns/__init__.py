@@ -36,6 +36,7 @@ class DNSConfig(PluginConfig):
             ZoneStatusChoices.STATUS_ACTIVE,
             ZoneStatusChoices.STATUS_DYNAMIC,
         ],
+        "filter_record_types": [],
         "record_active_status": [
             RecordStatusChoices.STATUS_ACTIVE,
         ],

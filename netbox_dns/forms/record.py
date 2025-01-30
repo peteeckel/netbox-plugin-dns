@@ -21,7 +21,7 @@ from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import View, Zone, Record
-from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+from netbox_dns.choices import RecordSelectableTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 
 
@@ -56,6 +56,11 @@ class RecordForm(TenancyForm, NetBoxModelForm):
             "view_id": "$view",
         },
         label=_("Zone"),
+    )
+    type = forms.ChoiceField(
+        choices=add_blank_choice(RecordSelectableTypeChoices),
+        required=True,
+        label=_("Type"),
     )
 
     disable_ptr = forms.BooleanField(
@@ -123,7 +128,7 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
 
     type = forms.MultipleChoiceField(
-        choices=RecordTypeChoices,
+        choices=RecordSelectableTypeChoices,
         required=False,
         label=_("Type"),
     )
@@ -210,7 +215,7 @@ class RecordImportForm(NetBoxModelImportForm):
         help_text=_("This field is required if the zone is not in the default view"),
     )
     type = CSVChoiceField(
-        choices=RecordTypeChoices,
+        choices=RecordSelectableTypeChoices,
         required=True,
         label=_("Type"),
     )
@@ -268,7 +273,7 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
         label=_("Zone"),
     )
     type = forms.ChoiceField(
-        choices=add_blank_choice(RecordTypeChoices),
+        choices=add_blank_choice(RecordSelectableTypeChoices),
         required=False,
         label=_("Type"),
     )
