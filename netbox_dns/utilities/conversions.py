@@ -13,6 +13,7 @@ __all__ = (
     "name_to_unicode",
     "value_to_unicode",
     "normalize_name",
+    "network_to_reverse",
 )
 
 
@@ -81,3 +82,27 @@ def normalize_name(name):
 
     except DNSException as exc:
         raise NameFormatError from exc
+
+
+def network_to_reverse(network):
+    try:
+        ip_network = IPNetwork(network)
+    except AddrFormatError:
+        return
+
+    if ip_network.first == ip_network.last:
+        return
+
+    labels = None
+    match ip_network.version:
+        case 4:
+            if not ip_network.prefixlen % 8:
+                labels = 3 + ip_network.prefixlen // 8
+        case 6:
+            if not ip_network.prefixlen % 4:
+                labels = 3 + ip_network.prefixlen // 4
+        case _:
+            return
+
+    if labels:
+        return ".".join(ip_network[0].reverse_dns.split(".")[-labels:])

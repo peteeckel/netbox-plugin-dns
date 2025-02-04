@@ -35,7 +35,7 @@ from netbox_dns.models import (
     ZoneTemplate,
 )
 from netbox_dns.choices import ZoneStatusChoices
-from netbox_dns.utilities import name_to_unicode
+from netbox_dns.utilities import name_to_unicode, network_to_reverse
 from netbox_dns.fields import RFC2317NetworkFormField
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
 
@@ -306,6 +306,13 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             if self.cleaned_data["default_ttl"]
             else self.initial["default_ttl"]
         )
+
+    def clean_name(self):
+        name = self.cleaned_data["name"]
+        if reverse_name := network_to_reverse(name):
+            return reverse_name
+        else:
+            return name
 
     class Meta:
         model = Zone
