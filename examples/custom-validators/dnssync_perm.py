@@ -9,16 +9,15 @@
 # RFC2317 records etc.
 #
 
-from django.db import transaction, models
+from django.db import transaction
 from extras.validators import CustomValidator
-from netbox.plugins.utils import get_plugin_config, get_installed_plugins
+from netbox.plugins.utils import get_plugin_config
 from django.db.models.base import Model
 
 
 def name_is_allowed(dns_name, ipaddress, request):
-    from netbox_dns.models.zone import Zone
-    from netbox_dns.models.record import Record
-    from netbox_dns.utilities.ipam_dnssync import get_zones
+    from netbox_dns.models import Record
+    from netbox_dns.utilities import get_zones
 
     # Dnssync is disabled, name is allowed
     if get_plugin_config("netbox_dns", "dnssync_disabled"):
