@@ -1,4 +1,5 @@
 import re
+from socket import inet_aton
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -94,6 +95,14 @@ def validate_domain_name(
         always_tolerant or get_plugin_config("netbox_dns", "enable_root_zones")
     ):
         return
+
+    try:
+        inet_aton(name)
+        raise ValidationError(
+            _("{name} is not a valid DNS domain name").format(name=name)
+        )
+    except OSError:
+        pass
 
     label, zone_label = _get_label(always_tolerant=always_tolerant)
     if zone_name:
