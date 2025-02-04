@@ -53,6 +53,8 @@ class ZoneNameValidationTestCase(TestCase):
             + ".example.com.",  # 256 octets, trailing dot
             ".",  # root zone
             "0/25.2.0.192.in-addr.arpa",  # RFC 2317 sample zone including "/"
+            "10.0.0.42",  # Name is interpreted as IP address by inet_aton
+            "0x2a",  # Name is interpreted as IP address by inet_aton
         )
 
         for name in names:
