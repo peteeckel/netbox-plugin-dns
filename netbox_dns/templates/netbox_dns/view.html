@@ -21,6 +21,7 @@
                         <td style="word-break:break-all;">{{ object.description }}</td>
                     </tr>
                     {% endif %}
+                    {% if object.tenant %}
                     <tr>
                         <th scope="row">{% trans "Tenant" %}</th>
                         <td>
@@ -30,6 +31,7 @@
                             {{ object.tenant|linkify|placeholder }}
                         </td>
                     </tr>
+                    {% endif %}
                 </table>
             </div>
             {% include 'inc/panels/custom_fields.html' %}

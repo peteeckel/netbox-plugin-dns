@@ -63,17 +63,6 @@
                     <td><a href="{% url 'plugins:netbox_dns:zone_records' pk=object.zone.pk %}">{{ object.zone }}</a></td>
                     {% endif %}
                 </tr>
-                {% if not object.managed or object.tenant %}
-                <tr>
-                    <th scope="row">{% trans "Tenant" %}</th>
-                    <td>
-                        {% if object.tenant.group %}
-                            {{ object.tenant.group|linkify }} /
-                        {% endif %}
-                        {{ object.tenant|linkify|placeholder }}
-                    </td>
-                </tr>
-                {% endif %}
                 <tr>
                     <th scope="row">{% trans "Type" %}</th>
                     <td>{{ object.type }}</td>
@@ -82,16 +71,33 @@
                     <th scope="row">{% trans "Value" %}</th>
                     <td style="word-break:break-all;">{{ object.value }}</td>
                 </tr>
+                {% if unicode_value %}
+                <tr>
+                    <th scope="row">{% trans "Unicode Value" %}</th>
+                    <td style="word-break:break-all;">{{ unicode_value }}</td>
+                </tr>
+                {% endif %}
                 {% if cname_warning %}
                 <tr class="text-warning">
                     <th scope="row">{% trans "Warning" %}</th>
                     <td>{{ cname_warning }}</td>
                 </tr>
                 {% endif %}
-                {% if unicode_value %}
+                {% if object.description %}
                 <tr>
-                    <th scope="row">{% trans "Unicode Value" %}</th>
-                    <td style="word-break:break-all;">{{ unicode_value }}</td>
+                    <th scope="row">{% trans "Description" %}</th>
+                    <td style="word-break:break-all;">{{ object.description }}</td>
+                </tr>
+                {% endif %}
+                {% if object.tenant %}
+                <tr>
+                    <th scope="row">{% trans "Tenant" %}</th>
+                    <td>
+                        {% if object.tenant.group %}
+                            {{ object.tenant.group|linkify }} /
+                        {% endif %}
+                        {{ object.tenant|linkify|placeholder }}
+                    </td>
                 </tr>
                 {% endif %}
                 <tr>
@@ -132,12 +138,6 @@
                     <th scope="row">Status</th>
                     <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
                 </tr>
-                {% if object.description %}
-                <tr>
-                    <th scope="row">{% trans "Description" %}</th>
-                    <td style="word-break:break-all;">{{ object.description }}</td>
-                </tr>
-                {% endif %}
             </table>
         </div>
         {% if cname_target_table %}

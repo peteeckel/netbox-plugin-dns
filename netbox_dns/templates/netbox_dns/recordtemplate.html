@@ -25,6 +25,12 @@
                     <td style="word-break:break-all;">{{ unicode_name }}</td>
                 </tr>
                 {% endif %}
+                {% if object.description %}
+                <tr>
+                    <th scope="row">{% trans "Description" %}</th>
+                    <td style="word-break:break-all;">{{ object.description }}</td>
+                </tr>
+                {% endif %}
                 {% if object.tenant %}
                 <tr>
                     <th scope="row">{% trans "Tenant" %}</th>
@@ -64,12 +70,6 @@
                     <th scope="row">{% trans "Status" %}</th>
                     <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
                 </tr>
-                {% if object.description %}
-                <tr>
-                    <th scope="row">{% trans "Description" %}</th>
-                    <td style="word-break:break-all;">{{ object.description }}</td>
-                </tr>
-                {% endif %}
             </table>
         </div>
         {% include 'inc/panels/custom_fields.html' %}
