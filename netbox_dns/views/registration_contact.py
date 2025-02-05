@@ -73,6 +73,7 @@ class RegistrationContactBulkEditView(generic.BulkEditView):
 @register_model_view(RegistrationContact, "bulk_delete", path="delete", detail=False)
 class RegistrationContactBulkDeleteView(generic.BulkDeleteView):
     queryset = RegistrationContact.objects.all()
+    filterset = RegistrationContactFilterSet
     table = RegistrationContactTable
 
 

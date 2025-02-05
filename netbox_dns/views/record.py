@@ -198,6 +198,7 @@ class RecordBulkEditView(generic.BulkEditView):
 @register_model_view(Record, "bulk_delete", path="delete", detail=False)
 class RecordBulkDeleteView(generic.BulkDeleteView):
     queryset = Record.objects.filter(managed=False)
+    filterset = RecordFilterSet
     table = RecordTable
 
 

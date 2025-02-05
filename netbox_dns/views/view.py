@@ -76,6 +76,7 @@ class ViewBulkEditView(generic.BulkEditView):
 @register_model_view(View, "bulk_delete", path="delete", detail=False)
 class ViewBulkDeleteView(generic.BulkDeleteView):
     queryset = View.objects.all()
+    filterset = ViewFilterSet
     table = ViewTable
 
 

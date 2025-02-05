@@ -101,6 +101,7 @@ class ZoneBulkEditView(generic.BulkEditView):
 @register_model_view(Zone, "bulk_delete", path="delete", detail=False)
 class ZoneBulkDeleteView(generic.BulkDeleteView):
     queryset = Zone.objects.all()
+    filterset = ZoneFilterSet
     table = ZoneTable
 
 
