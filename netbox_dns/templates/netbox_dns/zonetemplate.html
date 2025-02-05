@@ -21,6 +21,7 @@
                     <td style="word-break:break-all;">{{ object.description }}</td>
                 </tr>
                 {% endif %}
+                {% if object.tenant %}
                 <tr>
                     <th scope="row">{% trans "Tenant" %}</th>
                     <td>
@@ -30,6 +31,7 @@
                         {{ object.tenant|linkify|placeholder }}
                     </td>
                 </tr>
+                {% endif %}
                 <tr>
                     <th scope="row">{% trans "Nameservers" %}</th>
                     <td>
@@ -39,10 +41,6 @@
                             {% endfor %}
                         </table>
                     </td>
-                </tr>
-                <tr>
-                    <th scope="row">{% trans "Description" %}</th>
-                    <td>{{ object.description }}</td>
                 </tr>
             </table>
         </div>

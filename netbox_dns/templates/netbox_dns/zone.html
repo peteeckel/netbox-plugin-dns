@@ -36,6 +36,7 @@
                     <td style="word-break:break-all;">{{ object.description }}</td>
                 </tr>
                 {% endif %}
+                {% if object.tenant %}
                 <tr>
                     <th scope="row">{% trans "Tenant" %}</th>
                     <td>
@@ -45,6 +46,7 @@
                         {{ object.tenant|linkify|placeholder }}
                     </td>
                 </tr>
+                {% endif %}
                 <tr>
                     <th scope="row">{% trans "Status" %}</th>
                     <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
@@ -90,10 +92,6 @@
                 <tr>
                     <th scope="row">{% trans "Default TTL" %}</th>
                     <td>{{ object.default_ttl }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">{% trans "Description" %}</th>
-                    <td>{{ object.description }}</td>
                 </tr>
             </table>
         </div>
