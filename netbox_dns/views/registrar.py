@@ -72,6 +72,7 @@ class RegistrarBulkEditView(generic.BulkEditView):
 @register_model_view(Registrar, "bulk_delete", path="delete", detail=False)
 class RegistrarBulkDeleteView(generic.BulkDeleteView):
     queryset = Registrar.objects.all()
+    filterset = RegistrarFilterSet
     table = RegistrarTable
 
 

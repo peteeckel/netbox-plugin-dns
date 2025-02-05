@@ -83,6 +83,7 @@ class NameServerBulkEditView(generic.BulkEditView):
 @register_model_view(NameServer, "bulk_delete", path="delete", detail=False)
 class NameServerBulkDeleteView(generic.BulkDeleteView):
     queryset = NameServer.objects.all()
+    filterset = NameServerFilterSet
     table = NameServerTable
 
 
