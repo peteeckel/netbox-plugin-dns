@@ -53,7 +53,7 @@ For integration with a large number of DNS server implementations integration to
 * NetBox 4.2.0 or higher
 * Python 3.10 or higher
 
-## Compatibility with earlier NetBox Versions
+## Compatibility with NetBox Versions
 
 NetBox Version | NetBox DNS Version | Comment
 -------------- | ------------------ | -------
@@ -62,6 +62,7 @@ NetBox Version | NetBox DNS Version | Comment
 3.7            | 0.22               |
 4.0 - 4.1      | 1.0                | Supports legacy IPAM Coupling
 4.0 - 4.1      | 1.1                | Supports IPAM DNSsync
+4.2            | 1.2                |
 
 ## Installation & Configuration
 
