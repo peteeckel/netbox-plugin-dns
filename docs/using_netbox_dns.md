@@ -286,6 +286,11 @@ Similarly, if a zone has nameservers defined, the name servers have domain names
 
 This will result in the secondary name servers being unable to be notified of zone updates, although the zone data itself is generally valid.
 
+##### Entering reverse zone names
+Starting with version 1.2.3, it is possible to enter reverse zone names in a simplified manned when using the GUI. Instead of entering a zone name like `42.168.192.in-addr.arpa` or `f.e.e.b.d.a.e.d.8.b.d.0.1.0.0.2.ip6.arpa`, prefix notation can be used by entering `192.168.42.0/24` or `2001:db8:dead:beef/64` in the above examples. This makes entering the domain names both  easier and less error-prone. The value entered will be translated into the correct zone name.
+
+Note that IPv4 prefixes must have a mask length that's divisible by 8, and IPv6 perfixes one that's divisible by 4 for this to work. Furthermore, the notation is only supported in the GUI, not in the API or bulk imports.
+
 #### SOA fields
 Zone specific data is maintained in the zone's "Start of Authority" (SOA) record. That record contains the following fields in the specified order:
 
