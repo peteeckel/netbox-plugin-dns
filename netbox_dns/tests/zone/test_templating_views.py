@@ -1,3 +1,5 @@
+from rest_framework import status
+
 from utilities.testing import create_tags, post_data
 from tenancy.models import Tenant
 from netbox.choices import CSVDelimiterChoices, ImportFormatChoices
@@ -73,6 +75,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         cls.tags = create_tags("Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot")
 
         cls.zone_template = ZoneTemplate.objects.create(name="Zone Template 1")
+        cls.zone_template.soa_mname = cls.nameservers[4]
+        cls.zone_template.soa_rname = "hostmaster.example.com"
         cls.zone_template.tenant = cls.tenants[0]
         cls.zone_template.registrar = cls.registrars[0]
         cls.zone_template.registrant = cls.contacts[0]
@@ -89,16 +93,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "status": ZoneStatusChoices.STATUS_ACTIVE,
             **Zone.get_defaults(),
             "soa_serial_auto": False,
-            "soa_mname": cls.nameservers[0].pk,
-            "soa_rname": "hostmaster.example.com",
         }
         cls.zone_data = {
             "view": View.get_default_view(),
             "status": ZoneStatusChoices.STATUS_ACTIVE,
             **Zone.get_defaults(),
             "soa_serial_auto": False,
-            "soa_mname": cls.nameservers[0],
-            "soa_rname": "hostmaster.example.com",
         }
 
         cls.record_templates = (
@@ -185,6 +185,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[0:3]))
         self.assertEqual(set(zone.tags.all()), set(self.tags[0:3]))
+        self.assertEqual(zone.soa_mname, self.nameservers[4])
+        self.assertEqual(zone.soa_rname, "hostmaster.example.com")
         self.assertEqual(zone.tenant, self.tenants[0])
         self.assertEqual(zone.registrar, self.registrars[0])
         self.assertEqual(zone.registrant, self.contacts[0])
@@ -208,6 +210,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "name": "test.example.com",
             "template": self.zone_template.pk,
             "nameservers": [nameserver.pk for nameserver in self.nameservers[3:6]],
+            "soa_mname": self.nameservers[5].pk,
+            "soa_rname": "hostmaster2.example.com",
             "registrar": self.registrars[1].pk,
             "registrant": self.contacts[4].pk,
             "tech_c": self.contacts[4].pk,
@@ -231,6 +235,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         zone = zones.first()
 
         self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[3:6]))
+        self.assertEqual(zone.soa_mname, self.nameservers[5])
+        self.assertEqual(zone.soa_rname, "hostmaster2.example.com")
         self.assertEqual(set(zone.tags.all()), set(self.tags[3:6]))
         self.assertEqual(zone.tenant, self.tenants[1])
         self.assertEqual(zone.registrar, self.registrars[1])
@@ -247,7 +253,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_nameserver",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            **self.zone_data,
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+        )
 
         request_data = {
             "name": "test.example.com",
@@ -265,6 +276,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         zone.refresh_from_db()
 
         self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[0:3]))
+        self.assertEqual(zone.soa_mname, self.nameservers[4])
+        self.assertEqual(zone.soa_rname, "hostmaster.example.com")
         self.assertEqual(set(zone.tags.all()), set(self.tags[0:3]))
         self.assertEqual(zone.tenant, self.tenants[0])
         self.assertEqual(zone.registrar, self.registrars[0])
@@ -281,7 +294,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_nameserver",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            **self.zone_data,
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+        )
         zone.nameservers.set(self.nameservers[3:6])
 
         self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[3:6]))
@@ -304,6 +322,98 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[3:6]))
 
+        self.assertEqual(zone.soa_mname, self.nameservers[4])
+        self.assertEqual(zone.soa_rname, "hostmaster.example.com")
+        self.assertEqual(set(zone.tags.all()), set(self.tags[0:3]))
+        self.assertEqual(zone.tenant, self.tenants[0])
+        self.assertEqual(zone.registrar, self.registrars[0])
+        self.assertEqual(zone.registrant, self.contacts[0])
+        self.assertEqual(zone.admin_c, self.contacts[1])
+        self.assertEqual(zone.tech_c, self.contacts[2])
+        self.assertEqual(zone.billing_c, self.contacts[3])
+
+    def test_update_zone_skip_existing_soa_mname(self):
+        self.add_permissions(
+            "netbox_dns.change_zone",
+            "netbox_dns.view_zonetemplate",
+            "netbox_dns.view_view",
+            "netbox_dns.view_nameserver",
+        )
+
+        zone = Zone.objects.create(
+            name="test.example.com",
+            **self.zone_data,
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+        )
+
+        self.assertEqual(zone.soa_mname, self.nameservers[5])
+
+        request_data = {
+            "name": "test.example.com",
+            "template": self.zone_template.pk,
+            "soa_mname": self.nameservers[1],
+            **self.zone_form_data,
+        }
+        request = {
+            "path": self._get_url("edit", instance=zone),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, 302)
+
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_mname, self.nameservers[1])
+
+        self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[0:3]))
+        self.assertEqual(zone.soa_rname, "hostmaster.example.com")
+        self.assertEqual(set(zone.tags.all()), set(self.tags[0:3]))
+        self.assertEqual(zone.tenant, self.tenants[0])
+        self.assertEqual(zone.registrar, self.registrars[0])
+        self.assertEqual(zone.registrant, self.contacts[0])
+        self.assertEqual(zone.admin_c, self.contacts[1])
+        self.assertEqual(zone.tech_c, self.contacts[2])
+        self.assertEqual(zone.billing_c, self.contacts[3])
+
+    def test_update_zone_skip_existing_soa_rname(self):
+        self.add_permissions(
+            "netbox_dns.change_zone",
+            "netbox_dns.view_zonetemplate",
+            "netbox_dns.view_view",
+            "netbox_dns.view_nameserver",
+        )
+
+        zone = Zone.objects.create(
+            name="test.example.com",
+            **self.zone_data,
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+        )
+
+        self.assertEqual(zone.soa_mname, self.nameservers[5])
+
+        request_data = {
+            "name": "test.example.com",
+            "template": self.zone_template.pk,
+            "soa_rname": "hostmaster3.example.com",
+            **self.zone_form_data,
+        }
+        request = {
+            "path": self._get_url("edit", instance=zone),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, 302)
+
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_rname, "hostmaster3.example.com")
+
+        self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[0:3]))
+        self.assertEqual(zone.soa_mname, self.nameservers[4])
         self.assertEqual(set(zone.tags.all()), set(self.tags[0:3]))
         self.assertEqual(zone.tenant, self.tenants[0])
         self.assertEqual(zone.registrar, self.registrars[0])
@@ -321,7 +431,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "extras.view_tag",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            **self.zone_data,
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+        )
         zone.tags.set(self.tags[3:6])
 
         self.assertEqual(set(zone.tags.all()), set(self.tags[3:6]))
@@ -361,7 +476,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "tenancy.view_tenant",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+            **self.zone_data,
+        )
         zone.tenant = self.tenants[1]
         zone.save
 
@@ -402,7 +522,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_registrar",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+            **self.zone_data,
+        )
         zone.registrar = self.registrars[1]
         zone.save
 
@@ -443,7 +568,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_registrationcontact",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+            **self.zone_data,
+        )
         zone.registrant = self.contacts[4]
         zone.save
 
@@ -484,7 +614,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_registrationcontact",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+            **self.zone_data,
+        )
         zone.tech_c = self.contacts[4]
         zone.save
 
@@ -525,7 +660,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_registrationcontact",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+            **self.zone_data,
+        )
         zone.admin_c = self.contacts[4]
         zone.save
 
@@ -566,7 +706,12 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_registrationcontact",
         )
 
-        zone = Zone.objects.create(name="test.example.com", **self.zone_data)
+        zone = Zone.objects.create(
+            name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
+            **self.zone_data,
+        )
         zone.billing_c = self.contacts[4]
         zone.save
 
@@ -676,7 +821,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         for zone in zones:
             self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[0:3]))
 
-    def test_create_zone_with_records(self):
+    def test_zone_create_with_records(self):
         test_templates = self.record_templates[0:4]
 
         self.add_permissions(
@@ -782,6 +927,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         zone = Zone.objects.create(
             name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
             **self.zone_data,
         )
 
@@ -823,6 +970,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         zone = Zone.objects.create(
             name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
             **self.zone_data,
         )
         existing_records = (
@@ -896,6 +1045,8 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
 
         zone = Zone.objects.create(
             name="test.example.com",
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster2.example.com",
             **self.zone_data,
         )
         Record.objects.create(
@@ -1026,3 +1177,59 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
                 self.assertTrue(
                     record_template_applied(records.first(), record_template)
                 )
+
+    def test_create_zone_missing_soa_mname(self):
+        self.add_permissions(
+            "netbox_dns.add_zone",
+            "netbox_dns.view_zonetemplate",
+            "netbox_dns.view_view",
+            "netbox_dns.view_nameserver",
+        )
+
+        self.zone_template.soa_mname = None
+        self.zone_template.save()
+
+        request_data = {
+            "name": "test.example.com",
+            "template": self.zone_template.pk,
+            **self.zone_form_data,
+        }
+        request = {
+            "path": self._get_url("add"),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertIn(
+            "soa_mname not set and no template or default value defined",
+            response.content.decode(),
+        )
+
+    def test_create_zone_missing_soa_rname(self):
+        self.add_permissions(
+            "netbox_dns.add_zone",
+            "netbox_dns.view_zonetemplate",
+            "netbox_dns.view_view",
+            "netbox_dns.view_nameserver",
+        )
+
+        self.zone_template.soa_rname = ""
+        self.zone_template.save()
+
+        request_data = {
+            "name": "test.example.com",
+            "template": self.zone_template.pk,
+            **self.zone_form_data,
+        }
+        request = {
+            "path": self._get_url("add"),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertIn(
+            "soa_rname not set and no template or default value defined",
+            response.content.decode(),
+        )

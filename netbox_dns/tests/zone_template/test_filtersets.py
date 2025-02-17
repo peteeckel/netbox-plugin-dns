@@ -81,6 +81,8 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.zone_templates = (
             ZoneTemplate(
                 name="Zone Template 1",
+                soa_mname=cls.nameservers[0],
+                soa_rname="hostmaster.example.com",
                 tenant=cls.tenants[0],
                 registrar=cls.registrars[0],
                 registrant=cls.contacts[0],
@@ -90,6 +92,8 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 2",
+                soa_mname=cls.nameservers[0],
+                soa_rname="hostmaster2.example.com",
                 tenant=cls.tenants[1],
                 registrar=cls.registrars[1],
                 registrant=cls.contacts[1],
@@ -99,6 +103,8 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 3",
+                soa_mname=cls.nameservers[0],
+                soa_rname="hostmaster.example.com",
                 tenant=cls.tenants[2],
                 registrar=cls.registrars[1],
                 registrant=cls.contacts[1],
@@ -108,6 +114,8 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 4",
+                soa_mname=cls.nameservers[1],
+                soa_rname="hostmaster2.example.com",
                 tenant=cls.tenants[0],
                 registrar=cls.registrars[1],
                 registrant=cls.contacts[1],
@@ -117,6 +125,8 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 5",
+                soa_mname=cls.nameservers[1],
+                soa_rname="hostmaster.example.com",
                 tenant=cls.tenants[1],
                 registrar=cls.registrars[2],
                 registrant=cls.contacts[2],
@@ -126,6 +136,8 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 6",
+                soa_mname=cls.nameservers[1],
+                soa_rname="hostmaster2.example.com",
                 tenant=cls.tenants[2],
                 registrar=cls.registrars[0],
                 registrant=cls.contacts[2],
@@ -166,6 +178,18 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"nameserver_id": [self.nameservers[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
         params = {"nameserver_id": [self.nameservers[2].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_soa_mname(self):
+        params = {"soa_mname": [self.nameservers[0].name]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"soa_mname_id": [self.nameservers[1].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_soa_rname(self):
+        params = {"soa_rname": ["hostmaster.example.com"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"soa_rname": ["hostmaster2.example.com"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_record_template(self):

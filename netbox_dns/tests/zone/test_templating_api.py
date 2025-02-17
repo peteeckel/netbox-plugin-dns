@@ -76,6 +76,8 @@ class ZoneTemplatingAPITestCase(APITestCase):
 
         cls.zone_template = ZoneTemplate.objects.create(
             name="Test Zone Template",
+            soa_mname=cls.nameservers[0],
+            soa_rname="hostmaster.example.com",
             registrar=cls.registrars[0],
             registrant=cls.contacts[0],
             admin_c=cls.contacts[1],
@@ -87,11 +89,6 @@ class ZoneTemplatingAPITestCase(APITestCase):
         cls.zone_template.nameservers.set(cls.nameservers[0:3])
         cls.zone_template.record_templates.set(cls.record_templates)
 
-        cls.zone_data = {
-            "soa_mname": cls.nameservers[0],
-            "soa_rname": "hostmaster.example.com",
-        }
-
     def test_create_zone(self):
         self.add_permissions("netbox_dns.add_zone")
         self.add_permissions("extras.view_tag")
@@ -100,10 +97,6 @@ class ZoneTemplatingAPITestCase(APITestCase):
 
         data = {
             "name": "test.example.com",
-            "soa_mname": {
-                "name": self.nameservers[0].name,
-            },
-            "soa_rname": "hostmaster.example.com",
             "template": {
                 "name": self.zone_template.name,
             },
@@ -117,6 +110,8 @@ class ZoneTemplatingAPITestCase(APITestCase):
         self.assertEqual(zones.count(), 1)
         zone = zones.first()
 
+        self.assertEqual(zone.soa_mname, self.nameservers[0])
+        self.assertEqual(zone.soa_rname, "hostmaster.example.com")
         self.assertEqual(zone.registrar, self.registrars[0])
         self.assertEqual(zone.registrant, self.contacts[0])
         self.assertEqual(zone.admin_c, self.contacts[1])
@@ -146,9 +141,9 @@ class ZoneTemplatingAPITestCase(APITestCase):
         data = {
             "name": "test.example.com",
             "soa_mname": {
-                "name": self.nameservers[0].name,
+                "name": self.nameservers[4].name,
             },
-            "soa_rname": "hostmaster.example.com",
+            "soa_rname": "hostmaster2.example.com",
             "template": {
                 "name": self.zone_template.name,
             },
@@ -202,6 +197,8 @@ class ZoneTemplatingAPITestCase(APITestCase):
         self.assertEqual(zones.count(), 1)
         zone = zones.first()
 
+        self.assertEqual(zone.soa_mname, self.nameservers[4])
+        self.assertEqual(zone.soa_rname, "hostmaster2.example.com")
         self.assertEqual(zone.registrar, self.registrars[1])
         self.assertEqual(zone.registrant, self.contacts[4])
         self.assertEqual(zone.admin_c, self.contacts[4])
@@ -227,7 +224,8 @@ class ZoneTemplatingAPITestCase(APITestCase):
 
         zone = Zone.objects.create(
             name="test.example.com",
-            **self.zone_data,
+            soa_mname=self.nameservers[5],
+            soa_rname="hostmaster3.example.com",
         )
 
         url = reverse("plugins-api:netbox_dns-api:zone-detail", kwargs={"pk": zone.pk})
@@ -262,3 +260,51 @@ class ZoneTemplatingAPITestCase(APITestCase):
                     value=record_template.value,
                 ).exists()
             )
+
+    def test_create_zone_missing_soa_mname(self):
+        self.add_permissions("netbox_dns.add_zone")
+        self.add_permissions("extras.view_tag")
+
+        url = reverse("plugins-api:netbox_dns-api:zone-list")
+
+        self.zone_template.soa_mname = None
+        self.zone_template.save()
+
+        data = {
+            "name": "test.example.com",
+            "template": {
+                "name": self.zone_template.name,
+            },
+            **Zone.get_defaults(),
+        }
+
+        response = self.client.post(url, data, format="json", **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(
+            "soa_mname not set and no template or default value defined"
+            in response.json().get("soa_mname")
+        )
+
+    def test_create_zone_missing_soa_rname(self):
+        self.add_permissions("netbox_dns.add_zone")
+        self.add_permissions("extras.view_tag")
+
+        url = reverse("plugins-api:netbox_dns-api:zone-list")
+
+        self.zone_template.soa_rname = ""
+        self.zone_template.save()
+
+        data = {
+            "name": "test.example.com",
+            "template": {
+                "name": self.zone_template.name,
+            },
+            **Zone.get_defaults(),
+        }
+
+        response = self.client.post(url, data, format="json", **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(
+            "soa_rname not set and no template or default value defined"
+            in response.json().get("soa_rname")
+        )

@@ -111,6 +111,8 @@ class ZoneTemplateAPITestCase(
             {
                 "name": "Zone Template 7",
                 "nameservers": [nameserver.pk for nameserver in nameservers[0:1]],
+                "soa_mname": nameservers[2].pk,
+                "soa_rname": "hostmaster.example.com",
                 "record_templates": [
                     record_template.pk for record_template in record_templates[0:3]
                 ],
@@ -123,6 +125,8 @@ class ZoneTemplateAPITestCase(
             {
                 "name": "Zone Template 8",
                 "nameservers": [nameserver.pk for nameserver in nameservers[1:2]],
+                "soa_mname": nameservers[0].pk,
+                "soa_rname": "hostmaster.example.com",
                 "record_templates": [record_templates[1].pk],
                 "registrar": registrars[0].pk,
                 "registrant": contacts[0].pk,
@@ -133,6 +137,8 @@ class ZoneTemplateAPITestCase(
             {
                 "name": "Zone Template 9",
                 "nameservers": [nameserver.pk for nameserver in nameservers[2:3]],
+                "soa_mname": nameservers[0].pk,
+                "soa_rname": "hostmaster2.example.com",
                 "record_templates": [record_templates[0].pk, record_templates[2].pk],
                 "registrar": registrars[1].pk,
                 "registrant": contacts[5].pk,
@@ -152,7 +158,9 @@ class ZoneTemplateAPITestCase(
 
         cls.bulk_update_data = {
             "description": "Test Zone Template",
-            "nameservers": [nameserver.pk for nameserver in nameservers[0:5]],
+            "nameservers": [nameserver.pk for nameserver in nameservers[1:5]],
+            "soa_mname": nameservers[0].pk,
+            "soa_rname": "hostmaster3.example.com",
             "record_templates": [record_templates[1].pk, record_templates[2].pk],
             "registrar": registrars[0].pk,
             "tech_c": contacts[0].pk,
