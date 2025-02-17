@@ -18,6 +18,10 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Name"),
         linkify=True,
     )
+    soa_mname = tables.Column(
+        verbose_name=_("SOA MName"),
+        linkify=True,
+    )
     tags = TagColumn(
         url_name="plugins:netbox_dns:zonetemplate_list",
     )
@@ -44,7 +48,10 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = ZoneTemplate
-        fields = ("description",)
+        fields = (
+            "soa_rname",
+            "description",
+        )
         default_columns = (
             "name",
             "tags",

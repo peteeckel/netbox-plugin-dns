@@ -1,9 +1,15 @@
+from dns import name as dns_name
+from dns.exception import DNSException
+
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
+
+from netbox_dns.validators import validate_rname
 
 
 __all__ = (
@@ -28,6 +34,19 @@ class ZoneTemplate(NetBoxModel):
         verbose_name=_("Nameservers"),
         to="NameServer",
         related_name="+",
+        blank=True,
+    )
+    soa_mname = models.ForeignKey(
+        verbose_name=_("SOA MName"),
+        to="NameServer",
+        related_name="+",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
+    soa_rname = models.CharField(
+        verbose_name=_("SOA RName"),
+        max_length=255,
         blank=True,
     )
     record_templates = models.ManyToManyField(
@@ -98,6 +117,8 @@ class ZoneTemplate(NetBoxModel):
     )
 
     template_fields = (
+        "soa_mname",
+        "soa_rname",
         "tenant",
         "registrar",
         "registrant",
@@ -139,6 +160,18 @@ class ZoneTemplate(NetBoxModel):
     def create_records(self, zone):
         for record_template in self.record_templates.all():
             record_template.create_record(zone=zone)
+
+    def clean(self, *args, **kwargs):
+        if self.soa_rname:
+            try:
+                dns_name.from_text(self.soa_rname, origin=dns_name.root)
+                validate_rname(self.soa_rname)
+            except (DNSException, ValidationError) as exc:
+                raise ValidationError(
+                    {
+                        "soa_rname": exc,
+                    }
+                )
 
 
 @register_search

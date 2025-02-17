@@ -43,6 +43,18 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("Nameserver"),
     )
+    soa_mname_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=NameServer.objects.all(),
+        field_name="soa_mname",
+        to_field_name="id",
+        label=_("SOA MNAME ID"),
+    )
+    soa_mname = django_filters.ModelMultipleChoiceFilter(
+        queryset=NameServer.objects.all(),
+        field_name="soa_mname__name",
+        to_field_name="name",
+        label=_("SOA MNAME"),
+    )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
         label=_("Registrar ID"),
@@ -100,6 +112,7 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "id",
             "name",
             "description",
+            "soa_rname",
         )
 
     def search(self, queryset, name, value):
@@ -107,6 +120,7 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             return queryset
         qs_filter = (
             Q(name__icontains=value)
+            | Q(soa_rname__icontains=value)
             | Q(registrar__name__icontains=value)
             | Q(registry_domain_id__icontains=value)
             | Q(registrant__name__icontains=value)

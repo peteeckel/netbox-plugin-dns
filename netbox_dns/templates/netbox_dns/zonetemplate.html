@@ -42,6 +42,14 @@
                         </table>
                     </td>
                 </tr>
+                <tr>
+                    <th scope="row">{% trans "SOA MName" %}</th>
+                    <td>{{ object.soa_mname|linkify }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">{% trans "SOA RName" %}</th>
+                    <td>{{ object.soa_rname }}</td>
+                </tr>
             </table>
         </div>
 

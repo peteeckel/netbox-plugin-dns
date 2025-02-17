@@ -40,6 +40,11 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
         queryset=NameServer.objects.all(),
         required=False,
     )
+    soa_mname = DynamicModelChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label=_("MName"),
+    )
     record_templates = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
@@ -47,6 +52,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
 
     fieldsets = (
         FieldSet("name", "description", "nameservers", name=_("Zone Template")),
+        FieldSet("soa_mname", "soa_rname", name=_("SOA")),
         FieldSet("record_templates", name=_("Record Templates")),
         FieldSet(
             "registrar",
@@ -66,6 +72,8 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
         fields = (
             "name",
             "nameservers",
+            "soa_mname",
+            "soa_rname",
             "record_templates",
             "description",
             "registrar",
@@ -77,6 +85,9 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
             "tenant",
             "tags",
         )
+        labels = {
+            "soa_rname": _("RName"),
+        }
 
 
 class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
@@ -84,6 +95,7 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "nameserver_id", "description", name=_("Attributes")),
+        FieldSet("soa_mname_id", "soa_rname", name=_("SOA")),
         FieldSet("record_template_id", name=_("Record Templates")),
         FieldSet(
             "registrar_id",
@@ -104,6 +116,15 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         queryset=NameServer.objects.all(),
         required=False,
         label=_("Nameservers"),
+    )
+    soa_mname_id = DynamicModelMultipleChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label=_("MName"),
+    )
+    soa_rname = forms.CharField(
+        required=False,
+        label=_("RName"),
     )
     record_template_id = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
@@ -147,6 +168,12 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         to_field_name="name",
         required=False,
         label=_("Nameservers"),
+    )
+    soa_mname = CSVModelChoiceField(
+        queryset=NameServer.objects.all(),
+        to_field_name="name",
+        required=False,
+        label=_("SOA MName"),
     )
     record_templates = CSVModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
@@ -212,6 +239,8 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         fields = (
             "name",
             "nameservers",
+            "soa_mname",
+            "soa_rname",
             "record_templates",
             "description",
             "registrar",
@@ -230,12 +259,20 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Nameservers"),
     )
+    soa_mname = DynamicModelChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label=_("MName"),
+    )
+    soa_rname = forms.CharField(max_length=255, required=False, label=_("RName"))
     record_templates = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
         label=_("Record Templates"),
     )
-    description = forms.CharField(max_length=200, required=False)
+    description = forms.CharField(
+        max_length=200, required=False, label=_("Description")
+    )
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
@@ -281,6 +318,11 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
             name=_("Attributes"),
         ),
         FieldSet(
+            "soa_mname",
+            "soa_rname",
+            name=_("SOA"),
+        ),
+        FieldSet(
             "record_templates",
             name=_("Record Templates"),
         ),
@@ -298,6 +340,8 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     nullable_fields = (
         "description",
         "nameservers",
+        "soa_mname",
+        "soa_rname",
         "record_templates",
         "registrar",
         "registrant",
