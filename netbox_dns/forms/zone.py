@@ -66,13 +66,20 @@ class ZoneTemplateUpdateMixin:
             self.cleaned_data["tags"] = template.tags.all()
 
         for field in template.template_fields:
-            if (
-                self.cleaned_data.get(field) is None
-                and getattr(template, field) is not None
-            ):
+            if self.cleaned_data.get(field) in (None, "") and getattr(
+                template, field
+            ) not in (None, ""):
                 self.cleaned_data[field] = getattr(template, field)
 
-        template_error = None
+        if self.cleaned_data.get("soa_mname") is None:
+            self.add_error(
+                "soa_mname",
+                _("soa_mname not set and no template or default value defined"),
+            )
+
+        if self.errors:
+            return
+
         saved_events_queue = events_queue.get()
 
         try:
@@ -106,13 +113,20 @@ class ZoneTemplateUpdateMixin:
                 raise RollbackTransaction
 
         except ValidationError as exc:
-            self.add_error("template", exc.messages)
+            if hasattr(exc, "error_dict"):
+                for field_name in self.fields.keys():
+                    exc.error_dict.pop(field_name, None)
+                errors = exc.error_dict.values()
+            else:
+                errors = exc.messages
+
+            for error in errors:
+                self.add_error("template", error)
+
         except RollbackTransaction:
             pass
 
         events_queue.set(saved_events_queue)
-        if template_error is not None:
-            raise ValidationError({"template": template_error})
 
         return self.cleaned_data
 
@@ -161,8 +175,14 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         validators=[MinValueValidator(1)],
         label=_("SOA TTL"),
     )
+    soa_mname = DynamicModelChoiceField(
+        queryset=NameServer.objects.all(),
+        help_text=_("Primary nameserver this zone"),
+        required=False,
+        label=_("SOA MName"),
+    )
     soa_rname = forms.CharField(
-        required=True,
+        required=False,
         help_text=_("Mailbox of the zone's administrator"),
         label=_("SOA RName"),
     )

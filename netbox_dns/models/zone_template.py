@@ -139,21 +139,21 @@ class ZoneTemplate(NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:zonetemplate", kwargs={"pk": self.pk})
 
-    def apply_to_zone(self, zone):
+    def apply_to_zone_data(self, data):
+        fields_changed = False
+        for field in self.template_fields:
+            if data.get(field) in (None, "") and getattr(self, field) not in (None, ""):
+                fields_changed = True
+                data[field] = getattr(self, field)
+
+        return fields_changed
+
+    def apply_to_zone_relations(self, zone):
         if not zone.nameservers.all() and self.nameservers.all():
             zone.nameservers.set(self.nameservers.all())
 
         if not zone.tags.all() and self.tags.all():
             zone.tags.set(self.tags.all())
-
-        fields_changed = True
-        for field in self.template_fields:
-            if getattr(zone, field) is None and getattr(self, field) is not None:
-                fields_changed = True
-                setattr(zone, field, getattr(self, field))
-
-        if fields_changed:
-            zone.save()
 
         self.create_records(zone)
 

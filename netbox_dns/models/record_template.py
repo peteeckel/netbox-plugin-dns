@@ -163,9 +163,11 @@ class RecordTemplate(NetBoxModel):
             record = Record.objects.create(**record_data)
         except ValidationError as exc:
             raise ValidationError(
-                _("Error while processing record template {template}: {error}").format(
-                    template=self, error=exc.messages[0]
-                )
+                {
+                    None: _(
+                        "Error while processing record template {template}: {error}"
+                    ).format(template=self, error=exc.messages[0])
+                }
             )
 
         if tags := self.tags.all():
