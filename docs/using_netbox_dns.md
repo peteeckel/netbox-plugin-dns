@@ -588,6 +588,8 @@ Field                | Required | Template Field | Explanation
 **Name**             | Yes      | No             | The name of the zone template
 **Description**      | No       | No             | A short textual description of the zone template
 **Nameservers**      | No       | Yes            | The set of nameservers associated with the zone template
+**SOA MName**        | No       | Yes            | The master name server for the SOA record
+**SOA RName**        | No       | Yes            | The mail address of the responsible contact for the SOA record
 **Record templates** | No       | Yes            | The set of record templates associated with the zone template
 **Registrar**        | No       | Yes            | The registrar associated with the zone template
 **Registrant**       | No       | Yes            | The registrant associated with the zone template
