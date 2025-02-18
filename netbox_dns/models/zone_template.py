@@ -1,9 +1,15 @@
+from dns import name as dns_name
+from dns.exception import DNSException
+
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
+
+from netbox_dns.validators import validate_rname
 
 
 __all__ = (
@@ -28,6 +34,19 @@ class ZoneTemplate(NetBoxModel):
         verbose_name=_("Nameservers"),
         to="NameServer",
         related_name="+",
+        blank=True,
+    )
+    soa_mname = models.ForeignKey(
+        verbose_name=_("SOA MName"),
+        to="NameServer",
+        related_name="+",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
+    soa_rname = models.CharField(
+        verbose_name=_("SOA RName"),
+        max_length=255,
         blank=True,
     )
     record_templates = models.ManyToManyField(
@@ -98,6 +117,8 @@ class ZoneTemplate(NetBoxModel):
     )
 
     template_fields = (
+        "soa_mname",
+        "soa_rname",
         "tenant",
         "registrar",
         "registrant",
@@ -118,27 +139,39 @@ class ZoneTemplate(NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:zonetemplate", kwargs={"pk": self.pk})
 
-    def apply_to_zone(self, zone):
+    def apply_to_zone_data(self, data):
+        fields_changed = False
+        for field in self.template_fields:
+            if data.get(field) in (None, "") and getattr(self, field) not in (None, ""):
+                fields_changed = True
+                data[field] = getattr(self, field)
+
+        return fields_changed
+
+    def apply_to_zone_relations(self, zone):
         if not zone.nameservers.all() and self.nameservers.all():
             zone.nameservers.set(self.nameservers.all())
 
         if not zone.tags.all() and self.tags.all():
             zone.tags.set(self.tags.all())
 
-        fields_changed = True
-        for field in self.template_fields:
-            if getattr(zone, field) is None and getattr(self, field) is not None:
-                fields_changed = True
-                setattr(zone, field, getattr(self, field))
-
-        if fields_changed:
-            zone.save()
-
         self.create_records(zone)
 
     def create_records(self, zone):
         for record_template in self.record_templates.all():
             record_template.create_record(zone=zone)
+
+    def clean(self, *args, **kwargs):
+        if self.soa_rname:
+            try:
+                dns_name.from_text(self.soa_rname, origin=dns_name.root)
+                validate_rname(self.soa_rname)
+            except (DNSException, ValidationError) as exc:
+                raise ValidationError(
+                    {
+                        "soa_rname": exc,
+                    }
+                )
 
 
 @register_search

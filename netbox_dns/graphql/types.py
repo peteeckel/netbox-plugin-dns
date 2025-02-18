@@ -219,6 +219,13 @@ class NetBoxDNSZoneTemplateType(NetBoxObjectType):
             "NetBoxDNSNameServerType", strawberry.lazy("netbox_dns.graphql.types")
         ]
     ]
+    soa_mname: (
+        Annotated[
+            "NetBoxDNSNameServerType", strawberry.lazy("netbox_dns.graphql.types")
+        ]
+        | None
+    )
+    soa_rname: str | None
     record_templates: List[
         Annotated[
             "NetBoxDNSRecordTemplateType", strawberry.lazy("netbox_dns.graphql.types")

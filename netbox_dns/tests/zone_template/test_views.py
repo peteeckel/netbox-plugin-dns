@@ -85,7 +85,9 @@ class ZoneTemplateViewTestCase(
 
         cls.form_data = {
             "name": "Zone Template 4",
-            "nameservers": [nameserver.pk for nameserver in nameservers[0:2]],
+            "nameservers": [nameserver.pk for nameserver in nameservers[1:2]],
+            "soa_mname": nameservers[0].pk,
+            "soa_rname": "hostmaster.example.com",
             "record_templates": [
                 record_template.pk for record_template in record_templates[0:2]
             ],
@@ -104,6 +106,7 @@ class ZoneTemplateViewTestCase(
             "tech_c": contacts[1].pk,
             "billing_c": contacts[0].pk,
             "nameservers": [nameserver.pk for nameserver in nameservers[1:3]],
+            "soa_rname": "hostmaster.example.com",
             "record_templates": [
                 record_template.pk for record_template in record_templates[1:3]
             ],
@@ -111,14 +114,14 @@ class ZoneTemplateViewTestCase(
         }
 
         cls.csv_data = (
-            "name,nameservers,record_templates,registrar,registrant,admin_c,tech_c,billing_c",
-            f"Zone Template 5,\"{','.join(nameserver.name for nameserver in nameservers[0:1])}\",\"{','.join(record_template.name for record_template in record_templates[0:1])}\",{registrars[0].name},{contacts[0].contact_id},{contacts[1].contact_id},{contacts[2].contact_id},{contacts[3].contact_id}",
-            f"Zone Template 6,\"{','.join(nameserver.name for nameserver in nameservers[1:2])}\",,{registrars[1].name},{contacts[2].contact_id},{contacts[3].contact_id},{contacts[0].contact_id},{contacts[1].contact_id}",
-            f"Zone Template 7,\"{','.join(nameserver.name for nameserver in nameservers[0:1])}\",,{registrars[0].name},{contacts[3].contact_id},{contacts[2].contact_id},{contacts[1].contact_id},{contacts[3].contact_id}",
-            f"Zone Template 8,,,{registrars[1].name},{contacts[0].contact_id},,{contacts[2].contact_id},",
+            "name,nameservers,soa_rname,soa_mname,record_templates,registrar,registrant,admin_c,tech_c,billing_c",
+            f"Zone Template 5,\"{','.join(nameserver.name for nameserver in nameservers[0:1])}\",hostmaster.example.com,{nameservers[0].name},\"{','.join(record_template.name for record_template in record_templates[0:1])}\",{registrars[0].name},{contacts[0].contact_id},{contacts[1].contact_id},{contacts[2].contact_id},{contacts[3].contact_id}",
+            f"Zone Template 6,\"{','.join(nameserver.name for nameserver in nameservers[1:2])}\",,{nameservers[1].name},,{registrars[1].name},{contacts[2].contact_id},{contacts[3].contact_id},{contacts[0].contact_id},{contacts[1].contact_id}",
+            f"Zone Template 7,\"{','.join(nameserver.name for nameserver in nameservers[0:1])}\",hostmaster.example.com,,,{registrars[0].name},{contacts[3].contact_id},{contacts[2].contact_id},{contacts[1].contact_id},{contacts[3].contact_id}",
+            f"Zone Template 8,,,,,{registrars[1].name},{contacts[0].contact_id},,{contacts[2].contact_id},",
         )
 
         cls.csv_update_data = (
-            "id,record_templates,registrar,registrant,billing_c,tech_c,admin_c",
-            f'{zone_templates[0].pk},"{record_templates[0].name},{record_templates[1].name}",{registrars[0].name},{contacts[0].contact_id},{contacts[1].contact_id},{contacts[2].contact_id},{contacts[3].contact_id}',
+            "id,soa_mname,record_templates,registrar,registrant,billing_c,tech_c,admin_c",
+            f'{zone_templates[0].pk},{nameservers[0].name},"{record_templates[0].name},{record_templates[1].name}",{registrars[0].name},{contacts[0].contact_id},{contacts[1].contact_id},{contacts[2].contact_id},{contacts[3].contact_id}',
         )

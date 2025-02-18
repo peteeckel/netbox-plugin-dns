@@ -92,7 +92,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 view=cls.views[0],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                soa_rname="hostmaster.example.com",
+                soa_rname="hostmaster2.example.com",
                 soa_serial_auto=True,
                 registry_domain_id="acme-002-2323",
                 registrar=cls.registrars[1],
@@ -106,7 +106,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 view=cls.views[1],
                 tenant=cls.tenants[0],
                 soa_mname=cls.nameservers[0],
-                soa_rname="hostmaster.example.com",
+                soa_rname="hostmaster2.example.com",
                 soa_serial_auto=False,
                 registry_domain_id="acme-002-4242",
                 registrar=cls.registrars[1],
@@ -120,7 +120,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 view=cls.views[1],
                 tenant=cls.tenants[1],
                 soa_mname=cls.nameservers[1],
-                soa_rname="hostmaster.example.com",
+                soa_rname="hostmaster2.example.com",
                 soa_serial_auto=False,
                 registry_domain_id="acme-003-4223",
                 registrar=cls.registrars[2],
@@ -134,7 +134,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 view=cls.views[1],
                 tenant=cls.tenants[2],
                 soa_mname=cls.nameservers[2],
-                soa_rname="hostmaster.example.com",
+                soa_rname="hostmaster2.example.com",
                 soa_serial_auto=False,
                 registry_domain_id="acme-003-2342",
                 registrar=cls.registrars[0],
@@ -244,6 +244,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
         params = {"soa_mname_id": [self.nameservers[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_soa_rname(self):
+        params = {"soa_rname": ["hostmaster.example.com"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 9)
+        params = {"soa_rname": ["hostmaster2.example.com"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_arpa_network(self):
         params = {"arpa_network": ["fe80:dead:beef::/48", "10.0.0.0/24"]}

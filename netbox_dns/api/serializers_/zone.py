@@ -44,6 +44,12 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text=_("Primary nameserver for the zone"),
     )
+    soa_rname = serializers.CharField(
+        max_length=255,
+        read_only=False,
+        required=False,
+        help_text=_("Contact email for the zone"),
+    )
     rfc2317_parent_zone = NestedZoneSerializer(
         many=False,
         read_only=True,
@@ -105,6 +111,12 @@ class ZoneSerializer(NetBoxModelSerializer):
     )
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
+    def validate(self, data):
+        if (template := data.get("template")) is not None:
+            template.apply_to_zone_data(data)
+
+        return super().validate(data)
+
     def create(self, validated_data):
         template = validated_data.pop("template", None)
         nameservers = validated_data.pop("nameservers", None)
@@ -115,7 +127,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             zone.nameservers.set(nameservers)
 
         if template is not None:
-            template.apply_to_zone(zone)
+            template.apply_to_zone_relations(zone)
 
         return zone
 
@@ -129,7 +141,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             zone.nameservers.set(nameservers)
 
         if template is not None:
-            template.apply_to_zone(zone)
+            template.apply_to_zone_relations(zone)
 
         return zone
 

@@ -26,6 +26,13 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
         required=False,
         help_text=_("Nameservers for the zone"),
     )
+    soa_mname = NameServerSerializer(
+        nested=True,
+        many=False,
+        read_only=False,
+        required=False,
+        help_text=_("Primary nameserver for the zone"),
+    )
     record_templates = NestedRecordTemplateSerializer(
         many=True,
         read_only=False,
@@ -108,6 +115,8 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
             "name",
             "display",
             "nameservers",
+            "soa_mname",
+            "soa_rname",
             "description",
             "tags",
             "created",

@@ -670,15 +670,25 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 if value not in (None, ""):
                     setattr(self, field, value)
 
-        if self.soa_mname_id is None:
-            default_soa_mname = defaults.get("zone_soa_mname")
-            try:
-                self.soa_mname = NameServer.objects.get(name=default_soa_mname)
-            except NameServer.DoesNotExist:
-                raise ValidationError(
-                    _("Default soa_mname instance {nameserver} does not exist").format(
-                        nameserver=default_soa_mname
+        if self.soa_mname_id is None and "soa_mname" not in exclude:
+            if default_soa_mname := defaults.get("zone_soa_mname"):
+                try:
+                    self.soa_mname = NameServer.objects.get(name=default_soa_mname)
+                except NameServer.DoesNotExist:
+                    raise ValidationError(
+                        {
+                            "soa_mname": _(
+                                "Default soa_mname instance {nameserver} does not exist"
+                            ).format(nameserver=default_soa_mname)
+                        }
                     )
+            else:
+                raise ValidationError(
+                    {
+                        "soa_mname": _(
+                            "soa_mname not set and no template or default value defined"
+                        )
+                    }
                 )
 
         super().clean_fields(exclude=exclude)
@@ -706,7 +716,13 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             )
 
         if self.soa_rname in (None, ""):
-            raise ValidationError(_("soa_rname not set and no default value defined"))
+            raise ValidationError(
+                {
+                    "soa_rname": _(
+                        "soa_rname not set and no template or default value defined"
+                    ),
+                }
+            )
         try:
             dns_name.from_text(self.soa_rname, origin=dns_name.root)
             validate_rname(self.soa_rname)
