@@ -152,7 +152,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         queryset=RecordTemplate.objects.all(),
         to_field_name="name",
         required=False,
-        label=_("Record Remplates"),
+        label=_("Record Templates"),
     )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
