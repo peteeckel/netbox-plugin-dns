@@ -287,9 +287,9 @@ Similarly, if a zone has nameservers defined, the name servers have domain names
 This will result in the secondary name servers being unable to be notified of zone updates, although the zone data itself is generally valid.
 
 ##### Entering reverse zone names
-Starting with version 1.2.3, it is possible to enter reverse zone names in a simplified manned when using the GUI. Instead of entering a zone name like `42.168.192.in-addr.arpa` or `f.e.e.b.d.a.e.d.8.b.d.0.1.0.0.2.ip6.arpa`, prefix notation can be used by entering `192.168.42.0/24` or `2001:db8:dead:beef/64` in the above examples. This makes entering the domain names both  easier and less error-prone. The value entered will be translated into the correct zone name.
+Starting with version 1.2.3, it is possible to enter reverse zone names in a simplified manner when using the GUI. Instead of entering a zone name like `42.168.192.in-addr.arpa` or `f.e.e.b.d.a.e.d.8.b.d.0.1.0.0.2.ip6.arpa`, prefix notation can be used by entering `192.168.42.0/24` or `2001:db8:dead:beef/64` in the above examples. This makes entering the domain names both  easier and less error-prone. The value entered will be translated into the correct zone name.
 
-Note that IPv4 prefixes must have a mask length that's divisible by 8, and IPv6 perfixes one that's divisible by 4 for this to work. Furthermore, the notation is only supported in the GUI, not in the API or bulk imports.
+Note that IPv4 prefixes must have a mask length that's divisible by 8, and IPv6 prefixes one that's divisible by 4 for this to work. Furthermore, the notation is only supported in the GUI, not in the API or bulk imports.
 
 #### SOA fields
 Zone specific data is maintained in the zone's "Start of Authority" (SOA) record. That record contains the following fields in the specified order:
@@ -299,7 +299,7 @@ SOA Field     | Explanation
 **TTL**       | The time to live for the SOA record.
 **MNAME**     | The FQDN of the primary name server for the zone
 **RNAME**     | The mailbox of the person responsible for the zone. Note that the "@" in the e-mail address used here has to be replaced by a dot ".".
-**SERIAL**    | An unsigned 32 bit number indicating the current state of the zone on the primary name server
+**SERIAL**    | An unsigned 32 bit number indicating the current version of the zone on the primary name server
 **REFRESH**   | A 32 bit time interval in seconds that indicates the interval after which the zone should be refreshed from the upstream name server
 **RETRY**     | A 32 bit time interval in seconds that indicates how long a name server should wait before retrying a failed refresh attempt
 **EXPIRE**    | A 32 bit time interval in seconds that indicates the duration after which a zone that cannot be refreshed is no longer authoritative
@@ -326,7 +326,7 @@ All fields are optional.
 If there is registration information for a zone, the zone's detail view contains an additional 'Registration' tab showing that information.
 
 ### Automatic SOA SERIAL generation
-SOA SERIAL fields are crucial for the propagation of zone data from primary name servers to secondaries, as the process involves checking the zone's serial number on the secondary against the serial number on the primary and only performing the update when the primary has a higher serial number or the interval specified in the SOA EXPIRE field has passed.
+SOA SERIAL fields are crucial for the propagation of zone data from primary name servers to secondaries, as the process involves checking the zone's serial number on the secondary against the serial number on the primary and only performing the transfer when the primary has a higher serial number or the interval specified in the SOA REFRESH field has elapsed, after which the SERIAL is checked.
 
 This is particularly relevant when PTR records are automatically created from A and AAAA records and an update to a forward zone thus can result in one or several reverse zones being updated in the background as well.
 
@@ -554,7 +554,7 @@ If there are zones registered for the contact, a second tab shows a list of thes
 ![Contact DetailZones](images/ContactDetailZones.png)
 
 ### Zone Templates
-Zone templates can be used to add common sets objects to zones. As an example, there are often groups of zones that are using the same set of name servers, the same tenant or the same registration information. Template records provide another functionality that makes it possible to comfortably assign common objects to zones.
+Zone templates can be used to add common sets of objects to zones. As an example, there are often groups of zones that are using the same set of name servers, the same tenant or the same registration information. Template records provide another functionality that makes it possible to comfortably assign common objects to zones.
 
 Zone templates can be used interactively at zone creation time, or for existing zones using the edit view. It is also possible to assign a zone template while importing zones via CSV, JSON or YAML, both for new and existing zones, and via the REST API. Assigning zone templates in Bulk Edit operations is currently not supported.
 
