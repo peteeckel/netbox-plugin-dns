@@ -4,14 +4,14 @@ The NetBox DNS plugin enables NetBox to manage operational DNS data such as name
 ## Objectives
 NetBox DNS is designed to be the 'DNS Source of Truth' analogous to NetBox being the 'Network Source of Truth'.
 
-The plugin stores information about DNS name servers, DNS views and zones, and DNS records, making it a data source for automatic provisioning of DNS instances. Registration information about DNS registrars and registratiob contacts for DNS domains can also be stored and associated with zones.
+The plugin stores information about DNS name servers, DNS views and zones, and DNS records, making it a data source for automatic provisioning of DNS instances. Registration information about DNS registrars and registration contacts for DNS domains can also be stored and associated with zones.
 
 The main focus of the plugin is to ensure the quality of the data stored in it. To achieve this, there are many validation and automation mechanisms in place:
 
 * Validation of record names and values
 * Automatic maintenance of PTR records for IPv6 and IPv4 address records
 * Automatic generation of SOA records, optionally including the serial number of the zone data
-* Validation of changs to the SOA SERIAL number, whether they are done automatically or manually
+* Validation of changes to the SOA SERIAL number, whether they are done automatically or manually
 * Validation of record types such as CNAME and singletons, to ensure DNS zone validity
 * Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
 * Automatic creation of address records and the corresponding pointer records for IPAM IP addresses (IPAM DNSsync)
@@ -146,7 +146,7 @@ NetBox 3.5.0 up to NetBox 3.7.x are not supported by the latest version of NetBo
 Currently NetBox DNS can manage eight different object types: Views, Name Servers, Zone Templates, Zones, Record Templates, Records, Registration Contacts and Registrars.
 
 ### Views
-Views are a concept that allows the DNS namespace to be partitioned into groups of zones that are isolated from each other. They are mainly used in split horizon DNS setups, for example in cases where there is a different DNS resolution requirement for external and internal clients, where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
+Views are a concept that allows the DNS name space to be partitioned into groups of zones that are isolated from each other. They are mainly used in split horizon DNS setups, for example in cases where there is a different DNS resolution requirement for external and internal clients, where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
 
 Each zone is associated with a view. There is a default view, initially named `_default_`, which is assigned automatically to all zones that don't specify an explicit view. The default view can be renamed at the discretion of the user, provided the view name is unique. Other views can be added as needed. If there is only the default view, no special action is required.
 
@@ -191,10 +191,10 @@ Field                 | Required | Explanation
 **Name**              | Yes      | The name of the view
 **Default View**      | Yes      | The view is the default view. This flag is set for exactly one view, setting it for a different view removes it from the former default view
 **Description**       | No       | A short textual description of the view
-**IPAM Prefixes**     | No       | A list of IPAM prefixes to link to the view for IPAM DNSsync. If prefixes are assigned to a view, IPAM DNSsync will try to find a a matching zone in the view if an IP Address has a DNS name assigned to it, and create an address record for that DNS name in the longest matching zone.
+**IPAM Prefixes**     | No       | A list of IPAM prefixes to link to the view for IPAM DNSsync. If prefixes are assigned to a view, IPAM DNSsync will try to find a matching zone in the view if an IP Address has a DNS name assigned to it, and create an address record for that DNS name in the longest matching zone.
 **IP Address Filter** | No       | A set of filter criteria for IP Address objects that determine whether or not IPAM DNSsync should create address records for it. If the field is empty, all IP Addresses will be considered for address record creation, otherwise only IP addresses matching the criteria will get address records. The syntax is the same as for object permissions in NetBox.
 **Tags**              | No       | NetBox tags assigned to the view. Tags can be used to categorise views by arbitrary criteria such as Production/Test/Development systems
-**Tenant**            | No       | The tenant the view is assined to
+**Tenant**            | No       | The tenant the view is assigned to
 
 ### Name servers
 Name server objects correspond to name servers in the DNS infrastructure and are basically fully qualified domain names (FQDN) of hosts running name server instances.
@@ -227,7 +227,7 @@ Field           | Required | Explanation
 **Name**        | Yes      | The fully qualified domain name (FQDN) of the name server
 **Description** | No       | A short textual description of the name server
 **Tags**        | No       | NetBox tags assigned to the name server. Tags can be used to categorise name servers by arbitrary criteria such as Production/Test/Development systems
-**Tenant**      | No       | The tenant the name server is assined to
+**Tenant**      | No       | The tenant the name server is assigned to
 
 A name server detail view:
 
@@ -451,7 +451,7 @@ A record detail view for a managed record:
 Note that for managed records there are no buttons for deleting, editing or cloning them as they cannot be managed manually. Otherwise they are handled  in the same way as standard records.
 
 #### Displaying records
-Records can either be displayed by opening the record list view from the "Records" or "Managed Records" navigation item on the left, or per zone via the respective tabs in the zone defail view. In any case, the tables can be filtered by name, value, zone, or tags to narrow down the set of records displayed.
+Records can either be displayed by opening the record list view from the "Records" or "Managed Records" navigation item on the left, or per zone via the respective tabs in the zone default view. In any case, the tables can be filtered by name, value, zone, or tags to narrow down the set of records displayed.
 
 #### Importing records
 When importing records in bulk, the mandatory fields are `name`, `zone`, `type` and `value`. If the optional `view` field is not specified, NetBox DNS will always look for the zone specified in `zone` in the default view. To address zones in non-default views, the `view` field must also be specified.
@@ -492,7 +492,7 @@ The following fields are defined for registrars:
 Field             | Required | Explanation
 -----             | -------- | -----------
 **Name**          | Yes      | A unique name for the registrar
-**IANA ID**       | No       | A numeric ID assigned by the IANA on accredtiation of the registrar
+**IANA ID**       | No       | A numeric ID assigned by the IANA on accreditation of the registrar
 **Referral URL**  | No       | The URL of the registrar's web presence
 **WHOIS Server**  | No       | The WHOIS server for the registrar
 **Abuse Email**   | No       | The Email address used to report abuse cases for a domain
@@ -588,7 +588,7 @@ Field                | Required | Template Field | Explanation
 **Name**             | Yes      | No             | The name of the zone template
 **Description**      | No       | No             | A short textual description of the zone template
 **Nameservers**      | No       | Yes            | The set of nameservers associated with the zone template
-**SOA MName**        | No       | Yes            | The master name server for the SOA record
+**SOA MName**        | No       | Yes            | The primary name server for the SOA record
 **SOA RName**        | No       | Yes            | The mail address of the responsible contact for the SOA record
 **Record templates** | No       | Yes            | The set of record templates associated with the zone template
 **Registrar**        | No       | Yes            | The registrar associated with the zone template
@@ -599,7 +599,7 @@ Field                | Required | Template Field | Explanation
 **Tags**             | No       | Yes            | NetBox tags assigned to the zone template
 **Tenant**           | No       | Yes            | A tenant associated with the zone template
 
-Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each remplate will be created in the target zone if there is no record with the same name, type and value yet.
+Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each template will be created in the target zone if there is no record with the same name, type and value yet.
 
 ### Record Templates
 Record templates are used to create records in zones to which zone templates are applied. A record template is very similar to a record without a zone. When it is applied to a zone, it defines a record to be created in that zone.
@@ -643,7 +643,7 @@ Field                | Required | Template Field | Explanation
 **Tenant**           | No       | Yes            | A tenant associated with the zone template
 **Tags**             | No       | Yes            | NetBox tags assigned to the zone template
 
-Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each remplate will be created in the target zone if there is no record with the same name, type and value yet.
+Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each template will be created in the target zone if there is no record with the same name, type and value yet.
 
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
@@ -663,7 +663,7 @@ There are some special cases that need to be taken care of:
 
 To take care of these cases, there are three configuration variables for NetBox DNS that adjust the validation of record names:
 
-* `tolerate_underscores_in_labels` can be set to allow the use of undercores in host names. Underscores are normally only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
+* `tolerate_underscores_in_labels` can be set to allow the use of underscores in host names. Underscores are normally only permitted in certain record types such as SRV, not in normal host names, but at least one operating system's DNS implementation does not follow the standard and allows this.
 * `tolerate_characters_in_zone_labels` is a string consisting of characters that are to be allowed in zone labels in addition to the standard characters. This can be used to allow zone names like `0/25.2.0.192.in-addr.arpa` from the RFC2317 examples. Allowing special characters can lead to unexpected results with zone provisioning tools and to zones not loadable by some or all DNS server implementations, so use this option with extreme caution.
 * `tolerate_leading_underscore_types` contains a list of RR types that allow an underscore as the first character in a label.
 * `tolerate_non_rfc1035_types` contains a list of record types that allow characters outside the set defined in RFC1035 to be used in RR names. Record types in this list are exempt from validation.
@@ -691,9 +691,9 @@ PLUGINS_CONFIG = {
 ```
 
 ## SOA SERIAL validation
-The SOA SERIAL field contains a serial number of a zone that is used to control if and when DNS slave servers load zone updates from their master servers. Basically, a slave server checks for the SOA SERIAL of a zone on the master server and only transfers the zone if that number is higher than the one it has in its own cached data. This does not depend on whether the transfer has been triggered by the upstream server via `NOTIFY` or whether it is scheduled by the slave because the SOA REFRESH time has elapsed.
+The SOA SERIAL field contains a serial number of a zone that is used to control if and when DNS secondary servers load zone updates from their primary servers. Basically, a secondary server checks for the SOA SERIAL of a zone on the primary server and only transfers the zone if that number is higher than the one it has in its own cached data. This does not depend on whether the transfer has been triggered by the upstream server via `NOTIFY` or whether it is scheduled by the secondary because the SOA REFRESH time has elapsed.
 
-SOA SERIAL numbers use integer arithmetic modulo 2^32, i.e. they wrap back to zero at 4.294.967.296. As a general rule, a serial number must never decrease (as this would keep the slaves from updating the zone). Any advancement by less than 2**31 (2.147.483.648) is considered an increase, 2.147.483.648 or more would mean a decrease in that logic and hence it is not a permitted change.
+SOA SERIAL numbers use integer arithmetic modulo 2^32, i.e. they wrap back to zero at 4.294.967.296. As a general rule, a serial number must never decrease (as this would keep the secondaries from updating the zone). Any advancement by less than 2**31 (2.147.483.648) is considered an increase, 2.147.483.648 or more would mean a decrease in that logic and hence it is not a permitted change.
 
 Starting from version 1.0.1, NetBox DNS does not allow the serial number to decrease and presents an error message if the user tries to perform an action that would lead to a lower than before serial number:
 
@@ -703,7 +703,7 @@ A special case occurs when a zone is switched from static serial numbers to auto
 
 ![Auto Serial Number Decrease Error](images/AutoSerialNumberDecrease.png)
 
-In this case, the serial number must first be adjusted manually so that the automatically generated serials are higher than the last value present on the slaves. See [RFC 2182, Section 7](https://datatracker.ietf.org/doc/html/rfc2182#section-7) for details on how to proceed.
+In this case, the serial number must first be adjusted manually so that the automatically generated serials are higher than the last value present on the secondaries. See [RFC 2182, Section 7](https://datatracker.ietf.org/doc/html/rfc2182#section-7) for details on how to proceed.
 
 
 ## International Domain Names (IDNs)
@@ -830,7 +830,7 @@ IPAM DNSsync is a new feature introduced with NetBox DNS 1.1 and replaces the ex
 ### Basic functionality
 The functionality of IPAM DNSsync is based on mapping IPAM Prefix objects to NetBox DNS View objects. An IPAM prefix can be assigned to one or multiple DNS views via the edit view for View objects.
 
-If a prefix is assigned to one or more views, NetBox DNS checks all IP addresses in the prefix for their 'DNS Name' field. If the DNS name ends in the zone name of any zone within the view, an address record within that zone is created so that the records's FQDN matches the DNS name of the IP address.
+If a prefix is assigned to one or more views, NetBox DNS checks all IP addresses in the prefix for their 'DNS Name' field. If the DNS name ends in the zone name of any zone within the view, an address record within that zone is created so that the records' FQDN matches the DNS name of the IP address.
 
 If there are multiple matching zones within the view, the one with the longest name is chosen. For example, if the DNS name is `name1.zone1.example.com` and there are zones `example.com` and `zone1.example.com` in the view, the resulting DNS record will be `name1` in zone `zone1.example.com` rather than `name1.zone1` in zone `example.com`.
 
@@ -1132,7 +1132,7 @@ PLUGINS_CONFIG = {
 The name of the submenu is always 'NETBOX DNS' and cannot be changed by setting `menu_name `. This is hard-coded in NetBox.
 
 ### Zone and Record status
-By default there are pre-defined values for the "Status" field of Zone and Record objects, which should fit the general case. For special requirements, both the list of possible statuses and the statuses consisidered active can be modified by editing the NetBox configuration file.
+By default there are pre-defined values for the "Status" field of Zone and Record objects, which should fit the general case. For special requirements, both the list of possible statuses and the statuses considered active can be modified by editing the NetBox configuration file.
 
 The list of possible choices for the zone and record statuses can be modified by setting the `FIELD_CHOICES` variable in the NetBox configuration file `configuration.py`, the statuses NetBox DNS considers active for zones and records in the `PLUGINS_CONFIG` variable in the same file.
 
@@ -1147,7 +1147,7 @@ FIELD_CHOICES = {
 }
 ```
 
-The first element in the tuple is the internal name for the new status (used e.g. in the API), the second is the label used in the GUI, and the optional third element is a colour used to display the status in the GUI. Note the `+` at the end of the key `netbox_dns.Zone.status+`. Without it, it would be necessary to define all standard statuses as well as the one to be added, which is error-prone. Do not remove standard statuses, especialls not the "Active" status!
+The first element in the tuple is the internal name for the new status (used e.g. in the API), the second is the label used in the GUI, and the optional third element is a colour used to display the status in the GUI. Note the `+` at the end of the key `netbox_dns.Zone.status+`. Without it, it would be necessary to define all standard statuses as well as the one to be added, which is error-prone. Do not remove standard statuses, specially not the "Active" status!
 
 The list of zone statuses considered active is defined in the `zone_active_status` variable in the plugin configuration for NetBox DNS. The default configuration can be modified by adding a status to that variable:
 
