@@ -83,7 +83,7 @@ PLUGINS = [
 ]
 ```
 
-To permanently keep the plugin installed when updating NetBox via `update.sh`:
+To permanently keep the plugin installed when updating NetBox via `upgrade.sh`:
 
 ```
 echo netbox-plugin-dns >> ~/netbox/local_requirements.txt
