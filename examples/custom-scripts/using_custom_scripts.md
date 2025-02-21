@@ -152,3 +152,30 @@ The above configuration should result in the scripts running whenever an address
 A click on the Job ID in the first column provides more detail:
 
 ![Add Tenancy Event Action](images/TenancyJobDetail.png)
+
+## Importing Zones via AXFR
+A recent discussion at FOSDEM 2025 led to the development of the `AXFR_Importer.py` custom script.
+
+The general idea is that it might be desirable to import a zone from another name server into NetBox DNS. This is mainly thought as a migration tool for the initial provisioning of NetBox DNS with existing data, but other uses of this technique may be desired.
+
+The script takes some parameters to run, mainly the name of the zone to import, the view to import it to, the connection data for the source name server and, optionally, a TSIG key for authentication of the zone transfer.
+
+![Add Tenancy Event Rule](images/AXFRImporterParameters.png)
+
+* **View**: The NetBox DNS view for the zone to be imported.
+* **Zone**: The name of the zone to import. This is also the name the zone will get in NetBox DNS. The example import script does not support updating an existing zone; it is therefore essential that the zone does not exist in NetBox DNS when running an import.
+* **Nameserver**: The IP address (not the host name) of the source name server.
+* **TSIG Key Name**: The name of an optional TSIG key used to authenticate against the source name server.
+* **TSIG Key**: The TSIG key to use for authentication.
+* **TSIG Key Algorithm**: The algorithm to be used with the TSIG key.
+* **Relativize Names**: A flag that determine whether to use relative names in record values or not. Some fields, such as SOA RNAME, and nameserver names, will always be represented absolute values regardless of this setting.
+* **Disable PTR**: If this flag is set, address records (`A` and `AAAA`) will not automatically create PTR records even if the matching reverse zone exists.
+
+Upon successful execution, the script should have the following result:
+
+* Objects for all name servers referenced in SOA MNAME or NS records will be created in NetBox DNS if they don't exist yet
+* The Zone will be created and all SOA fields will be populated from the source zone's SOA record.
+* All records present in the source zone will be created, with the exception of the following record types: `SOA`, `NSEC3`, `NSEC3PARAM`, `CDS`, `RRSIG`, and BIND RR type 65534.
+
+### Caveat
+This is **not** production quality code. It does not contain proper error handling and is only very superficially tested. Using it in production will potentially lead to data loss or corruption. The code is meant to serve as an example for users' own development and it's entirely within the users' responsibility to ensure the integrity and correctness of their data.
