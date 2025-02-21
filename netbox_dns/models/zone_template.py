@@ -136,6 +136,7 @@ class ZoneTemplate(NetBoxModel):
     def __str__(self):
         return str(self.name)
 
+    # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:zonetemplate", kwargs={"pk": self.pk})
 
