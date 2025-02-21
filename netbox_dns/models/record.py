@@ -263,6 +263,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def get_status_color(self):
         return RecordStatusChoices.colors.get(self.status)
 
+    # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:record", kwargs={"pk": self.pk})
 
