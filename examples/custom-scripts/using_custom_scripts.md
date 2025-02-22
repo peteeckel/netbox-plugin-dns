@@ -37,7 +37,7 @@ Additionally, a permission to view all DNS data is needed and must be created an
 ![Admin Create Permission](images/AdminCreateViewPermission.png)
 
 #### Installing the Exporter Script
-After these preparations, the example custom script `netbox_dns_exporters.py` can be installed using the NetBox GUI. Navigate to 'Customization/Scripts' in the sidebar, click on '+' and select the file containing the script for upload in the following dialog:
+After these preparations, the example custom script `NetBox_DNS_Exporter.py` can be installed using the NetBox GUI. Navigate to 'Customization/Scripts' in the sidebar, click on '+' and select the file containing the script for upload in the following dialog:
 
 ![Script Upload](images/ScriptUpload.png)
 
