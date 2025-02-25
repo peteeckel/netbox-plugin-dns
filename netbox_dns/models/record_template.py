@@ -174,9 +174,11 @@ class RecordTemplate(NetBoxModel):
         if tags := self.tags.all():
             record.tags.set(tags)
 
-    def clean_fields(self, *args, **kwargs):
+    def clean_fields(self, exclude=None):
         self.type = self.type.upper()
-        super().clean_fields(*args, **kwargs)
+        self.record_name = self.record_name.lower()
+
+        super().clean_fields(exclude=exclude)
 
     def clean(self, *args, **kwargs):
         self.validate_name()

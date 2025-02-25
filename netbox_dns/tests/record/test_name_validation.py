@@ -52,8 +52,8 @@ class RecordNameValidationTestCase(TestCase):
             {"name": "x" * 63 + f".{self.zones[1].name}", "zone": self.zones[1]},
             {"name": "xn--nme1-loa", "zone": self.zones[0]},
             {"name": "xn--nme2-loa.zone1.example.com.", "zone": self.zones[0]},
-            {"name": "XN--nme1-loa", "zone": self.zones[0]},
-            {"name": "XN--nme2-loa.zone1.example.com.", "zone": self.zones[0]},
+            {"name": "XN--nme3-loa", "zone": self.zones[0]},
+            {"name": "XN--nme4-loa.zone1.example.com.", "zone": self.zones[0]},
         )
 
         for record in records:

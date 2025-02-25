@@ -73,6 +73,11 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:nameserver", kwargs={"pk": self.pk})
 
+    def clean_fields(self, exclude=None):
+        self.name = self.name.lower()
+
+        super().clean_fields(exclude=exclude)
+
     def clean(self, *args, **kwargs):
         try:
             self.name = normalize_name(self.name)

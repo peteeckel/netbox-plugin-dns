@@ -373,7 +373,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         else:
             ptr_name = dns_name.from_text(
                 ipaddress.ip_address(self.value).reverse_pointer
-            ).relativize(dns_name.from_text(ptr_zone.name))
+            ).relativize(dns_name.from_text(ptr_zone.name)).to_text()
 
         ptr_value = self.fqdn
         ptr_record = self.ptr_record
@@ -442,10 +442,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if self.zone.rfc2317_parent_managed:
             cname_name = dns_name.from_text(
                 ipaddress.ip_address(self.ip_address).reverse_pointer
-            ).relativize(dns_name.from_text(self.zone.rfc2317_parent_zone.name))
+            ).relativize(dns_name.from_text(self.zone.rfc2317_parent_zone.name)).to_text()
 
             if self.rfc2317_cname_record is not None:
-                if self.rfc2317_cname_record.name == cname_name.to_text():
+                if self.rfc2317_cname_record.name == cname_name:
                     self.rfc2317_cname_record.zone = self.zone.rfc2317_parent_zone
                     self.rfc2317_cname_record.value = self.fqdn
                     self.rfc2317_cname_record.ttl = min_ttl(
@@ -770,9 +770,11 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             record.ttl = ttl
             record.save(update_fields=["ttl"], update_rrset_ttl=False)
 
-    def clean_fields(self, *args, **kwargs):
+    def clean_fields(self, exclude=None):
         self.type = self.type.upper()
-        super().clean_fields(*args, **kwargs)
+        self.name = self.name.lower()
+
+        super().clean_fields(exclude=exclude)
 
     def clean(self, *args, new_zone=None, **kwargs):
         self.validate_name(new_zone=new_zone)
