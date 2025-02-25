@@ -663,6 +663,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def clean_fields(self, exclude=None):
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
+        self.name = self.name.lower()
+
         if self.view_id is None:
             self.view_id = View.get_default_view().pk
 

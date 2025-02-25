@@ -37,6 +37,17 @@ class NameServerNameValidationTestCase(TestCase):
             with self.assertRaises(ValidationError):
                 NameServer.objects.create(name=name)
 
+    def test_name_lowercase(self):
+        nameserver = NameServer.objects.create(name="NS1.example.COM")
+
+        self.assertEqual(nameserver.name, "ns1.example.com")
+
+    def test_name_case_insensitive_conflict(self):
+        NameServer.objects.create(name="ns1.example.com")
+
+        with self.assertRaises(ValidationError):
+            NameServer.objects.create(name="NS1.example.COM")
+
     @override_settings(
         PLUGINS_CONFIG={"netbox_dns": {"tolerate_underscores_in_labels": True}}
     )

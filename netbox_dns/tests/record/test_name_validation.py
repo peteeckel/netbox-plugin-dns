@@ -52,8 +52,8 @@ class RecordNameValidationTestCase(TestCase):
             {"name": "x" * 63 + f".{self.zones[1].name}", "zone": self.zones[1]},
             {"name": "xn--nme1-loa", "zone": self.zones[0]},
             {"name": "xn--nme2-loa.zone1.example.com.", "zone": self.zones[0]},
-            {"name": "XN--nme1-loa", "zone": self.zones[0]},
-            {"name": "XN--nme2-loa.zone1.example.com.", "zone": self.zones[0]},
+            {"name": "XN--nme3-loa", "zone": self.zones[0]},
+            {"name": "XN--nme4-loa.zone1.example.com.", "zone": self.zones[0]},
         )
 
         for record in records:
@@ -123,6 +123,19 @@ class RecordNameValidationTestCase(TestCase):
                 Record.objects.create(
                     name=record.get("name"), zone=record.get("zone"), **self.record_data
                 )
+
+    def test_name_lowercase(self):
+        record = Record.objects.create(
+            name="NAME1", zone=self.zones[0], **self.record_data
+        )
+
+        self.assertEqual(record.fqdn, "name1.zone1.example.com.")
+
+    def test_name_case_insensitive_conflict(self):
+        Record.objects.create(name="name1", zone=self.zones[0], **self.record_data)
+
+        with self.assertRaises(ValidationError):
+            Record.objects.create(name="NAME1", zone=self.zones[0], **self.record_data)
 
     @override_settings(
         PLUGINS_CONFIG={
