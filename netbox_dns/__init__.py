@@ -64,6 +64,7 @@ class DNSConfig(PluginConfig):
         "enforce_unique_rrset_ttl": True,
         "menu_name": "DNS",
         "top_level_menu": True,
+        "convert_names_to_lowercase": False,
     }
     base_url = "netbox-dns"
 

@@ -176,7 +176,8 @@ class RecordTemplate(NetBoxModel):
 
     def clean_fields(self, exclude=None):
         self.type = self.type.upper()
-        self.record_name = self.record_name.lower()
+        if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
+            self.record_name = self.record_name.lower()
 
         super().clean_fields(exclude=exclude)
 

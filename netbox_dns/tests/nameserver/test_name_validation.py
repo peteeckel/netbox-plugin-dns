@@ -37,6 +37,14 @@ class NameServerNameValidationTestCase(TestCase):
             with self.assertRaises(ValidationError):
                 NameServer.objects.create(name=name)
 
+    def test_name_no_lowercase(self):
+        nameserver = NameServer.objects.create(name="NS1.example.COM")
+
+        self.assertEqual(nameserver.name, "NS1.example.COM")
+
+    @override_settings(
+        PLUGINS_CONFIG={"netbox_dns": {"convert_names_to_lowercase": True}}
+    )
     def test_name_lowercase(self):
         nameserver = NameServer.objects.create(name="NS1.example.COM")
 

@@ -124,6 +124,16 @@ class RecordNameValidationTestCase(TestCase):
                     name=record.get("name"), zone=record.get("zone"), **self.record_data
                 )
 
+    def test_name_no_lowercase(self):
+        record = Record.objects.create(
+            name="NAME1", zone=self.zones[0], **self.record_data
+        )
+
+        self.assertEqual(record.fqdn, "NAME1.zone1.example.com.")
+
+    @override_settings(
+        PLUGINS_CONFIG={"netbox_dns": {"convert_names_to_lowercase": True}}
+    )
     def test_name_lowercase(self):
         record = Record.objects.create(
             name="NAME1", zone=self.zones[0], **self.record_data

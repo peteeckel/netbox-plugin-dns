@@ -11,8 +11,8 @@ from django.core.validators import (
 )
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
-from django.db.models import Q, Max, ExpressionWrapper, BooleanField
-from django.db.models.functions import Length
+from django.db.models import Q, Max, ExpressionWrapper, BooleanField, UniqueConstraint
+from django.db.models.functions import Length, Lower
 from django.db.models.signals import m2m_changed
 from django.urls import reverse
 from django.dispatch import receiver
@@ -282,10 +282,13 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             "view",
             "name",
         )
-        unique_together = (
-            "view",
-            "name",
-        )
+        constraints = [
+            UniqueConstraint(
+                Lower("name"),
+                "view",
+                name="name_view_unique_ci",
+            ),
+        ]
 
     def __str__(self):
         if self.name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
@@ -663,7 +666,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def clean_fields(self, exclude=None):
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
-        self.name = self.name.lower()
+        if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
+            self.name = self.name.lower()
 
         if self.view_id is None:
             self.view_id = View.get_default_view().pk
