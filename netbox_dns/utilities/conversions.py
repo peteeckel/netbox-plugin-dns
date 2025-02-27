@@ -14,6 +14,7 @@ __all__ = (
     "value_to_unicode",
     "normalize_name",
     "network_to_reverse",
+    "regex_from_list",
 )
 
 
@@ -106,3 +107,7 @@ def network_to_reverse(network):
 
     if labels:
         return ".".join(ip_network[0].reverse_dns.split(".")[-labels:])
+
+
+def regex_from_list(names):
+    return f"^({'|'.join(re.escape(name) for name in names)})$"

@@ -16,7 +16,11 @@ from netbox_dns.forms import (
 from netbox_dns.models import Record, Zone
 from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.tables import RecordTable, ManagedRecordTable, RelatedRecordTable
-from netbox_dns.utilities import value_to_unicode, get_parent_zone_names
+from netbox_dns.utilities import (
+    value_to_unicode,
+    get_parent_zone_names,
+    regex_from_list,
+)
 
 
 __all__ = (
@@ -74,7 +78,9 @@ class RecordView(generic.ObjectView):
             )
 
         if instance.zone.view.zones.filter(
-            name__in=get_parent_zone_names(instance.value_fqdn, min_labels=1),
+            name__iregex=regex_from_list(
+                get_parent_zone_names(instance.value_fqdn, min_labels=1)
+            ),
             active=True,
         ).exists():
             raise (
@@ -97,7 +103,9 @@ class RecordView(generic.ObjectView):
         )
 
         parent_zones = instance.zone.view.zones.filter(
-            name__in=get_parent_zone_names(instance.fqdn, include_self=True),
+            name__iregex=regex_from_list(
+                get_parent_zone_names(instance.fqdn, include_self=True)
+            ),
         )
 
         for parent_zone in parent_zones:
@@ -148,10 +156,12 @@ class RecordView(generic.ObjectView):
 
                 if Zone.objects.filter(
                     active=True,
-                    name__in=get_parent_zone_names(
-                        instance.fqdn,
-                        min_labels=len(fqdn) - len(name),
-                        include_self=True,
+                    name__iregex=regex_from_list(
+                        get_parent_zone_names(
+                            instance.fqdn,
+                            min_labels=len(fqdn) - len(name),
+                            include_self=True,
+                        )
                     ),
                 ).exists():
                     context["mask_warning"] = _(

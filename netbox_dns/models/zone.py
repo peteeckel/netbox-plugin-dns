@@ -36,6 +36,7 @@ from netbox_dns.utilities import (
     name_to_unicode,
     normalize_name,
     get_parent_zone_names,
+    regex_from_list,
     NameFormatError,
 )
 from netbox_dns.validators import (
@@ -402,12 +403,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def descendant_zones(self):
-        return self.view.zones.filter(name__endswith=f".{self.name}")
+        return self.view.zones.filter(name__iendswith=f".{self.name}")
 
     @property
     def parent_zone(self):
         try:
-            return self.view.zones.get(name=get_parent_zone_names(self.name)[-1])
+            return self.view.zones.get(
+                name__iexact=get_parent_zone_names(self.name)[-1]
+            )
         except (Zone.DoesNotExist, IndexError):
             return None
 
@@ -415,20 +418,24 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def ancestor_zones(self):
         return (
             self.view.zones.annotate(name_length=Length("name"))
-            .filter(name__in=get_parent_zone_names(self.name))
+            .filter(name__iregex=regex_from_list(get_parent_zone_names(self.name)))
             .order_by("name_length")
         )
 
     @property
     def delegation_records(self):
         descendant_zone_names = [
-            f"{name}." for name in self.descendant_zones.values_list("name", flat=True)
+            rf"{name}."
+            for name in (
+                name.lower()
+                for name in self.descendant_zones.values_list("name", flat=True)
+            )
         ]
 
         ns_records = (
             self.records.filter(type=RecordTypeChoices.NS)
-            .exclude(fqdn=self.fqdn)
-            .filter(fqdn__in=descendant_zone_names)
+            .exclude(fqdn__iexact=self.fqdn)
+            .filter(fqdn__iregex=regex_from_list(descendant_zone_names))
         )
         ns_values = [record.value_fqdn for record in ns_records]
 
