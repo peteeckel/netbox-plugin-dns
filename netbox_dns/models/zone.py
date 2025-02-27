@@ -11,8 +11,8 @@ from django.core.validators import (
 )
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
-from django.db.models import Q, Max, ExpressionWrapper, BooleanField
-from django.db.models.functions import Length
+from django.db.models import Q, Max, ExpressionWrapper, BooleanField, UniqueConstraint
+from django.db.models.functions import Length, Lower
 from django.db.models.signals import m2m_changed
 from django.urls import reverse
 from django.dispatch import receiver
@@ -36,6 +36,7 @@ from netbox_dns.utilities import (
     name_to_unicode,
     normalize_name,
     get_parent_zone_names,
+    regex_from_list,
     NameFormatError,
 )
 from netbox_dns.validators import (
@@ -282,10 +283,13 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             "view",
             "name",
         )
-        unique_together = (
-            "view",
-            "name",
-        )
+        constraints = [
+            UniqueConstraint(
+                Lower("name"),
+                "view",
+                name="name_view_unique_ci",
+            ),
+        ]
 
     def __str__(self):
         if self.name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
@@ -399,12 +403,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def descendant_zones(self):
-        return self.view.zones.filter(name__endswith=f".{self.name}")
+        return self.view.zones.filter(name__iendswith=f".{self.name}")
 
     @property
     def parent_zone(self):
         try:
-            return self.view.zones.get(name=get_parent_zone_names(self.name)[-1])
+            return self.view.zones.get(
+                name__iexact=get_parent_zone_names(self.name)[-1]
+            )
         except (Zone.DoesNotExist, IndexError):
             return None
 
@@ -412,20 +418,24 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def ancestor_zones(self):
         return (
             self.view.zones.annotate(name_length=Length("name"))
-            .filter(name__in=get_parent_zone_names(self.name))
+            .filter(name__iregex=regex_from_list(get_parent_zone_names(self.name)))
             .order_by("name_length")
         )
 
     @property
     def delegation_records(self):
         descendant_zone_names = [
-            f"{name}." for name in self.descendant_zones.values_list("name", flat=True)
+            rf"{name}."
+            for name in (
+                name.lower()
+                for name in self.descendant_zones.values_list("name", flat=True)
+            )
         ]
 
         ns_records = (
             self.records.filter(type=RecordTypeChoices.NS)
-            .exclude(fqdn=self.fqdn)
-            .filter(fqdn__in=descendant_zone_names)
+            .exclude(fqdn__iexact=self.fqdn)
+            .filter(fqdn__iregex=regex_from_list(descendant_zone_names))
         )
         ns_values = [record.value_fqdn for record in ns_records]
 
@@ -663,7 +673,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def clean_fields(self, exclude=None):
         defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
-        self.name = self.name.lower()
+        if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
+            self.name = self.name.lower()
 
         if self.view_id is None:
             self.view_id = View.get_default_view().pk

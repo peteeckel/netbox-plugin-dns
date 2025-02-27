@@ -619,7 +619,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             new_zone = self.zone
 
         records = new_zone.records.filter(
-            name=self.name,
+            name__iexact=self.name,
             type=self.type,
             value=self.value,
             status__in=RECORD_ACTIVE_STATUS_LIST,
@@ -778,7 +778,8 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def clean_fields(self, exclude=None):
         self.type = self.type.upper()
-        self.name = self.name.lower()
+        if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
+            self.name = self.name.lower()
 
         super().clean_fields(exclude=exclude)
 

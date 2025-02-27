@@ -61,6 +61,16 @@ class ZoneNameValidationTestCase(TestCase):
             with self.assertRaises(ValidationError):
                 Zone.objects.create(name=name, **self.zone_data)
 
+    def test_name_nolowercase(self):
+        zone = Zone.objects.create(name="ZONE1.example.COM", **self.zone_data)
+
+        self.assertEqual(zone.name, "ZONE1.example.COM")
+
+    @override_settings(
+        PLUGINS_CONFIG={
+            "netbox_dns": {**zone_defaults, "convert_names_to_lowercase": True}
+        }
+    )
     def test_name_lowercase(self):
         zone = Zone.objects.create(name="ZONE1.example.COM", **self.zone_data)
 

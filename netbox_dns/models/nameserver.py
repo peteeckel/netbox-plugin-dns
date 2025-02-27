@@ -2,13 +2,15 @@ from dns import name as dns_name
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, UniqueConstraint
+from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.models.features import ContactsMixin
+from netbox.plugins.utils import get_plugin_config
 
 from netbox_dns.utilities import (
     name_to_unicode,
@@ -29,7 +31,6 @@ __all__ = (
 class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     name = models.CharField(
         verbose_name=_("Name"),
-        unique=True,
         max_length=255,
         db_collation="natural_sort",
     )
@@ -59,6 +60,13 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         ordering = ("name",)
 
+        constraints = [
+            UniqueConstraint(
+                Lower("name"),
+                name="name_unique_ci",
+            ),
+        ]
+
     def __str__(self):
         try:
             return dns_name.from_text(self.name, origin=None).to_unicode()
@@ -74,7 +82,8 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         return reverse("plugins:netbox_dns:nameserver", kwargs={"pk": self.pk})
 
     def clean_fields(self, exclude=None):
-        self.name = self.name.lower()
+        if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
+            self.name = self.name.lower()
 
         super().clean_fields(exclude=exclude)
 

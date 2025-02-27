@@ -13,6 +13,7 @@ from ipam.models import IPAddress, Prefix
 from netbox_dns.choices import RecordStatusChoices
 
 from .dns import get_parent_zone_names
+from .conversions import regex_from_list
 
 
 __all__ = (
@@ -90,8 +91,10 @@ def get_zones(ip_address, view=None, old_zone=None):
 
     zones = Zone.objects.filter(
         view__in=views,
-        name__in=get_parent_zone_names(
-            ip_address.dns_name, min_labels=min_labels, include_self=True
+        name__iregex=regex_from_list(
+            get_parent_zone_names(
+                ip_address.dns_name, min_labels=min_labels, include_self=True
+            )
         ),
         active=True,
     )
