@@ -288,6 +288,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 Lower("name"),
                 "view",
                 name="name_view_unique_ci",
+                violation_error_message=_(
+                    "There is already a zone with the same name in this view"
+                ),
             ),
         ]
 

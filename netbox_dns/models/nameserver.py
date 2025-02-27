@@ -64,6 +64,9 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             UniqueConstraint(
                 Lower("name"),
                 name="name_unique_ci",
+                violation_error_message=_(
+                    "There is already a nameserver with this name"
+                ),
             ),
         ]
 
