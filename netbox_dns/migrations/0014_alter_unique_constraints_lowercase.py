@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(
                 django.db.models.functions.text.Lower("name"),
                 models.F("view"),
-                name="name_vieq_unique_ci",
+                name="name_view_unique_ci",
             ),
         ),
     ]
