@@ -1,8 +1,5 @@
 import uuid
 
-from unittest import skipIf
-from packaging.version import Version
-
 import django_rq
 from django.urls import reverse
 from django.test import RequestFactory
@@ -12,26 +9,15 @@ from core.models import ObjectType
 from extras.models import EventRule, Tag, Webhook
 from extras.choices import EventRuleActionChoices
 
-# Backward compatibility for NetBox 4.0.x
-try:
-    from netbox.context_managers import event_tracking
-    from utilities.release import load_release_data
-    from core.events import OBJECT_CREATED, OBJECT_UPDATED
+from netbox.context_managers import event_tracking
+from core.events import OBJECT_CREATED, OBJECT_UPDATED
 
-    NETBOX_VERSION = Version(load_release_data().version)
-except ImportError:
-    from extras.context_managers import event_tracking
-    from django.conf import settings
-
-    NETBOX_VERSION = Version(settings.VERSION)
 from utilities.testing import APITestCase
 
 from netbox_dns.models import NameServer, Zone
 
 
 class ZoneEventRuleTest(APITestCase):
-    MIN_VERSION = "4.0.5"
-
     def setUp(self):
         super().setUp()
 
@@ -51,29 +37,17 @@ class ZoneEventRuleTest(APITestCase):
         )
         Webhook.objects.bulk_create(webhooks)
 
-        # Backward compatibility for NetBox 4.0.x
-        CREATE_OBJECT_SELECTOR = (
-            {"event_types": [OBJECT_CREATED]}
-            if NETBOX_VERSION >= Version("4.1.0")
-            else {"type_create": "True"}
-        )
-        UPDATE_OBJECT_SELECTOR = (
-            {"event_types": [OBJECT_UPDATED]}
-            if NETBOX_VERSION >= Version("4.1.0")
-            else {"type_update": "True"}
-        )
-
         event_rules = (
             EventRule(
                 name="Zone Create",
-                **CREATE_OBJECT_SELECTOR,
+                event_types=[OBJECT_CREATED],
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
             ),
             EventRule(
                 name="Zone Update",
-                **UPDATE_OBJECT_SELECTOR,
+                event_types=[OBJECT_UPDATED],
                 action_type=EventRuleActionChoices.WEBHOOK,
                 action_object_type=webhook_type,
                 action_object_id=webhooks[0].id,
@@ -102,10 +76,6 @@ class ZoneEventRuleTest(APITestCase):
             "soa_rname": "hostmaster.example.com",
         }
 
-    @skipIf(
-        NETBOX_VERSION < Version(MIN_VERSION),
-        f"Event rule processing is broken in NetBox < {MIN_VERSION}",
-    )
     def test_create_zone(self):
         url = reverse("plugins:netbox_dns:zone_add")
         request = RequestFactory().get(url)
@@ -160,10 +130,6 @@ class ZoneEventRuleTest(APITestCase):
         )
         self.assertEqual(job.kwargs["snapshots"]["postchange"]["soa_refresh"], 86400)
 
-    @skipIf(
-        NETBOX_VERSION < Version(MIN_VERSION),
-        f"Event rule processing is broken in NetBox < {MIN_VERSION}",
-    )
     def test_update_zone_add_nameservers(self):
         zone = Zone.objects.create(name="zone1.example.com", **self.zone_data)
 
@@ -192,10 +158,6 @@ class ZoneEventRuleTest(APITestCase):
             [nameserver.pk for nameserver in self.nameservers[1:]],
         )
 
-    @skipIf(
-        NETBOX_VERSION < Version(MIN_VERSION),
-        f"Event rule processing is broken in NetBox < {MIN_VERSION}",
-    )
     def test_update_zone_remove_nameservers(self):
         zone = Zone.objects.create(name="zone1.example.com", **self.zone_data)
         zone.nameservers.set(self.nameservers[1:])
@@ -222,10 +184,6 @@ class ZoneEventRuleTest(APITestCase):
         )
         self.assertEqual(len(job.kwargs["snapshots"]["postchange"]["nameservers"]), 0)
 
-    @skipIf(
-        NETBOX_VERSION < Version(MIN_VERSION),
-        f"Event rule processing is broken in NetBox < {MIN_VERSION}",
-    )
     def test_update_zone_add_tags(self):
         zone = Zone.objects.create(name="zone1.example.com", **self.zone_data)
 
@@ -253,10 +211,6 @@ class ZoneEventRuleTest(APITestCase):
             [tag.name for tag in self.tags],
         )
 
-    @skipIf(
-        NETBOX_VERSION < Version(MIN_VERSION),
-        f"Event rule processing is broken in NetBox < {MIN_VERSION}",
-    )
     def test_update_zone_remove_tags(self):
         zone = Zone.objects.create(name="zone1.example.com", **self.zone_data)
         zone.tags.set(self.tags)
