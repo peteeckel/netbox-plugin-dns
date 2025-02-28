@@ -1,3 +1,5 @@
+from packaging.version import Version
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -7,6 +9,7 @@ from netbox.forms import (
     NetBoxModelImportForm,
     NetBoxModelForm,
 )
+from utilities.release import load_release_data
 from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
     TagFilterField,
@@ -34,20 +37,25 @@ __all__ = (
     "ZoneTemplateBulkEditForm",
 )
 
+QUICK_ADD = Version(load_release_data().version) >= Version("4.2.5")
+
 
 class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        quick_add=QUICK_ADD,
     )
     soa_mname = DynamicModelChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
         label=_("MName"),
+        quick_add=QUICK_ADD,
     )
     record_templates = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
+        quick_add=QUICK_ADD,
     )
 
     fieldsets = (
