@@ -936,7 +936,7 @@ class RecordValidationTestCase(TestCase):
             Record(
                 name="name3",
                 zone=zone,
-                value='"\U0001F595"',
+                value='"\U0001f595"',
             ),
         )
 
