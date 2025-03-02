@@ -25,7 +25,9 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="nameserver",
             constraint=models.UniqueConstraint(
-                django.db.models.functions.text.Lower("name"), name="name_unique_ci"
+                django.db.models.functions.text.Lower("name"),
+                name="name_unique_ci",
+                violation_error_message="There is already a nameserver with this name",
             ),
         ),
         migrations.AddConstraint(
@@ -34,6 +36,7 @@ class Migration(migrations.Migration):
                 django.db.models.functions.text.Lower("name"),
                 models.F("view"),
                 name="name_view_unique_ci",
+                violation_error_message="There is already a zone with the same name in this view",
             ),
         ),
     ]
