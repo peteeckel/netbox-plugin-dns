@@ -92,6 +92,46 @@ managed_record_menu_item = PluginMenuItem(
     permissions=["netbox_dns.view_record"],
 )
 
+dnsseckey_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:dnsseckey_list",
+    link_text=_("DNSSEC Keys"),
+    permissions=["netbox_dns.view_dnsseckey"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:dnsseckey_add",
+            _("Add"),
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_dnsseckey"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:dnsseckey_bulk_import",
+            _("Import"),
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_dnsseckey"],
+        ),
+    ),
+)
+
+dnssecpolicy_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:dnssecpolicy_list",
+    link_text=_("DNSSEC Policies"),
+    permissions=["netbox_dns.view_dnssecpolicy"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:dnssecpolicy_add",
+            _("Add"),
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_dnssecpolicy"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:dnssecpolicy_bulk_import",
+            _("Import"),
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_dnssecpolicy"],
+        ),
+    ),
+)
+
 zonetemplate_menu_item = PluginMenuItem(
     link="plugins:netbox_dns:zonetemplate_list",
     link_text=_("Zone Templates"),
@@ -188,6 +228,13 @@ if top_level_menu:
                 ),
             ),
             (
+                _("DNSSEC"),
+                (
+                    dnsseckey_menu_item,
+                    dnssecpolicy_menu_item,
+                ),
+            ),
+            (
                 _("Templates"),
                 (
                     zonetemplate_menu_item,
@@ -211,6 +258,8 @@ else:
         nameserver_menu_item,
         record_menu_item,
         managed_record_menu_item,
+        dnsseckey_menu_item,
+        dnssecpolicy_menu_item,
         registrar_menu_item,
         contact_menu_item,
     )
