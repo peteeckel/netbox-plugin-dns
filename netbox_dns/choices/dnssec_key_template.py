@@ -26,9 +26,9 @@ __all__ = (
 
 
 class DNSSECKeyTemplateTypeChoices(ChoiceSet):
-    TYPE_CSK = "csk"
-    TYPE_KSK = "ksk"
-    TYPE_ZSK = "zsk"
+    TYPE_CSK = "CSK"
+    TYPE_KSK = "KSK"
+    TYPE_ZSK = "ZSK"
 
     CHOICES = [
         (TYPE_CSK, _("CSK"), "purple"),
