@@ -186,9 +186,12 @@ class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
     name: str
     description: str | None
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
-    key_templates: List[Annotated[
-        "NetBoxDNSDNSSECKeyTemplateType", strawberry.lazy("netbox_dns.graphql.types")
-    ]]
+    key_templates: List[
+        Annotated[
+            "NetBoxDNSDNSSECKeyTemplateType",
+            strawberry.lazy("netbox_dns.graphql.types"),
+        ]
+    ]
     inline_signing: bool
     dnskey_ttl: BigInt | None
     purge_keys: BigInt | None
