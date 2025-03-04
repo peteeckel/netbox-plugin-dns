@@ -191,6 +191,10 @@ class RecordTemplateImportForm(NetBoxModelImportForm):
 class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
     model = RecordTemplate
 
+    record_name = forms.CharField(
+        required=False,
+        label=_("Record Name"),
+    )
     type = forms.ChoiceField(
         choices=add_blank_choice(RecordSelectableTypeChoices),
         required=False,
