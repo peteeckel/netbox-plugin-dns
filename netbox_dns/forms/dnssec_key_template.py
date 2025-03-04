@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.postgres.forms import SimpleArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
@@ -13,10 +14,15 @@ from utilities.forms.fields import (
     DynamicModelChoiceField,
 )
 from utilities.forms.rendering import FieldSet
+from utilities.forms import add_blank_choice
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import DNSSECKeyTemplate
+from netbox_dns.choices import (
+    DNSSECKeyTemplateTypeChoices,
+    DNSSECKeyTemplateAlgorithmChoices,
+)
 
 
 __all__ = (
@@ -56,7 +62,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name=_("Attributes")),
         FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
-        FieldSet("type", "tenant_id", name=_("Tenancy")),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
 
     name = forms.CharField(
@@ -64,6 +70,24 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     description = forms.CharField(
         required=False,
+    )
+    type = forms.MultipleChoiceField(
+        choices=DNSSECKeyTemplateTypeChoices,
+        required=False,
+    )
+    lifetime = SimpleArrayField(
+        base_field=forms.IntegerField(),
+        required=False,
+        help_text=_("Enter a list of integer lifetime values, separated by comma (,)"),
+    )
+    algorithm = forms.MultipleChoiceField(
+        choices=DNSSECKeyTemplateAlgorithmChoices,
+        required=False,
+    )
+    key_size = SimpleArrayField(
+        base_field=forms.IntegerField(),
+        required=False,
+        help_text=_("Enter a list of integer key sizes, separated by comma (,)"),
     )
     tag = TagFilterField(DNSSECKeyTemplate)
 
@@ -93,6 +117,24 @@ class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
 class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
     model = DNSSECKeyTemplate
 
+    type = forms.ChoiceField(
+        choices=add_blank_choice(DNSSECKeyTemplateTypeChoices),
+        required=False,
+        label=_("Key Type"),
+    )
+    lifetime = forms.IntegerField(
+        required=False,
+        label=_("Lifetime"),
+    )
+    algorithm = forms.ChoiceField(
+        choices=add_blank_choice(DNSSECKeyTemplateAlgorithmChoices),
+        required=False,
+        label=_("Algorithm"),
+    )
+    key_size = forms.IntegerField(
+        required=False,
+        label=_("Key Size"),
+    )
     description = forms.CharField(
         max_length=200,
         required=False,
@@ -116,6 +158,11 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         ),
         FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
         FieldSet("tenant_group", "tenant", name=_("Tenancy")),
+    )
+
+    fields = (
+        "algorithm",
+        "key_size",
     )
 
     nullable_fields = ("description", "tenant", "lifetime", "key_size")

@@ -33,4 +33,14 @@ class DNSSECKeyTemplateSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name", "description")
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "type",
+            "lifetime",
+            "algorithm",
+            "key_size",
+            "description",
+        )
