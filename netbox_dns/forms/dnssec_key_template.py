@@ -12,13 +12,14 @@ from utilities.forms.fields import (
     TagFilterField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms import add_blank_choice
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import DNSSECKeyTemplate
+from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
@@ -61,6 +62,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name=_("Attributes")),
+        FieldSet("policy_id", name=_("Policies")),
         FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
         FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
@@ -70,6 +72,11 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     description = forms.CharField(
         required=False,
+    )
+    policy_id = DynamicModelMultipleChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        label=_("Policies"),
     )
     type = forms.MultipleChoiceField(
         choices=DNSSECKeyTemplateTypeChoices,
