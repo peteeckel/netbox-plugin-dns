@@ -124,7 +124,11 @@
                         </tr>
                         {% if object.nsec3_iterations or object.nsec3_opt_out or object.nsec3_salt_size %}
                         <tr>
-                            <td class="text-warning">{% trans "Using NSEC3 iterations, opt-out or a salt is not recommended" %}</th>
+                            <th class="text-warning">
+                                {% blocktrans with link='<a href="https://datatracker.ietf.org/doc/html/rfc9276.html#section-3.1">RFC 9276, Section 3.1</a>' %}
+                                    Using NSEC3 options is not recommended (see {{ link }})
+                                {% endblocktrans %}
+                            </th>
                         </tr>
                         {% endif %}
                     {% endif %}
