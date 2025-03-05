@@ -18,6 +18,7 @@ from utilities.forms.fields import (
 from utilities.release import load_release_data
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import BulkEditNullBooleanSelect
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -118,7 +119,40 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name=_("Attributes")),
+        FieldSet(
+            "key_template_id",
+            "inline_signing",
+            name=_("Signing"),
+        ),
+        FieldSet(
+            "dnskey_ttl",
+            "purge_keys",
+            "publish_safety",
+            "retire_safety",
+            "signatures_jitter",
+            "signatures_refresh",
+            "signatures_validity",
+            "signatures_validity_dnskey",
+            "max_zone_ttl",
+            "zone_propagation_delay",
+            name=_("Timing"),
+        ),
+        FieldSet(
+            "create_cdnskey",
+            "cds_digest_types",
+            "parent_ds_ttl",
+            "parent_propagation_delay",
+            name=_("Parent Delegation"),
+        ),
+        FieldSet(
+            "use_nsec3",
+            "nsec3_iterations",
+            "nsec3_opt_out",
+            "nsec3_salt_size",
+            name=_("Proof of Non-Existence"),
+        ),
         FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet("tags", name=_("Tags")),
     )
 
     name = forms.CharField(
@@ -127,6 +161,98 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     description = forms.CharField(
         required=False,
     )
+
+    key_template_id = DynamicModelMultipleChoiceField(
+        queryset=DNSSECKeyTemplate.objects.all(),
+        required=False,
+        label=_("Key Templates"),
+    )
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Use Inline Signing"),
+    )
+
+    dnskey_ttl = forms.IntegerField(
+        required=False,
+        label=_("DNSKEY TTL"),
+    )
+    purge_keys = forms.IntegerField(
+        required=False,
+        label=_("Purge Keys"),
+    )
+    publish_safety = forms.IntegerField(
+        required=False,
+        label=_("Publish Safety"),
+    )
+    retire_safety = forms.IntegerField(
+        required=False,
+        label=_("Retire Safety"),
+    )
+    signatures_jitter = forms.IntegerField(
+        required=False,
+        label=_("Signatures Jitter"),
+    )
+    signatures_refresh = forms.IntegerField(
+        required=False,
+        label=_("Signatures Refresh"),
+    )
+    signatures_validity = forms.IntegerField(
+        required=False,
+        label=_("Signatures Validity"),
+    )
+    signatures_validity_dnskey = forms.IntegerField(
+        required=False,
+        label=_("Signatures Validity (DNSKEY)"),
+    )
+    max_zone_ttl = forms.IntegerField(
+        required=False,
+        label=_("Max Zone TTL"),
+    )
+    zone_propagation_delay = forms.IntegerField(
+        required=False,
+        label=_("Zone Propagation Delay"),
+    )
+
+    create_cdnskey = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Create CDNSKEY"),
+    )
+    cds_digest_types = forms.MultipleChoiceField(
+        required=False,
+        choices=DNSSECPolicyDigestChoices,
+        label=_("CDS Digest Types"),
+    )
+    parent_ds_ttl = forms.IntegerField(
+        required=False,
+        label=_("Parent DS TTL"),
+    )
+    parent_propagation_delay = forms.IntegerField(
+        required=False,
+        label=_("Parent Propagation Delay"),
+    )
+
+    use_nsec3 = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Use NSEC3"),
+    )
+    nsec3_iterations = forms.IntegerField(
+        required=False,
+        label=_("NSEC3 Iterations"),
+    )
+    nsec3_opt_out = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("NSEC3 Opt-Out"),
+    )
+    nsec3_salt_size = forms.IntegerField(
+        required=False,
+        label=_("NSEC3 Salt Size"),
+    )
+
+
     tag = TagFilterField(DNSSECPolicy)
 
 
