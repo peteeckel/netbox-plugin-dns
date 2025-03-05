@@ -17,10 +17,12 @@ from utilities.forms.fields import (
 )
 from utilities.release import load_release_data
 from utilities.forms.rendering import FieldSet
+from utilities.forms.widgets import BulkEditNullBooleanSelect
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
+from netbox_dns.choices import DNSSECPolicyDigestChoices
 
 
 __all__ = (
@@ -110,6 +112,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "tags",
         )
 
+
 class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = DNSSECPolicy
     fieldsets = (
@@ -173,6 +176,92 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Description"),
     )
+
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label=_("Use Inline Signing"),
+    )
+
+    dnskey_ttl = forms.IntegerField(
+        required=False,
+        label=_("DNSKEY TTL"),
+    )
+    purge_keys = forms.IntegerField(
+        required=False,
+        label=_("Purge Keys"),
+    )
+    publish_safety = forms.IntegerField(
+        required=False,
+        label=_("Publish Safety"),
+    )
+    retire_safety = forms.IntegerField(
+        required=False,
+        label=_("Retire Safety"),
+    )
+    signatures_jitter = forms.IntegerField(
+        required=False,
+        label=_("Signatures Jitter"),
+    )
+    signatures_refresh = forms.IntegerField(
+        required=False,
+        label=_("Signatures Refresh"),
+    )
+    signatures_validity = forms.IntegerField(
+        required=False,
+        label=_("Signatures Validity"),
+    )
+    signatures_validity_dnskey = forms.IntegerField(
+        required=False,
+        label=_("Signatures Validity (DNSKEY)"),
+    )
+    max_zone_ttl = forms.IntegerField(
+        required=False,
+        label=_("Max Zone TTL"),
+    )
+    zone_propagation_delay = forms.IntegerField(
+        required=False,
+        label=_("Zone Propagation Delay"),
+    )
+
+    create_cdnskey = forms.NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label=_("Create CDNSKEY"),
+    )
+    cds_digest_types = forms.MultipleChoiceField(
+        choices=DNSSECPolicyDigestChoices,
+        required=False,
+        label=_("CDS Digest Types"),
+    )
+    parent_ds_ttl = forms.IntegerField(
+        required=False,
+        label=_("Parent DS TTL"),
+    )
+    parent_propagation_delay = forms.IntegerField(
+        required=False,
+        label=_("Parent Propagation Delay"),
+    )
+
+    use_nsec3 = forms.NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label=_("Use NSEC3"),
+    )
+    nsec3_iterations = forms.IntegerField(
+        required=False,
+        label=_("NSEC3 Iterations"),
+    )
+    nsec3_opt_out = forms.NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label=_("NSEC3 Opt-Out"),
+    )
+    nsec3_salt_size = forms.IntegerField(
+        required=False,
+        label=_("NSEC3 Salt Size"),
+    )
+
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),
         required=False,
@@ -247,3 +336,14 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         "parent_ds_ttl",
         "parent_propagation_delay",
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.cleaned_data.get("cds_digest_types"):
+            if "cds_digest_types" not in self.data.get("_nullify", []):
+                self.cleaned_data["cds_digest_types"] = self.initial.get(
+                    "cds_digest_types"
+                )
+
+        return cleaned_data
