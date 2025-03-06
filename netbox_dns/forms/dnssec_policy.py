@@ -1,3 +1,5 @@
+from packaging.version import Version
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -13,6 +15,7 @@ from utilities.forms.fields import (
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
 )
+from utilities.release import load_release_data
 from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
@@ -26,6 +29,8 @@ __all__ = (
     "DNSSECPolicyImportForm",
     "DNSSECPolicyBulkEditForm",
 )
+
+QUICK_ADD = Version(load_release_data().version) >= Version("4.2.5")
 
 
 class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
@@ -72,7 +77,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         required=False,
         label=_("Key Templates"),
         help_text=_("Select CSK or KSK/ZSK templates for signing"),
-        quick_add=True,
+        quick_add=QUICK_ADD,
     )
 
     class Meta:
