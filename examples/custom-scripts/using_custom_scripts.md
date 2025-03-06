@@ -177,5 +177,7 @@ Upon successful execution, the script should have the following result:
 * The Zone will be created and all SOA fields will be populated from the source zone's SOA record.
 * All records present in the source zone will be created, with the exception of the following record types: `SOA`, `NSEC3`, `NSEC3PARAM`, `CDS`, `RRSIG`, and BIND RR type 65534.
 
+A different approach to the task of importing data from existing zones has been implemented by Matt Kollross (@kollross) and made available, together with some other useful tools he implemented for NetBox and NetBox DNS, in [this GitHub repository](https://github.com/ncsa/neteng-netbox-tools). 
+
 ### Caveat
 This is **not** production quality code. It does not contain proper error handling and is only very superficially tested. Using it in production will potentially lead to data loss or corruption. The code is meant to serve as an example for users' own development and it's entirely within the users' responsibility to ensure the integrity and correctness of their data.
