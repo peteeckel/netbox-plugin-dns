@@ -8,6 +8,8 @@ from .types import (
     NetBoxDNSViewType,
     NetBoxDNSZoneType,
     NetBoxDNSRecordType,
+    NetBoxDNSDNSSECKeyTemplateType,
+    NetBoxDNSDNSSECPolicyType,
     NetBoxDNSRegistrationContactType,
     NetBoxDNSRegistrarType,
     NetBoxDNSZoneTemplateType,
@@ -39,6 +41,24 @@ class NetBoxDNSZoneQuery:
 class NetBoxDNSRecordQuery:
     netbox_dns_record: NetBoxDNSRecordType = strawberry_django.field()
     netbox_dns_record_list: List[NetBoxDNSRecordType] = strawberry_django.field()
+
+
+@strawberry.type(name="Query")
+class NetBoxDNSDNSSECKeyTemplateQuery:
+    netbox_dns_dnssec_key_template: NetBoxDNSDNSSECKeyTemplateType = (
+        strawberry_django.field()
+    )
+    netbox_dns_dnssec_key_template_list: List[NetBoxDNSDNSSECKeyTemplateType] = (
+        strawberry_django.field()
+    )
+
+
+@strawberry.type(name="Query")
+class NetBoxDNSDNSSECPolicyQuery:
+    netbox_dns_dnssec_policy: NetBoxDNSDNSSECPolicyType = strawberry_django.field()
+    netbox_dns_dnssec_policy_list: List[NetBoxDNSDNSSECPolicyType] = (
+        strawberry_django.field()
+    )
 
 
 @strawberry.type(name="Query")
