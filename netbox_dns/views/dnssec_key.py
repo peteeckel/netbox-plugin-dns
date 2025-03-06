@@ -36,7 +36,7 @@ class DNSSECKeyListView(generic.ObjectListView):
 
 @register_model_view(DNSSECKey)
 class DNSSECKeyView(generic.ObjectView):
-    queryset = DNSSECKey.objects.prefetch_related("dnsseckeys")
+    queryset = DNSSECKey.objects.prefetch_related("policies")
 
 
 @register_model_view(DNSSECKey, "add", detail=False)

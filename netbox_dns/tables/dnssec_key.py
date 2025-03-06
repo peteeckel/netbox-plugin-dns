@@ -26,7 +26,7 @@ class DNSSECKeyTable(TenancyColumnsMixin, NetBoxTable):
     lifetime = tables.Column(
         verbose_name=_("Lifetime"),
     )
-    algorithm = tables.Column(
+    algorithm = ChoiceFieldColumn(
         verbose_name=_("Algorithm"),
     )
     key_size = tables.Column(
@@ -43,5 +43,6 @@ class DNSSECKeyTable(TenancyColumnsMixin, NetBoxTable):
             "name",
             "type",
             "algorithm",
+            "key_size",
             "tags",
         )
