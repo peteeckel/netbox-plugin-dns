@@ -2,6 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from netbox.plugins.utils import get_plugin_config
 
+
 def define_choice_attributes(filter_name=None):
     try:
         if filter_name is not None:
