@@ -1,13 +1,14 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.contrib.postgres.fields import ArrayField
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.models.features import ContactsMixin
 
 from netbox_dns.choices import DNSSECPolicyDigestChoices
+from netbox_dns.fields import ChoiceArrayField
+
 
 __all__ = (
     "DNSSECPolicy",
@@ -94,7 +95,7 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         null=False,
         default=True,
     )
-    cds_digest_types = ArrayField(
+    cds_digest_types = ChoiceArrayField(
         base_field=models.CharField(
             choices=DNSSECPolicyDigestChoices,
         ),
@@ -160,7 +161,7 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
 
     # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:dnsseckey", kwargs={"pk": self.pk})
+        return reverse("plugins:netbox_dns:dnssecpolicy", kwargs={"pk": self.pk})
 
 
 @register_search
