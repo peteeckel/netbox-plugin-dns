@@ -24,6 +24,7 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
 from netbox_dns.choices import DNSSECPolicyDigestChoices
+from netbox_dns.fields import TimePeriodField
 
 
 __all__ = (
@@ -113,6 +114,55 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "tags",
         )
 
+    dnskey_ttl = TimePeriodField(
+        required=False,
+        label=_("DNSKEY TTL"),
+    )
+    purge_keys = TimePeriodField(
+        required=False,
+        label=_("Purge Keys"),
+    )
+    publish_safety = TimePeriodField(
+        required=False,
+        label=_("Publish Safety"),
+    )
+    retire_safety = TimePeriodField(
+        required=False,
+        label=_("Retire Safety"),
+    )
+    signatures_jitter = TimePeriodField(
+        required=False,
+        label=_("Signatures Jitter"),
+    )
+    signatures_refresh = TimePeriodField(
+        required=False,
+        label=_("Signatures Refresh"),
+    )
+    signatures_validity = TimePeriodField(
+        required=False,
+        label=_("Signatures Validity"),
+    )
+    signatures_validity_dnskey = TimePeriodField(
+        required=False,
+        label=_("Signatures Validity (DNSKEY)"),
+    )
+    max_zone_ttl = TimePeriodField(
+        required=False,
+        label=_("Max Zone TTL"),
+    )
+    zone_propagation_delay = TimePeriodField(
+        required=False,
+        label=_("Zone Propagation Delay"),
+    )
+    parent_ds_ttl = TimePeriodField(
+        required=False,
+        label=_("Parent DS TTL"),
+    )
+    parent_propagation_delay = TimePeriodField(
+        required=False,
+        label=_("Parent Propagation Delay"),
+    )
+
 
 class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = DNSSECPolicy
@@ -161,7 +211,6 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     description = forms.CharField(
         required=False,
     )
-
     key_template_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
         required=False,
@@ -172,48 +221,46 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_("Use Inline Signing"),
     )
-
-    dnskey_ttl = forms.IntegerField(
+    dnskey_ttl = TimePeriodField(
         required=False,
         label=_("DNSKEY TTL"),
     )
-    purge_keys = forms.IntegerField(
+    purge_keys = TimePeriodField(
         required=False,
         label=_("Purge Keys"),
     )
-    publish_safety = forms.IntegerField(
+    publish_safety = TimePeriodField(
         required=False,
         label=_("Publish Safety"),
     )
-    retire_safety = forms.IntegerField(
+    retire_safety = TimePeriodField(
         required=False,
         label=_("Retire Safety"),
     )
-    signatures_jitter = forms.IntegerField(
+    signatures_jitter = TimePeriodField(
         required=False,
         label=_("Signatures Jitter"),
     )
-    signatures_refresh = forms.IntegerField(
+    signatures_refresh = TimePeriodField(
         required=False,
         label=_("Signatures Refresh"),
     )
-    signatures_validity = forms.IntegerField(
+    signatures_validity = TimePeriodField(
         required=False,
         label=_("Signatures Validity"),
     )
-    signatures_validity_dnskey = forms.IntegerField(
+    signatures_validity_dnskey = TimePeriodField(
         required=False,
         label=_("Signatures Validity (DNSKEY)"),
     )
-    max_zone_ttl = forms.IntegerField(
+    max_zone_ttl = TimePeriodField(
         required=False,
         label=_("Max Zone TTL"),
     )
-    zone_propagation_delay = forms.IntegerField(
+    zone_propagation_delay = TimePeriodField(
         required=False,
         label=_("Zone Propagation Delay"),
     )
-
     create_cdnskey = forms.NullBooleanField(
         required=False,
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
@@ -224,15 +271,14 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         choices=DNSSECPolicyDigestChoices,
         label=_("CDS Digest Types"),
     )
-    parent_ds_ttl = forms.IntegerField(
+    parent_ds_ttl = TimePeriodField(
         required=False,
         label=_("Parent DS TTL"),
     )
-    parent_propagation_delay = forms.IntegerField(
+    parent_propagation_delay = TimePeriodField(
         required=False,
         label=_("Parent Propagation Delay"),
     )
-
     use_nsec3 = forms.NullBooleanField(
         required=False,
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
@@ -252,11 +298,58 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         label=_("NSEC3 Salt Size"),
     )
 
-
     tag = TagFilterField(DNSSECPolicy)
 
 
 class DNSSECPolicyImportForm(NetBoxModelImportForm):
+    dnskey_ttl = TimePeriodField(
+        required=False,
+        label=_("DNSKEY TTL"),
+    )
+    purge_keys = TimePeriodField(
+        required=False,
+        label=_("Purge Keys"),
+    )
+    publish_safety = TimePeriodField(
+        required=False,
+        label=_("Publish Safety"),
+    )
+    retire_safety = TimePeriodField(
+        required=False,
+        label=_("Retire Safety"),
+    )
+    signatures_jitter = TimePeriodField(
+        required=False,
+        label=_("Signatures Jitter"),
+    )
+    signatures_refresh = TimePeriodField(
+        required=False,
+        label=_("Signatures Refresh"),
+    )
+    signatures_validity = TimePeriodField(
+        required=False,
+        label=_("Signatures Validity"),
+    )
+    signatures_validity_dnskey = TimePeriodField(
+        required=False,
+        label=_("Signatures Validity (DNSKEY)"),
+    )
+    max_zone_ttl = TimePeriodField(
+        required=False,
+        label=_("Max Zone TTL"),
+    )
+    zone_propagation_delay = TimePeriodField(
+        required=False,
+        label=_("Zone Propagation Delay"),
+    )
+    parent_ds_ttl = TimePeriodField(
+        required=False,
+        label=_("Parent DS TTL"),
+    )
+    parent_propagation_delay = TimePeriodField(
+        required=False,
+        label=_("Parent Propagation Delay"),
+    )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
@@ -302,54 +395,51 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Description"),
     )
-
     inline_signing = forms.NullBooleanField(
         required=False,
         widget=BulkEditNullBooleanSelect(),
         label=_("Use Inline Signing"),
     )
-
-    dnskey_ttl = forms.IntegerField(
+    dnskey_ttl = TimePeriodField(
         required=False,
         label=_("DNSKEY TTL"),
     )
-    purge_keys = forms.IntegerField(
+    purge_keys = TimePeriodField(
         required=False,
         label=_("Purge Keys"),
     )
-    publish_safety = forms.IntegerField(
+    publish_safety = TimePeriodField(
         required=False,
         label=_("Publish Safety"),
     )
-    retire_safety = forms.IntegerField(
+    retire_safety = TimePeriodField(
         required=False,
         label=_("Retire Safety"),
     )
-    signatures_jitter = forms.IntegerField(
+    signatures_jitter = TimePeriodField(
         required=False,
         label=_("Signatures Jitter"),
     )
-    signatures_refresh = forms.IntegerField(
+    signatures_refresh = TimePeriodField(
         required=False,
         label=_("Signatures Refresh"),
     )
-    signatures_validity = forms.IntegerField(
+    signatures_validity = TimePeriodField(
         required=False,
         label=_("Signatures Validity"),
     )
-    signatures_validity_dnskey = forms.IntegerField(
+    signatures_validity_dnskey = TimePeriodField(
         required=False,
         label=_("Signatures Validity (DNSKEY)"),
     )
-    max_zone_ttl = forms.IntegerField(
+    max_zone_ttl = TimePeriodField(
         required=False,
         label=_("Max Zone TTL"),
     )
-    zone_propagation_delay = forms.IntegerField(
+    zone_propagation_delay = TimePeriodField(
         required=False,
         label=_("Zone Propagation Delay"),
     )
-
     create_cdnskey = forms.NullBooleanField(
         required=False,
         widget=BulkEditNullBooleanSelect(),
@@ -360,15 +450,14 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("CDS Digest Types"),
     )
-    parent_ds_ttl = forms.IntegerField(
+    parent_ds_ttl = TimePeriodField(
         required=False,
         label=_("Parent DS TTL"),
     )
-    parent_propagation_delay = forms.IntegerField(
+    parent_propagation_delay = TimePeriodField(
         required=False,
         label=_("Parent Propagation Delay"),
     )
-
     use_nsec3 = forms.NullBooleanField(
         required=False,
         widget=BulkEditNullBooleanSelect(),
@@ -387,7 +476,6 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("NSEC3 Salt Size"),
     )
-
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),
         required=False,
