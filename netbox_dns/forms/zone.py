@@ -39,7 +39,7 @@ from netbox_dns.models import (
 )
 from netbox_dns.choices import ZoneStatusChoices
 from netbox_dns.utilities import name_to_unicode, network_to_reverse
-from netbox_dns.fields import RFC2317NetworkFormField
+from netbox_dns.fields import RFC2317NetworkFormField, TimePeriodField
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
 
 
@@ -171,7 +171,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         label=_("Nameservers"),
         quick_add=QUICK_ADD,
     )
-    default_ttl = forms.IntegerField(
+    default_ttl = TimePeriodField(
         required=False,
         help_text=_("Default TTL for new records in this zone"),
         validators=[MinValueValidator(1)],
@@ -181,7 +181,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         required=False,
         label=_("Description"),
     )
-    soa_ttl = forms.IntegerField(
+    soa_ttl = TimePeriodField(
         required=True,
         help_text=_("TTL for the SOA record of the zone"),
         validators=[MinValueValidator(1)],
@@ -199,25 +199,25 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         help_text=_("Mailbox of the zone's administrator"),
         label=_("SOA RName"),
     )
-    soa_refresh = forms.IntegerField(
+    soa_refresh = TimePeriodField(
         required=True,
         help_text=_("Refresh interval for secondary nameservers"),
         validators=[MinValueValidator(1)],
         label=_("SOA Refresh"),
     )
-    soa_retry = forms.IntegerField(
+    soa_retry = TimePeriodField(
         required=True,
         help_text=_("Retry interval for secondary nameservers"),
         validators=[MinValueValidator(1)],
         label=_("SOA Retry"),
     )
-    soa_expire = forms.IntegerField(
+    soa_expire = TimePeriodField(
         required=True,
         validators=[MinValueValidator(1)],
         help_text=_("Expire time after which the zone is considered unavailable"),
         label=_("SOA Expire"),
     )
-    soa_minimum = forms.IntegerField(
+    soa_minimum = TimePeriodField(
         required=True,
         help_text=_("Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"),
         validators=[MinValueValidator(1)],
@@ -530,11 +530,11 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         label=_("Nameservers"),
     )
-    default_ttl = forms.IntegerField(
+    default_ttl = TimePeriodField(
         required=False,
         label=_("Default TTL"),
     )
-    soa_ttl = forms.IntegerField(
+    soa_ttl = TimePeriodField(
         required=False,
         help_text=_("TTL for the SOA record of the zone"),
         label=_("SOA TTL"),
@@ -562,22 +562,22 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         label=_("SOA Serial"),
     )
-    soa_refresh = forms.IntegerField(
+    soa_refresh = TimePeriodField(
         required=False,
         help_text=_("Refresh interval for secondary nameservers"),
         label=_("SOA Refresh"),
     )
-    soa_retry = forms.IntegerField(
+    soa_retry = TimePeriodField(
         required=False,
         help_text=_("Retry interval for secondary nameservers"),
         label=_("SOA Retry"),
     )
-    soa_expire = forms.IntegerField(
+    soa_expire = TimePeriodField(
         required=False,
         help_text=_("Expire time after which the zone is considered unavailable"),
         label=_("SOA Expire"),
     )
-    soa_minimum = forms.IntegerField(
+    soa_minimum = TimePeriodField(
         required=False,
         help_text=_("Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"),
         label=_("SOA Minimum TTL"),
@@ -726,7 +726,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Nameservers"),
     )
-    default_ttl = forms.IntegerField(
+    default_ttl = TimePeriodField(
         required=False,
         validators=[MinValueValidator(1)],
         label=_("Default TTL"),
@@ -736,7 +736,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Description"),
     )
-    soa_ttl = forms.IntegerField(
+    soa_ttl = TimePeriodField(
         required=False,
         validators=[MinValueValidator(1)],
         label=_("SOA TTL"),
@@ -760,22 +760,22 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         validators=[MinValueValidator(1), MaxValueValidator(4294967295)],
         label=_("SOA Serial"),
     )
-    soa_refresh = forms.IntegerField(
+    soa_refresh = TimePeriodField(
         required=False,
         validators=[MinValueValidator(1)],
         label=_("SOA Refresh"),
     )
-    soa_retry = forms.IntegerField(
+    soa_retry = TimePeriodField(
         required=False,
         validators=[MinValueValidator(1)],
         label=_("SOA Retry"),
     )
-    soa_expire = forms.IntegerField(
+    soa_expire = TimePeriodField(
         required=False,
         validators=[MinValueValidator(1)],
         label=_("SOA Expire"),
     )
-    soa_minimum = forms.IntegerField(
+    soa_minimum = TimePeriodField(
         required=False,
         validators=[MinValueValidator(1)],
         label=_("SOA Minimum TTL"),

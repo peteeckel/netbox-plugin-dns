@@ -145,6 +145,10 @@ NetBox 3.5.0 up to NetBox 3.7.x are not supported by the latest version of NetBo
 ## Object types
 Currently NetBox DNS can manage eight different object types: Views, Name Servers, Zone Templates, Zones, Record Templates, Records, Registration Contacts and Registrars.
 
+For all fields that contain time periods (record TTL and the zone SOA timer fields, just to name a few) there is an alternative way of entering values. Instead of having to convert the desired value to seconds, NetBox DNS supports a subset of the ISO 8601 duration format starting with version 1.2.6. To specify a TTL of one day, the format "P1D" is accepted, which will be converted to 86400 before being written to the database. A time period of 15 hours is written as "PT15H" (the "T" means that the remaining part of the string represents time, not date) is interpreted as 54000. All letters have to be uppercase.
+
+Please note that the ISO 8601 support is not complete. For example, "P4W" won't work as the only non-time-related unit supported is "D". This is a restriction of the `django.dateutil` module and will be resolved automatically if and when full ISO 8601 duration support is implemented by the Django project.
+
 ### Views
 Views are a concept that allows the DNS name space to be partitioned into groups of zones that are isolated from each other. They are mainly used in split horizon DNS setups, for example in cases where there is a different DNS resolution requirement for external and internal clients, where external clients do not get the same set of names, or see different IP addresses than internal clients in case of NAT setups. Other scenarios are possible as well.
 
