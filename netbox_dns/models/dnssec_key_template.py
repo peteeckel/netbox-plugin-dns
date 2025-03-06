@@ -6,16 +6,19 @@ from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.models.features import ContactsMixin
 
-from netbox_dns.choices import DNSSECKeyTypeChoices, DNSSECKeyAlgorithmChoices
-
-
-__all__ = (
-    "DNSSECKey",
-    "DNSSECKeyIndex",
+from netbox_dns.choices import (
+    DNSSECKeyTemplateTypeChoices,
+    DNSSECKeyTemplateAlgorithmChoices,
 )
 
 
-class DNSSECKey(ContactsMixin, NetBoxModel):
+__all__ = (
+    "DNSSECKeyTemplate",
+    "DNSSECKeyTemplateIndex",
+)
+
+
+class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
@@ -28,7 +31,7 @@ class DNSSECKey(ContactsMixin, NetBoxModel):
 
     type = models.CharField(
         verbose_name=_("Type"),
-        choices=DNSSECKeyTypeChoices,
+        choices=DNSSECKeyTemplateTypeChoices,
         max_length=3,
         blank=False,
         null=False,
@@ -40,7 +43,7 @@ class DNSSECKey(ContactsMixin, NetBoxModel):
     )
     algorithm = models.CharField(
         verbose_name=_("Algorithm"),
-        choices=DNSSECKeyAlgorithmChoices,
+        choices=DNSSECKeyTemplateAlgorithmChoices,
         blank=False,
         null=False,
     )
@@ -54,7 +57,7 @@ class DNSSECKey(ContactsMixin, NetBoxModel):
         verbose_name=_("Tenant"),
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
-        related_name="netbox_dns_dnssec_keys",
+        related_name="netbox_dns_dnssec_key_templates",
         blank=True,
         null=True,
     )
@@ -69,8 +72,8 @@ class DNSSECKey(ContactsMixin, NetBoxModel):
     )
 
     class Meta:
-        verbose_name = _("DNSSEC Key")
-        verbose_name_plural = _("DNSSEC Keys")
+        verbose_name = _("DNSSEC Key Template")
+        verbose_name_plural = _("DNSSEC Key Templates")
         unique_together = (
             "name",
             "type",
@@ -83,15 +86,15 @@ class DNSSECKey(ContactsMixin, NetBoxModel):
 
     # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:dnsseckey", kwargs={"pk": self.pk})
+        return reverse("plugins:netbox_dns:dnsseckeytemplate", kwargs={"pk": self.pk})
 
     def get_type_color(self):
-        return DNSSECKeyTypeChoices.colors.get(self.type)
+        return DNSSECKeyTemplateTypeChoices.colors.get(self.type)
 
 
 @register_search
-class DNSSECKeyIndex(SearchIndex):
-    model = DNSSECKey
+class DNSSECKeyTemplateIndex(SearchIndex):
+    model = DNSSECKeyTemplate
     fields = (
         ("name", 100),
         ("description", 500),

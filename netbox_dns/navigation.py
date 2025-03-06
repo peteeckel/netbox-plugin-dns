@@ -92,22 +92,22 @@ managed_record_menu_item = PluginMenuItem(
     permissions=["netbox_dns.view_record"],
 )
 
-dnsseckey_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:dnsseckey_list",
-    link_text=_("DNSSEC Keys"),
-    permissions=["netbox_dns.view_dnsseckey"],
+dnsseckeytemplate_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:dnsseckeytemplate_list",
+    link_text=_("DNSSEC Key Templates"),
+    permissions=["netbox_dns.view_dnsseckeytemplate"],
     buttons=(
         PluginMenuButton(
-            "plugins:netbox_dns:dnsseckey_add",
+            "plugins:netbox_dns:dnsseckeytemplate_add",
             _("Add"),
             "mdi mdi-plus-thick",
-            permissions=["netbox_dns.add_dnsseckey"],
+            permissions=["netbox_dns.add_dnsseckeytemplate"],
         ),
         PluginMenuButton(
-            "plugins:netbox_dns:dnsseckey_bulk_import",
+            "plugins:netbox_dns:dnsseckeytemplate_bulk_import",
             _("Import"),
             "mdi mdi-upload",
-            permissions=["netbox_dns.add_dnsseckey"],
+            permissions=["netbox_dns.add_dnsseckeytemplate"],
         ),
     ),
 )
@@ -230,7 +230,7 @@ if top_level_menu:
             (
                 _("DNSSEC"),
                 (
-                    dnsseckey_menu_item,
+                    dnsseckeytemplate_menu_item,
                     dnssecpolicy_menu_item,
                 ),
             ),
@@ -258,7 +258,7 @@ else:
         nameserver_menu_item,
         record_menu_item,
         managed_record_menu_item,
-        dnsseckey_menu_item,
+        dnsseckeytemplate_menu_item,
         dnssecpolicy_menu_item,
         registrar_menu_item,
         contact_menu_item,
