@@ -7,6 +7,8 @@ from netbox_dns.models import (
     View,
     Zone,
     Record,
+    DNSSECKeyTemplate,
+    DNSSECPolicy,
     RegistrationContact,
     Registrar,
     ZoneTemplate,
@@ -17,6 +19,8 @@ from netbox_dns.filtersets import (
     ViewFilterSet,
     ZoneFilterSet,
     RecordFilterSet,
+    DNSSECKeyTemplateFilterSet,
+    DNSSECPolicyFilterSet,
     RegistrationContactFilterSet,
     RegistrarFilterSet,
     ZoneTemplateFilterSet,
@@ -45,6 +49,18 @@ class NetBoxDNSZoneFilter(BaseFilterMixin):
 @strawberry_django.filter(Record, lookups=True)
 @autotype_decorator(RecordFilterSet)
 class NetBoxDNSRecordFilter(BaseFilterMixin):
+    ip_address: str | None
+
+
+@strawberry_django.filter(DNSSECKeyTemplate, lookups=True)
+@autotype_decorator(DNSSECKeyTemplateFilterSet)
+class NetBoxDNSDNSSECKeyTemplateFilter(BaseFilterMixin):
+    ip_address: str | None
+
+
+@strawberry_django.filter(DNSSECPolicy, lookups=True)
+@autotype_decorator(DNSSECPolicyFilterSet)
+class NetBoxDNSDNSSECPolicyFilter(BaseFilterMixin):
     ip_address: str | None
 
 
