@@ -13,6 +13,8 @@ from netbox_dns.models import (
     View,
     Zone,
     Record,
+    DNSSECKeyTemplate,
+    DNSSECPolicy,
     RegistrationContact,
     Registrar,
     ZoneTemplate,
@@ -23,6 +25,8 @@ from .filters import (
     NetBoxDNSViewFilter,
     NetBoxDNSZoneFilter,
     NetBoxDNSRecordFilter,
+    NetBoxDNSDNSSECKeyTemplateFilter,
+    NetBoxDNSDNSSECPolicyFilter,
     NetBoxDNSRegistrationContactFilter,
     NetBoxDNSRegistrarFilter,
     NetBoxDNSZoneTemplateFilter,
@@ -160,6 +164,50 @@ class NetBoxDNSRecordType(NetBoxObjectType):
     rfc2317_ptr_records: List[
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
     ]
+
+
+@strawberry_django.type(
+    DNSSECKeyTemplate, fields="__all__", filters=NetBoxDNSDNSSECKeyTemplateFilter
+)
+class NetBoxDNSDNSSECKeyTemplateType(NetBoxObjectType):
+    name: str
+    description: str
+    tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    type: str
+    lifetime: BigInt | None
+    algorithm: str
+    key_size: BigInt | None
+
+
+@strawberry_django.type(
+    DNSSECPolicy, fields="__all__", filters=NetBoxDNSDNSSECPolicyFilter
+)
+class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
+    name: str
+    description: str | None
+    tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    key_templates: List[Annotated[
+        "NetBoxDNSDNSSECKeyTemplateType", strawberry.lazy("netbox_dns.graphql.types")
+    ]]
+    inline_signing: bool
+    dnskey_ttl: BigInt | None
+    purge_keys: BigInt | None
+    publish_safety: BigInt | None
+    retire_safety: BigInt | None
+    signatures_jitter: BigInt | None
+    signatures_refresh: BigInt | None
+    signatures_validity: BigInt | None
+    signatures_validity_dnskey: BigInt | None
+    max_zone_ttl: BigInt | None
+    zone_propagation_delay: BigInt | None
+    create_cdnskey: bool
+    cds_digest_types: List[str]
+    parent_ds_ttl: BigInt | None
+    parent_propagation_delay: BigInt | None
+    use_nsec3: bool
+    nsec3_iterations: BigInt | None
+    nsec3_opt_out: bool
+    nsec3_salt_size: BigInt | None
 
 
 @strawberry_django.type(
