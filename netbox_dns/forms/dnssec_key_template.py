@@ -24,6 +24,7 @@ from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
 )
+from netbox_dns.fields import TimePeriodField
 
 
 __all__ = (
@@ -35,6 +36,10 @@ __all__ = (
 
 
 class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
+    lifetime = TimePeriodField(
+        required=False,
+    )
+
     fieldsets = (
         FieldSet("name", "description", name=_("Attributes")),
         FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
@@ -100,6 +105,10 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
+    lifetime = TimePeriodField(
+        required=False,
+        label=_("Lifetime"),
+    )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
@@ -129,7 +138,7 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Key Type"),
     )
-    lifetime = forms.IntegerField(
+    lifetime = TimePeriodField(
         required=False,
         label=_("Lifetime"),
     )
