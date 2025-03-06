@@ -20,12 +20,12 @@ DEPRECATED_ALGORITHMS = (
 
 
 __all__ = (
-    "DNSSECKeyTypeChoices",
-    "DNSSECKeyAlgorithmChoices",
+    "DNSSECKeyTemplateTypeChoices",
+    "DNSSECKeyTemplateAlgorithmChoices",
 )
 
 
-class DNSSECKeyTypeChoices(ChoiceSet):
+class DNSSECKeyTemplateTypeChoices(ChoiceSet):
     TYPE_CSK = "csk"
     TYPE_KSK = "ksk"
     TYPE_ZSK = "zsk"
@@ -38,7 +38,7 @@ class DNSSECKeyTypeChoices(ChoiceSet):
 
 
 @define_choice_attributes()
-class DNSSECKeyAlgorithmChoices(ChoiceSet):
+class DNSSECKeyTemplateAlgorithmChoices(ChoiceSet):
     CHOICES = [
         (algorithm.name, algorithm.name)
         for algorithm in sorted(Algorithm, key=lambda a: a.name)
