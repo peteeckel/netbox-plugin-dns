@@ -10,6 +10,8 @@ from netbox_dns.api.views import (
     RegistrationContactViewSet,
     ZoneTemplateViewSet,
     RecordTemplateViewSet,
+    DNSSECKeyViewSet,
+    DNSSECPolicyViewSet,
     PrefixViewSet,
 )
 
@@ -24,6 +26,8 @@ router.register("registrars", RegistrarViewSet)
 router.register("contacts", RegistrationContactViewSet)
 router.register("zonetemplates", ZoneTemplateViewSet)
 router.register("recordtemplates", RecordTemplateViewSet)
+router.register("dnsseckeys", DNSSECKeyViewSet)
+router.register("dnssecpolicies", DNSSECPolicyViewSet)
 
 router.register("prefixes", PrefixViewSet)
 
