@@ -1,3 +1,55 @@
 {% extends 'generic/object.html' %}
 {% load i18n %}
 
+{% block content %}
+    <div class="row">
+        <div class="col col-md-6">
+            <div class="card">
+                <h5 class="card-header">{% trans "DNSSEC Key" %}</h5>
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">{% trans "Name" %}</th>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                    {% if object.description %}
+                    <tr>
+                        <th scope="row">{% trans "Description" %}</th>
+                        <td style="word-break:break-all;">{{ object.description }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="row">{% trans "Type" %}</th>
+                        <td>{% badge object.get_type_display bg_color=object.get_type_color %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Lifetime" %}</th>
+                        <td>{{ object.lifetime|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Algorithm" %}</th>
+                        <td>{% badge object.get_algorithm_display %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Key Size" %}</th>
+                        <td>{{ object.key_size|placeholder }}</td>
+                    </tr>
+                    {% if object.tenant %}
+                    <tr>
+                        <th scope="row">{% trans "Tenant" %}</th>
+                        <td>
+                            {% if object.tenant.group %}
+                                {{ object.tenant.group|linkify }} /
+                            {% endif %}
+                            {{ object.tenant|linkify|placeholder }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% include 'inc/panels/custom_fields.html' %}
+        </div>
+        <div class="col col-md-6">
+            {% include 'inc/panels/tags.html' %}
+        </div>
+    </div>
+{% endblock %}

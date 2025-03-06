@@ -11,12 +11,14 @@ from utilities.forms.fields import (
     TagFilterField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
-from utilities.forms.rendering import FieldSet
+from utilities.forms.rendering import FieldSet, TabbedGroups
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import DNSSECPolicy
+from netbox_dns.models import DNSSECPolicy, DNSSECKey
+from netbox_dns.choices import DNSSECKeyTypeChoices
 
 
 __all__ = (
@@ -30,6 +32,11 @@ __all__ = (
 class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
     fieldsets = (
         FieldSet("name", "description", name=_("Attributes")),
+        FieldSet(
+            "keys",
+            "inline_signing",
+            name=_("Signing"),
+        ),
         FieldSet(
             "dnskey_ttl",
             "purge_keys",
@@ -57,8 +64,16 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "nsec3_salt_size",
             name=_("NSEC"),
         ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
         FieldSet("tags", name=_("Tags")),
+    )
+
+    keys = DynamicModelMultipleChoiceField(
+        queryset=DNSSECKey.objects.all(),
+        required=False,
+        label=_("Signing Keys"),
+        help_text=_("Select CSK or KSK/CSK for signing"),
+        quick_add=True,
     )
 
     class Meta:
@@ -66,6 +81,8 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         fields = (
             "name",
             "description",
+            "keys",
+            "inline_signing",
             "dnskey_ttl",
             "purge_keys",
             "publish_safety",
@@ -89,13 +106,12 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "tags",
         )
 
-
 class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = DNSSECPolicy
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name=_("Attributes")),
-        FieldSet("type", "tenant_id", name=_("Tenancy")),
+        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
 
     name = forms.CharField(
@@ -169,7 +185,11 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
             "description",
             name=_("Attributes"),
         ),
-        FieldSet("keys", "inline_signing", name=_("Signing")),
+        FieldSet(
+            "keys",
+            "inline_signing",
+            name=_("Signing"),
+        ),
         FieldSet(
             "dnskey_ttl",
             "purge_keys",
