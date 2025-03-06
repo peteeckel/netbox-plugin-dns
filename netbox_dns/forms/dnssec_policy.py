@@ -1,6 +1,5 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from django.contrib.postgres.forms import SimpleArrayField
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -18,7 +17,6 @@ from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import DNSSECPolicy
-from netbox_dns.choices import DNSSECPolicyDigestChoices
 
 
 __all__ = (
@@ -63,14 +61,6 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         FieldSet("tags", name=_("Tags")),
     )
 
-    cds_digest_types = SimpleArrayField(
-        base_field=forms.ChoiceField(
-            choices=DNSSECPolicyDigestChoices,
-        ),
-        required=True,
-        label=_("CDS Digest Types"),
-    )
-
     class Meta:
         model = DNSSECPolicy
         fields = (
@@ -87,6 +77,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "max_zone_ttl",
             "zone_propagation_delay",
             "create_cdnskey",
+            "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
             "use_nsec3",
