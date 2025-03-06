@@ -66,6 +66,7 @@ class RecordViewTestCase(
         }
 
         cls.bulk_edit_data = {
+            "record_name": "name10",
             "type": RecordTypeChoices.TXT,
             "value": "Test",
             "status": RecordStatusChoices.STATUS_INACTIVE,
