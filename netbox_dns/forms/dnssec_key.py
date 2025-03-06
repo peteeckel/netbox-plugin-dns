@@ -78,7 +78,16 @@ class DNSSECKeyImportForm(NetBoxModelImportForm):
 
     class Meta:
         model = DNSSECKey
-        fields = ("name", "description", "type", "lifetime", "algorithm", "key_size", "tenant", "tags")
+        fields = (
+            "name",
+            "description",
+            "type",
+            "lifetime",
+            "algorithm",
+            "key_size",
+            "tenant",
+            "tags",
+        )
 
 
 class DNSSECKeyBulkEditForm(NetBoxModelBulkEditForm):
