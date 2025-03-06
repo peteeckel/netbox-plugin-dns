@@ -70,12 +70,12 @@ urlpatterns = (
         include(get_model_urls("netbox_dns", "zone")),
     ),
     path(
-        "dnsseckeys/",
-        include(get_model_urls("netbox_dns", "dnsseckey", detail=False)),
+        "dnsseckeytemplates/",
+        include(get_model_urls("netbox_dns", "dnsseckeytemplate", detail=False)),
     ),
     path(
-        "dnsseckeys/<int:pk>/",
-        include(get_model_urls("netbox_dns", "dnsseckey")),
+        "dnsseckeytemplates/<int:pk>/",
+        include(get_model_urls("netbox_dns", "dnsseckeytemplate")),
     ),
     path(
         "dnssecpolicies/",

@@ -6,7 +6,7 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 
 from netbox_dns.models import DNSSECPolicy
 
-from .dnssec_key import DNSSECKeySerializer
+from .dnssec_key_template import DNSSECKeyTemplateSerializer
 
 
 __all__ = ("DNSSECPolicySerializer",)
@@ -16,13 +16,13 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:dnssecpolicy-detail"
     )
-    keys = DNSSECKeySerializer(
+    key_templates = DNSSECKeyTemplateSerializer(
         nested=True,
         many=True,
         read_only=False,
         required=False,
         default=None,
-        help_text=_("Keys assigned to the policy"),
+        help_text=_("Key templates assigned to the policy"),
     )
     tenant = TenantSerializer(required=False, allow_null=True)
 
@@ -35,7 +35,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "name",
             "description",
             "tags",
-            "keys",
+            "key_templates",
             "inline_signing",
             "dnskey_ttl",
             "purge_keys",
@@ -63,21 +63,21 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
         brief_fields = ("id", "url", "display", "name", "description")
 
     def create(self, validated_data):
-        dnssec_keys = validated_data.pop("keys", None)
+        dnssec_key_templates = validated_data.pop("key_templates", None)
 
         dnssec_policy = super().create(validated_data)
 
-        if dnssec_keys is not None:
-            dnssec_policy.keys.set(dnssec_keys)
+        if dnssec_key_templates is not None:
+            dnssec_policy.key_templates.set(dnssec_key_templates)
 
         return dnssec_policy
 
     def update(self, instance, validated_data):
-        dnssec_keys = validated_data.pop("keys", None)
+        dnssec_key_templates = validated_data.pop("key_templates", None)
 
         dnssec_policy = super().update(instance, validated_data)
 
-        if dnssec_keys is not None:
-            dnssec_policy.nameservers.set(dnssec_keys)
+        if dnssec_key_templates is not None:
+            dnssec_policy.key_templates.set(dnssec_key_templates)
 
         return dnssec_policy

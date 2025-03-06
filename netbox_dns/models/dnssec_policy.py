@@ -28,9 +28,9 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         blank=True,
     )
 
-    keys = models.ManyToManyField(
-        verbose_name=_("Keys"),
-        to="DNSSECKey",
+    key_templates = models.ManyToManyField(
+        verbose_name=_("Key Templates"),
+        to="DNSSECKeyTemplate",
         related_name="policies",
         blank=True,
     )
@@ -100,7 +100,8 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
             choices=DNSSECPolicyDigestChoices,
         ),
         verbose_name=_("CDS Digest Types"),
-        null=False,
+        blank=True,
+        null=True,
         default=list,
     )
     parent_ds_ttl = models.PositiveIntegerField(
@@ -126,8 +127,9 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
     )
     nsec3_opt_out = models.BooleanField(
         verbose_name=_("NSEC3 Opt-Out"),
-        blank=True,
-        null=True,
+        blank=False,
+        null=False,
+        default=False,
     )
     nsec3_salt_size = models.PositiveIntegerField(
         verbose_name=_("NSEC3 Salt Size"),
