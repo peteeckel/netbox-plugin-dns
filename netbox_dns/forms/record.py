@@ -23,6 +23,7 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from netbox_dns.models import View, Zone, Record
 from netbox_dns.choices import RecordSelectableTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
+from netbox_dns.fields import TimePeriodField
 
 
 __all__ = (
@@ -67,7 +68,7 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         required=False,
         label=_("Disable PTR"),
     )
-    ttl = forms.IntegerField(
+    ttl = TimePeriodField(
         required=False,
         label=_("TTL"),
     )
@@ -112,16 +113,17 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet(
+            "name",
             "view_id",
             "zone_id",
-            "name",
             "fqdn",
             "type",
             "value",
-            "disable_ptr",
             "status",
-            "active",
+            "ttl",
+            "disable_ptr",
             "description",
+            "active",
             name=_("Attributes"),
         ),
         FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
@@ -153,6 +155,10 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         choices=RecordStatusChoices,
         required=False,
         label=_("Status"),
+    )
+    ttl = TimePeriodField(
+        required=False,
+        label=_("TTL"),
     )
     view_id = DynamicModelMultipleChoiceField(
         queryset=View.objects.all(),
@@ -224,7 +230,7 @@ class RecordImportForm(NetBoxModelImportForm):
         required=False,
         label=_("Status"),
     )
-    ttl = forms.IntegerField(
+    ttl = TimePeriodField(
         required=False,
         label=_("TTL"),
     )
@@ -286,7 +292,7 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Status"),
     )
-    ttl = forms.IntegerField(
+    ttl = TimePeriodField(
         required=False,
         label=_("TTL"),
     )

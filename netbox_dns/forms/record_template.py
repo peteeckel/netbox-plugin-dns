@@ -23,6 +23,7 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordSelectableTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
+from netbox_dns.fields import TimePeriodField
 
 
 __all__ = (
@@ -50,7 +51,7 @@ class RecordTemplateForm(TenancyForm, NetBoxModelForm):
         required=False,
         label=_("Disable PTR"),
     )
-    ttl = forms.IntegerField(
+    ttl = TimePeriodField(
         required=False,
         label=_("TTL"),
     )
@@ -99,6 +100,7 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "type",
             "value",
             "status",
+            "ttl",
             "disable_ptr",
             "description",
             name=_("Attributes"),
@@ -129,6 +131,10 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("Status"),
     )
+    ttl = TimePeriodField(
+        required=False,
+        label=_("TTL"),
+    )
     disable_ptr = forms.NullBooleanField(
         required=False,
         label=_("Disable PTR"),
@@ -156,7 +162,7 @@ class RecordTemplateImportForm(NetBoxModelImportForm):
         required=False,
         label=_("Status"),
     )
-    ttl = forms.IntegerField(
+    ttl = TimePeriodField(
         required=False,
         label=_("TTL"),
     )
@@ -209,7 +215,7 @@ class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Status"),
     )
-    ttl = forms.IntegerField(
+    ttl = TimePeriodField(
         required=False,
         label=_("TTL"),
     )
