@@ -1,7 +1,5 @@
 from dns.dnssectypes import DSDigest
 
-from django.utils.translation import gettext_lazy as _
-
 from utilities.choices import ChoiceSet
 
 from .utilities import define_choice_attributes
@@ -13,9 +11,7 @@ DEPRECATED_DIGESTS = (
 )
 
 
-__all__ = (
-    "DNSSECPolicyDigestChoices",
-)
+__all__ = ("DNSSECPolicyDigestChoices",)
 
 
 @define_choice_attributes()
