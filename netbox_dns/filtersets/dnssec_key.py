@@ -12,13 +12,6 @@ __all__ = ("DNSSECKeyFilterSet",)
 
 
 class DNSSECKeyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
-    policy_id = django_filters.ModelMultipleChoiceFilter(
-        field_name="policies",
-        queryset=DNSSECPolicy.objects.all(),
-        to_field_name="id",
-        label=_("Policies"),
-    )
-
     class Meta:
         model = DNSSECKey
         fields = ("id", "name", "description")
