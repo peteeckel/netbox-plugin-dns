@@ -69,4 +69,20 @@ urlpatterns = (
         "zones/<int:pk>/",
         include(get_model_urls("netbox_dns", "zone")),
     ),
+    path(
+        "dnsseckeys/",
+        include(get_model_urls("netbox_dns", "dnsseckey", detail=False)),
+    ),
+    path(
+        "dnsseckeys/<int:pk>/",
+        include(get_model_urls("netbox_dns", "dnsseckey")),
+    ),
+    path(
+        "dnssecpolicies/",
+        include(get_model_urls("netbox_dns", "dnssecpolicy", detail=False)),
+    ),
+    path(
+        "dnssecpolicies/<int:pk>/",
+        include(get_model_urls("netbox_dns", "dnssecpolicy")),
+    ),
 )
