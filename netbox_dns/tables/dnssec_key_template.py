@@ -9,13 +9,13 @@ from netbox.tables import (
 )
 from tenancy.tables import TenancyColumnsMixin
 
-from netbox_dns.models import DNSSECKey
+from netbox_dns.models import DNSSECKeyTemplate
 
 
-__all__ = ("DNSSECKeyTable",)
+__all__ = ("DNSSECKeyTemplateTable",)
 
 
-class DNSSECKeyTable(TenancyColumnsMixin, NetBoxTable):
+class DNSSECKeyTemplateTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -33,11 +33,11 @@ class DNSSECKeyTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Key Size"),
     )
     tags = TagColumn(
-        url_name="plugins:netbox_dns:dnsseckey_list",
+        url_name="plugins:netbox_dns:dnsseckeytemplate_list",
     )
 
     class Meta(NetBoxTable.Meta):
-        model = DNSSECKey
+        model = DNSSECKeyTemplate
         fields = ("description",)
         default_columns = (
             "name",

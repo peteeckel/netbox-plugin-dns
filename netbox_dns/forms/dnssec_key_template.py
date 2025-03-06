@@ -16,18 +16,18 @@ from utilities.forms.rendering import FieldSet
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import DNSSECKey
+from netbox_dns.models import DNSSECKeyTemplate
 
 
 __all__ = (
-    "DNSSECKeyForm",
-    "DNSSECKeyFilterForm",
-    "DNSSECKeyImportForm",
-    "DNSSECKeyBulkEditForm",
+    "DNSSECKeyTemplateForm",
+    "DNSSECKeyTemplateFilterForm",
+    "DNSSECKeyTemplateImportForm",
+    "DNSSECKeyTemplateBulkEditForm",
 )
 
 
-class DNSSECKeyForm(TenancyForm, NetBoxModelForm):
+class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
     fieldsets = (
         FieldSet("name", "description", name=_("Attributes")),
         FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
@@ -36,7 +36,7 @@ class DNSSECKeyForm(TenancyForm, NetBoxModelForm):
     )
 
     class Meta:
-        model = DNSSECKey
+        model = DNSSECKeyTemplate
         fields = (
             "name",
             "description",
@@ -50,8 +50,8 @@ class DNSSECKeyForm(TenancyForm, NetBoxModelForm):
         )
 
 
-class DNSSECKeyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
-    model = DNSSECKey
+class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+    model = DNSSECKeyTemplate
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name=_("Attributes")),
@@ -65,10 +65,10 @@ class DNSSECKeyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     description = forms.CharField(
         required=False,
     )
-    tag = TagFilterField(DNSSECKey)
+    tag = TagFilterField(DNSSECKeyTemplate)
 
 
-class DNSSECKeyImportForm(NetBoxModelImportForm):
+class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
@@ -77,7 +77,7 @@ class DNSSECKeyImportForm(NetBoxModelImportForm):
     )
 
     class Meta:
-        model = DNSSECKey
+        model = DNSSECKeyTemplate
         fields = (
             "name",
             "description",
@@ -90,8 +90,8 @@ class DNSSECKeyImportForm(NetBoxModelImportForm):
         )
 
 
-class DNSSECKeyBulkEditForm(NetBoxModelBulkEditForm):
-    model = DNSSECKey
+class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
+    model = DNSSECKeyTemplate
 
     description = forms.CharField(
         max_length=200,

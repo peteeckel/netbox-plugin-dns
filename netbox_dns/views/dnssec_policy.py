@@ -36,7 +36,7 @@ class DNSSECPolicyListView(generic.ObjectListView):
 
 @register_model_view(DNSSECPolicy)
 class DNSSECPolicyView(generic.ObjectView):
-    queryset = DNSSECPolicy.objects.prefetch_related("keys")
+    queryset = DNSSECPolicy.objects.prefetch_related("key_templates")
 
 
 @register_model_view(DNSSECPolicy, "add", detail=False)
