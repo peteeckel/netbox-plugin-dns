@@ -19,10 +19,6 @@
                             <td>{{ key_template|linkify }}</td>
                         </tr>
                     {% endfor %}
-                    <tr>
-                        <th scope="row">{% trans "Use Inline Signing" %}</th>
-                        <td>{% checkmark object.inline_signing %}</td>
-                    </tr>
                     {% if object.tenant %}
                     <tr>
                         <th scope="row">{% trans "Tenant" %}</th>

@@ -192,7 +192,6 @@ class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
             strawberry.lazy("netbox_dns.graphql.types"),
         ]
     ]
-    inline_signing: bool
     dnskey_ttl: BigInt | None
     purge_keys: BigInt | None
     publish_safety: BigInt | None
