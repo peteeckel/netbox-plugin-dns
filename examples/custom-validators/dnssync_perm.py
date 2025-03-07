@@ -35,7 +35,8 @@ def name_is_allowed(dns_name, ipaddress, request):
         for zone in zones:
             # Create "A" Record
             name = dns_name.replace(zone.name, "")
-            obj = Record(name=name, zone=zone, type="A", value=ipaddress)
+            value = str(ipaddress.address.ip)
+            obj = Record(name=name, zone=zone, type="A", value=value)
             # Low-level save: Record.save() is not called, no additional action
             Model.save(obj)
             # Check object level permissions for user
