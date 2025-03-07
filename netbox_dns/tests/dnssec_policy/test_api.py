@@ -28,7 +28,6 @@ class DNSSECPolicyAPITestCase(
     create_data = [
         {
             "name": "Test Policy 1",
-            "inline_signing": True,
             "dnskey_ttl": 3600,
             "purge_keys": 7776000,
             "publish_safety": 3600,
@@ -53,7 +52,6 @@ class DNSSECPolicyAPITestCase(
         },
         {
             "name": "Test Policy 3",
-            "inline_signing": True,
             "max_zone_ttl": 43200,
             "create_cdnskey": True,
             "use_nsec3": False,
@@ -62,7 +60,6 @@ class DNSSECPolicyAPITestCase(
 
     bulk_update_data = {
         "description": "Update Description",
-        "inline_signing": False,
         "dnskey_ttl": 7200,
         "purge_keys": 7776999,
         "publish_safety": 7200,
@@ -88,7 +85,6 @@ class DNSSECPolicyAPITestCase(
         dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 4",
-                inline_signing=True,
                 dnskey_ttl=3600,
                 purge_keys=7776000,
                 publish_safety=3600,
@@ -113,7 +109,6 @@ class DNSSECPolicyAPITestCase(
             ),
             DNSSECPolicy(
                 name="Test Policy 6",
-                inline_signing=True,
                 max_zone_ttl=43200,
                 create_cdnskey=True,
                 use_nsec3=False,

@@ -34,11 +34,6 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         related_name="policies",
         blank=True,
     )
-    inline_signing = models.BooleanField(
-        verbose_name=_("Use Inline Signing"),
-        null=False,
-        default=True,
-    )
     dnskey_ttl = models.PositiveIntegerField(
         verbose_name=_("DNSKEY TTL"),
         blank=True,

@@ -36,7 +36,6 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "description",
             "tags",
             "key_templates",
-            "inline_signing",
             "dnskey_ttl",
             "purge_keys",
             "publish_safety",

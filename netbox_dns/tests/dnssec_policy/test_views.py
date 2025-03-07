@@ -26,7 +26,6 @@ class DNSSECPolicyViewTestCase(
         cls.dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 4",
-                inline_signing=True,
                 dnskey_ttl=3600,
                 purge_keys=7776000,
                 publish_safety=3600,
@@ -51,7 +50,6 @@ class DNSSECPolicyViewTestCase(
             ),
             DNSSECPolicy(
                 name="Test Policy 6",
-                inline_signing=True,
                 max_zone_ttl=43200,
                 create_cdnskey=True,
                 use_nsec3=False,
@@ -63,7 +61,6 @@ class DNSSECPolicyViewTestCase(
 
         cls.form_data = {
             "name": "Test Policy 1",
-            "inline_signing": True,
             "dnskey_ttl": 3600,
             "purge_keys": 7776000,
             "publish_safety": 3600,
@@ -87,7 +84,6 @@ class DNSSECPolicyViewTestCase(
 
         cls.bulk_edit_data = {
             "description": "Update Description",
-            "inline_signing": False,
             "dnskey_ttl": 7200,
             "purge_keys": 7776999,
             "publish_safety": 7200,
@@ -109,16 +105,16 @@ class DNSSECPolicyViewTestCase(
         }
 
         cls.csv_data = (
-            "name,inline_signing,dnskey_ttl,max_zone_ttl,create_cdnskey,use_nsec3",
-            f"Test Policy 1,true,86400,43200,true,true",
-            f"Test Policy 2,false,86400,43200,false,true",
-            f"Test Policy 3,true,43200,86400,true,false",
+            "name,dnskey_ttl,max_zone_ttl,create_cdnskey,use_nsec3",
+            "Test Policy 1,86400,43200,true,true",
+            "Test Policy 2,86400,43200,false,true",
+            "Test Policy 3,43200,86400,true,false",
         )
 
         cls.csv_update_data = (
-            "id,description,use_nsec3,create_cdnskey,inline_signing",
-            f"{cls.dnssec_policies[0].pk},Test Description 1,true,true,true",
-            f"{cls.dnssec_policies[1].pk},Test Description 2,false,false,false",
+            "id,description,use_nsec3,create_cdnskey",
+            f"{cls.dnssec_policies[0].pk},Test Description 1,true,true",
+            f"{cls.dnssec_policies[1].pk},Test Description 2,false,false",
         )
 
     maxDiff = None

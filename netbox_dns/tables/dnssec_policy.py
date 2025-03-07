@@ -19,9 +19,6 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Name"),
         linkify=True,
     )
-    inline_signing = tables.Column(
-        verbose_name=_("Inline Signing"),
-    )
     dnskey_ttl = tables.Column(
         verbose_name=_("DNSKEY TTL"),
     )
@@ -88,7 +85,7 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
         fields = ("description",)
         default_columns = (
             "name",
-            "inline_signing",
+            "description",
             "use_nsec3",
             "tags",
         )
