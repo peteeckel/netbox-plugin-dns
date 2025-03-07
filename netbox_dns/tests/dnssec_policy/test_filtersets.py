@@ -22,7 +22,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 1",
-                inline_signing=True,
                 dnskey_ttl=3600,
                 purge_keys=7776000,
                 publish_safety=7200,
@@ -44,7 +43,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECPolicy(
                 name="Test Policy 2",
-                inline_signing=True,
                 dnskey_ttl=7200,
                 purge_keys=7776000,
                 publish_safety=3600,
@@ -66,7 +64,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECPolicy(
                 name="Test Policy 3",
-                inline_signing=False,
                 dnskey_ttl=3600,
                 purge_keys=7776001,
                 publish_safety=3600,
@@ -120,12 +117,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"name": ["Test Policy 1", "Test Policy 2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
-    def test_inline_signing(self):
-        params = {"inline_signing": True}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"inline_signing": False}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
-
     def test_dnskey_ttl(self):
         params = {"dnskey_ttl": [3600]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
@@ -177,7 +168,12 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"cds_digest_types": [DNSSECPolicyDigestChoices.SHA384]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
-        params = {"cds_digest_types": [DNSSECPolicyDigestChoices.SHA256, DNSSECPolicyDigestChoices.SHA384]}
+        params = {
+            "cds_digest_types": [
+                DNSSECPolicyDigestChoices.SHA256,
+                DNSSECPolicyDigestChoices.SHA384,
+            ]
+        }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_parent_ds_ttl(self):
