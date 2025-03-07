@@ -86,7 +86,6 @@ class Migration(migrations.Migration):
                 ),
                 ("name", models.CharField(max_length=255, unique=True)),
                 ("description", models.CharField(blank=True, max_length=200)),
-                ("inline_signing", models.BooleanField(default=True)),
                 ("dnskey_ttl", models.PositiveIntegerField(blank=True, null=True)),
                 ("purge_keys", models.PositiveIntegerField(blank=True, null=True)),
                 ("publish_safety", models.PositiveIntegerField(blank=True, null=True)),
