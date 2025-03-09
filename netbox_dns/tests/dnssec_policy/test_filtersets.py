@@ -8,6 +8,7 @@ from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
     DNSSECPolicyDigestChoices,
+    DNSSECPolicyStatusChoices,
 )
 
 
@@ -22,6 +23,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 1",
+                status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
                 dnskey_ttl=3600,
                 purge_keys=7776000,
                 publish_safety=7200,
@@ -43,6 +45,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECPolicy(
                 name="Test Policy 2",
+                status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
                 dnskey_ttl=7200,
                 purge_keys=7776000,
                 publish_safety=3600,
@@ -64,6 +67,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECPolicy(
                 name="Test Policy 3",
+                status=DNSSECPolicyStatusChoices.STATUS_INACTIVE,
                 dnskey_ttl=3600,
                 purge_keys=7776001,
                 publish_safety=3600,
@@ -116,6 +120,12 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     def test_name(self):
         params = {"name": ["Test Policy 1", "Test Policy 2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_status(self):
+        params = {"status": [DNSSECPolicyStatusChoices.STATUS_ACTIVE]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"status": [DNSSECPolicyStatusChoices.STATUS_INACTIVE]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_dnskey_ttl(self):
         params = {"dnskey_ttl": [3600]}

@@ -7,7 +7,7 @@ from netbox.search import SearchIndex, register_search
 from netbox.models.features import ContactsMixin
 from netbox.plugins.utils import get_plugin_config
 
-from netbox_dns.choices import DNSSECPolicyDigestChoices
+from netbox_dns.choices import DNSSECPolicyDigestChoices, DNSSECPolicyStatusChoices
 from netbox_dns.fields import ChoiceArrayField
 
 
@@ -27,6 +27,13 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         verbose_name=_("Description"),
         max_length=200,
         blank=True,
+    )
+    status = models.CharField(
+        verbose_name=_("Status"),
+        choices=DNSSECPolicyStatusChoices,
+        default=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+        blank=False,
+        null=False,
     )
 
     key_templates = models.ManyToManyField(
@@ -157,6 +164,9 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
 
     def __str__(self):
         return str(self.name)
+
+    def get_status_color(self):
+        return DNSSECPolicyStatusChoices.colors.get(self.status)
 
     # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
