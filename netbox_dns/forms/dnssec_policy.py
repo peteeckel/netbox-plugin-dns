@@ -25,6 +25,7 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
 from netbox_dns.choices import DNSSECPolicyDigestChoices
 from netbox_dns.fields import TimePeriodField
+from netbox_dns.validators import validate_key_templates
 
 
 __all__ = (
@@ -156,6 +157,14 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         required=False,
         label=_("Parent Propagation Delay"),
     )
+
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+        cleaned_data = self.cleaned_data
+
+        validate_key_templates(cleaned_data.get("key_templates"))
+
+        return cleaned_data
 
 
 class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
@@ -369,6 +378,14 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
             "tags",
         )
 
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+        cleaned_data = self.cleaned_data
+
+        validate_key_templates(cleaned_data.get("key_templates"))
+
+        return cleaned_data
+
 
 class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
     model = DNSSECPolicy
@@ -525,8 +542,11 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         "parent_propagation_delay",
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+        cleaned_data = self.cleaned_data
+
+        validate_key_templates(cleaned_data.get("key_templates"))
 
         if not self.cleaned_data.get("cds_digest_types"):
             if "cds_digest_types" not in self.data.get("_nullify", []):

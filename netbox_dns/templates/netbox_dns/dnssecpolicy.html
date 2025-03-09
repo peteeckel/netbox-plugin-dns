@@ -18,7 +18,14 @@
                         <td>
                             <table>
                                 {% for key_template in object.key_templates.all %}
-                                <tr><td>{{ key_template|linkify }}</td></tr>
+                                    <tr><td>{{ key_template|linkify }}</td></tr>
+                                    {% for template_id, errors in key_template_errors.items %}
+                                        {% if template_id == key_template.pk %}
+                                            {% for error in errors %}
+                                                <tr><td class="text-danger">{{ error }}</td></tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endfor %}
                             </table>
                         </td>

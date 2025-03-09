@@ -13,6 +13,7 @@ from netbox_dns.forms import (
 )
 from netbox_dns.models import DNSSECPolicy
 from netbox_dns.tables import DNSSECPolicyTable
+from netbox_dns.validators import validate_key_template_lifetime
 
 
 __all__ = (
@@ -37,6 +38,16 @@ class DNSSECPolicyListView(generic.ObjectListView):
 @register_model_view(DNSSECPolicy)
 class DNSSECPolicyView(generic.ObjectView):
     queryset = DNSSECPolicy.objects.prefetch_related("key_templates")
+
+    def get_extra_context(self, request, instance):
+        errors = {
+            key_template.pk: validate_key_template_lifetime(key_template, instance)
+            for key_template in instance.key_templates.all()
+        }
+
+        return {
+            "key_template_errors": errors,
+        }
 
 
 @register_model_view(DNSSECPolicy, "add", detail=False)

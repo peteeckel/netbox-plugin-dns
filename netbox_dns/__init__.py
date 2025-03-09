@@ -65,6 +65,18 @@ class DNSConfig(PluginConfig):
         "menu_name": "DNS",
         "top_level_menu": True,
         "convert_names_to_lowercase": False,
+        "dnssec_purge_keys": 7776000,  # P90D
+        "dnssec_publish_safety": 3600,  # PT1H
+        "dnssec_retire_safety": 3600,  # PT1H
+        "dnssec_signatures_jitter": 43200,  # PT12H
+        "dnssec_signatures_refresh": 432000,  # P5D
+        "dnssec_signatures_validity": 1209600,  # P14D
+        "dnssec_signatures_validity_dnskey": 1209600,  # P14D
+        "dnssec_max_zone_ttl": 86400,  # P1D
+        "dnssec_zone_propagation_delay": 300,  # PT5M
+        "dnssec_parent_ds_ttl": 86400,  # P1D
+        "dnssec_parent_propagation_delay": 3600,  # PT1H
+        "dnssec_dnskey_ttl": 3600,  # PT1H
     }
     base_url = "netbox-dns"
 
