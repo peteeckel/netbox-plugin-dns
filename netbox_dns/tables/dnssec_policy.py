@@ -5,13 +5,18 @@ from django.utils.translation import gettext_lazy as _
 from netbox.tables import (
     NetBoxTable,
     TagColumn,
+    ChoiceFieldColumn,
+    ActionsColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import DNSSECPolicy
 
 
-__all__ = ("DNSSECPolicyTable",)
+__all__ = (
+    "DNSSECPolicyTable",
+    "DNSSECPolicyDisplayTable",
+)
 
 
 class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
@@ -87,5 +92,36 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
             "name",
             "description",
             "use_nsec3",
+            "tags",
+        )
+
+
+class DNSSECPolicyDisplayTable(TenancyColumnsMixin, NetBoxTable):
+    actions = ActionsColumn(actions="")
+
+    name = tables.Column(
+        verbose_name=_("Name"),
+        linkify=True,
+    )
+    status = ChoiceFieldColumn(
+        verbose_name=_("Status"),
+    )
+    create_cdnskey = tables.BooleanColumn(
+        verbose_name=_("Create CDNSKEY"),
+    )
+    use_nsec3 = tables.BooleanColumn(
+        verbose_name=_("Use NSEC3"),
+    )
+    tags = TagColumn(
+        url_name="plugins:netbox_dns:dnssecpolicy_list",
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = DNSSECPolicy
+        fields = ("description",)
+        default_columns = (
+            "name",
+            "description",
+            "status",
             "tags",
         )

@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
 from netbox.models.features import ContactsMixin
+from netbox.plugins.utils import get_plugin_config
 
 from netbox_dns.choices import DNSSECPolicyDigestChoices
 from netbox_dns.fields import ChoiceArrayField
@@ -160,6 +161,25 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
     # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:dnssecpolicy", kwargs={"pk": self.pk})
+
+    @property
+    def purge_keys_value(self):
+        return self.purge_keys if self.purge_keys is not None else 776000
+
+    @property
+    def publish_safety_value(self):
+        return self.publish_safety if self.publish_safety is not None else 3600
+
+    def get_effective_value(self, attribute):
+        default_value = get_plugin_config("netbox_dns", f"dnssec_{attribute}", None)
+
+        if not hasattr(self, attribute):
+            raise AttributeError(f"DNSSECPolicy does not have attribute {attribute}")
+
+        if (value := getattr(self, attribute)) is None:
+            return default_value
+
+        return value
 
 
 @register_search
