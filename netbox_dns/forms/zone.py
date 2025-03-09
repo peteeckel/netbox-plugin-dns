@@ -243,7 +243,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
     rfc2317_parent_managed = forms.BooleanField(
         required=False,
         help_text=_(
-            "IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS"
+            "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
         ),
         label=_("RFC2317 Parent Managed"),
     )
@@ -590,7 +590,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
     rfc2317_parent_managed = forms.BooleanField(
         required=False,
         help_text=_(
-            "IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS"
+            "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
         ),
         label=_("RFC2317 Parent Managed"),
     )
@@ -790,7 +790,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         widget=BulkEditNullBooleanSelect(),
         help_text=_(
-            "IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in NetBox DNS"
+            "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
         ),
         label=_("RFC2317 Parent Managed"),
     )
