@@ -769,7 +769,7 @@ msgstr "Préfixe IPv4 RFC2317 avec une longueur d'au moins 25 bits"
 
 #: forms/zone.py:213 forms/zone.py:553 forms/zone.py:753
 msgid ""
-"IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in "
+"IPv4 reverse zone for delegating the RFC2317 PTR records is managed in "
 "NetBox DNS"
 msgstr ""
 "La zone IPv4 inverse pour déléguer les enregistrement PTR RFC2317 est "

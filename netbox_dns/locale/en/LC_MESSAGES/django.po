@@ -783,7 +783,7 @@ msgstr ""
 
 #: forms/zone.py:230 forms/zone.py:577 forms/zone.py:777
 msgid ""
-"IPv4 reverse zone for deletgating the RFC2317 PTR records is managed in "
+"IPv4 reverse zone for delegating the RFC2317 PTR records is managed in "
 "NetBox DNS"
 msgstr ""
 
