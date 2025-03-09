@@ -34,6 +34,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "display",
             "name",
             "description",
+            "status",
             "tags",
             "key_templates",
             "dnskey_ttl",
@@ -59,7 +60,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name", "description")
+        brief_fields = ("id", "url", "display", "name", "description", "status")
 
     def create(self, validated_data):
         dnssec_key_templates = validated_data.pop("key_templates", None)

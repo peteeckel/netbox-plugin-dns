@@ -12,18 +12,19 @@ from netbox.forms import (
 from utilities.forms.fields import (
     TagFilterField,
     CSVModelChoiceField,
+    CSVChoiceField,
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
 )
 from utilities.release import load_release_data
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import BulkEditNullBooleanSelect
-from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
-from netbox_dns.choices import DNSSECPolicyDigestChoices
+from netbox_dns.choices import DNSSECPolicyDigestChoices, DNSSECPolicyStatusChoices
 from netbox_dns.fields import TimePeriodField
 from netbox_dns.validators import validate_key_templates
 
@@ -40,7 +41,13 @@ QUICK_ADD = Version(load_release_data().version) >= Version("4.2.5")
 
 class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
     fieldsets = (
-        FieldSet("name", "description", "key_templates", name=_("Attributes")),
+        FieldSet(
+            "name",
+            "description",
+            "status",
+            "key_templates",
+            name=_("Attributes"),
+        ),
         FieldSet(
             "dnskey_ttl",
             "purge_keys",
@@ -85,6 +92,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         fields = (
             "name",
             "description",
+            "status",
             "key_templates",
             "dnskey_ttl",
             "purge_keys",
@@ -171,7 +179,13 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = DNSSECPolicy
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "description", "key_template_id", name=_("Attributes")),
+        FieldSet(
+            "name",
+            "description",
+            "status",
+            "key_template_id",
+            name=_("Attributes"),
+        ),
         FieldSet(
             "dnskey_ttl",
             "purge_keys",
@@ -208,6 +222,11 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     description = forms.CharField(
         required=False,
+    )
+    status = forms.MultipleChoiceField(
+        choices=DNSSECPolicyStatusChoices,
+        required=False,
+        label=_("Status"),
     )
     key_template_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
@@ -295,6 +314,11 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class DNSSECPolicyImportForm(NetBoxModelImportForm):
+    status = CSVChoiceField(
+        choices=DNSSECPolicyStatusChoices,
+        required=False,
+        label=_("Status"),
+    )
     dnskey_ttl = TimePeriodField(
         required=False,
         label=_("DNSKEY TTL"),
@@ -394,6 +418,11 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         max_length=200,
         required=False,
         label=_("Description"),
+    )
+    status = forms.ChoiceField(
+        choices=add_blank_choice(DNSSECPolicyStatusChoices),
+        required=False,
+        label=_("Status"),
     )
     dnskey_ttl = TimePeriodField(
         required=False,

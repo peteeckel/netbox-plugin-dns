@@ -8,7 +8,7 @@ from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
-
+from netbox_dns.choices import DNSSECPolicyStatusChoices
 
 __all__ = ("DNSSECPolicyFilterSet",)
 
@@ -20,6 +20,7 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "id",
             "name",
             "description",
+            "status",
             "dnskey_ttl",
             "purge_keys",
             "publish_safety",
@@ -39,6 +40,9 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "nsec3_salt_size",
         )
 
+    status = django_filters.MultipleChoiceFilter(
+        choices=DNSSECPolicyStatusChoices,
+    )
     cds_digest_types = MultiValueCharFilter(
         method="filter_cds_digest_types",
         label=_("CDS Digest Types"),

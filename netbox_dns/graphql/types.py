@@ -185,6 +185,7 @@ class NetBoxDNSDNSSECKeyTemplateType(NetBoxObjectType):
 class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
     name: str
     description: str | None
+    status: str
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
     key_templates: List[
         Annotated[
