@@ -22,6 +22,7 @@ class DNSSECPolicyAPITestCase(
         "display",
         "id",
         "name",
+        "status",
         "url",
     ]
 
