@@ -12,7 +12,7 @@ from netbox_dns.forms import (
     DNSSECKeyTemplateBulkEditForm,
 )
 from netbox_dns.models import DNSSECKeyTemplate
-from netbox_dns.tables import DNSSECKeyTemplateTable
+from netbox_dns.tables import DNSSECKeyTemplateTable, DNSSECPolicyDisplayTable
 
 
 __all__ = (
@@ -37,6 +37,14 @@ class DNSSECKeyTemplateListView(generic.ObjectListView):
 @register_model_view(DNSSECKeyTemplate)
 class DNSSECKeyTemplateView(generic.ObjectView):
     queryset = DNSSECKeyTemplate.objects.prefetch_related("policies")
+
+    def get_extra_context(self, request, instance):
+        if instance.policies.exists():
+            return {
+                "policy_table": DNSSECPolicyDisplayTable(data=instance.policies.all())
+            }
+
+        return {}
 
 
 @register_model_view(DNSSECKeyTemplate, "add", detail=False)

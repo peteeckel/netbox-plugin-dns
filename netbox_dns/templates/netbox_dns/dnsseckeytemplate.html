@@ -1,4 +1,5 @@
 {% extends 'generic/object.html' %}
+{% load render_table from django_tables2 %}
 {% load i18n %}
 
 {% block content %}
@@ -52,4 +53,18 @@
             {% include 'inc/panels/tags.html' %}
         </div>
     </div>
+    {% if policy_table %}
+        <div class="col col-md-12">
+            <div class="card">
+                {% if policy_table.rows|length == 1 %}
+                    <h2 class="card-header">{% trans "Policy" %}</h2>
+                {% else %}
+                    <h2 class="card-header">{% trans "Policies" %}</h2>
+                {% endif %}
+                <div class="table-responsive">
+                    {% render_table policy_table 'inc/table.html' %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
