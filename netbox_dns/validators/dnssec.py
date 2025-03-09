@@ -10,6 +10,9 @@ __all__ = (
 
 
 def validate_key_templates(key_templates):
+    if key_templates is None:
+        return
+
     csk = key_templates.filter(type=DNSSECKeyTemplateTypeChoices.TYPE_CSK)
     ksk = key_templates.filter(type=DNSSECKeyTemplateTypeChoices.TYPE_KSK)
     zsk = key_templates.filter(type=DNSSECKeyTemplateTypeChoices.TYPE_ZSK)
