@@ -143,6 +143,7 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
 
     clone_fields = (
         "name",
+        "key_templates",
         "description",
         "tenant",
     )
