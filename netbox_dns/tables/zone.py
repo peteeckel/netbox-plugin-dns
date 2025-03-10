@@ -5,13 +5,17 @@ from netbox.tables import (
     ChoiceFieldColumn,
     NetBoxTable,
     TagColumn,
+    ActionsColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import Zone
 
 
-__all__ = ("ZoneTable",)
+__all__ = (
+    "ZoneTable",
+    "ZoneDisplayTable",
+)
 
 
 class ZoneTable(TenancyColumnsMixin, NetBoxTable):
@@ -87,3 +91,10 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "status",
             "tags",
         )
+
+
+class ZoneDisplayTable(ZoneTable):
+    actions = ActionsColumn(actions=("changelog",))
+
+    class Meta(ZoneTable.Meta):
+        pass
