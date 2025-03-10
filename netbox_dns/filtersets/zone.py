@@ -8,7 +8,14 @@ from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
-from netbox_dns.models import View, Zone, Registrar, RegistrationContact, NameServer
+from netbox_dns.models import (
+    View,
+    Zone,
+    Registrar,
+    RegistrationContact,
+    NameServer,
+    DNSSECPolicy,
+)
 from netbox_dns.choices import ZoneStatusChoices
 
 
@@ -51,9 +58,15 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("SOA MName"),
     )
-    arpa_network = MultiValueCharFilter(
-        method="filter_arpa_network",
-        label=_("ARPA Network"),
+    dnssec_policy_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=DNSSECPolicy.objects.all(),
+        label=_("DNSSEC Policy ID"),
+    )
+    dnssec_policy = django_filters.ModelMultipleChoiceFilter(
+        queryset=DNSSECPolicy.objects.all(),
+        field_name="dnssec_policy__name",
+        to_field_name="name",
+        label=_("DNSSEC Policy"),
     )
     rfc2317_prefix = MultiValueCharFilter(
         method="filter_rfc2317_prefix",
@@ -121,6 +134,10 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="contact_id",
         label=_("Billing Contact"),
     )
+    arpa_network = MultiValueCharFilter(
+        method="filter_arpa_network",
+        label=_("ARPA Network"),
+    )
     active = django_filters.BooleanFilter(
         label=_("Zone is active"),
     )
@@ -141,6 +158,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "soa_minimum",
             "soa_serial_auto",
             "rfc2317_parent_managed",
+            "inline_signing",
             "registry_domain_id",
         )
 
@@ -179,6 +197,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             Q(name__icontains=value)
             | Q(status__icontains=value)
             | Q(view__name__icontains=value)
+            | Q(dnssec_policy__name__icontains=value)
             | Q(registrar__name__icontains=value)
             | Q(registry_domain_id__icontains=value)
             | Q(registrant__name__icontains=value)

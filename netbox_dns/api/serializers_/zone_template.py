@@ -10,6 +10,7 @@ from netbox_dns.api.nested_serializers import NestedRecordTemplateSerializer
 from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
 from .registration_contact import RegistrationContactSerializer
+from .dnssec_policy import DNSSECPolicySerializer
 
 
 __all__ = ("ZoneTemplateSerializer",)
@@ -38,6 +39,13 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
         read_only=False,
         required=False,
         help_text=_("Record templates assigned to the zone template"),
+    )
+    dnssec_policy = DNSSECPolicySerializer(
+        nested=True,
+        many=False,
+        read_only=False,
+        required=False,
+        help_text=_("DNSSEC policy assigned to the zone template"),
     )
     registrar = RegistrarSerializer(
         nested=True,
@@ -113,20 +121,21 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
             "id",
             "url",
             "name",
+            "description",
             "display",
             "nameservers",
             "soa_mname",
             "soa_rname",
-            "description",
-            "tags",
-            "created",
-            "last_updated",
+            "dnssec_policy",
             "registrar",
             "registrant",
             "tech_c",
             "admin_c",
             "billing_c",
             "active",
+            "tags",
+            "created",
+            "last_updated",
             "custom_fields",
             "tenant",
             "record_templates",

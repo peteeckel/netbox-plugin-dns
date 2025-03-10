@@ -62,6 +62,7 @@ class NetBoxDNSViewType(NetBoxObjectType):
 @strawberry_django.type(Zone, fields="__all__", filters=NetBoxDNSZoneFilter)
 class NetBoxDNSZoneType(NetBoxObjectType):
     name: str
+    description: str | None
     status: str
     active: bool
     view: Annotated["NetBoxDNSViewType", strawberry.lazy("netbox_dns.graphql.types")]
@@ -82,9 +83,13 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     soa_expire: BigInt
     soa_minimum: BigInt
     soa_serial_auto: bool
-    description: str | None
-    arpa_network: str | None
-    tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    dnssec_policy: (
+        Annotated[
+            "NetBoxDNSDNSSECPolicyType", strawberry.lazy("netbox_dns.graphql.types")
+        ]
+        | None
+    )
+    inline_signing: bool
     registrar: (
         Annotated["NetBoxDNSRegistrarType", strawberry.lazy("netbox_dns.graphql.types")]
         | None
@@ -130,6 +135,8 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     rfc2317_child_zones: List[
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
     ]
+    arpa_network: str | None
+    tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
 
 
 @strawberry_django.type(Record, fields="__all__", filters=NetBoxDNSRecordFilter)
@@ -277,6 +284,12 @@ class NetBoxDNSZoneTemplateType(NetBoxObjectType):
         | None
     )
     soa_rname: str | None
+    dnssec_policy: (
+        Annotated[
+            "NetBoxDNSDNSSECPolicyType", strawberry.lazy("netbox_dns.graphql.types")
+        ]
+        | None
+    )
     record_templates: List[
         Annotated[
             "NetBoxDNSRecordTemplateType", strawberry.lazy("netbox_dns.graphql.types")
