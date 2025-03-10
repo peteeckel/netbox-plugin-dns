@@ -12,6 +12,7 @@ from netbox_dns.models import (
     Registrar,
     RegistrationContact,
     NameServer,
+    DNSSECPolicy,
 )
 
 
@@ -54,6 +55,16 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="soa_mname__name",
         to_field_name="name",
         label=_("SOA MNAME"),
+    )
+    dnssec_policy_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=DNSSECPolicy.objects.all(),
+        label=_("DNSSEC Policy ID"),
+    )
+    dnssec_policy = django_filters.ModelMultipleChoiceFilter(
+        queryset=DNSSECPolicy.objects.all(),
+        field_name="dnssec_policy__name",
+        to_field_name="name",
+        label=_("DNSSEC Policy"),
     )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
