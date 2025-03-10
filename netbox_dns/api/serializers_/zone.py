@@ -9,6 +9,7 @@ from .nameserver import NameServerSerializer
 from .registrar import RegistrarSerializer
 from .registration_contact import RegistrationContactSerializer
 from .zone_template import ZoneTemplateSerializer
+from .dnssec_policy import DNSSECPolicySerializer
 
 from ..nested_serializers import NestedZoneSerializer
 
@@ -61,6 +62,13 @@ class ZoneSerializer(NetBoxModelSerializer):
         read_only=True,
         required=False,
         help_text=_("RFC2317 child zones of the zone"),
+    )
+    dnssec_policy = DNSSECPolicySerializer(
+        nested=True,
+        many=False,
+        read_only=False,
+        required=False,
+        help_text=_("DNSSEC policy to apply to the zone"),
     )
     registrar = RegistrarSerializer(
         nested=True,
@@ -173,6 +181,8 @@ class ZoneSerializer(NetBoxModelSerializer):
             "rfc2317_parent_managed",
             "rfc2317_parent_zone",
             "rfc2317_child_zones",
+            "dnssec_policy",
+            "inline_signing",
             "registrar",
             "registry_domain_id",
             "registrant",
