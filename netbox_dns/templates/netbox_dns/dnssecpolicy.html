@@ -34,6 +34,9 @@
                             </table>
                         </td>
                     </tr>
+                    {% if policy_warning %}
+                        <tr><td class="text-danger">{{ policy_warning }}</td></tr>
+                    {% endif %}
                     {% if object.tenant %}
                     <tr>
                         <th scope="row">{% trans "Tenant" %}</th>
