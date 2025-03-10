@@ -14,6 +14,7 @@ from netbox_dns.forms import (
 from netbox_dns.models import DNSSECPolicy
 from netbox_dns.tables import DNSSECPolicyTable
 from netbox_dns.validators import validate_key_template_lifetime
+from netbox_dns.choices import DNSSECKeyTemplateTypeChoices
 
 
 __all__ = (
@@ -40,14 +41,26 @@ class DNSSECPolicyView(generic.ObjectView):
     queryset = DNSSECPolicy.objects.prefetch_related("key_templates")
 
     def get_extra_context(self, request, instance):
-        errors = {
+        context = {}
+
+        key_errors = {
             key_template.pk: validate_key_template_lifetime(key_template, instance)
             for key_template in instance.key_templates.all()
         }
 
-        return {
-            "key_template_errors": errors,
-        }
+        context["key_template_errors"] = key_errors
+
+        if not instance.key_templates.filter(
+            type__in=(
+                DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
+                DNSSECKeyTemplateTypeChoices.TYPE_CSK,
+            )
+        ).exists():
+            context["policy_warning"] = _(
+                "No key for signing zones (CSK or ZSK) is assigned"
+            )
+
+        return context
 
 
 @register_model_view(DNSSECPolicy, "add", detail=False)
