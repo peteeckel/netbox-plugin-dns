@@ -14,6 +14,7 @@ from netbox_dns.models import (
     Registrar,
     ZoneTemplate,
     RecordTemplate,
+    DNSSECPolicy,
 )
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
@@ -50,6 +51,13 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         )
         NameServer.objects.bulk_create(cls.nameservers)
 
+        cls.dnssec_policies = (
+            DNSSECPolicy(name="Test Policy 1"),
+            DNSSECPolicy(name="Test Policy 2"),
+            DNSSECPolicy(name="Test Policy 3"),
+        )
+        DNSSECPolicy.objects.bulk_create(cls.dnssec_policies)
+
         cls.registrars = (
             Registrar(name="Registrar 1"),
             Registrar(name="Registrar 2"),
@@ -83,6 +91,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         cls.zone_template.admin_c = cls.contacts[1]
         cls.zone_template.tech_c = cls.contacts[2]
         cls.zone_template.billing_c = cls.contacts[3]
+        cls.zone_template.dnssec_policy = cls.dnssec_policies[0]
         cls.zone_template.save()
 
         cls.zone_template.nameservers.set(cls.nameservers[0:3])
@@ -187,6 +196,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         self.assertEqual(set(zone.tags.all()), set(self.tags[0:3]))
         self.assertEqual(zone.soa_mname, self.nameservers[4])
         self.assertEqual(zone.soa_rname, "hostmaster.example.com")
+        self.assertEqual(zone.dnssec_policy, self.dnssec_policies[0])
         self.assertEqual(zone.tenant, self.tenants[0])
         self.assertEqual(zone.registrar, self.registrars[0])
         self.assertEqual(zone.registrant, self.contacts[0])
@@ -200,6 +210,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "netbox_dns.view_zonetemplate",
             "netbox_dns.view_view",
             "netbox_dns.view_nameserver",
+            "netbox_dns.view_dnssecpolicy",
             "netbox_dns.view_registrar",
             "netbox_dns.view_registrationcontact",
             "extras.view_tag",
@@ -212,6 +223,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
             "nameservers": [nameserver.pk for nameserver in self.nameservers[3:6]],
             "soa_mname": self.nameservers[5].pk,
             "soa_rname": "hostmaster2.example.com",
+            "dnssec_policy": self.dnssec_policies[1].pk,
             "registrar": self.registrars[1].pk,
             "registrant": self.contacts[4].pk,
             "tech_c": self.contacts[4].pk,
@@ -237,6 +249,7 @@ class ZoneTemplatingViewTestCase(ModelViewTestCase):
         self.assertEqual(set(zone.nameservers.all()), set(self.nameservers[3:6]))
         self.assertEqual(zone.soa_mname, self.nameservers[5])
         self.assertEqual(zone.soa_rname, "hostmaster2.example.com")
+        self.assertEqual(zone.dnssec_policy, self.dnssec_policies[1])
         self.assertEqual(set(zone.tags.all()), set(self.tags[3:6]))
         self.assertEqual(zone.tenant, self.tenants[1])
         self.assertEqual(zone.registrar, self.registrars[1])
