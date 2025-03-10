@@ -1,18 +1,26 @@
 from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
-from utilities.views import register_model_view
+from utilities.views import ViewTab, register_model_view
 from tenancy.views import ObjectContactsView
 
-from netbox_dns.filtersets import DNSSECPolicyFilterSet
+from netbox_dns.filtersets import (
+    DNSSECPolicyFilterSet,
+    ZoneFilterSet,
+    ZoneTemplateFilterSet,
+)
 from netbox_dns.forms import (
     DNSSECPolicyImportForm,
     DNSSECPolicyFilterForm,
     DNSSECPolicyForm,
     DNSSECPolicyBulkEditForm,
 )
-from netbox_dns.models import DNSSECPolicy
-from netbox_dns.tables import DNSSECPolicyTable
+from netbox_dns.models import DNSSECPolicy, Zone, ZoneTemplate
+from netbox_dns.tables import (
+    DNSSECPolicyTable,
+    ZoneDisplayTable,
+    ZoneTemplateDisplayTable,
+)
 from netbox_dns.validators import validate_key_template_lifetime
 from netbox_dns.choices import DNSSECKeyTemplateTypeChoices
 
@@ -103,3 +111,43 @@ class DNSSECPolicyBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(DNSSECPolicy, "contacts")
 class DNSSECPolicyContactsView(ObjectContactsView):
     queryset = DNSSECPolicy.objects.all()
+
+
+@register_model_view(DNSSECPolicy, "zones")
+class DNSSECPolicyZoneListView(generic.ObjectChildrenView):
+    queryset = DNSSECPolicy.objects.all()
+    child_model = Zone
+    table = ZoneDisplayTable
+    filterset = ZoneFilterSet
+    template_name = "netbox_dns/zone/child.html"
+    hide_if_empty = True
+
+    tab = ViewTab(
+        label=_("Zones"),
+        permission="netbox_dns.view_zones",
+        badge=lambda obj: obj.zones.count(),
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        return parent.zones.restrict(request.user, "view")
+
+
+@register_model_view(DNSSECPolicy, "zonetemplates")
+class DNSSECPolicyZoneTemplateListView(generic.ObjectChildrenView):
+    queryset = DNSSECPolicy.objects.all()
+    child_model = ZoneTemplate
+    table = ZoneTemplateDisplayTable
+    filterset = ZoneTemplateFilterSet
+    template_name = "netbox_dns/zonetemplate/child.html"
+    hide_if_empty = True
+
+    tab = ViewTab(
+        label=_("Zone Templates"),
+        permission="netbox_dns.view_zonetemplates",
+        badge=lambda obj: obj.zone_templates.count(),
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        return parent.zone_templates.restrict(request.user, "view")
