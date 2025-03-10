@@ -3,7 +3,14 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import Zone, View, NameServer, Registrar, RegistrationContact
+from netbox_dns.models import (
+    Zone,
+    View,
+    NameServer,
+    Registrar,
+    RegistrationContact,
+    DNSSECPolicy,
+)
 from netbox_dns.choices import ZoneStatusChoices
 
 from netbox_dns.filtersets import ZoneFilterSet
@@ -57,6 +64,13 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         RegistrationContact.objects.bulk_create(cls.contacts)
 
+        cls.dnssec_policies = (
+            DNSSECPolicy(name="Test Policy 1"),
+            DNSSECPolicy(name="Test Policy 2"),
+            DNSSECPolicy(name="Test Policy 3"),
+        )
+        DNSSECPolicy.objects.bulk_create(cls.dnssec_policies)
+
         cls.zones = (
             Zone(
                 name="zone1.example.com",
@@ -71,6 +85,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[0],
                 admin_c=cls.contacts[0],
                 billing_c=cls.contacts[0],
+                dnssec_policy=cls.dnssec_policies[0],
             ),
             Zone(
                 name="zone2.example.com",
@@ -86,6 +101,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
+                dnssec_policy=cls.dnssec_policies[0],
             ),
             Zone(
                 name="zone3.example.com",
@@ -100,6 +116,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
+                dnssec_policy=cls.dnssec_policies[1],
+                inline_signing=False,
             ),
             Zone(
                 name="zone1.example.com",
@@ -114,6 +132,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
+                dnssec_policy=cls.dnssec_policies[1],
+                inline_signing=False,
             ),
             Zone(
                 name="zone2.example.com",
@@ -128,6 +148,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[2],
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
+                dnssec_policy=cls.dnssec_policies[2],
+                inline_signing=False,
             ),
             Zone(
                 name="zone3.example.com",
@@ -142,6 +164,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[2],
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
+                dnssec_policy=cls.dnssec_policies[2],
             ),
             Zone(
                 name="0.0.10.in-addr.arpa",
@@ -150,6 +173,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 soa_mname=cls.nameservers[2],
                 soa_rname="hostmaster.example.com",
                 soa_serial_auto=True,
+                inline_signing=True,
             ),
             Zone(
                 name="1.0.10.in-addr.arpa",
@@ -158,6 +182,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 soa_mname=cls.nameservers[2],
                 soa_rname="hostmaster.example.com",
                 soa_serial_auto=True,
+                inline_signing=True,
             ),
             Zone(
                 name="0-31.0.0.10.in-addr.arpa",
@@ -352,3 +377,22 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
         params = {"soa_serial_auto": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 8)
+
+    def test_dnssec_policy(self):
+        params = {
+            "dnssec_policy_id": [self.dnssec_policies[0].pk, self.dnssec_policies[1].pk]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {
+            "dnssec_policy": [
+                self.dnssec_policies[0].name,
+                self.dnssec_policies[1].name,
+            ]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_inline_signing(self):
+        params = {"inline_signing": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 10)
+        params = {"inline_signing": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)

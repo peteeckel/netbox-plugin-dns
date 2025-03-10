@@ -25,6 +25,10 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
     tags = TagColumn(
         url_name="plugins:netbox_dns:zonetemplate_list",
     )
+    dnssec_policy = tables.Column(
+        verbose_name=_("DNSSEC Policy"),
+        linkify=True,
+    )
     registrar = tables.Column(
         verbose_name=_("Registrar"),
         linkify=True,

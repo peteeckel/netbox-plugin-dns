@@ -16,6 +16,8 @@ from netbox_dns.api.serializers import (
     RegistrationContactSerializer,
     ZoneTemplateSerializer,
     RecordTemplateSerializer,
+    DNSSECKeyTemplateSerializer,
+    DNSSECPolicySerializer,
     PrefixSerializer,
 )
 from netbox_dns.filtersets import (
@@ -27,6 +29,8 @@ from netbox_dns.filtersets import (
     RegistrationContactFilterSet,
     ZoneTemplateFilterSet,
     RecordTemplateFilterSet,
+    DNSSECKeyTemplateFilterSet,
+    DNSSECPolicyFilterSet,
 )
 from netbox_dns.models import (
     View,
@@ -37,6 +41,8 @@ from netbox_dns.models import (
     RegistrationContact,
     ZoneTemplate,
     RecordTemplate,
+    DNSSECKeyTemplate,
+    DNSSECPolicy,
 )
 
 
@@ -133,6 +139,18 @@ class RecordTemplateViewSet(NetBoxModelViewSet):
     queryset = RecordTemplate.objects.all()
     serializer_class = RecordTemplateSerializer
     filterset_class = RecordTemplateFilterSet
+
+
+class DNSSECKeyTemplateViewSet(NetBoxModelViewSet):
+    queryset = DNSSECKeyTemplate.objects.all()
+    serializer_class = DNSSECKeyTemplateSerializer
+    filterset_class = DNSSECKeyTemplateFilterSet
+
+
+class DNSSECPolicyViewSet(NetBoxModelViewSet):
+    queryset = DNSSECPolicy.objects.all()
+    serializer_class = DNSSECPolicySerializer
+    filterset_class = DNSSECPolicyFilterSet
 
 
 class PrefixViewSet(NetBoxModelViewSet):
