@@ -65,7 +65,7 @@ class DNSSECPolicyView(generic.ObjectView):
             )
         ).exists():
             context["policy_warning"] = _(
-                "No key for signing zones (CSK or ZSK) is assigned"
+                "No key for signing zones (CSK or ZSK) is assigned."
             )
 
         return context
