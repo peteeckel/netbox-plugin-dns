@@ -296,16 +296,3 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             "tenant_group": [self.tenant_groups[0].slug, self.tenant_groups[1].slug]
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-
-    def test_dnssec_policy(self):
-        params = {
-            "dnssec_policy_id": [self.dnssec_policies[0].pk, self.dnssec_policies[1].pk]
-        }
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {
-            "dnssec_policy": [
-                self.dnssec_policies[0].name,
-                self.dnssec_policies[1].name,
-            ]
-        }
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)

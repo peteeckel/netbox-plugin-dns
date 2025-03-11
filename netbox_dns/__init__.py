@@ -83,6 +83,8 @@ class DNSConfig(PluginConfig):
     def ready(self):
         super().ready()
 
+        import netbox_dns.signals.dnssec  # noqa: F401
+
         if not get_plugin_config("netbox_dns", "dnssync_disabled"):
             import netbox_dns.signals.ipam_dnssync  # noqa: F401
             import netbox_dns.tables.ipam_dnssync  # noqa: F401
