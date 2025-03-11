@@ -1,10 +1,14 @@
-from utilities.testing import ViewTestCases, create_tags
+from rest_framework import status
+
+from utilities.testing import ViewTestCases, create_tags, post_data
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import DNSSECPolicy
+from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
 from netbox_dns.choices import (
     DNSSECPolicyDigestChoices,
     DNSSECPolicyStatusChoices,
+    DNSSECKeyTemplateTypeChoices,
+    DNSSECKeyTemplateAlgorithmChoices,
 )
 
 
@@ -24,6 +28,40 @@ class DNSSECPolicyViewTestCase(
 
     @classmethod
     def setUpTestData(cls):
+        cls.dnssec_key_templates = (
+            DNSSECKeyTemplate(
+                name="csk-template1",
+                type=DNSSECKeyTemplateTypeChoices.TYPE_CSK,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
+            ),
+            DNSSECKeyTemplate(
+                name="csk-template2",
+                type=DNSSECKeyTemplateTypeChoices.TYPE_CSK,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.ED25519,
+            ),
+            DNSSECKeyTemplate(
+                name="ksk-template1",
+                type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
+            ),
+            DNSSECKeyTemplate(
+                name="ksk-template2",
+                type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.ED25519,
+            ),
+            DNSSECKeyTemplate(
+                name="zsk-template1",
+                type=DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
+            ),
+            DNSSECKeyTemplate(
+                name="zsk-template2",
+                type=DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.ED25519,
+            ),
+        )
+        DNSSECKeyTemplate.objects.bulk_create(cls.dnssec_key_templates)
+
         cls.dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 4",
@@ -122,3 +160,268 @@ class DNSSECPolicyViewTestCase(
         )
 
     maxDiff = None
+
+    def test_ksk_zsk(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[2]
+        key_template2 = self.dnssec_key_templates[4]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+
+        self.assertIn(key_template1, policy.key_templates.all())
+        self.assertIn(key_template2, policy.key_templates.all())
+        self.assertEqual(policy.max_zone_ttl, 424242)
+
+    def test_csk(self):
+        policy = self.dnssec_policies[0]
+
+        key_template = self.dnssec_key_templates[0]
+
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+
+        self.assertIn(key_template, policy.key_templates.all())
+        self.assertEqual(policy.max_zone_ttl, 424242)
+
+    def test_csk_ksk_fail(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[0]
+        key_template2 = self.dnssec_key_templates[2]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        policy.refresh_from_db()
+
+        self.assertFalse(policy.key_templates.exists())
+        self.assertEqual(policy.max_zone_ttl, 86400)
+
+    def test_csk_zsk_fail(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[0]
+        key_template2 = self.dnssec_key_templates[4]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        policy.refresh_from_db()
+
+        self.assertFalse(policy.key_templates.exists())
+        self.assertEqual(policy.max_zone_ttl, 86400)
+
+    def test_csk_csk_fail(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[0]
+        key_template2 = self.dnssec_key_templates[1]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        policy.refresh_from_db()
+
+        self.assertFalse(policy.key_templates.exists())
+        self.assertEqual(policy.max_zone_ttl, 86400)
+
+    def test_ksk_ksk_fail(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[2]
+        key_template2 = self.dnssec_key_templates[3]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        policy.refresh_from_db()
+
+        self.assertFalse(policy.key_templates.exists())
+        self.assertEqual(policy.max_zone_ttl, 86400)
+
+    def test_zsk_zsk_fail(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[4]
+        key_template2 = self.dnssec_key_templates[5]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        policy.refresh_from_db()
+
+        self.assertFalse(policy.key_templates.exists())
+        self.assertEqual(policy.max_zone_ttl, 86400)
+
+    def test_ksk_zsk_different_algorithm_fail(self):
+        policy = self.dnssec_policies[0]
+
+        key_template1 = self.dnssec_key_templates[2]
+        key_template2 = self.dnssec_key_templates[5]
+
+        self.add_permissions(
+            "netbox_dns.change_dnssecpolicy",
+            "netbox_dns.view_dnsseckeytemplate",
+        )
+
+        request_data = {
+            "name": policy.name,
+            "key_templates": [
+                key_template1.pk,
+                key_template2.pk,
+            ],
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": 424242,
+        }
+        request = {
+            "path": self._get_url("edit", instance=policy),
+            "data": post_data(request_data),
+        }
+
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        policy.refresh_from_db()
+
+        self.assertFalse(policy.key_templates.exists())
+        self.assertEqual(policy.max_zone_ttl, 86400)

@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
