@@ -36,14 +36,14 @@ def validate_key_templates(key_templates):
         raise ValidationError(
             {
                 "key_templates": _(
-                    "At most one key template per type (CSK, KSK and ZSK) is allowed"
+                    "At most one key template per type (CSK, KSK and ZSK) is allowed."
                 )
             }
         )
 
     if (ksk and zsk) and (ksk.first().algorithm != zsk.first().algorithm):
         raise ValidationError(
-            {"key_templates": _("KSK and ZSK must use the same algorithm")}
+            {"key_templates": _("KSK and ZSK must use the same algorithm.")}
         )
 
 
@@ -69,7 +69,7 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
     ):
         validation_errors.append(
             _(
-                "Key Lifetime is less than DNSKEY TTL + Publish Safety + Zone Propagation Delay"
+                "Key Lifetime is less than DNSKEY TTL + Publish Safety + Zone Propagation Delay."
             )
         )
 
@@ -81,7 +81,7 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
     ):
         validation_errors.append(
             _(
-                "Key Lifetime is less than Max Zone TTL + Retire Safety + Zone Propagation Delay"
+                "Key Lifetime is less than Max Zone TTL + Retire Safety + Zone Propagation Delay."
             )
         )
 
@@ -95,7 +95,7 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
             and key_lifetime < signatures_validity - signatures_refresh
         ):
             validation_errors.append(
-                _("Key Lifetime is less than Signatures Validity - Signatures Refresh")
+                _("Key Lifetime is less than Signatures Validity - Signatures Refresh.")
             )
     else:
         parent_ds_ttl = policy.get_effective_value("parent_ds_ttl")
@@ -111,7 +111,7 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
         ):
             validation_errors.append(
                 _(
-                    "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Proagation Delay"
+                    "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Proagation Delay."
                 )
             )
 
