@@ -94,7 +94,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             DNSSECKeyTemplate(
                 name="Test KSK",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
-                algorithm=DNSSECKeyTemplateAlgorithmChoices.ECDSAP256SHA256,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
                 lifetime=86400,
             ),
             DNSSECKeyTemplate(

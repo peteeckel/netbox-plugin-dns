@@ -22,7 +22,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             DNSSECKeyTemplate(
                 name="Test KSK",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
-                algorithm=DNSSECKeyTemplateAlgorithmChoices.ECDSAP256SHA256,
+                algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
                 lifetime=86400,
             ),
             DNSSECKeyTemplate(
@@ -65,7 +65,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_algorithm(self):
-        params = {"algorithm": [DNSSECKeyTemplateAlgorithmChoices.ECDSAP256SHA256]}
+        params = {"algorithm": [DNSSECKeyTemplateAlgorithmChoices.ED25519]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         params = {
             "algorithm": [
@@ -73,7 +73,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 DNSSECKeyTemplateAlgorithmChoices.ED25519,
             ]
         }
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_lifetime(self):
         params = {"lifetime": [86400]}
