@@ -111,7 +111,7 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
         ):
             validation_errors.append(
                 _(
-                    "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Proagation Delay."
+                    "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Propagation Delay."
                 )
             )
 
