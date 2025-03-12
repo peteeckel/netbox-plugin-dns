@@ -5,6 +5,7 @@ from netbox_dns.models import DNSSECKeyTemplate
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
 )
 
 
@@ -37,19 +38,18 @@ class DNSSECKeyTemplateAPITestCase(
             "name": "Test KSK",
             "type": DNSSECKeyTemplateTypeChoices.TYPE_KSK,
             "algorithm": DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
-            "key_size": 2048,
+            "key_size": DNSSECKeyTemplateKeySizeChoices.SIZE_2048,
         },
         {
             "name": "Test ZSK",
             "type": DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
             "algorithm": DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
-            "key_size": 1024,
+            "key_size": DNSSECKeyTemplateKeySizeChoices.SIZE_1024,
         },
         {
             "name": "Test CSK",
             "type": DNSSECKeyTemplateTypeChoices.TYPE_CSK,
             "algorithm": DNSSECKeyTemplateAlgorithmChoices.ED25519,
-            "key_size": 1024,
         },
     ]
 
