@@ -1,15 +1,43 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from netbox_dns.choices import DNSSECKeyTemplateTypeChoices
+from netbox_dns.choices import (
+    DNSSECKeyTemplateTypeChoices,
+    DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
+)
 
 __all__ = (
-    "validate_key_templates",
+    "validate_key_template",
+    "validate_key_template_assignment",
     "validate_key_template_lifetime",
 )
 
 
-def validate_key_templates(key_templates):
+def validate_key_template(key_template):
+    if key_template.key_size is None:
+        return
+
+    if key_template.key_size not in DNSSECKeyTemplateKeySizeChoices.values():
+        raise ValidationError(
+            {
+                "key_size": _("{key_size} is not a supported key size.").format(
+                    key_size=key_template.key_size
+                )
+            }
+        )
+
+    if key_template.algorithm != DNSSECKeyTemplateAlgorithmChoices.RSASHA256:
+        raise ValidationError(
+            {
+                "key_size": _(
+                    "Specifying the key size is not supported for algorithm {algorithm}."
+                ).format(algorithm=key_template.algorithm)
+            }
+        )
+
+
+def validate_key_template_assignment(key_templates):
     if key_templates is None:
         return
 
