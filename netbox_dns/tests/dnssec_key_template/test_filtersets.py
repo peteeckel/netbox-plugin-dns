@@ -7,6 +7,7 @@ from netbox_dns.filtersets import DNSSECKeyTemplateFilterSet
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
 )
 
 
@@ -30,7 +31,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 type=DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
                 lifetime=86400,
-                key_size=1024,
+                key_size=DNSSECKeyTemplateKeySizeChoices.SIZE_1024,
             ),
             DNSSECKeyTemplate(
                 name="Test CSK",
@@ -80,7 +81,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_key_size(self):
-        params = {"key_size": [1024]}
+        params = {"key_size": [DNSSECKeyTemplateKeySizeChoices.SIZE_1024]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_policy(self):

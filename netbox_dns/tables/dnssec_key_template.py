@@ -29,7 +29,7 @@ class DNSSECKeyTemplateTable(TenancyColumnsMixin, NetBoxTable):
     algorithm = ChoiceFieldColumn(
         verbose_name=_("Algorithm"),
     )
-    key_size = tables.Column(
+    key_size = ChoiceFieldColumn(
         verbose_name=_("Key Size"),
     )
     tags = TagColumn(
