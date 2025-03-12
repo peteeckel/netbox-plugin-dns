@@ -46,7 +46,7 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Signatures Refresh"),
     )
     signatures_validity = tables.Column(
-        verbose_name=_("Signatures Validitiy"),
+        verbose_name=_("Signatures Validity"),
     )
     signatures_validity_dnskey = tables.Column(
         verbose_name=_("Signatures Validity (DNSKEY)"),
