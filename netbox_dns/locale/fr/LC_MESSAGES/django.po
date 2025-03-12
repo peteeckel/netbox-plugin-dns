@@ -1733,18 +1733,18 @@ msgstr ""
 #, python-brace-format
 msgid "Record value {value} is not a valid value for a {type} record: {error}."
 msgstr ""
-"La valeur '{value}' de l'enregistrement n'est pas vaide pour un "
+"La valeur '{value}' de l'enregistrement n'est pas valide pour un "
 "enregistrement de type '{type}' : {error}."
 
 #: validators/dnssec.py:24
 #, python-brace-format
 msgid "{key_size} is not a supported key size."
-msgstr ""
+msgstr "{key_size} n'est pas une taille gérée."
 
 #: validators/dnssec.py:34
 #, python-brace-format
 msgid "Specifying the key size is not supported for algorithm {algorithm}."
-msgstr ""
+msgstr "Specifier la taille de la clé n'est pas géré pour l'algorithme {algorithm}."
 
 #: validators/dnssec.py:52
 msgid ""
