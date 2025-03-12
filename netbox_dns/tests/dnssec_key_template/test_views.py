@@ -57,14 +57,14 @@ class DNSSECKeyTemplateViewTestCase(
         cls.bulk_edit_data = {
             "description": "New Description",
             "algorithm": DNSSECKeyTemplateAlgorithmChoices.ED25519,
-            "key_size": DNSSECKeyTemplateKeySizeChoices.SIZE_1024,
+            "key_size": None,
         }
 
         cls.csv_data = (
             "name,type,algorithm,key_size",
-            f"Test KSK,{DNSSECKeyTemplateTypeChoices.TYPE_KSK},{DNSSECKeyTemplateAlgorithmChoices.ED25519},{DNSSECKeyTemplateKeySizeChoices.SIZE_2048}",
-            f"Test ZSK,{DNSSECKeyTemplateTypeChoices.TYPE_ZSK},{DNSSECKeyTemplateAlgorithmChoices.ED25519},{DNSSECKeyTemplateKeySizeChoices.SIZE_1024}",
-            f"Test CSK,{DNSSECKeyTemplateTypeChoices.TYPE_CSK},{DNSSECKeyTemplateAlgorithmChoices.ED25519},{DNSSECKeyTemplateKeySizeChoices.SIZE_2048}",
+            f"Test KSK,{DNSSECKeyTemplateTypeChoices.TYPE_KSK},{DNSSECKeyTemplateAlgorithmChoices.RSASHA256},{DNSSECKeyTemplateKeySizeChoices.SIZE_2048}",
+            f"Test ZSK,{DNSSECKeyTemplateTypeChoices.TYPE_ZSK},{DNSSECKeyTemplateAlgorithmChoices.RSASHA256},{DNSSECKeyTemplateKeySizeChoices.SIZE_1024}",
+            f"Test CSK,{DNSSECKeyTemplateTypeChoices.TYPE_CSK},{DNSSECKeyTemplateAlgorithmChoices.RSASHA256},{DNSSECKeyTemplateKeySizeChoices.SIZE_2048}",
         )
 
         cls.csv_update_data = (

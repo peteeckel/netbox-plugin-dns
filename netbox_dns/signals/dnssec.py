@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from netbox.context import current_request
 from utilities.exceptions import AbortRequest
 
-from netbox_dns.validators import validate_key_templates
+from netbox_dns.validators import validate_key_template_assignment
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
 
@@ -24,7 +24,7 @@ def dnssec_policy_key_templates_changed(action, instance, pk_set, **kwargs):
             return
 
     try:
-        validate_key_templates(key_templates)
+        validate_key_template_assignment(key_templates)
     except ValidationError as exc:
         if request is not None:
             raise AbortRequest(exc)
