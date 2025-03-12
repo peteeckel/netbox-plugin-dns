@@ -32,7 +32,7 @@
                     </tr>
                     <tr>
                         <th scope="row">{% trans "Key Size" %}</th>
-                        <td>{{ object.key_size|placeholder }}</td>
+                        <td>{% badge object.get_key_size_display %}</td>
                     </tr>
                     {% if object.tenant %}
                     <tr>

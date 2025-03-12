@@ -23,6 +23,7 @@ from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
 )
 from netbox_dns.fields import TimePeriodField
 
@@ -54,8 +55,8 @@ class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
             "description",
             "type",
             "lifetime",
-            "algorithm",
             "key_size",
+            "algorithm",
             "tenant_group",
             "tenant",
             "tags",
@@ -97,7 +98,9 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
     )
     key_size = SimpleArrayField(
-        base_field=forms.IntegerField(),
+        base_field=forms.ChoiceField(
+            choices=DNSSECKeyTemplateKeySizeChoices,
+        ),
         required=False,
         help_text=_("Enter a list of integer key sizes, separated by comma (,)"),
     )
@@ -147,7 +150,8 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Algorithm"),
     )
-    key_size = forms.IntegerField(
+    key_size = forms.ChoiceField(
+        choices=add_blank_choice(DNSSECKeyTemplateKeySizeChoices),
         required=False,
         label=_("Key Size"),
     )

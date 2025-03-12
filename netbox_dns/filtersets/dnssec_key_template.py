@@ -9,6 +9,7 @@ from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
 )
 
 
@@ -21,6 +22,9 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
     algorithm = django_filters.MultipleChoiceFilter(
         choices=DNSSECKeyTemplateAlgorithmChoices,
+    )
+    key_size = django_filters.MultipleChoiceFilter(
+        choices=DNSSECKeyTemplateKeySizeChoices,
     )
 
     policy_id = django_filters.ModelMultipleChoiceFilter(
@@ -38,7 +42,7 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
     class Meta:
         model = DNSSECKeyTemplate
-        fields = ("id", "name", "description", "key_size", "lifetime")
+        fields = ("id", "name", "description", "lifetime")
 
     def search(self, queryset, name, value):
         if not value.strip():

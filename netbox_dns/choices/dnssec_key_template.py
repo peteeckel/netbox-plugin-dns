@@ -22,6 +22,7 @@ DEPRECATED_ALGORITHMS = (
 __all__ = (
     "DNSSECKeyTemplateTypeChoices",
     "DNSSECKeyTemplateAlgorithmChoices",
+    "DNSSECKeyTemplateKeySizeChoices",
 )
 
 
@@ -34,6 +35,22 @@ class DNSSECKeyTemplateTypeChoices(ChoiceSet):
         (TYPE_CSK, _("CSK"), "purple"),
         (TYPE_KSK, _("KSK"), "blue"),
         (TYPE_ZSK, _("ZSK"), "green"),
+    ]
+
+
+class DNSSECKeyTemplateKeySizeChoices(ChoiceSet):
+    SIZE_512 = 512
+    SIZE_1024 = 1024
+    SIZE_2048 = 2048
+    SIZE_3072 = 3072
+    SIZE_4096 = 4096
+
+    CHOICES = [
+        (SIZE_512, 512),
+        (SIZE_1024, 1024),
+        (SIZE_2048, 2048),
+        (SIZE_3072, 3072),
+        (SIZE_4096, 4096),
     ]
 
 

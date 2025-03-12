@@ -9,6 +9,7 @@ from netbox.models.features import ContactsMixin
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
 )
 
 
@@ -49,6 +50,7 @@ class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
     )
     key_size = models.PositiveIntegerField(
         verbose_name=_("Key Size"),
+        choices=DNSSECKeyTemplateKeySizeChoices,
         blank=True,
         null=True,
     )

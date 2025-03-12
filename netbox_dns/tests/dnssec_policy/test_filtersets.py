@@ -7,6 +7,7 @@ from netbox_dns.filtersets import DNSSECPolicyFilterSet
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
     DNSSECKeyTemplateAlgorithmChoices,
+    DNSSECKeyTemplateKeySizeChoices,
     DNSSECPolicyDigestChoices,
     DNSSECPolicyStatusChoices,
 )
@@ -95,6 +96,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 name="Test KSK",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
+                key_size=DNSSECKeyTemplateKeySizeChoices.SIZE_2048,
                 lifetime=86400,
             ),
             DNSSECKeyTemplate(
@@ -102,7 +104,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 type=DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
                 lifetime=86400,
-                key_size=1024,
+                key_size=DNSSECKeyTemplateKeySizeChoices.SIZE_1024,
             ),
             DNSSECKeyTemplate(
                 name="Test CSK",
