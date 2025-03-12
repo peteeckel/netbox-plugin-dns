@@ -9,10 +9,10 @@ msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-11 17:52+0000\n"
-"PO-Revision-Date: 2024-09-29 12:06+0000\n"
-"Last-Translator: Peter Eckel <pete@netbox-dns.org>\n"
+"PO-Revision-Date: 2025-03-12 08:06+0000\n"
+"Last-Translator: Jean Benoit <jean@unistra.fr>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
-"Language: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -159,15 +159,15 @@ msgstr ""
 
 #: netbox_dns/choices/dnssec_key_template.py:34
 msgid "CSK"
-msgstr ""
+msgstr "CSK"
 
 #: netbox_dns/choices/dnssec_key_template.py:35
 msgid "KSK"
-msgstr ""
+msgstr "KSK"
 
 #: netbox_dns/choices/dnssec_key_template.py:36
 msgid "ZSK"
-msgstr ""
+msgstr "ZSK"
 
 #: netbox_dns/choices/dnssec_policy.py:38 netbox_dns/choices/record.py:55
 #: netbox_dns/choices/zone.py:19 netbox_dns/forms/record.py:179
@@ -218,19 +218,19 @@ msgstr "Champ CIDR PostgreSQL pour un préfixe RFC2317"
 
 #: netbox_dns/filtersets/dnssec_key_template.py:30
 msgid "DNSSEC Policy IDs"
-msgstr ""
+msgstr "Identifiant politique DNSSEC"
 
 #: netbox_dns/filtersets/dnssec_key_template.py:36
 #: netbox_dns/models/dnssec_policy.py:161 netbox_dns/navigation.py:117
 msgid "DNSSEC Policies"
-msgstr ""
+msgstr "Politiques DNSSEC"
 
 #: netbox_dns/filtersets/dnssec_policy.py:48
 #: netbox_dns/forms/dnssec_policy.py:275 netbox_dns/forms/dnssec_policy.py:458
 #: netbox_dns/models/dnssec_policy.py:105 netbox_dns/tables/dnssec_policy.py:67
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:106
 msgid "CDS Digest Types"
-msgstr ""
+msgstr "Type de condensat CDS"
 
 #: netbox_dns/filtersets/dnssec_policy.py:54
 #: netbox_dns/models/dnssec_key_template.py:76 netbox_dns/navigation.py:97
@@ -363,7 +363,7 @@ msgstr "MName (serveur de nom primaire) du SOA"
 #: netbox_dns/filtersets/zone.py:63 netbox_dns/filtersets/zone_template.py:61
 #: netbox_dns/forms/zone_template.py:152
 msgid "DNSSEC Policy ID"
-msgstr ""
+msgstr "Identifiant politique DNSSEC"
 
 #: netbox_dns/filtersets/zone.py:69 netbox_dns/filtersets/zone_template.py:67
 #: netbox_dns/forms/zone.py:501 netbox_dns/forms/zone.py:622
@@ -373,7 +373,7 @@ msgstr ""
 #: netbox_dns/tables/zone.py:44 netbox_dns/tables/zone_template.py:29
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:8
 msgid "DNSSEC Policy"
-msgstr ""
+msgstr "Politique DNSSEC"
 
 #: netbox_dns/filtersets/zone.py:73 netbox_dns/forms/zone.py:242
 #: netbox_dns/forms/zone.py:606 netbox_dns/forms/zone.py:820
@@ -516,7 +516,7 @@ msgstr "Attributs"
 #: netbox_dns/forms/dnssec_key_template.py:71
 #: netbox_dns/forms/dnssec_key_template.py:175
 msgid "Key Properties"
-msgstr ""
+msgstr "Propriétés de la clé"
 
 #: netbox_dns/forms/dnssec_key_template.py:46
 #: netbox_dns/forms/dnssec_key_template.py:72
@@ -548,15 +548,15 @@ msgstr "Tags"
 #: netbox_dns/forms/dnssec_key_template.py:84
 #: netbox_dns/templates/netbox_dns/dnsseckeytemplate.html:62
 msgid "Policies"
-msgstr ""
+msgstr "Politiques"
 
 #: netbox_dns/forms/dnssec_key_template.py:93
 msgid "Enter a list of integer lifetime values, separated by comma (,)"
-msgstr ""
+msgstr "Entrer une liste de durées de vie entières, séparées par des virgules (,)"
 
 #: netbox_dns/forms/dnssec_key_template.py:102
 msgid "Enter a list of integer key sizes, separated by comma (,)"
-msgstr ""
+msgstr "Entrer une liste de tailles de clé entières, séparées par des virgules (,)"
 
 #: netbox_dns/forms/dnssec_key_template.py:110
 #: netbox_dns/forms/dnssec_key_template.py:143
@@ -564,7 +564,7 @@ msgstr ""
 #: netbox_dns/tables/dnssec_key_template.py:27
 #: netbox_dns/templates/netbox_dns/dnsseckeytemplate.html:26
 msgid "Lifetime"
-msgstr ""
+msgstr "Durée de vie"
 
 #: netbox_dns/forms/dnssec_key_template.py:116
 #: netbox_dns/forms/dnssec_key_template.py:167
@@ -597,21 +597,21 @@ msgstr "Entité"
 #, fuzzy
 #| msgid "Type"
 msgid "Key Type"
-msgstr "Type"
+msgstr "Type de clé"
 
 #: netbox_dns/forms/dnssec_key_template.py:148
 #: netbox_dns/models/dnssec_key_template.py:45
 #: netbox_dns/tables/dnssec_key_template.py:30
 #: netbox_dns/templates/netbox_dns/dnsseckeytemplate.html:30
 msgid "Algorithm"
-msgstr ""
+msgstr "Algorithme"
 
 #: netbox_dns/forms/dnssec_key_template.py:152
 #: netbox_dns/models/dnssec_key_template.py:51
 #: netbox_dns/tables/dnssec_key_template.py:33
 #: netbox_dns/templates/netbox_dns/dnsseckeytemplate.html:34
 msgid "Key Size"
-msgstr ""
+msgstr "Taille de clé"
 
 #: netbox_dns/forms/dnssec_key_template.py:157
 #: netbox_dns/forms/dnssec_policy.py:403 netbox_dns/forms/nameserver.py:76
@@ -655,7 +655,7 @@ msgstr "Groupe d'entités"
 #: netbox_dns/forms/dnssec_policy.py:514
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:54
 msgid "Timing"
-msgstr ""
+msgstr "Timing"
 
 #: netbox_dns/forms/dnssec_policy.py:68 netbox_dns/forms/dnssec_policy.py:198
 #: netbox_dns/forms/dnssec_policy.py:521
@@ -669,7 +669,7 @@ msgstr "Enregistrement de délégation parents"
 #: netbox_dns/forms/dnssec_policy.py:528
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:120
 msgid "Proof of Non-Existence"
-msgstr ""
+msgstr "Preuve de non-existence"
 
 #: netbox_dns/forms/dnssec_policy.py:84 netbox_dns/forms/dnssec_policy.py:225
 #: netbox_dns/models/dnssec_policy.py:40
@@ -681,7 +681,7 @@ msgstr "Modèles"
 
 #: netbox_dns/forms/dnssec_policy.py:85
 msgid "Select CSK or KSK/ZSK templates for signing"
-msgstr ""
+msgstr "Sélectionner un modèle de CSK ou de KSK/ZSK pour signature"
 
 #: netbox_dns/forms/dnssec_policy.py:121 netbox_dns/forms/dnssec_policy.py:229
 #: netbox_dns/forms/dnssec_policy.py:315 netbox_dns/forms/dnssec_policy.py:412
@@ -689,34 +689,34 @@ msgstr ""
 #: netbox_dns/tables/dnssec_policy.py:58
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:57
 msgid "DNSKEY TTL"
-msgstr ""
+msgstr "TTL DNSKEY"
 
 #: netbox_dns/forms/dnssec_policy.py:125 netbox_dns/forms/dnssec_policy.py:233
 #: netbox_dns/forms/dnssec_policy.py:319 netbox_dns/forms/dnssec_policy.py:416
 #: netbox_dns/models/dnssec_policy.py:51 netbox_dns/tables/dnssec_policy.py:34
 msgid "Purge Keys"
-msgstr ""
+msgstr "Purger les clés"
 
 #: netbox_dns/forms/dnssec_policy.py:129 netbox_dns/forms/dnssec_policy.py:237
 #: netbox_dns/forms/dnssec_policy.py:323 netbox_dns/forms/dnssec_policy.py:420
 #: netbox_dns/models/dnssec_policy.py:56 netbox_dns/tables/dnssec_policy.py:37
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:61
 msgid "Publish Safety"
-msgstr ""
+msgstr "Sécurité de publication"
 
 #: netbox_dns/forms/dnssec_policy.py:133 netbox_dns/forms/dnssec_policy.py:241
 #: netbox_dns/forms/dnssec_policy.py:327 netbox_dns/forms/dnssec_policy.py:424
 #: netbox_dns/models/dnssec_policy.py:61 netbox_dns/tables/dnssec_policy.py:40
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:65
 msgid "Retire Safety"
-msgstr ""
+msgstr "Sécurité de retrait"
 
 #: netbox_dns/forms/dnssec_policy.py:137 netbox_dns/forms/dnssec_policy.py:245
 #: netbox_dns/forms/dnssec_policy.py:331 netbox_dns/forms/dnssec_policy.py:428
 #: netbox_dns/models/dnssec_policy.py:66 netbox_dns/tables/dnssec_policy.py:43
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:69
 msgid "Signatures Jitter"
-msgstr ""
+msgstr "Variation des signatures"
 
 #: netbox_dns/forms/dnssec_policy.py:141 netbox_dns/forms/dnssec_policy.py:249
 #: netbox_dns/forms/dnssec_policy.py:335 netbox_dns/forms/dnssec_policy.py:432
@@ -725,42 +725,35 @@ msgstr ""
 #, fuzzy
 #| msgid "SOA Refresh"
 msgid "Signatures Refresh"
-msgstr "Délais d'actualisation"
-
-#: netbox_dns/forms/dnssec_policy.py:145 netbox_dns/forms/dnssec_policy.py:253
-#: netbox_dns/forms/dnssec_policy.py:339 netbox_dns/forms/dnssec_policy.py:436
-#: netbox_dns/models/dnssec_policy.py:76
-#: netbox_dns/templates/netbox_dns/dnssecpolicy.html:77
-msgid "Signatures Validity"
-msgstr ""
+msgstr "Délais d'actualisation des signatures"
 
 #: netbox_dns/forms/dnssec_policy.py:149 netbox_dns/forms/dnssec_policy.py:257
 #: netbox_dns/forms/dnssec_policy.py:343 netbox_dns/forms/dnssec_policy.py:440
 #: netbox_dns/tables/dnssec_policy.py:52
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:81
 msgid "Signatures Validity (DNSKEY)"
-msgstr ""
+msgstr "Validité des signatures (DNSKEY)"
 
 #: netbox_dns/forms/dnssec_policy.py:153 netbox_dns/forms/dnssec_policy.py:261
 #: netbox_dns/forms/dnssec_policy.py:347 netbox_dns/forms/dnssec_policy.py:444
 #: netbox_dns/models/dnssec_policy.py:86 netbox_dns/tables/dnssec_policy.py:55
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:85
 msgid "Max Zone TTL"
-msgstr ""
+msgstr "TTL maximum de la zone"
 
 #: netbox_dns/forms/dnssec_policy.py:157 netbox_dns/forms/dnssec_policy.py:265
 #: netbox_dns/forms/dnssec_policy.py:351 netbox_dns/forms/dnssec_policy.py:448
 #: netbox_dns/models/dnssec_policy.py:91 netbox_dns/tables/dnssec_policy.py:61
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:89
 msgid "Zone Propagation Delay"
-msgstr ""
+msgstr "Délai de propagation de zone"
 
 #: netbox_dns/forms/dnssec_policy.py:161 netbox_dns/forms/dnssec_policy.py:279
 #: netbox_dns/forms/dnssec_policy.py:355 netbox_dns/forms/dnssec_policy.py:462
 #: netbox_dns/models/dnssec_policy.py:111 netbox_dns/tables/dnssec_policy.py:70
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:110
 msgid "Parent DS TTL"
-msgstr ""
+msgstr "TTL DS parent"
 
 #: netbox_dns/forms/dnssec_policy.py:165 netbox_dns/forms/dnssec_policy.py:283
 #: netbox_dns/forms/dnssec_policy.py:359 netbox_dns/forms/dnssec_policy.py:466
@@ -769,7 +762,7 @@ msgstr ""
 #, fuzzy
 #| msgid "Parent Delegation Records"
 msgid "Parent Propagation Delay"
-msgstr "Enregistrement de délégation parents"
+msgstr "Délai de propagation parent"
 
 #: netbox_dns/forms/dnssec_policy.py:220 netbox_dns/forms/dnssec_policy.py:311
 #: netbox_dns/forms/dnssec_policy.py:408 netbox_dns/forms/record.py:157
@@ -794,31 +787,31 @@ msgstr "Statut"
 #: netbox_dns/tables/dnssec_policy.py:114
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:102
 msgid "Create CDNSKEY"
-msgstr ""
+msgstr "Créer CDNSKEY"
 
 #: netbox_dns/forms/dnssec_policy.py:288 netbox_dns/forms/dnssec_policy.py:471
 #: netbox_dns/models/dnssec_policy.py:122 netbox_dns/tables/dnssec_policy.py:76
 #: netbox_dns/tables/dnssec_policy.py:117
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:123
 msgid "Use NSEC3"
-msgstr ""
+msgstr "Utiliser NSEC3"
 
 #: netbox_dns/forms/dnssec_policy.py:292 netbox_dns/forms/dnssec_policy.py:475
 #: netbox_dns/models/dnssec_policy.py:127 netbox_dns/tables/dnssec_policy.py:79
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:128
 msgid "NSEC3 Iterations"
-msgstr ""
+msgstr "Itérations NSEC3"
 
 #: netbox_dns/forms/dnssec_policy.py:297 netbox_dns/forms/dnssec_policy.py:480
 #: netbox_dns/models/dnssec_policy.py:132
 msgid "NSEC3 Opt-Out"
-msgstr ""
+msgstr "Désengagement NSEC3"
 
 #: netbox_dns/forms/dnssec_policy.py:301 netbox_dns/forms/dnssec_policy.py:484
 #: netbox_dns/models/dnssec_policy.py:138 netbox_dns/tables/dnssec_policy.py:85
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:136
 msgid "NSEC3 Salt Size"
-msgstr ""
+msgstr "Taille salt NSEC3"
 
 #: netbox_dns/forms/nameserver.py:43 netbox_dns/forms/nameserver.py:62
 #: netbox_dns/forms/nameserver.py:89 netbox_dns/forms/record.py:139
@@ -1267,7 +1260,7 @@ msgstr "SOA"
 #: netbox_dns/navigation.py:231 netbox_dns/templates/netbox_dns/zone.html:101
 #: netbox_dns/templates/netbox_dns/zonetemplate.html:58
 msgid "DNSSEC"
-msgstr ""
+msgstr "DNSSEC"
 
 #: netbox_dns/forms/zone.py:283 netbox_dns/forms/zone.py:423
 #: netbox_dns/forms/zone.py:911 netbox_dns/templates/netbox_dns/zone.html:172
@@ -1323,7 +1316,7 @@ msgstr "Zone %(value)s non trouvée"
 #: netbox_dns/forms/zone.py:626 netbox_dns/forms/zone.py:838
 #: netbox_dns/templates/netbox_dns/zone.html:108
 msgid "Use Inline Signing"
-msgstr ""
+msgstr "Utiliser la signature intégrée (in line)"
 
 #: netbox_dns/forms/zone.py:633 netbox_dns/forms/zone_template.py:215
 #, fuzzy, python-format
@@ -1377,7 +1370,7 @@ msgstr "Modèle de zone"
 
 #: netbox_dns/models/dnssec_policy.py:81
 msgid "Signatures Validity for DNSKEY"
-msgstr ""
+msgstr "Validité des signatures pour DNSKEY"
 
 #: netbox_dns/models/nameserver.py:68
 #, fuzzy
@@ -1532,11 +1525,11 @@ msgstr ""
 
 #: netbox_dns/models/zone.py:187
 msgid "Inline Signing"
-msgstr ""
+msgstr "Signature intégrée (in line)"
 
 #: netbox_dns/models/zone.py:188
 msgid "Use inline signing for DNSSEC"
-msgstr ""
+msgstr "Utilisé la signature intégrée (in line) pour DNSSEC"
 
 #: netbox_dns/models/zone.py:245
 msgid "The parent zone for the RFC2317 zone is managed by NetBox DNS"
@@ -1552,7 +1545,7 @@ msgstr "Réseau associé à une zone inverse (.arpa)"
 
 #: netbox_dns/models/zone.py:305
 msgid "There is already a zone with the same name in this view"
-msgstr ""
+msgstr "Il y a déjà une zone avec le même nom dans cette vue"
 
 #: netbox_dns/models/zone.py:551
 #, python-brace-format
@@ -1689,13 +1682,17 @@ msgstr ""
 "vérifier les associations des vues DNS pour ce préfixe et son préfixe parent"
 
 #: netbox_dns/tables/dnssec_policy.py:49
+#: netbox_dns/forms/dnssec_policy.py:145 netbox_dns/forms/dnssec_policy.py:253
+#: netbox_dns/forms/dnssec_policy.py:339 netbox_dns/forms/dnssec_policy.py:436
+#: netbox_dns/models/dnssec_policy.py:76
+#: netbox_dns/templates/netbox_dns/dnssecpolicy.html:77
 msgid "Signatures Validity"
-msgstr ""
+msgstr "Validité des signatures"
 
 #: netbox_dns/tables/dnssec_policy.py:82
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:132
 msgid "NSEC3 Opt Out"
-msgstr ""
+msgstr "Désengagement (opt out) NSEC3"
 
 #: netbox_dns/tables/ipam_dnssync.py:8
 #: netbox_dns/templates/netbox_dns/view/button.html:7
@@ -1715,18 +1712,18 @@ msgstr "Enregistrement PTR"
 
 #: netbox_dns/templates/netbox_dns/dnsseckeytemplate.html:9
 msgid "DNSSEC Key"
-msgstr ""
+msgstr "Clé DNSSEC"
 
 #: netbox_dns/templates/netbox_dns/dnsseckeytemplate.html:60
 #: netbox_dns/templates/netbox_dns/zone.html:104
 #: netbox_dns/templates/netbox_dns/zonetemplate.html:61
 msgid "Policy"
-msgstr ""
+msgstr "Politique"
 
 #: netbox_dns/templates/netbox_dns/dnssecpolicy.html:142
 #, python-format
 msgid "Using NSEC3 options is not recommended (see %(link)s)"
-msgstr ""
+msgstr "Utiliser les options NSEC3 n'est pas recommandé (cf. %(link)s)" 
 
 #: netbox_dns/templates/netbox_dns/nameserver.html:16
 #: netbox_dns/templates/netbox_dns/record.html:54
@@ -1915,37 +1912,46 @@ msgstr ""
 #: netbox_dns/validators/dnssec.py:24
 msgid ""
 "Specifying a CSK together with any other key template type is not allowed."
-msgstr ""
+msgstr "Spécifier un CSK avec n'importe quel type de modèle de clé n'est pas autorisé"
 
 #: netbox_dns/validators/dnssec.py:39
 msgid "At most one key template per type (CSK, KSK and ZSK) is allowed."
-msgstr ""
+msgstr "Seul un modèle de clé par type (CSK, KSK et ZSK) est autorisé"
 
 #: netbox_dns/validators/dnssec.py:46
 msgid "KSK and ZSK must use the same algorithm."
-msgstr ""
+msgstr "KSK et ZSK doivent utiliser le même algorithme."
 
 #: netbox_dns/validators/dnssec.py:72
 msgid ""
 "Key Lifetime is less than DNSKEY TTL + Publish Safety + Zone Propagation "
 "Delay."
 msgstr ""
+"La durée de vie de la clé est inférieure à "
+"(TTL DNSKEY + sécurité de publication + délai de propagation de la zone)"
 
 #: netbox_dns/validators/dnssec.py:84
 msgid ""
 "Key Lifetime is less than Max Zone TTL + Retire Safety + Zone Propagation "
 "Delay."
 msgstr ""
+"La durée de vie de la clé est inférieure à "
+"(TTL maximum de la zone + sécurité de retrait + délai de propagation "
+"de la zone)"
 
 #: netbox_dns/validators/dnssec.py:98
 msgid "Key Lifetime is less than Signatures Validity - Signatures Refresh."
 msgstr ""
+"La durée de vie de la clé est inférieure à "
+"(validité des signatures - délai de ré-actualisation des signatures)."
 
 #: netbox_dns/validators/dnssec.py:114
 msgid ""
 "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Propagation "
 "Delay."
 msgstr ""
+"La durée de vie de la clé est inférieure à "
+"(TTL DS parent + Sécurité de retrait + délai de propagation parent)"
 
 #: netbox_dns/validators/rfc2317.py:15
 #, python-brace-format
@@ -1963,7 +1969,7 @@ msgstr "RFC2317 exige un préfixe d'au moins 25 bits de longueur"
 
 #: netbox_dns/views/dnssec_policy.py:68
 msgid "No key for signing zones (CSK or ZSK) is assigned."
-msgstr ""
+msgstr "Aucune clé pour signer les zones (CSK ou ZSK) n'est attribuée."
 
 #: netbox_dns/views/record.py:89
 #, python-brace-format
