@@ -1689,7 +1689,7 @@ msgstr ""
 "vérifier les associations des vues DNS pour ce préfixe et son préfixe parent"
 
 #: netbox_dns/tables/dnssec_policy.py:49
-msgid "Signatures Validitiy"
+msgid "Signatures Validity"
 msgstr ""
 
 #: netbox_dns/tables/dnssec_policy.py:82
@@ -1943,7 +1943,7 @@ msgstr ""
 
 #: netbox_dns/validators/dnssec.py:114
 msgid ""
-"Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Proagation "
+"Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Propagation "
 "Delay."
 msgstr ""
 
