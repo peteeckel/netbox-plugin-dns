@@ -11,6 +11,7 @@ from netbox_dns.choices import (
     DNSSECKeyTemplateAlgorithmChoices,
     DNSSECKeyTemplateKeySizeChoices,
 )
+from netbox_dns.validators import validate_key_template
 
 
 __all__ = (
@@ -92,6 +93,16 @@ class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
 
     def get_type_color(self):
         return DNSSECKeyTemplateTypeChoices.colors.get(self.type)
+
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+
+        validate_key_template(self)
+
+    def save(self, *args, **kwargs):
+        validate_key_template(self)
+
+        super().save(*args, **kwargs)
 
 
 @register_search
