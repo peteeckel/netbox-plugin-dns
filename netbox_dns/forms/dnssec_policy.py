@@ -74,7 +74,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "nsec3_salt_size",
             name=_("Proof of Non-Existence"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
         FieldSet("tags", name=_("Tags")),
     )
 
