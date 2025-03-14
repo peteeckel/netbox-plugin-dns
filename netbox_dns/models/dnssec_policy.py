@@ -181,15 +181,17 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         return self.publish_safety if self.publish_safety is not None else 3600
 
     def get_effective_value(self, attribute):
-        default_value = get_plugin_config("netbox_dns", f"dnssec_{attribute}", None)
-
         if not hasattr(self, attribute):
             raise AttributeError(f"DNSSECPolicy does not have attribute {attribute}")
 
         if (value := getattr(self, attribute)) is None:
-            return default_value
+            return self.get_fallback_setting(attribute)
 
         return value
+
+    @classmethod
+    def get_fallback_setting(cls, attribute):
+        return get_plugin_config("netbox_dns", f"dnssec_{attribute}")
 
 
 @register_search

@@ -97,8 +97,8 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
     ):
         validation_errors.append(
             _(
-                "Key Lifetime is less than DNSKEY TTL + Publish Safety + Zone Propagation Delay."
-            )
+                "Key Lifetime {lifetime} is less than DNSKEY TTL + Publish Safety + Zone Propagation Delay."
+            ).format(lifetime=key_lifetime)
         )
 
     if (
@@ -109,8 +109,8 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
     ):
         validation_errors.append(
             _(
-                "Key Lifetime is less than Max Zone TTL + Retire Safety + Zone Propagation Delay."
-            )
+                "Key Lifetime {lifetime} is less than Max Zone TTL + Retire Safety + Zone Propagation Delay."
+            ).format(lifetime=key_lifetime)
         )
 
     if key_template.type == DNSSECKeyTemplateTypeChoices.TYPE_ZSK:
@@ -123,8 +123,10 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
             and key_lifetime < signatures_validity - signatures_refresh
         ):
             validation_errors.append(
-                _("Key Lifetime is less than Signatures Validity - Signatures Refresh.")
-            )
+                _(
+                    "Key Lifetime {lifetime} is less than Signatures Validity - Signatures Refresh."
+                )
+            ).format(lifetime=key_lifetime)
     else:
         parent_ds_ttl = policy.get_effective_value("parent_ds_ttl")
         parent_propagation_delay = policy.get_effective_value(
@@ -139,8 +141,8 @@ def validate_key_template_lifetime(key_template, policy, raise_exception=True):
         ):
             validation_errors.append(
                 _(
-                    "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Propagation Delay."
-                )
+                    "Key Lifetime {lifetime} is less than Parent DS TTL + Retire Safety + Parent Propagation Delay."
+                ).format(lifetime=key_lifetime)
             )
 
     return validation_errors

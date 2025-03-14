@@ -119,50 +119,62 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
     dnskey_ttl = TimePeriodField(
         required=False,
         label=_("DNSKEY TTL"),
+        placeholder=DNSSECPolicy.get_fallback_setting("dnskey_ttl"),
     )
     purge_keys = TimePeriodField(
         required=False,
         label=_("Purge Keys"),
+        placeholder=DNSSECPolicy.get_fallback_setting("purge_keys"),
     )
     publish_safety = TimePeriodField(
         required=False,
         label=_("Publish Safety"),
+        placeholder=DNSSECPolicy.get_fallback_setting("publish_safety"),
     )
     retire_safety = TimePeriodField(
         required=False,
         label=_("Retire Safety"),
+        placeholder=DNSSECPolicy.get_fallback_setting("retire_safety"),
     )
     signatures_jitter = TimePeriodField(
         required=False,
         label=_("Signatures Jitter"),
+        placeholder=DNSSECPolicy.get_fallback_setting("signatures_jitter"),
     )
     signatures_refresh = TimePeriodField(
         required=False,
         label=_("Signatures Refresh"),
+        placeholder=DNSSECPolicy.get_fallback_setting("signatures_refresh"),
     )
     signatures_validity = TimePeriodField(
         required=False,
         label=_("Signatures Validity"),
+        placeholder=DNSSECPolicy.get_fallback_setting("signatures_validity"),
     )
     signatures_validity_dnskey = TimePeriodField(
         required=False,
         label=_("Signatures Validity (DNSKEY)"),
+        placeholder=DNSSECPolicy.get_fallback_setting("signatures_validity_dnskey"),
     )
     max_zone_ttl = TimePeriodField(
         required=False,
         label=_("Max Zone TTL"),
+        placeholder=DNSSECPolicy.get_fallback_setting("max_zone_ttl"),
     )
     zone_propagation_delay = TimePeriodField(
         required=False,
         label=_("Zone Propagation Delay"),
+        placeholder=DNSSECPolicy.get_fallback_setting("zone_propagation_delay"),
     )
     parent_ds_ttl = TimePeriodField(
         required=False,
         label=_("Parent DS TTL"),
+        placeholder=DNSSECPolicy.get_fallback_setting("parent_ds_ttl"),
     )
     parent_propagation_delay = TimePeriodField(
         required=False,
         label=_("Parent Propagation Delay"),
+        placeholder=DNSSECPolicy.get_fallback_setting("parent_propagation_delay"),
     )
 
 
