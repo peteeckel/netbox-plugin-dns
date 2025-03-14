@@ -57,7 +57,7 @@ class DNSSECKeyTemplateKeySizeChoices(ChoiceSet):
 @define_choice_attributes()
 class DNSSECKeyTemplateAlgorithmChoices(ChoiceSet):
     CHOICES = [
-        (algorithm.name, algorithm.name)
-        for algorithm in sorted(Algorithm, key=lambda a: a.name)
+        (algorithm.name, f"{algorithm.name} ({algorithm.value})")
+        for algorithm in sorted(Algorithm, key=lambda a: a.value)
         if algorithm.value < 252 and algorithm not in DEPRECATED_ALGORITHMS
     ]
