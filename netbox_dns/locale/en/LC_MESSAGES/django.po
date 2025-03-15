@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-12 12:13+0000\n"
+"POT-Creation-Date: 2025-03-15 14:29+0000\n"
 "PO-Revision-Date: 2024-09-29 12:06+0000\n"
 "Last-Translator: Peter Eckel <pete@netbox-dns.org>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
@@ -26,16 +26,28 @@ msgstr ""
 msgid "NetBox plugin for DNS data"
 msgstr ""
 
-#: api/nested_serializers.py:41 api/serializers_/zone.py:32
+#: api/nested_serializers.py:42 api/serializers_/zone.py:32
 msgid "View the zone belongs to"
 msgstr ""
 
-#: api/nested_serializers.py:86 api/serializers_/record.py:37
+#: api/nested_serializers.py:87 api/serializers_/record.py:37
 msgid "Zone the record belongs to"
 msgstr ""
 
-#: api/serializers_/dnssec_policy.py:25
+#: api/serializers_/dnssec_key_template.py:24
+msgid "Policies using this Key Template"
+msgstr ""
+
+#: api/serializers_/dnssec_policy.py:26
 msgid "Key templates assigned to the policy"
+msgstr ""
+
+#: api/serializers_/dnssec_policy.py:33
+msgid "Zones this policy is assigned to"
+msgstr ""
+
+#: api/serializers_/dnssec_policy.py:40
+msgid "Zone templates this policy is assigned to"
 msgstr ""
 
 #: api/serializers_/nameserver.py:24
@@ -204,8 +216,8 @@ msgstr ""
 msgid "DNSSEC Policies"
 msgstr ""
 
-#: filtersets/dnssec_policy.py:48 forms/dnssec_policy.py:275
-#: forms/dnssec_policy.py:458 models/dnssec_policy.py:105
+#: filtersets/dnssec_policy.py:48 forms/dnssec_policy.py:302
+#: forms/dnssec_policy.py:485 models/dnssec_policy.py:105
 #: tables/dnssec_policy.py:67 templates/netbox_dns/dnssecpolicy.html:110
 msgid "CDS Digest Types"
 msgstr ""
@@ -219,10 +231,25 @@ msgstr ""
 msgid "DNSSEC Key Template IDs"
 msgstr ""
 
-#: filtersets/nameserver.py:19 forms/nameserver.py:67 models/zone.py:293
-#: navigation.py:31 views/dnssec_policy.py:126 views/nameserver.py:105
+#: filtersets/dnssec_policy.py:66 filtersets/nameserver.py:19
+#: forms/dnssec_policy.py:247 forms/nameserver.py:67 models/zone.py:293
+#: navigation.py:31 views/dnssec_policy.py:128 views/nameserver.py:105
 #: views/registrar.py:89 views/registration_contact.py:92 views/view.py:110
 msgid "Zones"
+msgstr ""
+
+#: filtersets/dnssec_policy.py:72
+msgid "Zone IDs"
+msgstr ""
+
+#: filtersets/dnssec_policy.py:78 forms/dnssec_policy.py:252
+#: forms/record_template.py:108 forms/record_template.py:149 navigation.py:137
+#: templates/netbox_dns/recordtemplate.html:86 views/dnssec_policy.py:148
+msgid "Zone Templates"
+msgstr ""
+
+#: filtersets/dnssec_policy.py:84
+msgid "Zone Template IDs"
 msgstr ""
 
 #: filtersets/nameserver.py:24 forms/nameserver.py:72 views/nameserver.py:125
@@ -438,7 +465,7 @@ msgstr ""
 
 #: forms/dnssec_key_template.py:45 forms/dnssec_key_template.py:70
 #: forms/dnssec_key_template.py:177 forms/dnssec_policy.py:48
-#: forms/dnssec_policy.py:178 forms/dnssec_policy.py:501 forms/nameserver.py:82
+#: forms/dnssec_policy.py:190 forms/dnssec_policy.py:528 forms/nameserver.py:82
 #: forms/nameserver.py:134 forms/record.py:127 forms/record.py:329
 #: forms/record_template.py:106 forms/record_template.py:252
 #: forms/registrar.py:58 forms/registrar.py:161
@@ -455,7 +482,7 @@ msgstr ""
 
 #: forms/dnssec_key_template.py:47 forms/dnssec_key_template.py:73
 #: forms/dnssec_key_template.py:180 forms/dnssec_policy.py:77
-#: forms/dnssec_policy.py:207 forms/dnssec_policy.py:530 forms/nameserver.py:48
+#: forms/dnssec_policy.py:224 forms/dnssec_policy.py:557 forms/nameserver.py:48
 #: forms/nameserver.py:83 forms/record.py:89 forms/record.py:129
 #: forms/record.py:331 forms/record_template.py:71 forms/record_template.py:109
 #: forms/record_template.py:254 forms/view.py:131 forms/view.py:180
@@ -466,7 +493,7 @@ msgid "Tenancy"
 msgstr ""
 
 #: forms/dnssec_key_template.py:48 forms/dnssec_policy.py:78
-#: forms/dnssec_policy.py:208 forms/nameserver.py:49 forms/record.py:90
+#: forms/dnssec_policy.py:225 forms/nameserver.py:49 forms/record.py:90
 #: forms/record_template.py:72 forms/registrar.py:39 forms/view.py:132
 #: forms/zone.py:295 forms/zone_template.py:76
 msgid "Tags"
@@ -492,7 +519,7 @@ msgid "Lifetime"
 msgstr ""
 
 #: forms/dnssec_key_template.py:119 forms/dnssec_key_template.py:171
-#: forms/dnssec_policy.py:365 forms/dnssec_policy.py:494 forms/nameserver.py:95
+#: forms/dnssec_policy.py:392 forms/dnssec_policy.py:521 forms/nameserver.py:95
 #: forms/nameserver.py:125 forms/record.py:245 forms/record.py:317
 #: forms/record_template.py:177 forms/record_template.py:240 forms/view.py:222
 #: forms/view.py:246 forms/zone.py:681 forms/zone.py:877
@@ -525,7 +552,7 @@ msgstr ""
 msgid "Key Size"
 msgstr ""
 
-#: forms/dnssec_key_template.py:161 forms/dnssec_policy.py:403
+#: forms/dnssec_key_template.py:161 forms/dnssec_policy.py:430
 #: forms/nameserver.py:76 forms/nameserver.py:115 forms/record.py:183
 #: forms/record.py:307 forms/record_template.py:144
 #: forms/record_template.py:230 forms/registrar.py:79 forms/registrar.py:129
@@ -546,28 +573,28 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: forms/dnssec_key_template.py:166 forms/dnssec_policy.py:489
+#: forms/dnssec_key_template.py:166 forms/dnssec_policy.py:516
 #: forms/nameserver.py:120 forms/record.py:312 forms/record_template.py:235
 #: forms/view.py:241 forms/zone.py:872 forms/zone_template.py:336
 msgid "Tenant Group"
 msgstr ""
 
-#: forms/dnssec_policy.py:61 forms/dnssec_policy.py:191
-#: forms/dnssec_policy.py:514 templates/netbox_dns/dnssecpolicy.html:54
+#: forms/dnssec_policy.py:61 forms/dnssec_policy.py:208
+#: forms/dnssec_policy.py:541 templates/netbox_dns/dnssecpolicy.html:54
 msgid "Timing"
 msgstr ""
 
-#: forms/dnssec_policy.py:68 forms/dnssec_policy.py:198
-#: forms/dnssec_policy.py:521 templates/netbox_dns/dnssecpolicy.html:103
+#: forms/dnssec_policy.py:68 forms/dnssec_policy.py:215
+#: forms/dnssec_policy.py:548 templates/netbox_dns/dnssecpolicy.html:103
 msgid "Parent Delegation"
 msgstr ""
 
-#: forms/dnssec_policy.py:75 forms/dnssec_policy.py:205
-#: forms/dnssec_policy.py:528 templates/netbox_dns/dnssecpolicy.html:124
+#: forms/dnssec_policy.py:75 forms/dnssec_policy.py:222
+#: forms/dnssec_policy.py:555 templates/netbox_dns/dnssecpolicy.html:124
 msgid "Proof of Non-Existence"
 msgstr ""
 
-#: forms/dnssec_policy.py:84 forms/dnssec_policy.py:225
+#: forms/dnssec_policy.py:84 forms/dnssec_policy.py:242
 #: models/dnssec_policy.py:40 templates/netbox_dns/dnssecpolicy.html:21
 msgid "Key Templates"
 msgstr ""
@@ -576,91 +603,95 @@ msgstr ""
 msgid "Select CSK or KSK/ZSK templates for signing"
 msgstr ""
 
-#: forms/dnssec_policy.py:121 forms/dnssec_policy.py:229
-#: forms/dnssec_policy.py:315 forms/dnssec_policy.py:412
+#: forms/dnssec_policy.py:121 forms/dnssec_policy.py:256
+#: forms/dnssec_policy.py:342 forms/dnssec_policy.py:439
 #: models/dnssec_policy.py:46 tables/dnssec_policy.py:31
 #: tables/dnssec_policy.py:58 templates/netbox_dns/dnssecpolicy.html:57
 msgid "DNSKEY TTL"
 msgstr ""
 
-#: forms/dnssec_policy.py:125 forms/dnssec_policy.py:233
-#: forms/dnssec_policy.py:319 forms/dnssec_policy.py:416
+#: forms/dnssec_policy.py:126 forms/dnssec_policy.py:260
+#: forms/dnssec_policy.py:346 forms/dnssec_policy.py:443
 #: models/dnssec_policy.py:51 tables/dnssec_policy.py:34
 #: templates/netbox_dns/dnssecpolicy.html:65
 msgid "Purge Keys"
 msgstr ""
 
-#: forms/dnssec_policy.py:129 forms/dnssec_policy.py:237
-#: forms/dnssec_policy.py:323 forms/dnssec_policy.py:420
+#: forms/dnssec_policy.py:131 forms/dnssec_policy.py:264
+#: forms/dnssec_policy.py:350 forms/dnssec_policy.py:447
 #: models/dnssec_policy.py:56 tables/dnssec_policy.py:37
 #: templates/netbox_dns/dnssecpolicy.html:61
 msgid "Publish Safety"
 msgstr ""
 
-#: forms/dnssec_policy.py:133 forms/dnssec_policy.py:241
-#: forms/dnssec_policy.py:327 forms/dnssec_policy.py:424
+#: forms/dnssec_policy.py:136 forms/dnssec_policy.py:268
+#: forms/dnssec_policy.py:354 forms/dnssec_policy.py:451
 #: models/dnssec_policy.py:61 tables/dnssec_policy.py:40
 #: templates/netbox_dns/dnssecpolicy.html:69
 msgid "Retire Safety"
 msgstr ""
 
-#: forms/dnssec_policy.py:137 forms/dnssec_policy.py:245
-#: forms/dnssec_policy.py:331 forms/dnssec_policy.py:428
+#: forms/dnssec_policy.py:141 forms/dnssec_policy.py:272
+#: forms/dnssec_policy.py:358 forms/dnssec_policy.py:455
 #: models/dnssec_policy.py:66 tables/dnssec_policy.py:43
 #: templates/netbox_dns/dnssecpolicy.html:73
 msgid "Signatures Jitter"
 msgstr ""
 
-#: forms/dnssec_policy.py:141 forms/dnssec_policy.py:249
-#: forms/dnssec_policy.py:335 forms/dnssec_policy.py:432
+#: forms/dnssec_policy.py:146 forms/dnssec_policy.py:276
+#: forms/dnssec_policy.py:362 forms/dnssec_policy.py:459
 #: models/dnssec_policy.py:71 tables/dnssec_policy.py:46
 #: templates/netbox_dns/dnssecpolicy.html:77
 msgid "Signatures Refresh"
 msgstr ""
 
-#: forms/dnssec_policy.py:145 forms/dnssec_policy.py:253
-#: forms/dnssec_policy.py:339 forms/dnssec_policy.py:436
+#: forms/dnssec_policy.py:151 forms/dnssec_policy.py:280
+#: forms/dnssec_policy.py:366 forms/dnssec_policy.py:463
 #: models/dnssec_policy.py:76 tables/dnssec_policy.py:49
 #: templates/netbox_dns/dnssecpolicy.html:81
 msgid "Signatures Validity"
 msgstr ""
 
-#: forms/dnssec_policy.py:149 forms/dnssec_policy.py:257
-#: forms/dnssec_policy.py:343 forms/dnssec_policy.py:440
+#: forms/dnssec_policy.py:156 forms/dnssec_policy.py:284
+#: forms/dnssec_policy.py:370 forms/dnssec_policy.py:467
 #: tables/dnssec_policy.py:52 templates/netbox_dns/dnssecpolicy.html:85
 msgid "Signatures Validity (DNSKEY)"
 msgstr ""
 
-#: forms/dnssec_policy.py:153 forms/dnssec_policy.py:261
-#: forms/dnssec_policy.py:347 forms/dnssec_policy.py:444
+#: forms/dnssec_policy.py:161 forms/dnssec_policy.py:288
+#: forms/dnssec_policy.py:374 forms/dnssec_policy.py:471
 #: models/dnssec_policy.py:86 tables/dnssec_policy.py:55
 #: templates/netbox_dns/dnssecpolicy.html:89
 msgid "Max Zone TTL"
 msgstr ""
 
-#: forms/dnssec_policy.py:157 forms/dnssec_policy.py:265
-#: forms/dnssec_policy.py:351 forms/dnssec_policy.py:448
+#: forms/dnssec_policy.py:166 forms/dnssec_policy.py:292
+#: forms/dnssec_policy.py:378 forms/dnssec_policy.py:475
 #: models/dnssec_policy.py:91 tables/dnssec_policy.py:61
 #: templates/netbox_dns/dnssecpolicy.html:93
 msgid "Zone Propagation Delay"
 msgstr ""
 
-#: forms/dnssec_policy.py:161 forms/dnssec_policy.py:279
-#: forms/dnssec_policy.py:355 forms/dnssec_policy.py:462
+#: forms/dnssec_policy.py:171 forms/dnssec_policy.py:306
+#: forms/dnssec_policy.py:382 forms/dnssec_policy.py:489
 #: models/dnssec_policy.py:111 tables/dnssec_policy.py:70
 #: templates/netbox_dns/dnssecpolicy.html:114
 msgid "Parent DS TTL"
 msgstr ""
 
-#: forms/dnssec_policy.py:165 forms/dnssec_policy.py:283
-#: forms/dnssec_policy.py:359 forms/dnssec_policy.py:466
+#: forms/dnssec_policy.py:176 forms/dnssec_policy.py:310
+#: forms/dnssec_policy.py:386 forms/dnssec_policy.py:493
 #: models/dnssec_policy.py:116 tables/dnssec_policy.py:73
 #: templates/netbox_dns/dnssecpolicy.html:118
 msgid "Parent Propagation Delay"
 msgstr ""
 
-#: forms/dnssec_policy.py:220 forms/dnssec_policy.py:311
-#: forms/dnssec_policy.py:408 forms/record.py:157 forms/record.py:231
+#: forms/dnssec_policy.py:195
+msgid "Assignments"
+msgstr ""
+
+#: forms/dnssec_policy.py:237 forms/dnssec_policy.py:338
+#: forms/dnssec_policy.py:435 forms/record.py:157 forms/record.py:231
 #: forms/record.py:293 forms/record_template.py:132
 #: forms/record_template.py:163 forms/record_template.py:216 forms/zone.py:167
 #: forms/zone.py:445 forms/zone.py:543 forms/zone.py:755
@@ -673,30 +704,30 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: forms/dnssec_policy.py:270 forms/dnssec_policy.py:453
+#: forms/dnssec_policy.py:297 forms/dnssec_policy.py:480
 #: models/dnssec_policy.py:97 tables/dnssec_policy.py:64
 #: tables/dnssec_policy.py:114 templates/netbox_dns/dnssecpolicy.html:106
 msgid "Create CDNSKEY"
 msgstr ""
 
-#: forms/dnssec_policy.py:288 forms/dnssec_policy.py:471
+#: forms/dnssec_policy.py:315 forms/dnssec_policy.py:498
 #: models/dnssec_policy.py:122 tables/dnssec_policy.py:76
 #: tables/dnssec_policy.py:117 templates/netbox_dns/dnssecpolicy.html:127
 msgid "Use NSEC3"
 msgstr ""
 
-#: forms/dnssec_policy.py:292 forms/dnssec_policy.py:475
+#: forms/dnssec_policy.py:319 forms/dnssec_policy.py:502
 #: models/dnssec_policy.py:127 tables/dnssec_policy.py:79
 #: templates/netbox_dns/dnssecpolicy.html:132
 msgid "NSEC3 Iterations"
 msgstr ""
 
-#: forms/dnssec_policy.py:297 forms/dnssec_policy.py:480
+#: forms/dnssec_policy.py:324 forms/dnssec_policy.py:507
 #: models/dnssec_policy.py:132
 msgid "NSEC3 Opt-Out"
 msgstr ""
 
-#: forms/dnssec_policy.py:301 forms/dnssec_policy.py:484
+#: forms/dnssec_policy.py:328 forms/dnssec_policy.py:511
 #: models/dnssec_policy.py:138 tables/dnssec_policy.py:85
 #: templates/netbox_dns/dnssecpolicy.html:140
 msgid "NSEC3 Salt Size"
@@ -784,11 +815,6 @@ msgstr ""
 
 #: forms/record.py:221
 msgid "This field is required if the zone is not in the default view"
-msgstr ""
-
-#: forms/record_template.py:108 forms/record_template.py:149 navigation.py:137
-#: templates/netbox_dns/recordtemplate.html:86 views/dnssec_policy.py:146
-msgid "Zone Templates"
 msgstr ""
 
 #: forms/record_template.py:119 forms/zone_template.py:125
@@ -1655,25 +1681,31 @@ msgid "KSK and ZSK must use the same algorithm."
 msgstr ""
 
 #: validators/dnssec.py:100
+#, python-brace-format
 msgid ""
-"Key Lifetime is less than DNSKEY TTL + Publish Safety + Zone Propagation "
-"Delay."
+"Key Lifetime {lifetime} is less than DNSKEY TTL + Publish Safety + Zone "
+"Propagation Delay."
 msgstr ""
 
 #: validators/dnssec.py:112
+#, python-brace-format
 msgid ""
-"Key Lifetime is less than Max Zone TTL + Retire Safety + Zone Propagation "
-"Delay."
+"Key Lifetime {lifetime} is less than Max Zone TTL + Retire Safety + Zone "
+"Propagation Delay."
 msgstr ""
 
-#: validators/dnssec.py:126
-msgid "Key Lifetime is less than Signatures Validity - Signatures Refresh."
+#: validators/dnssec.py:127
+#, python-brace-format
+msgid ""
+"Key Lifetime {lifetime} is less than Signatures Validity - Signatures "
+"Refresh."
 msgstr ""
 
-#: validators/dnssec.py:142
+#: validators/dnssec.py:144
+#, python-brace-format
 msgid ""
-"Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Propagation "
-"Delay."
+"Key Lifetime {lifetime} is less than Parent DS TTL + Retire Safety + Parent "
+"Propagation Delay."
 msgstr ""
 
 #: validators/rfc2317.py:15
@@ -1689,7 +1721,7 @@ msgstr ""
 msgid "RFC2317 requires at least 25 bit prefix length."
 msgstr ""
 
-#: views/dnssec_policy.py:68
+#: views/dnssec_policy.py:70
 msgid "No key for signing zones (CSK or ZSK) is assigned."
 msgstr ""
 
