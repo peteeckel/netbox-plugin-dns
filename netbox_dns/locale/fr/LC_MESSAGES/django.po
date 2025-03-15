@@ -48,11 +48,11 @@ msgstr "Modèles d'enregistrement associés au modèle de zone"
 
 #: api/serializers_/dnssec_policy.py:33
 msgid "Zones this policy is assigned to"
-msgstr ""
+msgstr "Zones auxquelles cette politique est attribuée"
 
 #: api/serializers_/dnssec_policy.py:40
 msgid "Zone templates this policy is assigned to"
-msgstr ""
+msgstr "Modèles de zone auxquelles cette politique est attribuée"
 
 #: api/serializers_/nameserver.py:24
 msgid "Zones served by the authoritative nameserver"
@@ -727,7 +727,7 @@ msgstr "Délai de propagation parent"
 
 #: forms/dnssec_policy.py:195
 msgid "Assignments"
-msgstr ""
+msgstr "Attributions"
 
 #: forms/dnssec_policy.py:237 forms/dnssec_policy.py:338
 #: forms/dnssec_policy.py:435 forms/record.py:157 forms/record.py:231
