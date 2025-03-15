@@ -146,6 +146,7 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     zone_template_id = DynamicModelMultipleChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Zone Templates"),
     )
     tag = TagFilterField(RecordTemplate)
