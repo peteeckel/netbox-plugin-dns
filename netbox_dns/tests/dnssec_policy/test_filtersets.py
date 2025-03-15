@@ -2,7 +2,13 @@ from django.test import TestCase
 
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
+from netbox_dns.models import (
+    DNSSECKeyTemplate,
+    DNSSECPolicy,
+    NameServer,
+    Zone,
+    ZoneTemplate,
+)
 from netbox_dns.filtersets import DNSSECPolicyFilterSet
 from netbox_dns.choices import (
     DNSSECKeyTemplateTypeChoices,
@@ -115,6 +121,31 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         DNSSECKeyTemplate.objects.bulk_create(cls.dnssec_key_templates)
 
+        zone_data = {
+            "soa_rname": "hostmaster.example.com",
+            "soa_mname": NameServer.objects.create(name="hostmaster.example.com"),
+        }
+        cls.zones = (
+            Zone(
+                name="zone1.example.com",
+                dnssec_policy=cls.dnssec_policies[0],
+                **zone_data,
+            ),
+            Zone(
+                name="zone2.example.com",
+                dnssec_policy=cls.dnssec_policies[1],
+                **zone_data,
+            ),
+        )
+        for zone in cls.zones:
+            zone.save()
+
+        cls.zone_templates = (
+            ZoneTemplate(name="Zone Template 1", dnssec_policy=cls.dnssec_policies[0]),
+            ZoneTemplate(name="Zone Template 2", dnssec_policy=cls.dnssec_policies[1]),
+        )
+        ZoneTemplate.objects.bulk_create(cls.zone_templates)
+
         cls.dnssec_policies[0].key_templates.set(cls.dnssec_key_templates[0:2])
         cls.dnssec_policies[1].key_templates.set([cls.dnssec_key_templates[2]])
         cls.dnssec_policies[2].key_templates.set([cls.dnssec_key_templates[1]])
@@ -217,7 +248,21 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_key_templates(self):
-        params = {"key_template_id": [self.dnssec_key_templates[0].pk]}
+        params = {"key_templates_id": [self.dnssec_key_templates[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
-        params = {"key_template": [self.dnssec_key_templates[1].name]}
+        params = {"key_templates": [self.dnssec_key_templates[1].name]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_zones(self):
+        params = {"zones_id": [self.zones[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"zones": [self.zones[0].name, self.zones[1].name]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_zone_templates(self):
+        params = {"zone_templates_id": [self.zone_templates[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {
+            "zone_templates": [self.zone_templates[0].name, self.zone_templates[1].name]
+        }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
