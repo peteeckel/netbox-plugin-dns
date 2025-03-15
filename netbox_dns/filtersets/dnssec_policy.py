@@ -7,7 +7,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
-from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
+from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate, Zone, ZoneTemplate
 from netbox_dns.choices import DNSSECPolicyStatusChoices
 
 __all__ = ("DNSSECPolicyFilterSet",)
@@ -58,6 +58,30 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="id",
         label=_("DNSSEC Key Template IDs"),
+    )
+    zones = django_filters.ModelMultipleChoiceFilter(
+        field_name="zones__name",
+        queryset=Zone.objects.all(),
+        to_field_name="name",
+        label=_("Zones"),
+    )
+    zones_id = django_filters.ModelMultipleChoiceFilter(
+        field_name="zones",
+        queryset=Zone.objects.all(),
+        to_field_name="id",
+        label=_("Zone IDs"),
+    )
+    zone_templates = django_filters.ModelMultipleChoiceFilter(
+        field_name="zone_templates__name",
+        queryset=ZoneTemplate.objects.all(),
+        to_field_name="name",
+        label=_("Zone Templates"),
+    )
+    zone_templates_id = django_filters.ModelMultipleChoiceFilter(
+        field_name="zone_templates",
+        queryset=ZoneTemplate.objects.all(),
+        to_field_name="id",
+        label=_("Zone Template IDs"),
     )
 
     def filter_cds_digest_types(self, queryset, name, value):

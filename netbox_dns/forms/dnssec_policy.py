@@ -23,7 +23,7 @@ from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
-from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
+from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate, Zone, ZoneTemplate
 from netbox_dns.choices import DNSSECPolicyDigestChoices, DNSSECPolicyStatusChoices
 from netbox_dns.fields import TimePeriodField
 
@@ -186,8 +186,13 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "name",
             "description",
             "status",
-            "key_template_id",
+            "key_templates_id",
             name=_("Attributes"),
+        ),
+        FieldSet(
+            "zones_id",
+            "zone_templates_id",
+            name=_("Assignments"),
         ),
         FieldSet(
             "dnskey_ttl",
@@ -231,10 +236,20 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("Status"),
     )
-    key_template_id = DynamicModelMultipleChoiceField(
+    key_templates_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
         required=False,
         label=_("Key Templates"),
+    )
+    zones_id = DynamicModelMultipleChoiceField(
+        queryset=Zone.objects.all(),
+        required=False,
+        label=_("Zones"),
+    )
+    zone_templates_id = DynamicModelMultipleChoiceField(
+        queryset=ZoneTemplate.objects.all(),
+        required=False,
+        label=_("Zone Templates"),
     )
     dnskey_ttl = TimePeriodField(
         required=False,
