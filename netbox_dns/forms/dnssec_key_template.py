@@ -68,7 +68,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet("name", "description", name=_("Attributes")),
-        FieldSet("policy_id", name=_("Policies")),
+        FieldSet("policies_id", name=_("Policies")),
         FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
         FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
     )
@@ -79,7 +79,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     description = forms.CharField(
         required=False,
     )
-    policy_id = DynamicModelMultipleChoiceField(
+    policies_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
         required=False,
         label=_("Policies"),
