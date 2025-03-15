@@ -127,11 +127,13 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Nameservers"),
     )
     soa_mname_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("MName"),
     )
     soa_rname = forms.CharField(
@@ -141,6 +143,7 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     record_template_id = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Record Templates"),
     )
     description = forms.CharField(
@@ -149,31 +152,37 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     dnssec_policy_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("DNSSEC Policy ID"),
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrar"),
     )
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrant"),
     )
     admin_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Administrative Contact"),
     )
     tech_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Technical Contact"),
     )
     billing_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Billing Contact"),
     )
     tag = TagFilterField(ZoneTemplate)

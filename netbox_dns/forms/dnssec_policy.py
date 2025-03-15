@@ -239,16 +239,19 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     key_templates_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Key Templates"),
     )
     zones_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Zones"),
     )
     zone_templates_id = DynamicModelMultipleChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Zone Templates"),
     )
     dnskey_ttl = TimePeriodField(
