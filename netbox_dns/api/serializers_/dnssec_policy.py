@@ -7,6 +7,7 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 from netbox_dns.models import DNSSECPolicy
 
 from .dnssec_key_template import DNSSECKeyTemplateSerializer
+from ..nested_serializers import NestedZoneSerializer, NestedZoneTemplateSerializer
 
 
 __all__ = ("DNSSECPolicySerializer",)
@@ -24,6 +25,20 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
         default=None,
         help_text=_("Key templates assigned to the policy"),
     )
+    zones = NestedZoneSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        default=None,
+        help_text=_("Zones this policy is assigned to"),
+    )
+    zone_templates = NestedZoneTemplateSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        default=None,
+        help_text=_("Zone templates this policy is assigned to"),
+    )
     tenant = TenantSerializer(required=False, allow_null=True)
 
     class Meta:
@@ -37,6 +52,8 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "status",
             "tags",
             "key_templates",
+            "zones",
+            "zone_templates",
             "dnskey_ttl",
             "purge_keys",
             "publish_safety",

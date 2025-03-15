@@ -47,13 +47,13 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         method="filter_cds_digest_types",
         label=_("CDS Digest Types"),
     )
-    key_template = django_filters.ModelMultipleChoiceFilter(
+    key_templates = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates__name",
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="name",
         label=_("DNSSEC Key Templates"),
     )
-    key_template_id = django_filters.ModelMultipleChoiceFilter(
+    key_templates_id = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates",
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="id",

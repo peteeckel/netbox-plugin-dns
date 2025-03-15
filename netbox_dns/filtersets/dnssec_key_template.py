@@ -27,13 +27,13 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         choices=DNSSECKeyTemplateKeySizeChoices,
     )
 
-    policy_id = django_filters.ModelMultipleChoiceFilter(
+    policies_id = django_filters.ModelMultipleChoiceFilter(
         field_name="policies",
         queryset=DNSSECPolicy.objects.all(),
         to_field_name="id",
         label=_("DNSSEC Policy IDs"),
     )
-    policy = django_filters.ModelMultipleChoiceFilter(
+    policies = django_filters.ModelMultipleChoiceFilter(
         field_name="policies__name",
         queryset=DNSSECPolicy.objects.all(),
         to_field_name="name",
