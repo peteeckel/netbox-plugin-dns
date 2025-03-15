@@ -46,7 +46,9 @@ class DNSSECPolicyListView(generic.ObjectListView):
 
 @register_model_view(DNSSECPolicy)
 class DNSSECPolicyView(generic.ObjectView):
-    queryset = DNSSECPolicy.objects.prefetch_related("key_templates")
+    queryset = DNSSECPolicy.objects.prefetch_related(
+        "key_templates", "zones", "zone_templates"
+    )
 
     def get_extra_context(self, request, instance):
         context = {}
