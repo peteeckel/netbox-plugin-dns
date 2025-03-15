@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
 
-from netbox_dns.models import Zone, Record, ZoneTemplate, RecordTemplate
+from netbox_dns.models import Zone, Record, ZoneTemplate, RecordTemplate, DNSSECPolicy
 from netbox_dns.api.serializers_.view import ViewSerializer
 
 
@@ -12,6 +12,7 @@ __all__ = (
     "NestedRecordSerializer",
     "NestedZoneTemplateSerializer",
     "NestedRecordTemplateSerializer",
+    "NestedDNSSECPolicySerializer",
 )
 
 
@@ -126,4 +127,21 @@ class NestedRecordTemplateSerializer(WritableNestedSerializer):
             "status",
             "ttl",
             "description",
+        )
+
+
+class NestedDNSSECPolicySerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:dnssecpolicy-detail"
+    )
+
+    class Meta:
+        model = DNSSECPolicy
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "description",
+            "status",
         )
