@@ -82,6 +82,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     policies_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Policies"),
     )
     type = forms.MultipleChoiceField(

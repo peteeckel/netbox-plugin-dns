@@ -458,6 +458,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Nameservers"),
     )
     active = forms.NullBooleanField(
@@ -495,16 +496,19 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     rfc2317_parent_zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Parent Zone"),
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrar"),
     )
     dnssec_policy_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("DNSSEC Policy"),
     )
     registry_domain_id = forms.CharField(
@@ -514,21 +518,25 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrant"),
     )
     admin_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Administrative Contact"),
     )
     tech_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Technical Contact"),
     )
     billing_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Billing Contact"),
     )
     tag = TagFilterField(Zone)
