@@ -85,7 +85,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_policy(self):
-        params = {"policy": [self.dnssec_policies[0].name]}
+        params = {"policies": [self.dnssec_policies[0].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"policy_id": [self.dnssec_policies[1].pk]}
+        params = {"policies_id": [self.dnssec_policies[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
