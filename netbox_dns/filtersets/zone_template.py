@@ -48,13 +48,13 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=NameServer.objects.all(),
         field_name="soa_mname",
         to_field_name="id",
-        label=_("SOA MNAME ID"),
+        label=_("SOA MName ID"),
     )
     soa_mname = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         field_name="soa_mname__name",
         to_field_name="name",
-        label=_("SOA MNAME"),
+        label=_("SOA MName"),
     )
     dnssec_policy_id = django_filters.ModelMultipleChoiceFilter(
         queryset=DNSSECPolicy.objects.all(),
