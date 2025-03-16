@@ -2,6 +2,7 @@ import django_tables2 as tables
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from netbox.plugins.utils import get_plugin_config
 from netbox.plugins import PluginTemplateExtension
@@ -119,7 +120,7 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
 
 
 address_records = tables.ManyToManyColumn(
-    verbose_name="DNS Address Records",
+    verbose_name=_("DNS Address Records"),
     accessor="netbox_dns_records",
     linkify_item=True,
     transform=lambda obj: (

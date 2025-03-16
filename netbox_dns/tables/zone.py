@@ -38,7 +38,7 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
         url_name="plugins:netbox_dns:zone_list",
     )
     default_ttl = tables.Column(
-        verbose_name="Default TTL",
+        verbose_name=_("Default TTL"),
     )
     dnssec_policy = tables.Column(
         verbose_name=_("DNSSEC Policy"),

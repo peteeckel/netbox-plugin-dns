@@ -86,7 +86,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
-        label="Registrar ID",
+        label=_("Registrar ID"),
     )
     registrar = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),

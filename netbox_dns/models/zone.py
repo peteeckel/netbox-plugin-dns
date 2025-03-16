@@ -211,7 +211,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     admin_c = models.ForeignKey(
-        verbose_name="Administrative Contact",
+        verbose_name=_("Administrative Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="admin_c_zones",
