@@ -186,12 +186,12 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "name",
             "description",
             "status",
-            "key_templates_id",
+            "key_template_id",
             name=_("Attributes"),
         ),
         FieldSet(
-            "zones_id",
-            "zone_templates_id",
+            "zone_id",
+            "zone_template_id",
             name=_("Assignments"),
         ),
         FieldSet(
@@ -236,19 +236,19 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("Status"),
     )
-    key_templates_id = DynamicModelMultipleChoiceField(
+    key_template_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
         required=False,
         null_option=_("None"),
         label=_("Key Templates"),
     )
-    zones_id = DynamicModelMultipleChoiceField(
+    zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
         null_option=_("None"),
         label=_("Zones"),
     )
-    zone_templates_id = DynamicModelMultipleChoiceField(
+    zone_template_id = DynamicModelMultipleChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
         null_option=_("None"),
