@@ -247,22 +247,22 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"nsec3_salt_size": [16, 32]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
-    def test_key_templates(self):
-        params = {"key_templates_id": [self.dnssec_key_templates[0].pk]}
+    def test_key_template(self):
+        params = {"key_template_id": [self.dnssec_key_templates[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
-        params = {"key_templates": [self.dnssec_key_templates[1].name]}
+        params = {"key_template": [self.dnssec_key_templates[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
-    def test_zones(self):
-        params = {"zones_id": [self.zones[0].pk]}
+    def test_zone(self):
+        params = {"zone_id": [self.zones[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
-        params = {"zones": [self.zones[0].name, self.zones[1].name]}
+        params = {"zone": [self.zones[0].name, self.zones[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
-    def test_zone_templates(self):
-        params = {"zone_templates_id": [self.zone_templates[0].pk]}
+    def test_zone_template(self):
+        params = {"zone_template_id": [self.zone_templates[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         params = {
-            "zone_templates": [self.zone_templates[0].name, self.zone_templates[1].name]
+            "zone_template": [self.zone_templates[0].name, self.zone_templates[1].name]
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
