@@ -139,7 +139,7 @@ class ZoneTemplate(NetBoxModel):
 
     class Meta:
         verbose_name = _("Zone Template")
-        verbose_name_plural = "Zone Templates"
+        verbose_name_plural = _("Zone Templates")
 
         ordering = ("name",)
 
