@@ -653,11 +653,11 @@ Fields marked as "Template Field" are copied to zones that the template is appli
 NetBox DNS supports the management of DNSSEC in as much as DNSSEC Key Templates and DNSSEC Policies can be stored in NetBox DNS and assigned to zones. It does not, however, support zone signing nor storing cryptographic material in the NetBox database. There are two main reasons for this concept:
 
 1. Storing cryptographic material in a data source for automation is generally problematic. While there is the NetBox Secrets plugin, it is better practice to store confidential data in vault systems specifically created for this purpose. (In some cases the keys are stored in HSMs as an added method of protection.)
-2. In typical modern scenarios, signing servers maintain keys and sign records, so such configurations do not even require having NetBox DNS provide keys or create the signatures from within NetBox DNS. 
+2. In typical modern scenarios, signing servers maintain keys and sign records, so such configurations do not even require having NetBox DNS provide keys or create the signatures from within NetBox DNS.
 
 Additionally, there is no direct integration between NetBox and any given name server implementation, so an interface for providing signed zones to a name server is generally out of scope for NetBox DNS, just as it is the case for serving plain DNS. This should be implemented using specific solutions adapted to the use case and the name server implementation used.
 
-As noted earlier there are two data models for DNSSEC in NetBox DNS: DNSSEC Key Templates and DNSSEC Policies. The former are used for storing parameters for DNSSEC Keys such as the type, algorithm and lifetime, and the latter to define policies that determine how often signatures are regenerated, DS records are propagated etc. 
+As noted earlier there are two data models for DNSSEC in NetBox DNS: DNSSEC Key Templates and DNSSEC Policies. The former are used for storing parameters for DNSSEC Keys such as the type, algorithm and lifetime, and the latter to define policies that determine how often signatures are regenerated, DS records are propagated etc.
 
 While the implementation is oriented largely towards options BIND 9 provides, this is mainly because that software has a huge set of configuration options and other products are usually not very different, in most cases more limited than BIND 9. Given the large installed base of BIND 9, this is considered a good basis. (There is, however, no reason why NetBox DNS cannot be used to maintain data for, say, Knot-DNS and its KASP (_Key and Signing Policy_) or for generating CLI commands directed at PowerDNS.)
 
@@ -770,6 +770,37 @@ PLUGINS_CONFIG = {
     }
 }
 ```
+
+#### DNS Server Configuration
+
+The following table contains the names of configuration settings for two DNS servers which have support for KASP, BIND9 and Knot-DNS.
+
+| NetBox DNS                	| BIND9                         | Knot-DNS                          |
+| ------------------------------|-------------------------------|-----------------------------------|
+| Type	                    	| `keys {csk,ksk,zsk}`	        | `single-type-signing`             |
+| Lifetime	                	| `lifetime`                    | `ksk-lifetime` / `zsk-lifetime`   |
+| Algorithm	                	| `algorithm`                   | `algorithm`                       |
+| Key Size	                	| `keys .. length`              | `ksk-size` / `zsk-size`           |
+| DNSKEY TTL	                | `dnskey-ttl`                  | `dnskey-ttl`                  	|
+| Purge Keys	                | `purge-keys`                  | n.a.                          	|
+| Publish Safety	            | `publish-safety`              | n.a.                          	|
+| Retire Safety	            	| `retire-safety`               | n.a.                              |
+| Signatures Jitter	        	| `signatures-jitter`           | n.a.                              |
+| Signatures Refresh	        | `signatures-refresh`          | `rrsig-refresh`               	|
+| Signatures Validity	        | `signatures-validity`         | `rrsig-lifetime`              	|
+| Signatures Validity (DNSKEY)	| `signatures-validity-dnskey`  | `rrsig-lifetime`                	|
+| Max Zone TTL	            	| `max-zone-ttl`                | `zone-max-ttl`                    |
+| Zone Propagation Delay	    | `parent-propagation-delay`    | `propagation-delay`           	|
+| Create CDNSKEY	            | `cdnskey`                     | `cds-cdnskey-publish`         	|
+| CDS Digest Types	        	| `cds-digest-types`            | `cds-digest-type`                 |
+| Parent DS TTL	            	| `parent-ds-ttl`               | n.a.                              |
+| Parent Propagation Delay    	| `parent-propagation-delay`    | `propagation-delay`             	|
+| Use NSEC3	                	| `nsec3param`                  | `nsec3`                           |
+| NSEC3 Iterations	        	| `nsec3param iterations`       | `nsec3-iterations`                |
+| NSEC3 Opt Out	            	| `nsec3param optout`           | `nsec3-opt-out`                   |
+| NSEC3 Salt Size	            | `nsec3param salt-length`      | `nsec3-salt-length`           	|
+
+Note that some settings within NetBox DNS and BIND9 (after which they are modeled) do not have equivalent settings in Knot-DNS. Also note, that some settings might have differing semantics. Please check the DNS server documentation.
 
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
