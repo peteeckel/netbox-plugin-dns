@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-16 16:49+0000\n"
-"PO-Revision-Date: 2025-03-12 08:06+0000\n"
+"PO-Revision-Date: 2025-03-17 08:06+0000\n"
 "Last-Translator: Jean Benoit <jean@unistra.fr>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
 "Language: fr\n"
@@ -35,16 +35,12 @@ msgid "Zone the record belongs to"
 msgstr "Zone à laquelle appartient l'enregistrement"
 
 #: api/serializers_/dnssec_key_template.py:24
-#, fuzzy
-#| msgid "Zone templates using the record template"
 msgid "Policies using this Key Template"
-msgstr "Modèles de zone utilisant le modèle d'enregistrement"
+msgstr "Politiques utilisant ce modèle de clé"
 
 #: api/serializers_/dnssec_policy.py:26
-#, fuzzy
-#| msgid "Record templates assigned to the zone template"
 msgid "Key templates assigned to the policy"
-msgstr "Modèles d'enregistrement associés au modèle de zone"
+msgstr "Modèles de clé associées à la politique"
 
 #: api/serializers_/dnssec_policy.py:33
 msgid "Zones this policy is assigned to"
@@ -88,10 +84,8 @@ msgid "Primary nameserver for the zone"
 msgstr "Serveur de nom primaire pour la zone"
 
 #: api/serializers_/zone.py:52
-#, fuzzy
-#| msgid "Billing contact for the domain"
 msgid "Contact email for the zone"
-msgstr "Contact de facturation pour le domaine"
+msgstr "Contact pour le domaine"
 
 #: api/serializers_/zone.py:58
 msgid "RFC2317 parent zone of the zone"
@@ -102,10 +96,8 @@ msgid "RFC2317 child zones of the zone"
 msgstr "Zone RFC2317 enfant de la zone"
 
 #: api/serializers_/zone.py:71
-#, fuzzy
-#| msgid "Template to apply to the zone"
 msgid "DNSSEC policy to apply to the zone"
-msgstr "Modèle à appliquer à la zone"
+msgstr "Politique DNSSEC à appliquer à la zone"
 
 #: api/serializers_/zone.py:78 api/serializers_/zone_template.py:55
 msgid "Registrar the domain is registered with"
@@ -136,10 +128,8 @@ msgid "Record templates assigned to the zone template"
 msgstr "Modèles d'enregistrement associés au modèle de zone"
 
 #: api/serializers_/zone_template.py:48
-#, fuzzy
-#| msgid "Record templates assigned to the zone template"
 msgid "DNSSEC policy assigned to the zone template"
-msgstr "Modèles d'enregistrement associés au modèle de zone"
+msgstr "Politique DNSSEC associée au modèle de zone"
 
 #: api/views.py:90
 msgid "'managed' is True, refusing create"
@@ -234,16 +224,12 @@ msgstr "Type de condensat CDS"
 
 #: filtersets/dnssec_policy.py:54 models/dnssec_key_template.py:79
 #: navigation.py:97
-#, fuzzy
-#| msgid "Zone Templates"
 msgid "DNSSEC Key Templates"
-msgstr "Modèles de zone"
+msgstr "Modèles de clé DNSSEC"
 
 #: filtersets/dnssec_policy.py:60
-#, fuzzy
-#| msgid "Zone Template ID"
 msgid "DNSSEC Key Template IDs"
-msgstr "Identifiant du modèle de zone"
+msgstr "Identifiant du modèle de clé DNSSEC"
 
 #: filtersets/dnssec_policy.py:66 filtersets/nameserver.py:19
 #: forms/dnssec_policy.py:249 forms/nameserver.py:68 models/zone.py:293
@@ -253,10 +239,8 @@ msgid "Zones"
 msgstr "Zones"
 
 #: filtersets/dnssec_policy.py:72
-#, fuzzy
-#| msgid "Zones"
 msgid "Zone IDs"
-msgstr "Zones"
+msgstr "Identifiant de zone"
 
 #: filtersets/dnssec_policy.py:78 forms/dnssec_policy.py:255
 #: forms/record_template.py:108 forms/record_template.py:150
@@ -266,10 +250,8 @@ msgid "Zone Templates"
 msgstr "Modèles de zone"
 
 #: filtersets/dnssec_policy.py:84
-#, fuzzy
-#| msgid "Zone Template ID"
 msgid "Zone Template IDs"
-msgstr "Identifiant du modèle de zone"
+msgstr "Identifiants du modèle de zone"
 
 #: filtersets/nameserver.py:24 forms/nameserver.py:74 views/nameserver.py:125
 msgid "SOA Zones"
@@ -311,7 +293,6 @@ msgid "IP Address"
 msgstr "Adresse IP"
 
 #: filtersets/record.py:80
-#, fuzzy
 msgid "Record is active"
 msgstr "L'enregistrement est actif"
 
@@ -562,8 +543,6 @@ msgid "Tenant"
 msgstr "Entité"
 
 #: forms/dnssec_key_template.py:143 tables/dnssec_key_template.py:24
-#, fuzzy
-#| msgid "Type"
 msgid "Key Type"
 msgstr "Type de clé"
 
@@ -603,7 +582,6 @@ msgstr "Description"
 #: forms/dnssec_key_template.py:167 forms/dnssec_policy.py:519
 #: forms/nameserver.py:122 forms/record.py:312 forms/record_template.py:236
 #: forms/view.py:241 forms/zone.py:880 forms/zone_template.py:345
-#, fuzzy
 msgid "Tenant Group"
 msgstr "Groupe d'entités"
 
@@ -614,10 +592,8 @@ msgstr "Timing"
 
 #: forms/dnssec_policy.py:68 forms/dnssec_policy.py:215
 #: forms/dnssec_policy.py:551 templates/netbox_dns/dnssecpolicy.html:103
-#, fuzzy
-#| msgid "Parent Delegation Records"
 msgid "Parent Delegation"
-msgstr "Enregistrement de délégation parents"
+msgstr "Délégation parente"
 
 #: forms/dnssec_policy.py:75 forms/dnssec_policy.py:222
 #: forms/dnssec_policy.py:558 templates/netbox_dns/dnssecpolicy.html:124
@@ -626,10 +602,8 @@ msgstr "Preuve de non-existence"
 
 #: forms/dnssec_policy.py:84 forms/dnssec_policy.py:243
 #: models/dnssec_policy.py:40 templates/netbox_dns/dnssecpolicy.html:21
-#, fuzzy
-#| msgid "Templates"
 msgid "Key Templates"
-msgstr "Modèles"
+msgstr "Modèles de clé"
 
 #: forms/dnssec_policy.py:85
 msgid "Select CSK or KSK/ZSK templates for signing"
@@ -674,8 +648,6 @@ msgstr "Variation des signatures"
 #: forms/dnssec_policy.py:365 forms/dnssec_policy.py:462
 #: models/dnssec_policy.py:71 tables/dnssec_policy.py:46
 #: templates/netbox_dns/dnssecpolicy.html:77
-#, fuzzy
-#| msgid "SOA Refresh"
 msgid "Signatures Refresh"
 msgstr "Délais d'actualisation des signatures"
 
@@ -717,8 +689,6 @@ msgstr "TTL DS parent"
 #: forms/dnssec_policy.py:389 forms/dnssec_policy.py:496
 #: models/dnssec_policy.py:116 tables/dnssec_policy.py:73
 #: templates/netbox_dns/dnssecpolicy.html:118
-#, fuzzy
-#| msgid "Parent Delegation Records"
 msgid "Parent Propagation Delay"
 msgstr "Délai de propagation parent"
 
@@ -845,7 +815,7 @@ msgid "Zone %(value)s not found"
 msgstr "Zone %(value)s non trouvée"
 
 #: forms/record.py:219 forms/zone.py:544
-#, fuzzy, python-format
+#, python-format
 msgid "View %(value)s not found"
 msgstr "Vue %(value)s non trouvée."
 
@@ -997,8 +967,6 @@ msgid "Prefix IDs assigned to the view"
 msgstr "Identifiant du préfixe associé à la vue"
 
 #: forms/view.py:216
-#, fuzzy
-#| msgid "Prefix"
 msgid "Prefixes"
 msgstr "Préfixes"
 
@@ -1015,10 +983,8 @@ msgid "You do not have permission to modify assigned views"
 msgstr "Vous n'avez aucune permission de modifier les vues attribuées"
 
 #: forms/zone.py:83 models/zone.py:719
-#, fuzzy
-#| msgid "soa_rname not set and no default value defined"
 msgid "soa_mname not set and no template or default value defined"
-msgstr "soa_rname n'a pas été défini et aucune valeur par défaut n'a été paramétrée"
+msgstr "soa_mname n'a pas été défini et aucun modèle ni aucune valeur par défaut n'a été paramétré"
 
 #: forms/zone.py:162 forms/zone.py:695
 msgid "Template"
@@ -1050,10 +1016,8 @@ msgid "SOA TTL"
 msgstr "TTL du SOA"
 
 #: forms/zone.py:193
-#, fuzzy
-#| msgid "Primary nameserver for the zone"
 msgid "Primary nameserver this zone"
-msgstr "Serveur de nom primaire pour la zone"
+msgstr "Serveur de nom primaire pour cette zone"
 
 #: forms/zone.py:200 forms/zone.py:580
 msgid "Mailbox of the zone's administrator"
@@ -1089,16 +1053,14 @@ msgid "SOA Expire"
 msgstr "SOA Expire"
 
 #: forms/zone.py:223 forms/zone.py:608
-#, fuzzy
 msgid "Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"
-msgstr "TTL minimum pour les réponses négatives, comme NXRRSET ou NXDOMAIN"
+msgstr "TTL minimum pour les réponses négatives (NXRRSET ou NXDOMAIN par exemple)"
 
 #: forms/zone.py:225 forms/zone.py:609 forms/zone.py:822 models/zone.py:168
 msgid "SOA Minimum TTL"
 msgstr "SOA TTL minimum"
 
 #: forms/zone.py:229 models/zone.py:175
-#, fuzzy
 msgid "Automatically generate the SOA serial number"
 msgstr "Le numéro de série du SOA est généré automatiquement"
 
@@ -1172,42 +1134,30 @@ msgid "Registry Domain ID"
 msgstr "Identifiant du bureau d'enregistrement du domaine"
 
 #: forms/zone.py:573
-#, fuzzy, python-format
-#| msgid "Nameserver not found."
 msgid "Nameserver %(value)s not found"
 msgstr "Serveur de nom %(value)s non trouvé"
 
 #: forms/zone.py:628 forms/zone_template.py:215
-#, fuzzy, python-format
-#| msgid "Zone %(value)s not found"
 msgid "DNSSEC policy %(value)s not found"
-msgstr "Zone %(value)s non trouvée"
+msgstr "Politique DNSSEC %(value)s non trouvée"
 
 #: forms/zone.py:634 forms/zone.py:846 templates/netbox_dns/zone.html:108
 msgid "Use Inline Signing"
 msgstr "Utiliser la signature intégrée (in line)"
 
 #: forms/zone.py:641 forms/zone_template.py:224
-#, fuzzy, python-format
-#| msgid "Registrar not found."
 msgid "Registrar %(value)s not found"
 msgstr "Bureau d'enregistrement %(value)s non trouvé"
 
 #: forms/zone.py:654 forms/zone_template.py:233
-#, fuzzy, python-format
-#| msgid "Registrant contact ID not found"
 msgid "Registrant contact ID %(value)s not found"
 msgstr "Identifiant de contact pour le titulaire du domaine %(value)s non trouvé"
 
 #: forms/zone.py:663 forms/zone_template.py:242
-#, fuzzy, python-format
-#| msgid "Administrative contact ID not found"
 msgid "Administrative contact ID %(value)s not found"
 msgstr "Identifiant de contact administratif %(value)s non trouvé"
 
 #: forms/zone.py:672 forms/zone_template.py:251
-#, fuzzy, python-format
-#| msgid "Technical contact ID not found"
 msgid "Technical contact ID %(value)s not found"
 msgstr "Identifiant de contact technique %(value)s non trouvé"
 
@@ -1224,26 +1174,20 @@ msgid "Record Templates"
 msgstr "Modèles d'enregistrement"
 
 #: forms/zone_template.py:260
-#, fuzzy, python-format
-#| msgid "Billing contact ID not found"
 msgid "Billing contact ID %(value)s not found"
 msgstr "Identifiant de contact de facturation %(value)s non trouvé"
 
 #: models/dnssec_key_template.py:78
-#, fuzzy
-#| msgid "Zone Template"
 msgid "DNSSEC Key Template"
-msgstr "Modèle de zone"
+msgstr "Modèle de clé DNSSEC"
 
 #: models/dnssec_policy.py:81
 msgid "Signatures Validity for DNSKEY"
 msgstr "Validité des signatures pour DNSKEY"
 
 #: models/nameserver.py:68
-#, fuzzy
-#| msgid "Primary nameserver for the zone"
 msgid "There is already a nameserver with this name"
-msgstr "Serveur de nom primaire pour la zone"
+msgstr "Il y a déjà un serveur de nom avec ce nom"
 
 #: models/record.py:165
 msgid "Managed"
@@ -1405,10 +1349,8 @@ msgid "Default soa_mname instance {nameserver} does not exist"
 msgstr "Le serveur de nom par défaut '{nameserver}' pour soa_mname n'existe pas"
 
 #: models/zone.py:752
-#, fuzzy
-#| msgid "soa_rname not set and no default value defined"
 msgid "soa_rname not set and no template or default value defined"
-msgstr "soa_rname n'a pas été défini et aucune valeur par défaut n'a été paramétrée"
+msgstr "soa_rname n'a pas été défini et aucun modèle ni aucune valeur par défaut n'a été paramétré"
 
 #: models/zone.py:771
 #, python-brace-format
@@ -1460,7 +1402,7 @@ msgid "Templates"
 msgstr "Modèles"
 
 #: signals/ipam_dnssync.py:67
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Unique DNS records are enforced and there is already an active IP address {address} with DNS name {name}. Please choose a different name or disable record creation for this IP address."
 msgstr "La règle d'unicité des enregistrements DNS est appliquée, et  il y a déjà une adresse IP active '{address}' avec le nom '{name}'. Merci de choisir un nom différent ou de désactiver la création d'enregistrement DNS pour cette  adresse IP."
 
@@ -1469,7 +1411,7 @@ msgid "You do not have permission to alter DNSsync custom fields"
 msgstr "Vous n'avez pas la permission de modifier les champs personnalisés DNSsync"
 
 #: signals/ipam_dnssync.py:146
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "This prefix is currently assigned to the following DNS views: {views}. Please deassign it from these views before making changes to the prefix or VRF."
 msgstr "Ce préfixe est actuellement associé au vues DNS suivantes : {views}.Merci de supprimer son association avec ces vues avant de changer le préfixe ou la VRF"
 
@@ -1498,10 +1440,8 @@ msgid "Unicode Value"
 msgstr "Valeur Unicode"
 
 #: template_content.py:123
-#, fuzzy
-#| msgid "Address Record"
 msgid "DNS Address Records"
-msgstr "Enregistrement de type adresse"
+msgstr "Enregistrement DNS de type adresse"
 
 #: templates/netbox_dns/dnsseckeytemplate.html:9
 msgid "DNSSEC Key"
@@ -1524,8 +1464,6 @@ msgid "IDN"
 msgstr "IDN"
 
 #: templates/netbox_dns/record.html:48 templates/netbox_dns/record.html:82
-#, fuzzy
-#| msgid "Warnings"
 msgid "Warning"
 msgstr "Avertissement"
 
@@ -1716,28 +1654,24 @@ msgid "KSK and ZSK must use the same algorithm."
 msgstr "KSK et ZSK doivent utiliser le même algorithme."
 
 #: validators/dnssec.py:100
-#, fuzzy, python-brace-format
-#| msgid "Key Lifetime is less than DNSKEY TTL + Publish Safety + Zone Propagation Delay."
+#, python-brace-format
 msgid "Key Lifetime {lifetime} is less than DNSKEY TTL + Publish Safety + Zone Propagation Delay."
-msgstr "La durée de vie de la clé est inférieure à (TTL DNSKEY + sécurité de publication + délai de propagation de la zone)"
+msgstr "La durée de vie de la clé, {lifetime}, est inférieure à (TTL DNSKEY + sécurité de publication + délai de propagation de la zone)"
 
 #: validators/dnssec.py:112
-#, fuzzy, python-brace-format
-#| msgid "Key Lifetime is less than Max Zone TTL + Retire Safety + Zone Propagation Delay."
+#, python-brace-format
 msgid "Key Lifetime {lifetime} is less than Max Zone TTL + Retire Safety + Zone Propagation Delay."
-msgstr "La durée de vie de la clé est inférieure à (TTL maximum de la zone + sécurité de retrait + délai de propagation de la zone)"
+msgstr "La durée de vie de la clé, {lifetime}, est inférieure à (TTL maximum de la zone + sécurité de retrait + délai de propagation de la zone)"
 
 #: validators/dnssec.py:127
-#, fuzzy, python-brace-format
-#| msgid "Key Lifetime is less than Signatures Validity - Signatures Refresh."
+#, python-brace-format
 msgid "Key Lifetime {lifetime} is less than Signatures Validity - Signatures Refresh."
-msgstr "La durée de vie de la clé est inférieure à (validité des signatures - délai de ré-actualisation des signatures)."
+msgstr "La durée de vie de la clé, {lifetime}, est inférieure à (validité des signatures - délai de ré-actualisation des signatures)."
 
 #: validators/dnssec.py:144
-#, fuzzy, python-brace-format
-#| msgid "Key Lifetime is less than Parent DS TTL + Retire Safety + Parent Propagation Delay."
+#, python-brace-format
 msgid "Key Lifetime {lifetime} is less than Parent DS TTL + Retire Safety + Parent Propagation Delay."
-msgstr "La durée de vie de la clé est inférieure à (TTL DS parent + Sécurité de retrait + délai de propagation parent)"
+msgstr "La durée de vie de la clé, {lifetime}, est inférieure à (TTL DS parent + Sécurité de retrait + délai de propagation parent)"
 
 #: validators/rfc2317.py:15
 #, python-brace-format
