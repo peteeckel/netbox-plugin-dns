@@ -1,5 +1,4 @@
 from django.forms import Field, TextInput
-from django.utils.dateparse import parse_duration
 from django.core.exceptions import ValidationError
 
 from netbox_dns.utilities import iso8601_to_int
