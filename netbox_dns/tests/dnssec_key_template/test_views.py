@@ -1,4 +1,7 @@
-from utilities.testing import ViewTestCases, create_tags
+from django.urls import reverse
+from rest_framework import status
+
+from utilities.testing import ViewTestCases, create_tags, post_data
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import DNSSECKeyTemplate
@@ -74,3 +77,58 @@ class DNSSECKeyTemplateViewTestCase(
         )
 
     maxDiff = None
+
+    def test_create_iso8601_lifetime(self):
+        self.add_permissions("netbox_dns.add_dnsseckeytemplate")
+
+        url = reverse("plugins:netbox_dns:dnsseckeytemplate_add")
+
+        request_data = {
+            "name": "Test CSK 3",
+            "type": DNSSECKeyTemplateTypeChoices.TYPE_CSK,
+            "algorithm": DNSSECKeyTemplateAlgorithmChoices.ED25519,
+            "lifetime": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        key_template = DNSSECKeyTemplate.objects.get(name="Test CSK 3")
+        self.assertEqual(key_template.type, DNSSECKeyTemplateTypeChoices.TYPE_CSK)
+        self.assertEqual(
+            key_template.algorithm, DNSSECKeyTemplateAlgorithmChoices.ED25519
+        )
+        self.assertEqual(key_template.lifetime, 42 * 86400)
+
+    def test_update_iso8601_lifetime(self):
+        key_template = self.dnssec_key_templates[0]
+
+        self.add_permissions("netbox_dns.change_dnsseckeytemplate")
+
+        url = reverse(
+            "plugins:netbox_dns:dnsseckeytemplate_edit", kwargs={"pk": key_template.pk}
+        )
+        request_data = {
+            "name": key_template.name,
+            "type": key_template.type,
+            "algorithm": key_template.algorithm,
+            "lifetime": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        key_template.refresh_from_db()
+        self.assertEqual(key_template.lifetime, 42 * 86400)
