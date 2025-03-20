@@ -119,7 +119,7 @@ class ZoneRegistrationView(generic.ObjectView):
     template_name = "netbox_dns/zone/registration.html"
 
     tab = RegistrationViewTab(
-        label="Registration",
+        label=_("Registration"),
     )
 
 

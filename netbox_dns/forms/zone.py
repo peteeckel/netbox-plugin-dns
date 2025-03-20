@@ -36,6 +36,7 @@ from netbox_dns.models import (
     Registrar,
     RegistrationContact,
     ZoneTemplate,
+    DNSSECPolicy,
 )
 from netbox_dns.choices import ZoneStatusChoices
 from netbox_dns.utilities import name_to_unicode, network_to_reverse
@@ -272,6 +273,11 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             name=_("SOA"),
         ),
         FieldSet(
+            "dnssec_policy",
+            "inline_signing",
+            name=_("DNSSEC"),
+        ),
+        FieldSet(
             "rfc2317_prefix",
             "rfc2317_parent_managed",
             name=_("RFC2317"),
@@ -369,6 +375,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "soa_minimum",
             "rfc2317_prefix",
             "rfc2317_parent_managed",
+            "dnssec_policy",
+            "inline_signing",
             "registrar",
             "registry_domain_id",
             "registrant",
@@ -402,6 +410,11 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "soa_rname",
             "soa_serial_auto",
             name=_("SOA"),
+        ),
+        FieldSet(
+            "dnssec_policy",
+            "inline_signing",
+            name=_("DNSSEC"),
         ),
         FieldSet(
             "rfc2317_prefix",
@@ -438,6 +451,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Nameservers"),
     )
     active = forms.NullBooleanField(
@@ -475,12 +489,20 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     rfc2317_parent_zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Parent Zone"),
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrar"),
+    )
+    dnssec_policy_id = DynamicModelMultipleChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        null_option=_("None"),
+        label=_("DNSSEC Policy"),
     )
     registry_domain_id = forms.CharField(
         required=False,
@@ -489,21 +511,25 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrant"),
     )
     admin_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Administrative Contact"),
     )
     tech_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Technical Contact"),
     )
     billing_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Billing Contact"),
     )
     tag = TagFilterField(Zone)
@@ -594,6 +620,19 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         ),
         label=_("RFC2317 Parent Managed"),
     )
+    dnssec_policy = CSVModelChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        to_field_name="name",
+        error_messages={
+            "invalid_choice": _("DNSSEC policy %(value)s not found"),
+        },
+        label=_("DNSSEC Policy"),
+    )
+    inline_signing = forms.BooleanField(
+        required=False,
+        label=_("Use Inline Signing"),
+    )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
@@ -676,6 +715,8 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "soa_retry",
             "soa_expire",
             "soa_minimum",
+            "dnssec_policy",
+            "inline_signing",
             "rfc2317_prefix",
             "rfc2317_parent_managed",
             "registrar",
@@ -794,6 +835,16 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         ),
         label=_("RFC2317 Parent Managed"),
     )
+    dnssec_policy = DynamicModelChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        label=_("DNSSEC Policy"),
+    )
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label=_("Use Inline Signing"),
+    )
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
@@ -856,6 +907,11 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
             "soa_serial_auto",
             "soa_serial",
             name=_("SOA"),
+        ),
+        FieldSet(
+            "dnssec_policy",
+            "inline_signing",
+            name=_("DNSSEC"),
         ),
         FieldSet(
             "rfc2317_prefix",

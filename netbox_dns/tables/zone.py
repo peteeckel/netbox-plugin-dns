@@ -5,13 +5,17 @@ from netbox.tables import (
     ChoiceFieldColumn,
     NetBoxTable,
     TagColumn,
+    ActionsColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import Zone
 
 
-__all__ = ("ZoneTable",)
+__all__ = (
+    "ZoneTable",
+    "ZoneDisplayTable",
+)
 
 
 class ZoneTable(TenancyColumnsMixin, NetBoxTable):
@@ -34,7 +38,11 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
         url_name="plugins:netbox_dns:zone_list",
     )
     default_ttl = tables.Column(
-        verbose_name="Default TTL",
+        verbose_name=_("Default TTL"),
+    )
+    dnssec_policy = tables.Column(
+        verbose_name=_("DNSSEC Policy"),
+        linkify=True,
     )
     rfc2317_prefix = tables.Column(
         verbose_name=_("RFC2317 Prefix"),
@@ -73,6 +81,7 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "description",
             "soa_rname",
             "soa_serial",
+            "inline_signing",
             "rfc2317_parent_managed",
             "registry_domain_id",
         )
@@ -82,3 +91,10 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "status",
             "tags",
         )
+
+
+class ZoneDisplayTable(ZoneTable):
+    actions = ActionsColumn(actions=("changelog",))
+
+    class Meta(ZoneTable.Meta):
+        pass

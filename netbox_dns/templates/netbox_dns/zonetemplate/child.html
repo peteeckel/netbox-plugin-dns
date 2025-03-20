@@ -1,0 +1,46 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load render_table from django_tables2 %}
+{% load perms %}
+{% load i18n %}
+
+{% block content %}
+    {% include 'inc/table_controls_htmx.html' with table_modal="ZoneTemplateTable_config" %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="return_url" value="{% if return_url %}{{ return_url }}{% else %}{{ request.path }}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}{% endif %}" />
+
+        <div class="card">
+            <div class="htmx-container table-responsive" id="object_list">
+                {% include 'htmx/table.html' %}
+            </div>
+        </div>
+
+        {% if perms.netbox_dns.change_zonetemplate or perms.netbox_dns.delete_zonetemplate %}
+             {% with bulk_edit_url="plugins:netbox_dns:zonetemplate_bulk_edit" bulk_delete_url="plugins:netbox_dns:zonetemplate_bulk_delete" %}
+                 <div class="noprint bulk-buttons">
+                     <div class="bulk-button-group">
+                         {% block bulk_buttons %}{% endblock %}
+                         {% if bulk_edit_url and perms.netbox_dns.change_zonetemplate %}
+                             <button type="submit" name="_edit" formaction="{% url bulk_edit_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-warning">
+                                 <i class="mdi mdi-pencil" aria-hidden="true"></i> {% trans "Edit Selected" %}
+                             </button>
+                         {% endif %}
+                         {% if bulk_delete_url and perms.netbox_dns.delete_zonetemplate %}
+                             <button type="submit" name="_delete" formaction="{% url bulk_delete_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-danger">
+                                 <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i> {% trans "Delete Selected" %}
+                             </button>
+                         {% endif %}
+                     </div>
+                 </div>
+             {% endwith %}
+        {% endif %}
+    </form>
+
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% table_config_form table %}
+{% endblock modals %}

@@ -1,5 +1,4 @@
-from django.forms import Field
-from django.utils.dateparse import parse_duration
+from django.forms import Field, TextInput
 from django.core.exceptions import ValidationError
 
 from netbox_dns.utilities import iso8601_to_int
@@ -8,6 +7,14 @@ __all__ = ("TimePeriodField",)
 
 
 class TimePeriodField(Field):
+    def __init__(self, *args, **kwargs):
+        placeholder = kwargs.pop("placeholder", None)
+
+        if placeholder is not None:
+            self.widget = TextInput(attrs={"placeholder": placeholder})
+
+        return super().__init__(*args, **kwargs)
+
     def to_python(self, value):
         if not value:
             return None

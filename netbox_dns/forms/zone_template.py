@@ -27,6 +27,7 @@ from netbox_dns.models import (
     NameServer,
     Registrar,
     RegistrationContact,
+    DNSSECPolicy,
 )
 
 
@@ -62,6 +63,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
         FieldSet("name", "description", "nameservers", name=_("Zone Template")),
         FieldSet("soa_mname", "soa_rname", name=_("SOA")),
         FieldSet("record_templates", name=_("Record Templates")),
+        FieldSet("dnssec_policy", name=_("DNSSEC")),
         FieldSet(
             "registrar",
             "registrant",
@@ -82,6 +84,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
             "nameservers",
             "soa_mname",
             "soa_rname",
+            "dnssec_policy",
             "record_templates",
             "description",
             "registrar",
@@ -105,6 +108,7 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         FieldSet("name", "nameserver_id", "description", name=_("Attributes")),
         FieldSet("soa_mname_id", "soa_rname", name=_("SOA")),
         FieldSet("record_template_id", name=_("Record Templates")),
+        FieldSet("dnssec_policy", name=_("DNSSEC")),
         FieldSet(
             "registrar_id",
             "registrant_id",
@@ -123,11 +127,13 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Nameservers"),
     )
     soa_mname_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("MName"),
     )
     soa_rname = forms.CharField(
@@ -137,34 +143,46 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     record_template_id = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Record Templates"),
     )
     description = forms.CharField(
         required=False,
     )
+    dnssec_policy_id = DynamicModelMultipleChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        null_option=_("None"),
+        label=_("DNSSEC Policy ID"),
+    )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrar"),
     )
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Registrant"),
     )
     admin_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Administrative Contact"),
     )
     tech_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Technical Contact"),
     )
     billing_c_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Billing Contact"),
     )
     tag = TagFilterField(ZoneTemplate)
@@ -188,6 +206,15 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         to_field_name="name",
         required=False,
         label=_("Record Templates"),
+    )
+    dnssec_policy = CSVModelChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        to_field_name="name",
+        error_messages={
+            "invalid_choice": _("DNSSEC policy %(value)s not found"),
+        },
+        label=_("DNSSEC Policy"),
     )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
@@ -250,6 +277,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
             "soa_mname",
             "soa_rname",
             "record_templates",
+            "dnssec_policy",
             "description",
             "registrar",
             "registrant",
@@ -280,6 +308,11 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     )
     description = forms.CharField(
         max_length=200, required=False, label=_("Description")
+    )
+    dnssec_policy = DynamicModelChoiceField(
+        queryset=DNSSECPolicy.objects.all(),
+        required=False,
+        label=_("DNSSEC Policy"),
     )
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
@@ -335,6 +368,10 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
             name=_("Record Templates"),
         ),
         FieldSet(
+            "dnssec_policy",
+            name=_("DNSSEC"),
+        ),
+        FieldSet(
             "registrar",
             "registrant",
             "admin_c",
@@ -351,6 +388,7 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         "soa_mname",
         "soa_rname",
         "record_templates",
+        "dnssec_policy",
         "registrar",
         "registrant",
         "admin_c",

@@ -639,15 +639,168 @@ Field                | Required | Template Field | Explanation
 -----                | -------- | -------------- | -----------
 **Name**             | Yes      | No             | The name of the zone template
 **Description**      | No       | No             | A short textual description of the zone template
-**Record name**      | Yes      | Yes            | The set of nameservers associated with the zone template
-**Type**             | Yes      | Yes            | The set of record templates associated with the zone template
-**Value**            | Yes      | Yes            | The registrar associated with the zone template
-**Status**           | No       | Yes            | The registrant associated with the zone template
-**TTL**              | No       | Yes            | The administrative contact associated with the zone template
-**Tenant**           | No       | Yes            | A tenant associated with the zone template
-**Tags**             | No       | Yes            | NetBox tags assigned to the zone template
+**Record name**      | Yes      | Yes            | The name of records created from the record template
+**Type**             | Yes      | Yes            | The type of records created from the record template
+**Value**            | Yes      | Yes            | The value of records created from the record template
+**Status**           | No       | Yes            | The status (active or inactive) of records created from the record template
+**TTL**              | No       | Yes            | The TTL of records created from the record template
+**Tenant**           | No       | Yes            | The tenant associated with records created from the record template
+**Tags**             | No       | Yes            | NetBox tags assigned to records created from the record template
 
 Fields marked as "Template Field" are copied to zones that the template is applied to. In the case of record templates, a record for each template will be created in the target zone if there is no record with the same name, type and value yet.
+
+## DNSSEC Support
+NetBox DNS supports the management of DNSSEC in as much as DNSSEC Key Templates and DNSSEC Policies can be stored in NetBox DNS and assigned to zones. It does not, however, support zone signing nor storing cryptographic material in the NetBox database. There are two main reasons for this concept:
+
+1. Storing cryptographic material in a data source for automation is generally problematic. While there is the NetBox Secrets plugin, it is better practice to store confidential data in vault systems specifically created for this purpose. (In some cases the keys are stored in HSMs as an added method of protection.)
+2. In typical modern scenarios, signing servers maintain keys and sign records, so such configurations do not even require having NetBox DNS provide keys or create the signatures from within NetBox DNS.
+
+Additionally, there is no direct integration between NetBox and any given name server implementation, so an interface for providing signed zones to a name server is generally out of scope for NetBox DNS, just as it is the case for serving plain DNS. This should be implemented using specific solutions adapted to the use case and the name server implementation used.
+
+As noted earlier there are two data models for DNSSEC in NetBox DNS: DNSSEC Key Templates and DNSSEC Policies. The former are used for storing parameters for DNSSEC Keys such as the type, algorithm and lifetime, and the latter to define policies that determine how often signatures are regenerated, DS records are propagated etc.
+
+While the implementation is oriented largely towards options BIND 9 provides, this is mainly because that software has a huge set of configuration options and other products are usually not very different, in most cases more limited than BIND 9. Given the large installed base of BIND 9, this is considered a good basis. (There is, however, no reason why NetBox DNS cannot be used to maintain data for, say, Knot-DNS and its KASP (_Key and Signing Policy_) or for generating CLI commands directed at PowerDNS.)
+
+### DNSSEC Key Templates
+A DNSSEC Key template can be considered a boilerplate for creating DNSSEC Keys. There are three types of keys, CSK (combined signing key), KSK (key signing keys) and ZSK (zone signing keys). Each zone needs at least one CSK or ZSK assigned to it for zone signing, while the KSK that's used for signing the ZSKs may be stored offline and rotated less frequently - the CSK is used for both functions, hence the name.
+
+![DNSSEC Key Template Detail](images/DNSSECKeyTemplateDetail.png)
+
+The name and the type of a DNSSEC Key Template together form a unique name, so that for example the ZSK and the KSK of a separate key template pair can have the same name.
+
+#### Permissions
+The following Django permissions are applicable to DNSSECKeyTemplate objects:
+
+Permission                            | Action
+----------                            | ------
+`netbox_dns.add_dnsseckeytemplate`    | Create new DNSSEC key template objects
+`netbox_dns.change_dnsseckeytemplate` | Edit DNSSEC key template information
+`netbox_dns.delete_dnsseckeytemplate` | Delete a DNSSEC key template object
+`netbox_dns.view_dnsseckeytemplate`   | View DNSSEC key template information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for zone templates:
+
+Field                | Required | Default        | Explanation
+-----                | -------- | -------------- | -----------
+**Name**             | Yes      |                | The name of the DNSSEC key template
+**Description**      | No       |                | A short textual description of the DNSSEC key template
+**Type**             | Yes      |                | The type (CSK, KSK or ZSK) of the DNSSEC key template
+**Lifetime**         | No       |                | The desired lifetime for keys created from the template
+**Algorithm**        | Yes      |                | The algorithm for keys created from the template. Supported algorithms are ECDSAP256SHS256, ECDSAP284SHS384, ED25519, ED448 and RSASHA256.
+**Key Size**         | No       |                | An optional specification of a key size to use for keys. Not all algorithms support this parameter.
+**Tenant**           | No       |                | A tenant associated with the DNSSEC key template
+**Tags**             | No       |                | NetBox tags assigned with the DNSSEC key template
+
+
+### DNSSEC Policies
+A DNSSEC Policy basically bundles sets of DNSSEC Key Templates and parameters for DNSSEC that can then be assigned to zones. When a DNSSEC Policy is created, the sets of records undergo a basic validation that ensures that the records created for a policy can actually be used:
+
+1. A CSK cannot coexist with any of the other key template types,
+2. There can be no more that one key template of each type assigned to the same DNSSEC Policy,
+3. If a ZSK and a KSK are assigned to a DNSSEC Policy they are required to use the same algorithm.
+
+In addition, some basic validation of the lifetime of the key templates (if any) against various timing parameters of the DNSSEC Policy is performed. If there are any problems, they will be displayed in the DNSSEC Policy Detail view.
+
+![DNSSEC Policy Detail](images/DNSSECPolicyDetail.png)
+
+#### Permissions
+The following Django permissions are applicable to DNSSECKeyTemplate objects:
+
+Permission                        | Action
+----------                        | ------
+`netbox_dns.add_dnssecpolicy`     | Create new DNSSEC policy objects
+`netbox_dns.change_ddnssecpolicy` | Edit DNSSEC policy information
+`netbox_dns.delete_dnssecpolicy`  | Delete a DNSSEC policy object
+`netbox_dns.view_dnssecpolicy`    | View DNSSEC policy information
+
+To use tags, the `extras.view_tag` permission is required as well.
+
+#### Fields
+The following fields are defined for zone templates:
+
+Field                            | Required | Default | Explanation
+-----                            | -------- | ------- | -----------
+**Name**                         | Yes      |         | The name of the DNSSEC policy
+**Description**                  | No       |         | A short textual description of the DNSSEC policy
+**Status**                       | Yes      | active  | The status (active or inactive) of the DNSSEC policy
+**Key Templates**                | No       |         | The list of key templates (either CSK or KSK/ZSK) for the DNSSEC policy
+**DNSKEY TTL**                   | No       |         | TTL for the DNSKEY record set in the signed zone
+**Purge Keys**                   | No       | _P90D_  | Time period before keys deleted from a zone are removed from disk
+**Publish Safety**               | No       | _PT1H_  | Time period before the name server starts signing records with a new key
+**Retire Safety**                | No       | _PT1H_  | Time period before the name server removes the old key after rotation
+**Signatures Jitter**            | No       | _PT12H_ | Random time difference applied to new signature lifetimes
+**Signatures Refresh**           | No       | _P5D_   | Specifies how often signatures are refreshed
+**Signatures Validity**          | No       | _P14D_  | The validity period of a newly generated signature
+**Signatures Validity (DNSKEY)** | No       | _P14D_  | The validity period of a newly generated signature for DNSKEY records
+**Max Zone TTL**                 | No       | _P1D_   | The maximum allowed TTL for records
+**Zone Propagation Delay**       | No       | _PT5M_  | The expected time it takes for a zone to be picked up by all secondary servers after changes
+**Create CDNSKEY**               | Yes      | true    | Specified if a CDNSKEY is created during key rollover
+**CDS Digest Types**             | No       |         | Digest types allowed for CDS records
+**Parent DS TTL**                | No       | _P1D_   | TTL of the DS record in the parent zone
+**Parent Propagation Delay**     | No       | _PT1H_  | The expected time it takes for a parent zone to be picked up by all secondary servers after changes
+**Use NSEC3**                    | Yes      | true    | Use NSEC3 for proof of non-existence instead of NSEC
+**NSEC3 Iterations**             | No       |         | NSEC3 hash iterations (should be 0 as per RFC 9276)
+**NSEC3 Opt Out**                | Yes      | false   | NSEC3 opt-out (not recommended)
+**NSEC3 Salt Size**              | No       |         | NSEC3 salt length (using salt for NSEC3 not recommended)
+**Tenant**                       | No       |         | A tenant associated with the DNSSEC policy
+**Tags**                         | No       |         | NetBox tags assigned to the DNSSEC policy
+
+Defaults written in _italics_ are not applied by NetBox DNS in the database, but used when key template lifetimes are validated against DNSSEC Policy parameters. They have been taken from BIND 9 defaults originally, but can be adjusted in the NetBox DNS plugin configuration:
+
+```
+PLUGINS_CONFIG = {
+    "netbox_dns": {
+        ...
+        "dnssec_purge_keys": 7776000,  # P90D
+        "dnssec_publish_safety": 3600,  # PT1H
+        "dnssec_retire_safety": 3600,  # PT1H
+        "dnssec_signatures_jitter": 43200,  # PT12H
+        "dnssec_signatures_refresh": 432000,  # P5D
+        "dnssec_signatures_validity": 1209600,  # P14D
+        "dnssec_signatures_validity_dnskey": 1209600,  # P14D
+        "dnssec_max_zone_ttl": 86400,  # P1D
+        "dnssec_zone_propagation_delay": 300,  # PT5M
+        "dnssec_parent_ds_ttl": 86400,  # P1D
+        "dnssec_parent_propagation_delay": 3600,  # PT1H
+        "dnssec_dnskey_ttl": 3600,  # PT1H
+        ...
+    }
+}
+```
+
+#### DNS Server Configuration
+
+The following table contains the names of configuration settings for two DNS servers which have support for KASP, BIND9 and Knot-DNS.
+
+| NetBox DNS                	| BIND9                         | Knot-DNS                          |
+| ------------------------------|-------------------------------|-----------------------------------|
+| Type	                    	| `keys {csk,ksk,zsk}`	        | `single-type-signing`             |
+| Lifetime	                	| `lifetime`                    | `ksk-lifetime` / `zsk-lifetime`   |
+| Algorithm	                	| `algorithm`                   | `algorithm`                       |
+| Key Size	                	| `keys .. length`              | `ksk-size` / `zsk-size`           |
+| DNSKEY TTL	                | `dnskey-ttl`                  | `dnskey-ttl`                  	|
+| Purge Keys	                | `purge-keys`                  | n.a.                          	|
+| Publish Safety	            | `publish-safety`              | n.a.                          	|
+| Retire Safety	            	| `retire-safety`               | n.a.                              |
+| Signatures Jitter	        	| `signatures-jitter`           | n.a.                              |
+| Signatures Refresh	        | `signatures-refresh`          | `rrsig-refresh`               	|
+| Signatures Validity	        | `signatures-validity`         | `rrsig-lifetime`              	|
+| Signatures Validity (DNSKEY)	| `signatures-validity-dnskey`  | `rrsig-lifetime`                	|
+| Max Zone TTL	            	| `max-zone-ttl`                | `zone-max-ttl`                    |
+| Zone Propagation Delay	    | `parent-propagation-delay`    | `propagation-delay`           	|
+| Create CDNSKEY	            | `cdnskey`                     | `cds-cdnskey-publish`         	|
+| CDS Digest Types	        	| `cds-digest-types`            | `cds-digest-type`                 |
+| Parent DS TTL	            	| `parent-ds-ttl`               | n.a.                              |
+| Parent Propagation Delay    	| `parent-propagation-delay`    | `propagation-delay`             	|
+| Use NSEC3	                	| `nsec3param`                  | `nsec3`                           |
+| NSEC3 Iterations	        	| `nsec3param iterations`       | `nsec3-iterations`                |
+| NSEC3 Opt Out	            	| `nsec3param optout`           | `nsec3-opt-out`                   |
+| NSEC3 Salt Size	            | `nsec3param salt-length`      | `nsec3-salt-length`           	|
+
+Note that some settings within NetBox DNS and BIND9 (after which they are modeled) do not have equivalent settings in Knot-DNS. Also note, that some settings might have differing semantics. Please check the DNS server documentation.
 
 ## Name validation
 The names of DNS Resource Records are subject to a number of RFCs, most notably [RFC1035, Section 2.3.1](https://www.rfc-editor.org/rfc/rfc1035#section-2.3.1), [RFC2181, Section 11](https://www.rfc-editor.org/rfc/rfc2181#section-11) and [RFC5891, Section 4.2.3](https://www.rfc-editor.org/rfc/rfc5891#section-4.2.3). Although the specifications in the RFCs, especially in RFC2181, are rather permissive, most DNS servers enforce them and refuse to load zones containing non-conforming names. NetBox DNS validates RR names before saving records and refuses to accept records not adhering to the standards.
