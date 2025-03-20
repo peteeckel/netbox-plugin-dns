@@ -4,6 +4,8 @@ from dns import name as dns_name
 from dns.exception import DNSException
 from netaddr import IPNetwork, AddrFormatError
 
+from django.utils.dateparse import parse_duration
+
 from netbox.plugins.utils import get_plugin_config
 
 
@@ -15,6 +17,7 @@ __all__ = (
     "normalize_name",
     "network_to_reverse",
     "regex_from_list",
+    "iso8601_to_int",
 )
 
 
@@ -111,3 +114,13 @@ def network_to_reverse(network):
 
 def regex_from_list(names):
     return f"^({'|'.join(re.escape(name) for name in names)})$"
+
+
+def iso8601_to_int(value):
+    try:
+        return int(value)
+    except ValueError:
+        duration = parse_duration(value)
+        if duration is None:
+            raise TypeError
+        return int(duration.total_seconds())

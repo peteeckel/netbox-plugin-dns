@@ -8,6 +8,7 @@ from tenancy.api.serializers import TenantSerializer
 from netbox_dns.models import Record
 
 from ..nested_serializers import NestedZoneSerializer, NestedRecordSerializer
+from ..field_serializers import TimePeriodField
 
 
 __all__ = ("RecordSerializer",)
@@ -17,6 +18,7 @@ class RecordSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:record-detail"
     )
+    ttl = TimePeriodField(required=False, allow_null=True)
     ptr_record = NestedRecordSerializer(
         many=False,
         read_only=True,

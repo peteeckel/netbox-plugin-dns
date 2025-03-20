@@ -11,6 +11,7 @@ from .registration_contact import RegistrationContactSerializer
 from .zone_template import ZoneTemplateSerializer
 
 from ..nested_serializers import NestedZoneSerializer
+from ..field_serializers import TimePeriodField
 
 from netbox_dns.models import Zone
 
@@ -37,6 +38,8 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text=_("Nameservers for the zone"),
     )
+    default_ttl = TimePeriodField(required=False, allow_null=True)
+    soa_ttl = TimePeriodField(required=False, allow_null=True)
     soa_mname = NameServerSerializer(
         nested=True,
         many=False,
@@ -50,6 +53,10 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text=_("Contact email for the zone"),
     )
+    soa_refresh = TimePeriodField(required=False, allow_null=True)
+    soa_retry = TimePeriodField(required=False, allow_null=True)
+    soa_expire = TimePeriodField(required=False, allow_null=True)
+    soa_minimum = TimePeriodField(required=False, allow_null=True)
     rfc2317_parent_zone = NestedZoneSerializer(
         many=False,
         read_only=True,
