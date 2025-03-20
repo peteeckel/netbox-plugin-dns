@@ -7,6 +7,7 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 from netbox_dns.models import DNSSECKeyTemplate
 
 from ..nested_serializers import NestedDNSSECPolicySerializer
+from ..field_serializers import TimePeriodField
 
 
 __all__ = ("DNSSECKeyTemplateSerializer",)
@@ -16,6 +17,7 @@ class DNSSECKeyTemplateSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:dnsseckeytemplate-detail"
     )
+    lifetime = TimePeriodField(required=False, allow_null=True)
     policies = NestedDNSSECPolicySerializer(
         many=True,
         read_only=True,
