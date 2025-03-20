@@ -8,6 +8,7 @@ from netbox_dns.models import DNSSECPolicy
 
 from .dnssec_key_template import DNSSECKeyTemplateSerializer
 from ..nested_serializers import NestedZoneSerializer, NestedZoneTemplateSerializer
+from ..field_serializers import TimePeriodField
 
 
 __all__ = ("DNSSECPolicySerializer",)
@@ -25,6 +26,18 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
         default=None,
         help_text=_("Key templates assigned to the policy"),
     )
+    dnskey_ttl = TimePeriodField(required=False, allow_null=True)
+    purge_keys = TimePeriodField(required=False, allow_null=True)
+    publish_safety = TimePeriodField(required=False, allow_null=True)
+    retire_safety = TimePeriodField(required=False, allow_null=True)
+    signatures_jitter = TimePeriodField(required=False, allow_null=True)
+    signatures_refresh = TimePeriodField(required=False, allow_null=True)
+    signatures_validity = TimePeriodField(required=False, allow_null=True)
+    signatures_validity_dnskey = TimePeriodField(required=False, allow_null=True)
+    max_zone_ttl = TimePeriodField(required=False, allow_null=True)
+    zone_propagation_delay = TimePeriodField(required=False, allow_null=True)
+    parent_ds_ttl = TimePeriodField(required=False, allow_null=True)
+    parent_propagation_delay = TimePeriodField(required=False, allow_null=True)
     zones = NestedZoneSerializer(
         many=True,
         read_only=True,
