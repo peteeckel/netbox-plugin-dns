@@ -1,3 +1,6 @@
+from django.urls import reverse
+from rest_framework import status
+
 from utilities.testing import APIViewTestCases
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
@@ -60,7 +63,7 @@ class DNSSECKeyTemplateAPITestCase(
 
     @classmethod
     def setUpTestData(cls):
-        dnssec_key_templates = (
+        cls.dnssec_key_templates = (
             DNSSECKeyTemplate(
                 name="Test KSK 2",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
@@ -77,4 +80,45 @@ class DNSSECKeyTemplateAPITestCase(
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
             ),
         )
-        DNSSECKeyTemplate.objects.bulk_create(dnssec_key_templates)
+        DNSSECKeyTemplate.objects.bulk_create(cls.dnssec_key_templates)
+
+    def test_create_iso8601_lifetime(self):
+        self.add_permissions("netbox_dns.add_dnsseckeytemplate")
+
+        url = reverse("plugins-api:netbox_dns-api:dnsseckeytemplate-list")
+
+        data = {
+            "name": "Test CSK 3",
+            "type": DNSSECKeyTemplateTypeChoices.TYPE_CSK,
+            "algorithm": DNSSECKeyTemplateAlgorithmChoices.ED25519,
+            "lifetime": "P42D",
+        }
+
+        response = self.client.post(url, data, **self.header)
+        self.assertHttpStatus(response, status.HTTP_201_CREATED)
+
+        key_template = DNSSECKeyTemplate.objects.get(name="Test CSK 3")
+        self.assertEqual(key_template.type, DNSSECKeyTemplateTypeChoices.TYPE_CSK)
+        self.assertEqual(
+            key_template.algorithm, DNSSECKeyTemplateAlgorithmChoices.ED25519
+        )
+        self.assertEqual(key_template.lifetime, 42 * 86400)
+
+    def test_update_iso8601_lifetime(self):
+        key_template = self.dnssec_key_templates[0]
+
+        self.add_permissions("netbox_dns.change_dnsseckeytemplate")
+
+        url = reverse(
+            "plugins-api:netbox_dns-api:dnsseckeytemplate-detail",
+            kwargs={"pk": key_template.pk},
+        )
+        data = {
+            "lifetime": "P42D",
+        }
+
+        response = self.client.patch(url, data, **self.header)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        key_template.refresh_from_db()
+        self.assertEqual(key_template.lifetime, 42 * 86400)

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from rest_framework import status
 
 from utilities.testing import ViewTestCases, create_tags, post_data
@@ -425,3 +426,579 @@ class DNSSECPolicyViewTestCase(
 
         self.assertFalse(policy.key_templates.exists())
         self.assertEqual(policy.max_zone_ttl, 86400)
+
+    def test_create_iso8601_dnskey_ttl(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "dnskey_ttl": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.dnskey_ttl, 42 * 86400)
+
+    def test_update_iso8601_dnskey_ttl(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "dnskey_ttl": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.dnskey_ttl, 42 * 86400)
+
+    def test_create_iso8601_purge_keys(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "purge_keys": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.purge_keys, 42 * 86400)
+
+    def test_update_iso8601_purge_keys(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "purge_keys": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.purge_keys, 42 * 86400)
+
+    def test_create_iso8601_publish_safety(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "publish_safety": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.publish_safety, 42 * 86400)
+
+    def test_update_iso8601_publish_safety(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "publish_safety": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.publish_safety, 42 * 86400)
+
+    def test_create_iso8601_retire_safety(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "retire_safety": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.retire_safety, 42 * 86400)
+
+    def test_update_iso8601_retire_safety(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "retire_safety": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.retire_safety, 42 * 86400)
+
+    def test_create_iso8601_signatures_jitter(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "signatures_jitter": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.signatures_jitter, 42 * 86400)
+
+    def test_update_iso8601_signatures_jitter(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "signatures_jitter": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.signatures_jitter, 42 * 86400)
+
+    def test_create_iso8601_signatures_refresh(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "signatures_refresh": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.signatures_refresh, 42 * 86400)
+
+    def test_update_iso8601_signatures_refresh(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "signatures_refresh": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.signatures_refresh, 42 * 86400)
+
+    def test_create_iso8601_signatures_validity(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "signatures_validity": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.signatures_validity, 42 * 86400)
+
+    def test_update_iso8601_signatures_validity(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "signatures_validity": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.signatures_validity, 42 * 86400)
+
+    def test_create_iso8601_signatures_validity_dnskey(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "signatures_validity_dnskey": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.signatures_validity_dnskey, 42 * 86400)
+
+    def test_update_iso8601_signatures_validity_dnskey(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "signatures_validity_dnskey": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.signatures_validity_dnskey, 42 * 86400)
+
+    def test_create_iso8601_max_zone_ttl(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "max_zone_ttl": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.max_zone_ttl, 42 * 86400)
+
+    def test_update_iso8601_max_zone_ttl(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "max_zone_ttl": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.max_zone_ttl, 42 * 86400)
+
+    def test_create_iso8601_zone_propagation_delay(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "zone_propagation_delay": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.zone_propagation_delay, 42 * 86400)
+
+    def test_update_iso8601_zone_propagation_delay(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "zone_propagation_delay": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.zone_propagation_delay, 42 * 86400)
+
+    def test_create_iso8601_parent_ds_ttl(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "parent_ds_ttl": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.parent_ds_ttl, 42 * 86400)
+
+    def test_update_iso8601_parent_ds_ttl(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "parent_ds_ttl": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.parent_ds_ttl, 42 * 86400)
+
+    def test_create_iso8601_parent_propagation_delay(self):
+        self.add_permissions("netbox_dns.add_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_add")
+
+        request_data = {
+            "name": "Test Policy 7",
+            "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+            "parent_propagation_delay": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy = DNSSECPolicy.objects.get(name="Test Policy 7")
+        self.assertEqual(policy.status, DNSSECPolicyStatusChoices.STATUS_ACTIVE)
+        self.assertEqual(policy.parent_propagation_delay, 42 * 86400)
+
+    def test_update_iso8601_parent_propagation_delay(self):
+        policy = self.dnssec_policies[0]
+
+        self.add_permissions("netbox_dns.change_dnssecpolicy")
+
+        url = reverse("plugins:netbox_dns:dnssecpolicy_edit", kwargs={"pk": policy.pk})
+        request_data = {
+            "name": policy.name,
+            "status": policy.status,
+            "parent_propagation_delay": "P42D",
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        policy.refresh_from_db()
+        self.assertEqual(policy.parent_propagation_delay, 42 * 86400)
