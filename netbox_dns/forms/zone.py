@@ -58,10 +58,21 @@ class RollbackTransaction(Exception):
 
 
 class ZoneTemplateUpdateMixin:
+    def _check_soa_mname(self):
+        if (
+            self.cleaned_data.get("soa_mname") is None
+            and "soa_mname" in self.fields.keys()
+        ):
+            self.add_error(
+                "soa_mname",
+                _("soa_mname not set and no template or default value defined"),
+            )
+
     def clean(self, *args, **kwargs):
         super().clean(*args, **kwargs)
 
         if (template := self.cleaned_data.get("template")) is None:
+            self._check_soa_mname()
             return
 
         if not self.cleaned_data.get("nameservers") and template.nameservers.all():
@@ -76,11 +87,7 @@ class ZoneTemplateUpdateMixin:
             ) not in (None, ""):
                 self.cleaned_data[field] = getattr(template, field)
 
-        if self.cleaned_data.get("soa_mname") is None:
-            self.add_error(
-                "soa_mname",
-                _("soa_mname not set and no template or default value defined"),
-            )
+        self._check_soa_mname()
 
         if self.errors:
             return
