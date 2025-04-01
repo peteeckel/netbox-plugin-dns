@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import (
     DNSSECPolicyFilterSet,
@@ -108,11 +107,6 @@ class DNSSECPolicyBulkDeleteView(generic.BulkDeleteView):
     queryset = DNSSECPolicy.objects.all()
     filterset = DNSSECPolicyFilterSet
     table = DNSSECPolicyTable
-
-
-@register_model_view(DNSSECPolicy, "contacts")
-class DNSSECPolicyContactsView(ObjectContactsView):
-    queryset = DNSSECPolicy.objects.all()
 
 
 @register_model_view(DNSSECPolicy, "zones")

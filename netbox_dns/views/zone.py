@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import ZoneFilterSet, RecordFilterSet
 from netbox_dns.forms import (
@@ -247,8 +246,3 @@ class ZoneChildZoneListView(generic.ObjectChildrenView):
 
     def get_children(self, request, parent):
         return parent.child_zones
-
-
-@register_model_view(Zone, "contacts")
-class ZoneContactsView(ObjectContactsView):
-    queryset = Zone.objects.all()

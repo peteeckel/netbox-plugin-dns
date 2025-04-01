@@ -1,6 +1,5 @@
 from netbox.views import generic
 from utilities.views import register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import DNSSECKeyTemplateFilterSet
 from netbox_dns.forms import (
@@ -80,8 +79,3 @@ class DNSSECKeyTemplateBulkDeleteView(generic.BulkDeleteView):
     queryset = DNSSECKeyTemplate.objects.all()
     filterset = DNSSECKeyTemplateFilterSet
     table = DNSSECKeyTemplateTable
-
-
-@register_model_view(DNSSECKeyTemplate, "contacts")
-class DNSSECKeyTemplateContactsView(ObjectContactsView):
-    queryset = DNSSECKeyTemplate.objects.all()
