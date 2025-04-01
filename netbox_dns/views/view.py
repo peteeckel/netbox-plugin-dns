@@ -2,7 +2,6 @@ from utilities.views import ViewTab, register_model_view
 from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
-from tenancy.views import ObjectContactsView
 from ipam.models import Prefix
 
 from netbox_dns.models import View, Zone
@@ -115,8 +114,3 @@ class ViewZoneListView(generic.ObjectChildrenView):
 
     def get_children(self, request, parent):
         return parent.zones
-
-
-@register_model_view(View, "contacts")
-class ViewContactsView(ObjectContactsView):
-    queryset = View.objects.all()

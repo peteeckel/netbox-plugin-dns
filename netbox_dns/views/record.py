@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 from utilities.views import register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import RecordFilterSet
 from netbox_dns.forms import (
@@ -210,8 +209,3 @@ class RecordBulkDeleteView(generic.BulkDeleteView):
     queryset = Record.objects.filter(managed=False)
     filterset = RecordFilterSet
     table = RecordTable
-
-
-@register_model_view(Record, "contacts")
-class RecordContactsView(ObjectContactsView):
-    queryset = Record.objects.all()
