@@ -14,7 +14,6 @@ from django.db import models, transaction
 from django.db.models import Q, Max, ExpressionWrapper, BooleanField, UniqueConstraint
 from django.db.models.functions import Length, Lower
 from django.db.models.signals import m2m_changed
-from django.urls import reverse
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _

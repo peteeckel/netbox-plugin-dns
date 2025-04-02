@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
 from django.db.models.functions import Lower
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -79,10 +78,6 @@ class NameServer(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @property
     def display_name(self):
         return name_to_unicode(self.name)
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:nameserver", kwargs={"pk": self.pk})
 
     def clean_fields(self, exclude=None):
         if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
