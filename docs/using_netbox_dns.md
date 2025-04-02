@@ -35,7 +35,7 @@ The installation of plugins in general is described in the [NetBox documentation
 ### Requirements
 The installation of NetBox DNS requires a Python interpreter and a working NetBox deployment. The following versions are currently supported:
 
-* NetBox 4.0.0 or higher
+* NetBox 4.3.0 or higher
 * Python 3.10 or higher
 
 ### Compatibility
@@ -50,6 +50,7 @@ NetBox Version | NetBox DNS Version | Comment
 4.0 - 4.1      | 1.0                | Supports legacy IPAM Coupling
 4.0 - 4.1      | 1.1                | Supports IPAM DNSsync
 4.2            | 1.2                |
+4.3            | 1.3                |
 
 For earlier version of NetBox, please use the old version of the PyPI module `netbox-dns`.  Please be aware that this version is no longer supported and will not receive any further updates. We therefore strongly recommend that you move to at least NetBox 3.5 and use the latest supported version of NetBox DNS.
 
