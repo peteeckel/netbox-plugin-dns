@@ -8,7 +8,6 @@ from dns import rdata
 from django.core.exceptions import ValidationError
 from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
-from django.urls import reverse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
@@ -262,10 +261,6 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def get_status_color(self):
         return RecordStatusChoices.colors.get(self.status)
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:record", kwargs={"pk": self.pk})
 
     @property
     def value_fqdn(self):
