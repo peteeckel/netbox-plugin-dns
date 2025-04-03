@@ -419,7 +419,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             name=_("SOA"),
         ),
         FieldSet(
-            "dnssec_policy",
+            "dnssec_policy_id",
             "inline_signing",
             name=_("DNSSEC"),
         ),
@@ -499,17 +499,22 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         null_option=_("None"),
         label=_("Parent Zone"),
     )
-    registrar_id = DynamicModelMultipleChoiceField(
-        queryset=Registrar.objects.all(),
-        required=False,
-        null_option=_("None"),
-        label=_("Registrar"),
-    )
     dnssec_policy_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
         required=False,
         null_option=_("None"),
         label=_("DNSSEC Policy"),
+    )
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Use Inline Signing"),
+    )
+    registrar_id = DynamicModelMultipleChoiceField(
+        queryset=Registrar.objects.all(),
+        required=False,
+        null_option=_("None"),
+        label=_("Registrar"),
     )
     registry_domain_id = forms.CharField(
         required=False,
