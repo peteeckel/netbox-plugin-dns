@@ -1,8 +1,10 @@
+from datetime import date
+
 from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
 from netbox_dns.models import NameServer, View, Zone
-from netbox_dns.choices import ZoneStatusChoices
+from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 
 
 class ZoneViewTestCase(
@@ -76,18 +78,20 @@ class ZoneViewTestCase(
             "soa_ttl": 43200,
             "soa_minimum": 1800,
             "soa_serial_auto": False,
+            "expiration_date": date(2025, 4, 1),
+            "domain_status": ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
         }
 
         cls.csv_data = (
-            "name,status,soa_mname,soa_rname,nameservers",
-            "zone4.example.com,active,ns1.example.com,hostmaster.example.com,",
-            "zone5.example.com,active,ns1.example.com,hostmaster.example.com,",
-            "zone6.example.com,active,ns1.example.com,hostmaster.example.com,",
-            'zone7.example.com,active,ns1.example.com,hostmaster.example.com,"ns2.example.com,ns3.example.com"',
+            "name,status,soa_mname,soa_rname,nameservers,domain_status",
+            "zone4.example.com,active,ns1.example.com,hostmaster.example.com,,",
+            "zone5.example.com,active,ns1.example.com,hostmaster.example.com,,",
+            "zone6.example.com,active,ns1.example.com,hostmaster.example.com,,",
+            f'zone7.example.com,active,ns1.example.com,hostmaster.example.com,"ns2.example.com,ns3.example.com",{ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED}',
         )
 
         cls.csv_update_data = (
-            "id,status,description,view,nameservers",
-            f"{zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,,{nameservers[1].name}",
-            f'{zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{views[0].name},"{nameservers[1].name},{nameservers[2].name}',
+            "id,status,description,view,nameservers,domain_status",
+            f"{zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,,{nameservers[1].name},{ZoneEPPStatusChoices.EPP_STATUS_OK}",
+            f'{zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{views[0].name},"{nameservers[1].name},{nameservers[2].name}",',
         )
