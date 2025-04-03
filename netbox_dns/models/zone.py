@@ -26,7 +26,12 @@ from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 from ipam.models import IPAddress
 
-from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices
+from netbox_dns.choices import (
+    RecordClassChoices,
+    RecordTypeChoices,
+    ZoneStatusChoices,
+    ZoneEPPStatusChoices,
+)
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
     update_dns_records,
@@ -202,6 +207,18 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
         null=True,
     )
+    expiration_date = models.DateField(
+        verbose_name=_("Expiration Date"),
+        blank=True,
+        null=True,
+    )
+    domain_status = models.CharField(
+        verbose_name=_("Domain Status"),
+        max_length=50,
+        choices=ZoneEPPStatusChoices,
+        blank=True,
+        null=True,
+    )
     registrant = models.ForeignKey(
         verbose_name=_("Registrant"),
         to="RegistrationContact",
@@ -369,6 +386,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def get_status_color(self):
         return ZoneStatusChoices.colors.get(self.status)
+
+    def get_domain_status_color(self):
+        return ZoneEPPStatusChoices.colors.get(self.domain_status)
 
     # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):

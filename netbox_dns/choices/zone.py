@@ -28,11 +28,12 @@ class ZoneStatusChoices(ChoiceSet):
 
 
 class ZoneEPPStatusChoices(ChoiceSet):
-    '''
+    """
     Reflects the EPP status of a zone registered as a domain. See
     https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en
     for details.
-    '''
+    """
+
     key = "Zone.epp_status"
 
     EPP_STATUS_ADD_PERIOD = "addPeriod"
@@ -72,15 +73,47 @@ class ZoneEPPStatusChoices(ChoiceSet):
         (EPP_STATUS_PENDING_UPDATE, EPP_STATUS_PENDING_UPDATE, "blue"),
         (EPP_STATUS_REDEMPTION_PERIOD, EPP_STATUS_REDEMPTION_PERIOD, "blue"),
         (EPP_STATUS_RENEW_PERIOD, EPP_STATUS_RENEW_PERIOD, "blue"),
-        (EPP_STATUS_SERVER_DELETE_PROHIBITED, EPP_STATUS_SERVER_DELETE_PROHIBITED, "blue"),
+        (
+            EPP_STATUS_SERVER_DELETE_PROHIBITED,
+            EPP_STATUS_SERVER_DELETE_PROHIBITED,
+            "blue",
+        ),
         (EPP_STATUS_SERVER_HOLD, EPP_STATUS_SERVER_HOLD, "blue"),
-        (EPP_STATUS_SERVER_RENER_PROHIBITED, EPP_STATUS_SERVER_RENER_PROHIBITED, "blue"),
-        (EPP_STATUS_SERVER_TRANSFER_PROHIBITED, EPP_STATUS_SERVER_TRANSFER_PROHIBITED, "blue"),
-        (EPP_STATUS_SERVER_UPDATE_PROHIBITED, EPP_STATUS_SERVER_UPDATE_PROHIBITED, "blue"),
+        (
+            EPP_STATUS_SERVER_RENER_PROHIBITED,
+            EPP_STATUS_SERVER_RENER_PROHIBITED,
+            "blue",
+        ),
+        (
+            EPP_STATUS_SERVER_TRANSFER_PROHIBITED,
+            EPP_STATUS_SERVER_TRANSFER_PROHIBITED,
+            "blue",
+        ),
+        (
+            EPP_STATUS_SERVER_UPDATE_PROHIBITED,
+            EPP_STATUS_SERVER_UPDATE_PROHIBITED,
+            "blue",
+        ),
         (EPP_STATUS_TRANSFER_PERIOD, EPP_STATUS_TRANSFER_PERIOD, "blue"),
-        (EPP_STATUS_CLIENT_DELETE_PROHIBITED, EPP_STATUS_CLIENT_DELETE_PROHIBITED, "cyan"),
+        (
+            EPP_STATUS_CLIENT_DELETE_PROHIBITED,
+            EPP_STATUS_CLIENT_DELETE_PROHIBITED,
+            "cyan",
+        ),
         (EPP_STATUS_CLIENT_HOLD, EPP_STATUS_CLIENT_HOLD, "cyan"),
-        (EPP_STATUS_CLIENT_RENEW_PROHIBITED, EPP_STATUS_CLIENT_RENEW_PROHIBITED, "cyan"),
-        (EPP_STATUS_CLIENT_TRANSFER_PROHIBITED, EPP_STATUS_CLIENT_TRANSFER_PROHIBITED, "cyan"),
-        (EPP_STATUS_CLIENT_UPDATE_PROHIBITED, EPP_STATUS_CLIENT_UPDATE_PROHIBITED, "cyan"),
+        (
+            EPP_STATUS_CLIENT_RENEW_PROHIBITED,
+            EPP_STATUS_CLIENT_RENEW_PROHIBITED,
+            "cyan",
+        ),
+        (
+            EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
+            EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
+            "cyan",
+        ),
+        (
+            EPP_STATUS_CLIENT_UPDATE_PROHIBITED,
+            EPP_STATUS_CLIENT_UPDATE_PROHIBITED,
+            "cyan",
+        ),
     ]

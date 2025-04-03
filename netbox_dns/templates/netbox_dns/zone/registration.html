@@ -15,6 +15,14 @@
             <td>{{ object.registry_domain_id|placeholder }}</td>
         </tr>
         <tr>
+            <th scope="row">{% trans "Expiration Date" %}</th>
+            <td>{{ object.expiration_date|placeholder }}</td>
+        </tr>
+        <tr>
+            <th scope="row">{% trans "Domain Status" %}</th>
+            <td>{% badge object.get_domain_status_display bg_color=object.get_domain_status_color %}</td>
+        </tr>
+        <tr>
             <th scope="row">{% trans "Registrant" %}</th>
             <td>{{ object.registrant|linkify|placeholder }}</td>
         </tr>
