@@ -122,6 +122,16 @@ class ZoneRegistrationView(generic.ObjectView):
         label=_("Registration"),
     )
 
+    def get_extra_context(self, request, instance):
+        expiration_warning, expiration_error = instance.check_expiration()
+
+        context = {
+            "expiration_warning": expiration_warning,
+            "expiration_error": expiration_error,
+        }
+
+        return context
+
 
 @register_model_view(Zone, "records")
 class ZoneRecordListView(generic.ObjectChildrenView):

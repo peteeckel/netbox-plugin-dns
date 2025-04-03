@@ -1,6 +1,6 @@
 import re
 from math import ceil
-from datetime import datetime
+from datetime import datetime, date
 
 from dns import name as dns_name
 from dns.exception import DNSException
@@ -598,6 +598,26 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 )
 
         return ns_warnings, ns_errors
+
+    def check_expiration(self):
+        if self.expiration_date is None:
+            return None, None
+
+        expiration_warning = None
+        expiration_error = None
+
+        expiration_warning_days = get_plugin_config(
+            "netbox_dns", "zone_expiration_warning_days"
+        )
+
+        if self.expiration_date < date.today():
+            expiration_error = _("The registration for this domain has expired.")
+        elif (self.expiration_date - date.today()).days < expiration_warning_days:
+            expiration_warning = _(
+                f"The registration for his domain will expire less than {expiration_warning_days} days."
+            )
+
+        return expiration_warning, expiration_error
 
     def check_soa_serial_increment(self, old_serial, new_serial):
         MAX_SOA_SERIAL_INCREMENT = 2**31 - 1

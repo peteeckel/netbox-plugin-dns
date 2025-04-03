@@ -18,6 +18,17 @@
             <th scope="row">{% trans "Expiration Date" %}</th>
             <td>{{ object.expiration_date|placeholder }}</td>
         </tr>
+        {% if expiration_warning %}
+            <tr>
+                <th class="text-warning" scope="row">{% trans "Warning" %}</th>
+                <td class="text-warning">{{ expiration_warning }}</td>
+            </tr>
+        {% elif expiration_error %}
+            <tr>
+                <th class="text-danger" scope="row">{% trans "Error" %}</th>
+                <td class="text-danger">{{ expiration_error }}</td>
+            </tr>
+        {% endif %}
         <tr>
             <th scope="row">{% trans "Domain Status" %}</th>
             <td>{% badge object.get_domain_status_display bg_color=object.get_domain_status_color %}</td>
