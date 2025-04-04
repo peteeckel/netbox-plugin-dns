@@ -430,6 +430,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.admin_c,
                 self.tech_c,
                 self.billing_c,
+                self.expiration_date,
+                self.domain_status,
             )
         )
 
