@@ -28,7 +28,7 @@ msgstr "Greffon NetBox pour le DNS"
 
 #: api/field_serializers.py:12
 msgid "Enter a positive integer or an ISO8601 duration (W, M and Y are not supported)."
-msgstr ""
+msgstr "Entrer un entier positif ou une durée ISO8601 (W, M et Y ne sont pas gérés)."
 
 #: api/nested_serializers.py:42 api/serializers_/zone.py:33
 msgid "View the zone belongs to"
@@ -512,7 +512,7 @@ msgstr "Politiques"
 #: forms/zone_template.py:173 forms/zone_template.py:179
 #: forms/zone_template.py:185
 msgid "None"
-msgstr ""
+msgstr "Aucun"
 
 #: forms/dnssec_key_template.py:95
 msgid "Enter a list of integer lifetime values, separated by comma (,)"
@@ -1275,7 +1275,7 @@ msgstr "Il y a déjà un enregistrement de type '{type}' avec le nom '{name}' da
 #: models/record_template.py:169
 #, python-brace-format
 msgid "Error while processing record template {template}: {error}"
-msgstr "Erreur durant le traitement du modèle d'enregistrement bei der Verarbeitung der Datensatzvorlage {template}: {error}"
+msgstr "Erreur durant le traitement du modèle d'enregistrement {template}: {error}"
 
 #: models/registrar.py:69 navigation.py:177
 msgid "Registrars"
@@ -1424,7 +1424,7 @@ msgstr "Vous n'avez pas la permission de modifier les champs personnalisés DNSs
 #: signals/ipam_dnssync.py:146
 #, python-brace-format
 msgid "This prefix is currently assigned to the following DNS views: {views}. Please deassign it from these views before making changes to the prefix or VRF."
-msgstr "Ce préfixe est actuellement associé au vues DNS suivantes : {views}.Merci de supprimer son association avec ces vues avant de changer le préfixe ou la VRF"
+msgstr "Ce préfixe est actuellement associé au vues DNS suivantes : {views}. Merci de supprimer son association avec ces vues avant de changer le préfixe ou la VRF."
 
 #: signals/ipam_dnssync.py:154
 #, python-brace-format
