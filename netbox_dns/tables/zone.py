@@ -55,6 +55,9 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Registrar"),
         linkify=True,
     )
+    domain_status = ChoiceFieldColumn(
+        verbose_name=_("Domain Status"),
+    )
     registrant = tables.Column(
         verbose_name=_("Registrant"),
         linkify=True,
@@ -84,6 +87,8 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "inline_signing",
             "rfc2317_parent_managed",
             "registry_domain_id",
+            "expiration_date",
+            "domain_status",
         )
         default_columns = (
             "name",

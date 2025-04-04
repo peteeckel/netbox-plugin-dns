@@ -16,7 +16,7 @@ from netbox_dns.models import (
     NameServer,
     DNSSECPolicy,
 )
-from netbox_dns.choices import ZoneStatusChoices
+from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 
 
 __all__ = ("ZoneFilterSet",)
@@ -94,6 +94,10 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("Registrar"),
     )
+    expiration_date = django_filters.DateFromToRangeFilter()
+    domain_status = django_filters.MultipleChoiceFilter(
+        choices=ZoneEPPStatusChoices,
+    )
     registrant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
         label=_("Registrant ID"),
@@ -160,6 +164,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "rfc2317_parent_managed",
             "inline_signing",
             "registry_domain_id",
+            "domain_status",
         )
 
     def filter_arpa_network(self, queryset, name, value):

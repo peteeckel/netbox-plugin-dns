@@ -2,7 +2,7 @@ from utilities.testing import APIViewTestCases, create_tags
 
 from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
 from netbox_dns.models import View, Zone, NameServer, Registrar, RegistrationContact
-from netbox_dns.choices import ZoneStatusChoices
+from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 
 
 class ZoneAPITestCase(
@@ -79,6 +79,8 @@ class ZoneAPITestCase(
                 admin_c=contacts[1],
                 tech_c=contacts[2],
                 billing_c=contacts[3],
+                domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
+                expiration_date="2025-04-01",
             ),
             Zone(name="zone2.example.com", **zone_data, registrar=registrars[0]),
             Zone(

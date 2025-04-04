@@ -192,6 +192,8 @@ class ZoneSerializer(NetBoxModelSerializer):
             "inline_signing",
             "registrar",
             "registry_domain_id",
+            "expiration_date",
+            "domain_status",
             "registrant",
             "tech_c",
             "admin_c",

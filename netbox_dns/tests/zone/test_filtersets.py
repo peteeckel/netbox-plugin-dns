@@ -11,7 +11,7 @@ from netbox_dns.models import (
     RegistrationContact,
     DNSSECPolicy,
 )
-from netbox_dns.choices import ZoneStatusChoices
+from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 
 from netbox_dns.filtersets import ZoneFilterSet
 
@@ -86,6 +86,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[0],
                 billing_c=cls.contacts[0],
                 dnssec_policy=cls.dnssec_policies[0],
+                expiration_date="2025-04-01",
+                domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
             ),
             Zone(
                 name="zone2.example.com",
@@ -118,6 +120,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[1],
                 inline_signing=False,
+                expiration_date="2026-04-01",
+                domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
             ),
             Zone(
                 name="zone1.example.com",
@@ -150,6 +154,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 billing_c=cls.contacts[2],
                 dnssec_policy=cls.dnssec_policies[2],
                 inline_signing=False,
+                expiration_date="2025-04-01",
+                domain_status=ZoneEPPStatusChoices.EPP_STATUS_INACTIVE,
             ),
             Zone(
                 name="zone3.example.com",
@@ -174,6 +180,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 soa_rname="hostmaster.example.com",
                 soa_serial_auto=True,
                 inline_signing=True,
+                expiration_date="2026-04-01",
+                domain_status=ZoneEPPStatusChoices.EPP_STATUS_INACTIVE,
             ),
             Zone(
                 name="1.0.10.in-addr.arpa",
@@ -396,3 +404,25 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 10)
         params = {"inline_signing": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_domain_status(self):
+        params = {
+            "domain_status": [
+                ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED
+            ]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"domain_status": [ZoneEPPStatusChoices.EPP_STATUS_INACTIVE]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"domain_status": [ZoneEPPStatusChoices.EPP_STATUS_OK]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
+
+    def test_expiration_date(self):
+        params = {"expiration_date_before": "2025-06-01"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"expiration_date_after": "2025-06-01"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"expiration_date_before": "2024-06-01"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
+        params = {"expiration_date_after": "2026-06-01"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
