@@ -119,7 +119,7 @@ class ZoneSerializer(NetBoxModelSerializer):
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
     def validate(self, data):
-        if (template := data.get("template")) is not None:
+        if isinstance(data, dict) and (template := data.get("template")) is not None:
             template.apply_to_zone_data(data)
 
         return super().validate(data)
