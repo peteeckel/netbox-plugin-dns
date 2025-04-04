@@ -64,11 +64,13 @@ class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("Zones"),
     )
     soa_zone_id = DynamicModelMultipleChoiceField(
         queryset=Zone.objects.all(),
         required=False,
+        null_option=_("None"),
         label=_("SOA Zones"),
     )
     description = forms.CharField(

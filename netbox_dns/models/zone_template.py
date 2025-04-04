@@ -55,11 +55,11 @@ class ZoneTemplate(NetBoxModel):
         related_name="zone_templates",
         blank=True,
     )
-    tenant = models.ForeignKey(
-        verbose_name=_("Tenant"),
-        to="tenancy.Tenant",
+    dnssec_policy = models.ForeignKey(
+        verbose_name=_("DNSSEC Policy"),
+        to="DNSSECPolicy",
         on_delete=models.SET_NULL,
-        related_name="+",
+        related_name="zone_templates",
         blank=True,
         null=True,
     )
@@ -103,33 +103,43 @@ class ZoneTemplate(NetBoxModel):
         blank=True,
         null=True,
     )
+    tenant = models.ForeignKey(
+        verbose_name=_("Tenant"),
+        to="tenancy.Tenant",
+        on_delete=models.SET_NULL,
+        related_name="+",
+        blank=True,
+        null=True,
+    )
 
     clone_fields = (
         "description",
         "nameservers",
         "record_templates",
-        "tenant",
+        "dnssec_policy",
         "registrar",
         "registrant",
         "admin_c",
         "tech_c",
         "billing_c",
+        "tenant",
     )
 
     template_fields = (
         "soa_mname",
         "soa_rname",
-        "tenant",
+        "dnssec_policy",
         "registrar",
         "registrant",
         "admin_c",
         "tech_c",
         "billing_c",
+        "tenant",
     )
 
     class Meta:
         verbose_name = _("Zone Template")
-        verbose_name_plural = "Zone Templates"
+        verbose_name_plural = _("Zone Templates")
 
         ordering = ("name",)
 

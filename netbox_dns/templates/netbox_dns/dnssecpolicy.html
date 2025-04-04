@@ -1,0 +1,155 @@
+{% extends 'generic/object.html' %}
+{% load i18n %}
+
+{% block content %}
+    <div class="row">
+        <div class="col col-md-6">
+            <div class="card">
+                <h5 class="card-header">{% trans "DNSSEC Policy" %}</h5>
+                <table class="table table-hover attr-table">
+                    {% if object.description %}
+                    <tr>
+                        <th scope="row">{% trans "Description" %}</th>
+                        <td style="word-break:break-all;">{{ object.description }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="row">{% trans "Status" %}</th>
+                        <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Key Templates" %}</th>
+                        <td>
+                            <table>
+                                {% for key_template in object.key_templates.all %}
+                                    <tr><td>{{ key_template|linkify }}</td></tr>
+                                    {% for template_id, errors in key_template_errors.items %}
+                                        {% if template_id == key_template.pk %}
+                                            {% for error in errors %}
+                                                <tr><td class="text-danger">{{ error }}</td></tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% if policy_warning %}
+                        <tr><td class="text-danger">{{ policy_warning }}</td></tr>
+                    {% endif %}
+                    {% if object.tenant %}
+                    <tr>
+                        <th scope="row">{% trans "Tenant" %}</th>
+                        <td>
+                            {% if object.tenant.group %}
+                                {{ object.tenant.group|linkify }} /
+                            {% endif %}
+                            {{ object.tenant|linkify|placeholder }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            <div class="card">
+                <h5 class="card-header">{% trans "Timing" %}</h5>
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">{% trans "DNSKEY TTL" %}</th>
+                        <td>{{ object.dnskey_ttl|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Publish Safety" %}</th>
+                        <td>{{ object.publish_safety|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Purge Keys" %}</th>
+                        <td>{{ object.purge_keys|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Retire Safety" %}</th>
+                        <td>{{ object.retire_safety|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Signatures Jitter" %}</th>
+                        <td>{{ object.signatures_jitter|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Signatures Refresh" %}</th>
+                        <td>{{ object.signatures_refresh|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Signatures Validity" %}</th>
+                        <td>{{ object.signatures_validity|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Signatures Validity (DNSKEY)" %}</th>
+                        <td>{{ object.signatures_validity_dnskey|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Max Zone TTL" %}</th>
+                        <td>{{ object.max_zone_ttl|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Zone Propagation Delay" %}</th>
+                        <td>{{ object.zone_propagation_delay|placeholder }}</td>
+                    </tr>
+                </table>
+            </div>
+            {% include 'inc/panels/custom_fields.html' %}
+        </div>
+        <div class="col col-md-6">
+            {% include 'inc/panels/tags.html' %}
+            <div class="card">
+                <h5 class="card-header">{% trans "Parent Delegation" %}</h5>
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">{% trans "Create CDNSKEY" %}</th>
+                        <td>{% checkmark object.create_cdnskey %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "CDS Digest Types" %}</th>
+                        <td>{% if object.cds_digest_types %}{% for digest_type in object.cds_digest_types %}{% badge digest_type %}{% endfor %}{% else %}{{ object_cds_digest_types|placeholder }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Parent DS TTL" %}</th>
+                        <td>{{ object.parent_ds_ttl|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Parent Propagation Delay" %}</th>
+                        <td>{{ object.parent_propagation_delay|placeholder }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card">
+                <h5 class="card-header">{% trans "Proof of Non-Existence" %}</h5>
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">{% trans "Use NSEC3" %}</th>
+                        <td>{% checkmark object.use_nsec3 %}</td>
+                    </tr>
+                    {% if object.use_nsec3 %}
+                        <tr>
+                            <th scope="row">{% trans "NSEC3 Iterations" %}</th>
+                            <td>{{ object.nsec3_iterations|placeholder }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "NSEC3 Opt Out" %}</th>
+                            <td>{% checkmark object.nsec3_opt_out %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "NSEC3 Salt Size" %}</th>
+                            <td>{{ object.nsec3_salt_size|placeholder }}</td>
+                        </tr>
+                        {% if object.nsec3_iterations or object.nsec3_opt_out or object.nsec3_salt_size %}
+                        <tr>
+                            <th class="text-warning">
+                                {% blocktrans with link='<a href="https://datatracker.ietf.org/doc/html/rfc9276.html#section-3.1">RFC 9276, Section 3.1</a>' %}Using NSEC3 options is not recommended (see {{ link }}){% endblocktrans %}
+                            </th>
+                        </tr>
+                        {% endif %}
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

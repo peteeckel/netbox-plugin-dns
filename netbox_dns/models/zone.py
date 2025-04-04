@@ -97,6 +97,11 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         max_length=255,
         db_collation="natural_sort",
     )
+    description = models.CharField(
+        verbose_name=_("Description"),
+        max_length=200,
+        blank=True,
+    )
     status = models.CharField(
         verbose_name=_("Status"),
         max_length=50,
@@ -170,24 +175,18 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         help_text=_("Automatically generate the SOA serial number"),
         default=True,
     )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
-    )
-    arpa_network = NetworkField(
-        verbose_name=_("ARPA Network"),
-        help_text=_("Network related to a reverse lookup zone (.arpa)"),
-        blank=True,
-        null=True,
-    )
-    tenant = models.ForeignKey(
-        verbose_name=_("Tenant"),
-        to="tenancy.Tenant",
+    dnssec_policy = models.ForeignKey(
+        verbose_name=_("DNSSEC Policy"),
+        to="DNSSECPolicy",
         on_delete=models.PROTECT,
-        related_name="netbox_dns_zones",
+        related_name="zones",
         blank=True,
         null=True,
+    )
+    inline_signing = models.BooleanField(
+        verbose_name=_("Inline Signing"),
+        help_text=_("Use inline signing for DNSSEC"),
+        default=True,
     )
     registrar = models.ForeignKey(
         verbose_name=_("Registrar"),
@@ -212,7 +211,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
     admin_c = models.ForeignKey(
-        verbose_name="Administrative Contact",
+        verbose_name=_("Administrative Contact"),
         to="RegistrationContact",
         on_delete=models.SET_NULL,
         related_name="admin_c_zones",
@@ -255,12 +254,27 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
         null=True,
     )
+    arpa_network = NetworkField(
+        verbose_name=_("ARPA Network"),
+        help_text=_("Network related to a reverse lookup zone (.arpa)"),
+        blank=True,
+        null=True,
+    )
+    tenant = models.ForeignKey(
+        verbose_name=_("Tenant"),
+        to="tenancy.Tenant",
+        on_delete=models.PROTECT,
+        related_name="netbox_dns_zones",
+        blank=True,
+        null=True,
+    )
 
     objects = ZoneManager()
 
     clone_fields = (
         "view",
         "name",
+        "description",
         "status",
         "nameservers",
         "default_ttl",
@@ -271,7 +285,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "soa_retry",
         "soa_expire",
         "soa_minimum",
-        "description",
         "tenant",
     )
 

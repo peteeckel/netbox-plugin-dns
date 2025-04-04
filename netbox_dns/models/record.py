@@ -167,7 +167,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         default=False,
     )
     ptr_record = models.OneToOneField(
-        verbose_name="PTR Record",
+        verbose_name=_("PTR Record"),
         to="self",
         on_delete=models.SET_NULL,
         related_name="address_record",

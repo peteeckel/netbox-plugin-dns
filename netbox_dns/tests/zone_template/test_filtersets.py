@@ -9,6 +9,7 @@ from netbox_dns.models import (
     NameServer,
     Registrar,
     RegistrationContact,
+    DNSSECPolicy,
 )
 from netbox_dns.choices import RecordTypeChoices
 from netbox_dns.filtersets import ZoneTemplateFilterSet
@@ -78,6 +79,13 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         ]
         RecordTemplate.objects.bulk_create(cls.record_templates)
 
+        cls.dnssec_policies = (
+            DNSSECPolicy(name="Test Policy 1"),
+            DNSSECPolicy(name="Test Policy 2"),
+            DNSSECPolicy(name="Test Policy 3"),
+        )
+        DNSSECPolicy.objects.bulk_create(cls.dnssec_policies)
+
         cls.zone_templates = (
             ZoneTemplate(
                 name="Zone Template 1",
@@ -89,6 +97,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[0],
                 admin_c=cls.contacts[0],
                 billing_c=cls.contacts[0],
+                dnssec_policy=cls.dnssec_policies[0],
             ),
             ZoneTemplate(
                 name="Zone Template 2",
@@ -100,6 +109,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
+                dnssec_policy=cls.dnssec_policies[0],
             ),
             ZoneTemplate(
                 name="Zone Template 3",
@@ -111,6 +121,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
+                dnssec_policy=cls.dnssec_policies[1],
             ),
             ZoneTemplate(
                 name="Zone Template 4",
@@ -122,6 +133,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[1],
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
+                dnssec_policy=cls.dnssec_policies[1],
             ),
             ZoneTemplate(
                 name="Zone Template 5",
@@ -133,6 +145,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[2],
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
+                dnssec_policy=cls.dnssec_policies[2],
             ),
             ZoneTemplate(
                 name="Zone Template 6",
@@ -144,6 +157,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 tech_c=cls.contacts[2],
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
+                dnssec_policy=cls.dnssec_policies[2],
             ),
         )
         ZoneTemplate.objects.bulk_create(cls.zone_templates)
@@ -253,6 +267,19 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         params = {"billing_c_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_dnssec_policy(self):
+        params = {
+            "dnssec_policy_id": [self.dnssec_policies[0].pk, self.dnssec_policies[1].pk]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {
+            "dnssec_policy": [
+                self.dnssec_policies[0].name,
+                self.dnssec_policies[1].name,
+            ]
+        }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_tenant(self):
         params = {"tenant_id": [self.tenants[0].pk, self.tenants[1].pk]}

@@ -1,0 +1,70 @@
+{% extends 'generic/object.html' %}
+{% load render_table from django_tables2 %}
+{% load i18n %}
+
+{% block content %}
+    <div class="row">
+        <div class="col col-md-6">
+            <div class="card">
+                <h5 class="card-header">{% trans "DNSSEC Key" %}</h5>
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">{% trans "Name" %}</th>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                    {% if object.description %}
+                    <tr>
+                        <th scope="row">{% trans "Description" %}</th>
+                        <td style="word-break:break-all;">{{ object.description }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="row">{% trans "Type" %}</th>
+                        <td>{% badge object.get_type_display bg_color=object.get_type_color %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Lifetime" %}</th>
+                        <td>{{ object.lifetime|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Algorithm" %}</th>
+                        <td>{% badge object.get_algorithm_display %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{% trans "Key Size" %}</th>
+                        <td>{% badge object.get_key_size_display %}</td>
+                    </tr>
+                    {% if object.tenant %}
+                    <tr>
+                        <th scope="row">{% trans "Tenant" %}</th>
+                        <td>
+                            {% if object.tenant.group %}
+                                {{ object.tenant.group|linkify }} /
+                            {% endif %}
+                            {{ object.tenant|linkify|placeholder }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% include 'inc/panels/custom_fields.html' %}
+        </div>
+        <div class="col col-md-6">
+            {% include 'inc/panels/tags.html' %}
+        </div>
+    </div>
+    {% if policy_table %}
+        <div class="col col-md-12">
+            <div class="card">
+                {% if policy_table.rows|length == 1 %}
+                    <h2 class="card-header">{% trans "Policy" %}</h2>
+                {% else %}
+                    <h2 class="card-header">{% trans "Policies" %}</h2>
+                {% endif %}
+                <div class="table-responsive">
+                    {% render_table policy_table 'inc/table.html' %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
