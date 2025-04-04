@@ -988,6 +988,8 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         "nameservers",
         "rfc2317_prefix",
         "registrar",
+        "expiration_date",
+        "domain_status",
         "registry_domain_id",
         "registrant",
         "admin_c",
