@@ -1,6 +1,6 @@
 import re
 from math import ceil
-from datetime import datetime
+from datetime import datetime, date
 
 from dns import name as dns_name
 from dns.exception import DNSException
@@ -26,7 +26,12 @@ from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 from ipam.models import IPAddress
 
-from netbox_dns.choices import RecordClassChoices, RecordTypeChoices, ZoneStatusChoices
+from netbox_dns.choices import (
+    RecordClassChoices,
+    RecordTypeChoices,
+    ZoneStatusChoices,
+    ZoneEPPStatusChoices,
+)
 from netbox_dns.fields import NetworkField, RFC2317NetworkField
 from netbox_dns.utilities import (
     update_dns_records,
@@ -202,6 +207,18 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
         null=True,
     )
+    expiration_date = models.DateField(
+        verbose_name=_("Expiration Date"),
+        blank=True,
+        null=True,
+    )
+    domain_status = models.CharField(
+        verbose_name=_("Domain Status"),
+        max_length=50,
+        choices=ZoneEPPStatusChoices,
+        blank=True,
+        null=True,
+    )
     registrant = models.ForeignKey(
         verbose_name=_("Registrant"),
         to="RegistrationContact",
@@ -370,6 +387,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def get_status_color(self):
         return ZoneStatusChoices.colors.get(self.status)
 
+    def get_domain_status_color(self):
+        return ZoneEPPStatusChoices.colors.get(self.domain_status)
+
     # TODO: Remove in version 1.3.0 (NetBox #18555)
     def get_absolute_url(self):
         return reverse("plugins:netbox_dns:zone", kwargs={"pk": self.pk})
@@ -410,6 +430,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 self.admin_c,
                 self.tech_c,
                 self.billing_c,
+                self.expiration_date,
+                self.domain_status,
             )
         )
 
@@ -578,6 +600,26 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 )
 
         return ns_warnings, ns_errors
+
+    def check_expiration(self):
+        if self.expiration_date is None:
+            return None, None
+
+        expiration_warning = None
+        expiration_error = None
+
+        expiration_warning_days = get_plugin_config(
+            "netbox_dns", "zone_expiration_warning_days"
+        )
+
+        if self.expiration_date < date.today():
+            expiration_error = _("The registration for this domain has expired.")
+        elif (self.expiration_date - date.today()).days < expiration_warning_days:
+            expiration_warning = _(
+                f"The registration for his domain will expire less than {expiration_warning_days} days."
+            )
+
+        return expiration_warning, expiration_error
 
     def check_soa_serial_increment(self, old_serial, new_serial):
         MAX_SOA_SERIAL_INCREMENT = 2**31 - 1

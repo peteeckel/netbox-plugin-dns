@@ -23,7 +23,7 @@ from utilities.forms.fields import (
     DynamicModelChoiceField,
 )
 from utilities.release import load_release_data
-from utilities.forms.widgets import BulkEditNullBooleanSelect
+from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker
 from utilities.forms.rendering import FieldSet
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
 from tenancy.models import Tenant, TenantGroup
@@ -38,7 +38,7 @@ from netbox_dns.models import (
     ZoneTemplate,
     DNSSECPolicy,
 )
-from netbox_dns.choices import ZoneStatusChoices
+from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 from netbox_dns.utilities import name_to_unicode, network_to_reverse
 from netbox_dns.fields import RFC2317NetworkFormField, TimePeriodField
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
@@ -292,6 +292,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         FieldSet(
             "registrar",
             "registry_domain_id",
+            "expiration_date",
+            "domain_status",
             "registrant",
             "admin_c",
             "tech_c",
@@ -386,6 +388,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "inline_signing",
             "registrar",
             "registry_domain_id",
+            "expiration_date",
+            "domain_status",
             "registrant",
             "admin_c",
             "tech_c",
@@ -394,8 +398,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "tenant",
             "tags",
         )
-        help_texts = {
-            "soa_mname": _("Primary nameserver for the zone"),
+        widgets = {
+            "expiration_date": DatePicker,
         }
 
 
@@ -432,6 +436,9 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         FieldSet(
             "registrar_id",
             "registry_domain_id",
+            "expiration_date_before",
+            "expiration_date_after",
+            "domain_status",
             "registrant_id",
             "admin_c_id",
             "tech_c_id",
@@ -519,6 +526,21 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     registry_domain_id = forms.CharField(
         required=False,
         label=_("Registry Domain ID"),
+    )
+    expiration_date_after = forms.DateField(
+        required=False,
+        label=_("Expiration Date after"),
+        widget=DatePicker,
+    )
+    expiration_date_before = forms.DateField(
+        required=False,
+        label=_("Expiration Date before"),
+        widget=DatePicker,
+    )
+    domain_status = forms.MultipleChoiceField(
+        choices=ZoneEPPStatusChoices,
+        required=False,
+        label=_("Domain Status"),
     )
     registrant_id = DynamicModelMultipleChoiceField(
         queryset=RegistrationContact.objects.all(),
@@ -658,6 +680,11 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         required=False,
         label=_("Registry Domain ID"),
     )
+    domain_status = CSVChoiceField(
+        choices=ZoneEPPStatusChoices,
+        required=False,
+        label=_("Domain Status"),
+    )
     registrant = CSVModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
@@ -733,6 +760,8 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "rfc2317_parent_managed",
             "registrar",
             "registry_domain_id",
+            "expiration_date",
+            "domain_status",
             "registrant",
             "admin_c",
             "tech_c",
@@ -866,6 +895,16 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Registry Domain ID"),
     )
+    expiration_date = forms.DateField(
+        required=False,
+        label=_("Expiration Date"),
+        widget=DatePicker,
+    )
+    domain_status = forms.ChoiceField(
+        choices=add_blank_choice(ZoneEPPStatusChoices),
+        required=False,
+        label=_("Domain Status"),
+    )
     registrant = DynamicModelChoiceField(
         queryset=RegistrationContact.objects.all(),
         required=False,
@@ -933,6 +972,8 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         FieldSet(
             "registrar",
             "registry_domain_id",
+            "expiration_date",
+            "domain_status",
             "registrant",
             "admin_c",
             "tech_c",
@@ -947,6 +988,8 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         "nameservers",
         "rfc2317_prefix",
         "registrar",
+        "expiration_date",
+        "domain_status",
         "registry_domain_id",
         "registrant",
         "admin_c",
