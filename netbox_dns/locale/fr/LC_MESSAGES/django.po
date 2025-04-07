@@ -1144,16 +1144,16 @@ msgstr "Identifiant du bureau d'enregistrement du domaine"
 
 #: forms/zone.py:532
 msgid "Expiration Date after"
-msgstr ""
+msgstr "Date d'expiration après"
 
 #: forms/zone.py:537
 msgid "Expiration Date before"
-msgstr ""
+msgstr "Date d'expiration avant"
 
 #: forms/zone.py:543 forms/zone.py:686 forms/zone.py:906 models/zone.py:216
 #: tables/zone.py:59 templates/netbox_dns/zone/registration.html:33
 msgid "Domain Status"
-msgstr ""
+msgstr "Statut du domaine"
 
 #: forms/zone.py:607
 #, python-format
@@ -1339,7 +1339,7 @@ msgstr "Utilisé la signature intégrée (in line) pour DNSSEC"
 
 #: models/zone.py:211 templates/netbox_dns/zone/registration.html:18
 msgid "Expiration Date"
-msgstr ""
+msgstr "Date d'expiration"
 
 #: models/zone.py:262
 msgid "The parent zone for the RFC2317 zone is managed by NetBox DNS"
@@ -1369,12 +1369,12 @@ msgstr "Le serveur de nom '{nameserver}' n'a aucun enregistrement de type adress
 
 #: models/zone.py:614
 msgid "The registration for this domain has expired."
-msgstr ""
+msgstr "L'enregistrement de ce domaine a expiré."
 
 #: models/zone.py:617
 #, python-brace-format
 msgid "The registration for his domain will expire less than {expiration_warning_days} days."
-msgstr ""
+msgstr "L'enregistrement de son domaine expirera dans moins de {expiration_warning_days} jours."
 
 #: models/zone.py:633
 #, python-brace-format
