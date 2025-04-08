@@ -1,6 +1,10 @@
 from utilities.testing import APIViewTestCases, create_tags
 
-from netbox_dns.tests.custom import APITestCase, NetBoxDNSGraphQLMixin
+from netbox_dns.tests.custom import (
+    APITestCase,
+    NetBoxDNSGraphQLMixin,
+    CustomFieldTargetAPIMixin,
+)
 from netbox_dns.models import View, Zone, NameServer, Registrar, RegistrationContact
 from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 
@@ -13,6 +17,7 @@ class ZoneAPITestCase(
     APIViewTestCases.UpdateObjectViewTestCase,
     APIViewTestCases.DeleteObjectViewTestCase,
     NetBoxDNSGraphQLMixin,
+    CustomFieldTargetAPIMixin,
     APIViewTestCases.GraphQLTestCase,
 ):
     model = Zone
