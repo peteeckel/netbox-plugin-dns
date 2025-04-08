@@ -2,7 +2,6 @@ from django.test import override_settings
 from rest_framework import status
 
 from utilities.testing import APIViewTestCases
-from ipam.models import IPAddress
 
 from netbox_dns.tests.custom import (
     APITestCase,
