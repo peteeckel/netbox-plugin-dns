@@ -98,13 +98,6 @@ class DNSConfig(PluginConfig):
         ):
             _check_list(setting)
 
-        # +
-        # TODO: Remove this workaround as soon as it's no longer required
-        #
-        # Force loading views so the register_model_view is run for all views
-        # -
-        import netbox_dns.views  # noqa: F401
-
 
 #
 # Initialize plugin config
