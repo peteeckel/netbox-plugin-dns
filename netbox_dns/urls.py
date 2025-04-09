@@ -2,6 +2,13 @@ from django.urls import include, path
 
 from utilities.urls import get_model_urls
 
+# +
+# Import views so the register_model_view is run. This is required for the
+# URLs to be set up properly with get_model_urls().
+# -
+from .views import *  # noqa: F401
+
+
 app_name = "netbox_dns"
 
 urlpatterns = (
