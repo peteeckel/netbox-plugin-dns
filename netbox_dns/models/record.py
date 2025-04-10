@@ -649,6 +649,9 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     @property
     def absolute_value(self):
+        if self.type in RecordTypeChoices.CUSTOM_TYPES:
+            return self.value
+
         zone = dns_name.from_text(self.zone.name)
         rr = rdata.from_text(RecordClassChoices.IN, self.type, self.value)
 

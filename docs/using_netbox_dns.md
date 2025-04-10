@@ -419,7 +419,7 @@ For records the following fields are defined:
 Field           | Required | Explanation
 -----           | -------- | -----------
 **Zone**        | Yes      | The zone in which the record is to be defined
-**Type**        | Yes      | The type of the resource record. This can be one of a list of record types derived from [RFC 1035, Section 3.3](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3), e.g. A or AAAA. The list of record types can be limited using the configuration variable `filter_record_types`.
+**Type**        | Yes      | The type of the resource record. This can be one of a list of record types derived from [RFC 1035, Section 3.3](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3), e.g. A or AAAA. The list of record types can be limited using the configuration variable `filter_record_types`. Defining custom record types is possible as well using the configuration variable `custom_record_types`.
 **Disable PTR** | Yes      | A checkbox indicating whether a PTR record should be generated for an A or AAAA record automatically if there is a zone suitable for the PTR in NetBox DNS
 **Name**        | Yes      | The name of the record, e.g. the simple host name for A and AAAA records
 **Value**       | Yes      | The value of the record, e.g. the IPv4 or IPv6 addreess
@@ -807,8 +807,6 @@ The names of DNS Resource Records are subject to a number of RFCs, most notably 
 
 The names of Name Servers, Zones and Records are all used as RR names in DNS, so all of these are validated for conformity to the aforementioned RFCs. When a name does not comply with the RFC rules, NetBox DNS refuses to save the name server, zone or record with an error message indicating the reason for the refusal.
 
-**Please be aware that unlike names, values are not validated. While this is theoretically possible and may be implemented at some point, it is not a trivial task as there is a plethora of RR types with even more value formats.**
-
 ![Record Validation Error](images/RecordValidationError.png)
 
 ### Validation options
@@ -846,6 +844,13 @@ PLUGINS_CONFIG = {
     },
 }
 ```
+
+## Value validation
+Some limited amount of validation is applied to RR values as well. The validation rules are much less strict than for names because the targets for i.e. CNAME records may be records that are hosted by a different name server that applies different rules for name validation.
+
+The syntax of RR values is validated using `dnspython`, which provides basic syntax checking. This covers a lot of common errors in creating records.
+
+Please not that no validation at all - including length checks - is applied to custom record types allowed using the `custom_record_types` configuration variable.
 
 ## SOA SERIAL validation
 The SOA SERIAL field contains a serial number of a zone that is used to control if and when DNS secondary servers load zone updates from their primary servers. Basically, a secondary server checks for the SOA SERIAL of a zone on the primary server and only transfers the zone if that number is higher than the one it has in its own cached data. This does not depend on whether the transfer has been triggered by the upstream server via `NOTIFY` or whether it is scheduled by the secondary because the SOA REFRESH time has elapsed.

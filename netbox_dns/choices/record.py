@@ -1,10 +1,12 @@
 from dns import rdatatype, rdataclass
 
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ImproperlyConfigured
 
 from utilities.choices import ChoiceSet
+from netbox.plugins.utils import get_plugin_config
 
-from .utilities import define_choice_attributes
+from .utilities import initialize_choice_names
 
 
 __all__ = (
@@ -15,34 +17,79 @@ __all__ = (
 )
 
 
-@define_choice_attributes()
+def get_config_option(option_name):
+    try:
+        return get_plugin_config("netbox_dns", option_name, [])
+    except ImproperlyConfigured:
+        return []
+
+
+class RecordTypeNames:
+    def __init__(self):
+        self.record_type_names = sorted(
+            [
+                rdtype.name
+                for rdtype in rdatatype.RdataType
+                if not rdatatype.is_metatype(rdtype)
+            ]
+            + get_config_option("custom_record_types")
+        )
+
+    def __iter__(self):
+        for rdtype_name in self.record_type_names:
+            yield rdtype_name
+
+
+class RecordSelectableTypeNames:
+    def __init__(self, exclude_types=[]):
+        self.record_type_names = sorted(
+            [
+                rdtype.name
+                for rdtype in rdatatype.RdataType
+                if not rdatatype.is_metatype(rdtype)
+                and rdtype.name not in get_config_option("filter_record_types")
+            ]
+            + get_config_option("custom_record_types")
+        )
+
+    def __iter__(self):
+        for rdtype_name in self.record_type_names:
+            yield rdtype_name
+
+
+class RecordClassNames:
+    def __iter__(self):
+        for rdclass in rdataclass.RdataClass:
+            yield rdclass.name
+
+
+@initialize_choice_names
 class RecordTypeChoices(ChoiceSet):
-    CHOICES = [
-        (rdtype.name, rdtype.name)
-        for rdtype in sorted(rdatatype.RdataType, key=lambda a: a.name)
-        if not rdatatype.is_metatype(rdtype)
-    ]
+    def choices():
+        return RecordTypeNames()
+
+    CHOICES = [(name, name) for name in choices()]
+
     SINGLETONS = [
         rdtype.name for rdtype in rdatatype.RdataType if rdatatype.is_singleton(rdtype)
     ]
+    CUSTOM_TYPES = get_config_option("custom_record_types")
 
 
-@define_choice_attributes(filter_name="filter_record_types")
+@initialize_choice_names
 class RecordSelectableTypeChoices(ChoiceSet):
-    CHOICES = [
-        (rdtype.name, rdtype.name)
-        for rdtype in sorted(rdatatype.RdataType, key=lambda a: a.name)
-        if not rdatatype.is_metatype(rdtype)
-    ]
+    def choices():
+        return RecordSelectableTypeNames()
+
+    CHOICES = [(name, name) for name in choices()]
 
 
-@define_choice_attributes()
+@initialize_choice_names
 class RecordClassChoices(ChoiceSet):
-    CHOICES = [
-        (rdclass.name, rdclass.name)
-        for rdclass in sorted(rdataclass.RdataClass)
-        if not rdataclass.is_metaclass(rdclass)
-    ]
+    def choices():
+        return RecordClassNames()
+
+    CHOICES = [(name, name) for name in choices()]
 
 
 class RecordStatusChoices(ChoiceSet):
