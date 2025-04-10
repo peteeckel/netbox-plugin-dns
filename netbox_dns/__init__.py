@@ -38,6 +38,7 @@ class DNSConfig(PluginConfig):
         ],
         "zone_expiration_warning_days": 30,
         "filter_record_types": [],
+        "custom_record_types": [],
         "record_active_status": [
             RecordStatusChoices.STATUS_ACTIVE,
         ],

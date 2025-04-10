@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from utilities.choices import ChoiceSet
 
-from .utilities import define_choice_attributes
+from .utilities import initialize_choice_names
 
 DEPRECATED_ALGORITHMS = (
     Algorithm.RSAMD5,
@@ -54,7 +54,7 @@ class DNSSECKeyTemplateKeySizeChoices(ChoiceSet):
     ]
 
 
-@define_choice_attributes()
+@initialize_choice_names
 class DNSSECKeyTemplateAlgorithmChoices(ChoiceSet):
     CHOICES = [
         (algorithm.name, f"{algorithm.name} ({algorithm.value})")

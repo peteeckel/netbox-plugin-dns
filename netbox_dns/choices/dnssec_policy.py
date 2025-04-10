@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from utilities.choices import ChoiceSet
 
-from .utilities import define_choice_attributes
+from .utilities import initialize_choice_names
 
 DEPRECATED_DIGESTS = (
     DSDigest.NULL,
@@ -19,7 +19,7 @@ __all__ = (
 )
 
 
-@define_choice_attributes()
+@initialize_choice_names
 class DNSSECPolicyDigestChoices(ChoiceSet):
     CHOICES = [
         (digest.name, digest.name)

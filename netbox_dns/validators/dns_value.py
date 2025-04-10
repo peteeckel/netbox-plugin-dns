@@ -52,6 +52,9 @@ def validate_record_value(record):
             for part in textwrap.wrap(raw_value, MAX_TXT_LENGTH, drop_whitespace=False)
         )
 
+    if record.type in (RecordTypeChoices.CUSTOM_TYPES):
+        return
+
     if record.type in (RecordTypeChoices.TXT, RecordTypeChoices.SPF):
         if not (record.value.isascii() and record.value.isprintable()):
             raise ValidationError(
