@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -86,10 +85,6 @@ class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
 
     def __str__(self):
         return f"{str(self.name)} [{self.type}]"
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:dnsseckeytemplate", kwargs={"pk": self.pk})
 
     def get_type_color(self):
         return DNSSECKeyTemplateTypeChoices.colors.get(self.type)
