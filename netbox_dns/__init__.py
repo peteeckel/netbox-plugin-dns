@@ -31,7 +31,47 @@ class DNSConfig(PluginConfig):
         "zone_soa_minimum": 3600,
         "zone_active_status": ["active", "dynamic"],
         "zone_expiration_warning_days": 30,
-        "filter_record_types": [],
+        "filter_record_types": [
+            # Obsolete or experimental RRTypes
+            "A6",  # RFC 6563: Historic
+            "AFSDB",  # RFC 5864: Obsolete
+            "APL",  # RFC 3123: Experimental
+            "AVC",  # https://www.iana.org/assignments/dns-parameters/AVC/avc-completed-template
+            "GPOS",  # RFC 1712: Experimental
+            "KEY",  # RFC 3755: Obsolete
+            "L32",  # RFC 6742: Experimental
+            "L64",  # RFC 6742: Experimental
+            "LP",  # RFC 6742: Experimental
+            "MB",  # RFC 2505: Unlikely to ever be adopted
+            "MD",  # RFC 973: Obsolete
+            "MF",  # RFC 973: Obsolete
+            "MG",  # RFC 2505: Unlikely to ever be adopted
+            "MINFO",  # RFC 2505: Unlikely to ever be adopted
+            "MR",  # RFC 2505: Unlikely to ever be adopted
+            "NID",  # RFC 6742: Experimental
+            "NINFO",  # Application expired
+            "NULL",  # RFC 1035: Obsolete
+            "NXT",  # RFC 3755: Obsolete
+            "SIG",  # RFC 3755: Obsolete
+            "SPF",  # RFC 7208: Obsolete
+            "WKS",  # RFC 1127: Not recommended
+            # RRTypes with no current use by any notable application
+            # (see https://en.wikipedia.org/wiki/List_of_DNS_record_types)
+            "RP",
+            "ISDN",
+            "RT",
+            "X25",
+            "NSAP",
+            "NSAP_PTR",
+            "PX",
+            "TYPE0",  # Reserved
+            "UNSPEC",  # Reserved
+            # DNSSEC RRTypes that are usually not manually maintained
+            "NSEC",
+            "NSEC3",
+            "RRSIG",
+        ],
+        "filter_record_types+": [],
         "custom_record_types": [],
         "record_active_status": ["active"],
         "dnssync_disabled": False,
@@ -84,6 +124,9 @@ class DNSConfig(PluginConfig):
             "record_active_status",
             "dnssync_ipaddress_active_status",
             "tolerate_leading_underscore_types",
+            "filter_record_types",
+            "filter_record_types+",
+            "custom_record_types",
         ):
             _check_list(setting)
 
