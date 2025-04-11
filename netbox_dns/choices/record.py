@@ -1,7 +1,6 @@
 from dns import rdatatype, rdataclass
 
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ImproperlyConfigured
 
 from utilities.choices import ChoiceSet
 from netbox.plugins.utils import get_plugin_config
@@ -17,11 +16,8 @@ __all__ = (
 )
 
 
-def get_config_option(option_name):
-    try:
-        return get_plugin_config("netbox_dns", option_name, [])
-    except ImproperlyConfigured:
-        return []
+def _get_config_option(option_name):
+    return get_plugin_config("netbox_dns", option_name, [])
 
 
 class RecordTypeNames:
@@ -32,7 +28,7 @@ class RecordTypeNames:
                 for rdtype in rdatatype.RdataType
                 if not rdatatype.is_metatype(rdtype)
             ]
-            + get_config_option("custom_record_types")
+            + _get_config_option("custom_record_types")
         )
 
     def __iter__(self):
@@ -47,9 +43,9 @@ class RecordSelectableTypeNames:
                 rdtype.name
                 for rdtype in rdatatype.RdataType
                 if not rdatatype.is_metatype(rdtype)
-                and rdtype.name not in get_config_option("filter_record_types")
+                and rdtype.name not in _get_config_option("filter_record_types")
             ]
-            + get_config_option("custom_record_types")
+            + _get_config_option("custom_record_types")
         )
 
     def __iter__(self):
@@ -73,7 +69,7 @@ class RecordTypeChoices(ChoiceSet):
     SINGLETONS = [
         rdtype.name for rdtype in rdatatype.RdataType if rdatatype.is_singleton(rdtype)
     ]
-    CUSTOM_TYPES = get_config_option("custom_record_types")
+    CUSTOM_TYPES = _get_config_option("custom_record_types")
 
 
 @initialize_choice_names

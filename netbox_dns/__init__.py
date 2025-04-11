@@ -3,9 +3,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 from netbox.plugins import PluginConfig
 from netbox.plugins.utils import get_plugin_config
-from ipam.choices import IPAddressStatusChoices
-
-from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices, ZoneStatusChoices
 
 __version__ = "1.2.7"
 
@@ -32,33 +29,24 @@ class DNSConfig(PluginConfig):
         "zone_soa_retry": 7200,
         "zone_soa_expire": 2419200,
         "zone_soa_minimum": 3600,
-        "zone_active_status": [
-            ZoneStatusChoices.STATUS_ACTIVE,
-            ZoneStatusChoices.STATUS_DYNAMIC,
-        ],
+        "zone_active_status": ["active", "dynamic"],
         "zone_expiration_warning_days": 30,
         "filter_record_types": [],
         "custom_record_types": [],
-        "record_active_status": [
-            RecordStatusChoices.STATUS_ACTIVE,
-        ],
+        "record_active_status": ["active"],
         "dnssync_disabled": False,
-        "dnssync_ipaddress_active_status": [
-            IPAddressStatusChoices.STATUS_ACTIVE,
-            IPAddressStatusChoices.STATUS_DHCP,
-            IPAddressStatusChoices.STATUS_SLAAC,
-        ],
+        "dnssync_ipaddress_active_status": ["active", "dhcp", "slaac"],
         "dnssync_conflict_deactivate": False,
         "dnssync_minimum_zone_labels": 2,
         "tolerate_characters_in_zone_labels": "",
         "tolerate_underscores_in_labels": False,
         "tolerate_leading_underscore_types": [
-            RecordTypeChoices.CNAME,
-            RecordTypeChoices.DNAME,
-            RecordTypeChoices.SRV,
-            RecordTypeChoices.SVCB,
-            RecordTypeChoices.TLSA,
-            RecordTypeChoices.TXT,
+            "CNAME",
+            "DNAME",
+            "SRV",
+            "SVCB",
+            "TLSA",
+            "TXT",
         ],
         "tolerate_non_rfc1035_types": [],
         "enable_root_zones": False,
