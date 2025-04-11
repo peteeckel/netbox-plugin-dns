@@ -54,13 +54,11 @@ class NameServerView(generic.ObjectView):
 class NameServerEditView(generic.ObjectEditView):
     queryset = NameServer.objects.all()
     form = NameServerForm
-    default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
 @register_model_view(NameServer, "delete")
 class NameServerDeleteView(generic.ObjectDeleteView):
     queryset = NameServer.objects.all()
-    default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
 @register_model_view(NameServer, "bulk_import", detail=False)
@@ -68,7 +66,6 @@ class NameServerBulkImportView(generic.BulkImportView):
     queryset = NameServer.objects.all()
     model_form = NameServerImportForm
     table = NameServerTable
-    default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
 @register_model_view(NameServer, "bulk_edit", path="edit", detail=False)

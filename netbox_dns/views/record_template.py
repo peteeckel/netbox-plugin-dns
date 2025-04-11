@@ -62,13 +62,11 @@ class RecordTemplateView(generic.ObjectView):
 class RecordTemplateEditView(generic.ObjectEditView):
     queryset = RecordTemplate.objects.all()
     form = RecordTemplateForm
-    default_return_url = "plugins:netbox_dns:recordtemplate_list"
 
 
 @register_model_view(RecordTemplate, "delete")
 class RecordTemplateDeleteView(generic.ObjectDeleteView):
     queryset = RecordTemplate.objects.all()
-    default_return_url = "plugins:netbox_dns:recordtemplate_list"
 
 
 @register_model_view(RecordTemplate, "bulk_import", detail=False)
@@ -76,7 +74,6 @@ class RecordTemplateBulkImportView(generic.BulkImportView):
     queryset = RecordTemplate.objects.all()
     model_form = RecordTemplateImportForm
     table = RecordTemplateTable
-    default_return_url = "plugins:netbox_dns:recordtemplate_list"
 
 
 @register_model_view(RecordTemplate, "bulk_edit", path="edit", detail=False)
