@@ -177,13 +177,11 @@ class RecordEditView(generic.ObjectEditView):
         "zone", "ptr_record"
     )
     form = RecordForm
-    default_return_url = "plugins:netbox_dns:record_list"
 
 
 @register_model_view(Record, "delete")
 class RecordDeleteView(generic.ObjectDeleteView):
     queryset = Record.objects.filter(managed=False)
-    default_return_url = "plugins:netbox_dns:record_list"
 
 
 @register_model_view(Record, "bulk_import", detail=False)
@@ -193,7 +191,6 @@ class RecordBulkImportView(generic.BulkImportView):
     )
     model_form = RecordImportForm
     table = RecordTable
-    default_return_url = "plugins:netbox_dns:record_list"
 
 
 @register_model_view(Record, "bulk_edit", path="edit", detail=False)

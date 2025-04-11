@@ -51,13 +51,11 @@ class ZoneTemplateView(generic.ObjectView):
 class ZoneTemplateEditView(generic.ObjectEditView):
     queryset = ZoneTemplate.objects.all()
     form = ZoneTemplateForm
-    default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
 @register_model_view(ZoneTemplate, "delete")
 class ZoneTemplateDeleteView(generic.ObjectDeleteView):
     queryset = ZoneTemplate.objects.all()
-    default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
 @register_model_view(ZoneTemplate, "bulk_import", detail=False)
@@ -65,7 +63,6 @@ class ZoneTemplateBulkImportView(generic.BulkImportView):
     queryset = ZoneTemplate.objects.all()
     model_form = ZoneTemplateImportForm
     table = ZoneTemplateTable
-    default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
 @register_model_view(ZoneTemplate, "bulk_edit", path="edit", detail=False)
@@ -74,7 +71,6 @@ class ZoneTemplateBulkEditView(generic.BulkEditView):
     filterset = ZoneTemplateFilterSet
     table = ZoneTemplateTable
     form = ZoneTemplateBulkEditForm
-    default_return_url = "plugins:netbox_dns:zonetemplate_list"
 
 
 @register_model_view(ZoneTemplate, "bulk_delete", path="delete", detail=False)

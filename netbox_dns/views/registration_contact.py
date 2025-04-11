@@ -45,13 +45,11 @@ class RegistrationContactView(generic.ObjectView):
 class RegistrationContactEditView(generic.ObjectEditView):
     queryset = RegistrationContact.objects.all()
     form = RegistrationContactForm
-    default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
 @register_model_view(RegistrationContact, "delete")
 class RegistrationContactDeleteView(generic.ObjectDeleteView):
     queryset = RegistrationContact.objects.all()
-    default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
 @register_model_view(RegistrationContact, "bulk_import", detail=False)
@@ -59,7 +57,6 @@ class RegistrationContactBulkImportView(generic.BulkImportView):
     queryset = RegistrationContact.objects.all()
     model_form = RegistrationContactImportForm
     table = RegistrationContactTable
-    default_return_url = "plugins:netbox_dns:registrationcontact_list"
 
 
 @register_model_view(RegistrationContact, "bulk_edit", path="edit", detail=False)
