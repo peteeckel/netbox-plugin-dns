@@ -77,13 +77,11 @@ class DNSSECPolicyView(generic.ObjectView):
 class DNSSECPolicyEditView(generic.ObjectEditView):
     queryset = DNSSECPolicy.objects.all()
     form = DNSSECPolicyForm
-    default_return_url = "plugins:netbox_dns:dnssecpolicy_list"
 
 
 @register_model_view(DNSSECPolicy, "delete")
 class DNSSECPolicyDeleteView(generic.ObjectDeleteView):
     queryset = DNSSECPolicy.objects.all()
-    default_return_url = "plugins:netbox_dns:dnssecpolicy_list"
 
 
 @register_model_view(DNSSECPolicy, "bulk_import", detail=False)
@@ -91,7 +89,6 @@ class DNSSECPolicyBulkImportView(generic.BulkImportView):
     queryset = DNSSECPolicy.objects.all()
     model_form = DNSSECPolicyImportForm
     table = DNSSECPolicyTable
-    default_return_url = "plugins:netbox_dns:dnssecpolicy_list"
 
 
 @register_model_view(DNSSECPolicy, "bulk_edit", path="edit", detail=False)

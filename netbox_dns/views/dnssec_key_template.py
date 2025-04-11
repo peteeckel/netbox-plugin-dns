@@ -49,13 +49,11 @@ class DNSSECKeyTemplateView(generic.ObjectView):
 class DNSSECKeyTemplateEditView(generic.ObjectEditView):
     queryset = DNSSECKeyTemplate.objects.all()
     form = DNSSECKeyTemplateForm
-    default_return_url = "plugins:netbox_dns:dnsseckeytemplate_list"
 
 
 @register_model_view(DNSSECKeyTemplate, "delete")
 class DNSSECKeyTemplateDeleteView(generic.ObjectDeleteView):
     queryset = DNSSECKeyTemplate.objects.all()
-    default_return_url = "plugins:netbox_dns:dnsseckeytemplate_list"
 
 
 @register_model_view(DNSSECKeyTemplate, "bulk_import", detail=False)
@@ -63,7 +61,6 @@ class DNSSECKeyTemplateBulkImportView(generic.BulkImportView):
     queryset = DNSSECKeyTemplate.objects.all()
     model_form = DNSSECKeyTemplateImportForm
     table = DNSSECKeyTemplateTable
-    default_return_url = "plugins:netbox_dns:dnsseckeytemplate_list"
 
 
 @register_model_view(DNSSECKeyTemplate, "bulk_edit", path="edit", detail=False)
