@@ -44,13 +44,11 @@ class RegistrarView(generic.ObjectView):
 class RegistrarEditView(generic.ObjectEditView):
     queryset = Registrar.objects.all()
     form = RegistrarForm
-    default_return_url = "plugins:netbox_dns:registrar_list"
 
 
 @register_model_view(Registrar, "delete")
 class RegistrarDeleteView(generic.ObjectDeleteView):
     queryset = Registrar.objects.all()
-    default_return_url = "plugins:netbox_dns:registrar_list"
 
 
 @register_model_view(Registrar, "bulk_import", detail=False)
@@ -58,7 +56,6 @@ class RegistrarBulkImportView(generic.BulkImportView):
     queryset = Registrar.objects.all()
     model_form = RegistrarImportForm
     table = RegistrarTable
-    default_return_url = "plugins:netbox_dns:registrar_list"
 
 
 @register_model_view(Registrar, "bulk_edit", path="edit", detail=False)
