@@ -461,7 +461,22 @@ Records can either be displayed by opening the record list view from the "Record
 When importing records in bulk, the mandatory fields are `name`, `zone`, `type` and `value`. If the optional `view` field is not specified, NetBox DNS will always look for the zone specified in `zone` in the default view. To address zones in non-default views, the `view` field must also be specified.
 
 #### Configuration options
-The configuration variable `filter_record_types` can be used to limit the list of record types that are available in the GUI forms. For example if you are tired of IPv4 the creation of `A` records can be disabled by setting
+The configuration variable `filter_record_types` and `filter_record_types+` can be used to limit the list of record types that are available in the GUI forms. The difference is how the list of records specified is applied to the default list of record types: `filter_record_types` **replaces** the default list of filtered record types, while `filter_record_types+` **adds** to the list. 
+
+For example if you are tired of IPv4 the creation of A records can be disabled by setting
+
+```
+PLUGINS_CONFIG = {
+    "netbox_dns": {
+        ...
+        "filter_record_types+": [ "A" ],
+        ...
+    }
+}
+```
+This will result in all record types not in the default filter list will be available in the GUI except A. 
+
+On the other hand the setting
 
 ```
 PLUGINS_CONFIG = {
@@ -472,6 +487,34 @@ PLUGINS_CONFIG = {
     }
 }
 ```
+will result in all record types defined in `dnspython` (which includes a large number of deprecated, reserved and unrecommended record types) being available except A.
+
+Please note that it's still possible to import other types using the API or via custom scripts, and existing records will still remain in the database. Only the GUI is affected by this setting.
+
+The following table describes the default values for the variables affecting record types:
+
+Variable                             | Factory Default
+--------                             | ---------------
+`filter_record_types`                | `["A6", "AFSDB", "APL", "AVC", "GPOS", "KEY", "L32", "L64",`
+                                     | `"LP", "MB", "MD", "MF", "MG", "MINFO", "MR", "NID", "NINFO",`
+                                     | `"NULL", "NXT", "SIG", "WKS", "RP", "ISDN", "RT", "X25", "NSAP",`
+                                     | `"NSAP_PTR", "PX", "TYPE0", "UNSPEC", "NSEC", "NSEC3", "RRSIG"]`
+`filter_record_types+`               | `[]`
+`custom_record_types`                | `[]`
+
+The configuration variable `custom_record_types` can be used to add non-standard record types such as PowerDNS' LUA or Cloudflare's ALIAS. 
+
+```
+PLUGINS_CONFIG = {
+    "netbox_dns": {
+        ...
+        "custom_record_types": [ "LUA", "ALIAS" ],
+        ...
+    }
+}
+```
+
+This results in the configured record types being allowed in the GUI, the API, via custom scripts etc, and they will be treated as valid record types. There is, however, no validation of the values of these record types whatsoever, including the checking of length of the RDATA. If validation of custom record types is desired, a custom validator must be implemented. 
 
 ### Registrars
 Registrar objects relate to the DNS domain registration and represent the registrar information for DNS domains related to zones. A DNS zone does not necessarily need to be registered: Zones that are not available via public DNS or that are sub-zones of registered zones do not require registration. In most cases registration information is only required (and possible) for second-level domains.
