@@ -474,7 +474,7 @@ PLUGINS_CONFIG = {
     }
 }
 ```
-This will result in all record types not in the default filter list will be available in the GUI except A. 
+This will result in all record types not in the default filter list being available in the GUI except A. 
 
 On the other hand the setting
 
@@ -487,7 +487,7 @@ PLUGINS_CONFIG = {
     }
 }
 ```
-will result in all record types defined in `dnspython` (which includes a large number of deprecated, reserved and unrecommended record types) being available except A.
+will result in all record types defined in `dnspython` (which includes a large number of deprecated, reserved, and not recommended record types) being available except A.
 
 Please note that it's still possible to import other types using the API or via custom scripts, and existing records will still remain in the database. Only the GUI is affected by this setting.
 
@@ -514,7 +514,7 @@ PLUGINS_CONFIG = {
 }
 ```
 
-This results in the configured record types being allowed in the GUI, the API, via custom scripts etc, and they will be treated as valid record types. There is, however, no validation of the values of these record types whatsoever, including the checking of length of the RDATA. If validation of custom record types is desired, a custom validator must be implemented. 
+The configured record types will be allowed in the GUI, the API, via custom scripts etc, and they will be treated as valid record types. There is, however, no validation of the values of these record types whatsoever, including the checking of length of the RDATA. If validation of custom record types is desired, a custom validator must be implemented. 
 
 ### Registrars
 Registrar objects relate to the DNS domain registration and represent the registrar information for DNS domains related to zones. A DNS zone does not necessarily need to be registered: Zones that are not available via public DNS or that are sub-zones of registered zones do not require registration. In most cases registration information is only required (and possible) for second-level domains.
