@@ -419,7 +419,7 @@ For records the following fields are defined:
 Field           | Required | Explanation
 -----           | -------- | -----------
 **Zone**        | Yes      | The zone in which the record is to be defined
-**Type**        | Yes      | The type of the resource record. This can be one of a list of record types derived from [RFC 1035, Section 3.3](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3), e.g. A or AAAA. The list of record types can be limited using the configuration variable `filter_record_types`. Defining custom record types is possible as well using the configuration variable `custom_record_types`.
+**Type**        | Yes      | The type of the resource record. This can be one of a list of record types derived from [RFC 1035, Section 3.3](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3), e.g. A or AAAA. The list of record types can be limited using the configuration variables `filter_record_types`, `filter_record_types+`, `filter_record_types-`. Defining custom record types is possible as well using the configuration variable `custom_record_types`.
 **Disable PTR** | Yes      | A checkbox indicating whether a PTR record should be generated for an A or AAAA record automatically if there is a zone suitable for the PTR in NetBox DNS
 **Name**        | Yes      | The name of the record, e.g. the simple host name for A and AAAA records
 **Value**       | Yes      | The value of the record, e.g. the IPv4 or IPv6 addreess
@@ -476,6 +476,18 @@ PLUGINS_CONFIG = {
 ```
 This will result in all record types not in the default filter list being available in the GUI except A. 
 
+Alternatively it is possible to remove record types from the list by specifying `filter_record_types-` like this:
+```
+PLUGINS_CONFIG = {
+    "netbox_dns": {
+        ...
+        "filter_record_types-": [ "RRSIG" ],
+        ...
+    }
+}
+```
+This will remove RRSIG from the list of filtered types and make it appear in the dropdown menus alongside the other options.
+
 On the other hand the setting
 
 ```
@@ -489,6 +501,8 @@ PLUGINS_CONFIG = {
 ```
 will result in all record types defined in `dnspython` (which includes a large number of deprecated, reserved, and not recommended record types) being available except A.
 
+It is not possible to add non-supported record types by manipulating the filter list. This can be done with the `custom_record_types` option.
+
 Please note that it's still possible to import other types using the API or via custom scripts, and existing records will still remain in the database. Only the GUI is affected by this setting.
 
 The following table describes the default values for the variables affecting record types:
@@ -500,6 +514,7 @@ Variable                             | Factory Default
                                      | `"NULL", "NXT", "SIG", "WKS", "RP", "ISDN", "RT", "X25", "NSAP",`
                                      | `"NSAP_PTR", "PX", "TYPE0", "UNSPEC", "NSEC", "NSEC3", "RRSIG"]`
 `filter_record_types+`               | `[]`
+`filter_record_types-`               | `[]`
 `custom_record_types`                | `[]`
 
 The configuration variable `custom_record_types` can be used to add non-standard record types such as PowerDNS' LUA or Cloudflare's ALIAS. 

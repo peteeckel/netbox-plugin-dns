@@ -17,8 +17,10 @@ __all__ = (
 
 
 def _get_config_option(option_name):
-    return get_plugin_config("netbox_dns", option_name, []) + get_plugin_config(
-        "netbox_dns", f"{option_name}+", []
+    return list(
+        set(get_plugin_config("netbox_dns", option_name, []))
+        | set(get_plugin_config("netbox_dns", f"{option_name}+", []))
+        - set(get_plugin_config("netbox_dns", f"{option_name}-", []))
     )
 
 

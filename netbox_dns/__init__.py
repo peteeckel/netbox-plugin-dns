@@ -72,6 +72,7 @@ class DNSConfig(PluginConfig):
             "RRSIG",
         ],
         "filter_record_types+": [],
+        "filter_record_types-": [],
         "custom_record_types": [],
         "record_active_status": ["active"],
         "dnssync_disabled": False,
