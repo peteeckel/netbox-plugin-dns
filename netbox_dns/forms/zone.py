@@ -1,5 +1,3 @@
-from packaging.version import Version
-
 from django import forms
 from django.db import transaction
 from django.conf import settings
@@ -23,7 +21,6 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
 )
-from utilities.release import load_release_data
 from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker
 from utilities.forms.rendering import FieldSet
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
@@ -51,8 +48,6 @@ __all__ = (
     "ZoneImportForm",
     "ZoneBulkEditForm",
 )
-
-QUICK_ADD = Version(load_release_data().version) >= Version("4.2.5")
 
 
 class RollbackTransaction(Exception):
@@ -158,7 +153,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         queryset=View.objects.all(),
         required=True,
         label=_("View"),
-        quick_add=QUICK_ADD,
     )
     name = forms.CharField(
         required=True,
@@ -178,7 +172,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         queryset=NameServer.objects.all(),
         required=False,
         label=_("Nameservers"),
-        quick_add=QUICK_ADD,
     )
     default_ttl = TimePeriodField(
         required=False,
@@ -201,7 +194,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         help_text=_("Primary nameserver this zone"),
         required=False,
         label=_("SOA MName"),
-        quick_add=QUICK_ADD,
     )
     soa_rname = forms.CharField(
         required=False,
