@@ -305,6 +305,23 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "tenant",
     )
 
+    soa_clean_fields = {
+        "description",
+        "status",
+        "dnssec_policy",
+        "inline_signing",
+        "registrar",
+        "registry_domain_id",
+        "expiration_date",
+        "domain_status",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+        "rfc2317_parent_managed",
+        "tenant",
+    }
+
     class Meta:
         verbose_name = _("Zone")
         verbose_name_plural = _("Zones")
@@ -912,7 +929,9 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         changed_fields = self.changed_fields
 
-        if self.soa_serial_auto:
+        if self.soa_serial_auto and (
+            changed_fields is None or changed_fields - self.soa_clean_fields
+        ):
             self.soa_serial = self.get_auto_serial()
 
         super().save(*args, **kwargs)
