@@ -7,8 +7,22 @@ from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
-from netbox_dns.models import NameServer, Record, Zone
-from netbox_dns.choices import RecordClassChoices, RecordTypeChoices
+from tenancy.models import Tenant
+
+from netbox_dns.models import (
+    NameServer,
+    Record,
+    Zone,
+    Registrar,
+    RegistrationContact,
+    DNSSECPolicy,
+)
+from netbox_dns.choices import (
+    RecordClassChoices,
+    RecordTypeChoices,
+    ZoneStatusChoices,
+    ZoneEPPStatusChoices,
+)
 
 
 def set_soa_serial_back(zone):
@@ -66,10 +80,12 @@ class ZoneAutoSOASerialTestCase(TestCase):
         for zone in cls.zones:
             zone.save()
 
-    def test_soa_serial_auto(self):
-        zone = self.zones[0]
-
-        self.assertTrue(int(zone.soa_serial) >= self.start_time)
+        # +
+        # Reset the SOA serial to 1 for soa_serial_auto zones
+        # -
+        for zone in (cls.zones[0], cls.zones[2]):
+            zone.soa_serial = 1628586244
+            super(Zone, zone).save()
 
     def test_soa_serial_fixed(self):
         zone = self.zones[1]
@@ -687,3 +703,164 @@ class ZoneAutoSOASerialTestCase(TestCase):
         self.assertEqual(
             parse_soa_value(rfc2317_soa_record.value).serial, rfc2317_zone.soa_serial
         )
+
+    def test_update_description_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.description = "Changed"
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_status_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.status = ZoneStatusChoices.STATUS_DYNAMIC
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_dnssec_policy_no_soa_change(self):
+        zone = self.zones[0]
+        dnssec_policy = DNSSECPolicy.objects.create(name="Test Policy")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.dnssec_policy = dnssec_policy
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_inline_signing_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.inline_signing = False
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_registrar_no_soa_change(self):
+        zone = self.zones[0]
+        registrar = Registrar.objects.create(name="Test Registrar")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.registrar = registrar
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_registry_domain_id_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.registry_domain_id = 42
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_expiration_date_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.expiration_date = "2042-04-01"
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_domain_status_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.domain_status = ZoneEPPStatusChoices.EPP_STATUS_OK
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_registrant_no_soa_change(self):
+        zone = self.zones[0]
+        contact = RegistrationContact.objects.create(contact_id="Test Contact")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.registrant = contact
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_admin_c_no_soa_change(self):
+        zone = self.zones[0]
+        contact = RegistrationContact.objects.create(contact_id="Test Contact")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.admin_c = contact
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_tech_c_no_soa_change(self):
+        zone = self.zones[0]
+        contact = RegistrationContact.objects.create(contact_id="Test Contact")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.tech_c = contact
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_billing_c_no_soa_change(self):
+        zone = self.zones[0]
+        contact = RegistrationContact.objects.create(contact_id="Test Contact")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.billing_c = contact
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_rfc2317_parent_managed_no_soa_change(self):
+        zone = self.zones[0]
+
+        old_soa_serial = zone.soa_serial
+
+        zone.rfc2317_parent_managed = False
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
+
+    def test_update_tenant_no_soa_change(self):
+        zone = self.zones[0]
+        tenant = Tenant.objects.create(name="Test Tenant")
+
+        old_soa_serial = zone.soa_serial
+
+        zone.tenant = tenant
+        zone.save()
+        zone.refresh_from_db()
+
+        self.assertEqual(zone.soa_serial, old_soa_serial)
