@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -116,6 +117,14 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         verbose_name=_("Parent Propagation Delay"),
         blank=True,
         null=True,
+    )
+    parental_agents = ArrayField(
+        base_field=models.GenericIPAddressField(
+            protocol="both",
+        ),
+        blank=True,
+        null=True,
+        default=list,
     )
 
     use_nsec3 = models.BooleanField(

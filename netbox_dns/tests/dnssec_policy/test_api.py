@@ -56,6 +56,7 @@ class DNSSECPolicyAPITestCase(
             "cds_digest_types": [DNSSECPolicyDigestChoices.SHA256],
             "parent_ds_ttl": 86400,
             "parent_propagation_delay": 3600,
+            "parental_agents": ["10.0.0.23", "2001:db8:dead:beef::23"],
             "use_nsec3": True,
             "nsec3_iterations": None,
             "nsec3_opt_out": False,
@@ -88,6 +89,7 @@ class DNSSECPolicyAPITestCase(
         "cds_digest_types": [DNSSECPolicyDigestChoices.SHA384],
         "parent_ds_ttl": 86499,
         "parent_propagation_delay": 7200,
+        "parental_agents": ["10.0.0.42", "2001:db8:dead:beef::42"],
         "use_nsec3": False,
         "nsec3_iterations": 1,
         "nsec3_opt_out": True,
@@ -151,6 +153,7 @@ class DNSSECPolicyAPITestCase(
                 nsec3_iterations=None,
                 nsec3_opt_out=False,
                 nsec3_salt_size=None,
+                parental_agents=["10.0.0.42", "2001:db8:dead:beef::23"],
             ),
             DNSSECPolicy(
                 name="Test Policy 5",
