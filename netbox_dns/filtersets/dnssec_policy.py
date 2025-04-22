@@ -1,3 +1,6 @@
+import netaddr
+from netaddr.core import AddrFormatError
+
 import django_filters
 
 from django.db.models import Q
@@ -9,6 +12,7 @@ from utilities.filters import MultiValueCharFilter
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate, Zone, ZoneTemplate
 from netbox_dns.choices import DNSSECPolicyStatusChoices
+
 
 __all__ = ("DNSSECPolicyFilterSet",)
 
@@ -34,6 +38,7 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "create_cdnskey",
             "parent_ds_ttl",
             "parent_propagation_delay",
+            "parental_agents",
             "use_nsec3",
             "nsec3_iterations",
             "nsec3_opt_out",
@@ -83,12 +88,29 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="id",
         label=_("Zone Template IDs"),
     )
+    parental_agents = MultiValueCharFilter(
+        method="filter_parental_agents",
+        label=_("Parental Agents"),
+    )
 
     def filter_cds_digest_types(self, queryset, name, value):
         if not value:
             return queryset
 
         return queryset.filter(cds_digest_types__overlap=value)
+
+    def filter_parental_agents(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        query_values = []
+        for v in value:
+            try:
+                query_values.append(str(netaddr.IPAddress(v)))
+            except (AddrFormatError, ValueError):
+                pass
+
+        return queryset.filter(parental_agents__overlap=query_values)
 
     def search(self, queryset, name, value):
         if not value.strip():
