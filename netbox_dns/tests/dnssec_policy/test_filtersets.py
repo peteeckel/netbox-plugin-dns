@@ -49,7 +49,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 nsec3_iterations=None,
                 nsec3_opt_out=False,
                 nsec3_salt_size=16,
-                parental_agents=["10.0.0.42", "2001:db8:dead:beef::23"],
             ),
             DNSSECPolicy(
                 name="Test Policy 2",
@@ -72,7 +71,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 nsec3_iterations=1,
                 nsec3_opt_out=True,
                 nsec3_salt_size=None,
-                parental_agents=["10.0.0.23", "2001:db8:dead:beef::42"],
             ),
             DNSSECPolicy(
                 name="Test Policy 3",
@@ -95,7 +93,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 nsec3_iterations=2,
                 nsec3_opt_out=True,
                 nsec3_salt_size=None,
-                parental_agents=["10.0.0.42", "2001:db8:dead:beef::42"],
             ),
         )
         DNSSECPolicy.objects.bulk_create(cls.dnssec_policies)
@@ -228,12 +225,6 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     def test_parent_propagation_delay(self):
         params = {"parent_propagation_delay": [3600, 7200]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-
-    def test_parental_agents(self):
-        params = {"parental_agents": ["10.0.0.42"]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"parental_agents": ["10.0.0.23", "2001:db8:dead:beef::23"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_use_nsec3(self):

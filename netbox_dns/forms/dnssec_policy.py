@@ -1,7 +1,6 @@
 from packaging.version import Version
 
 from django import forms
-from django.contrib.postgres.forms import SimpleArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
@@ -66,7 +65,6 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
-            "parental_agents",
             name=_("Parent Delegation"),
         ),
         FieldSet(
@@ -147,11 +145,6 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         label=_("Parent Propagation Delay"),
         placeholder=DNSSECPolicy.get_fallback_setting("parent_propagation_delay"),
     )
-    parental_agents = SimpleArrayField(
-        required=False,
-        base_field=forms.GenericIPAddressField(),
-        label=_("Parental Agents"),
-    )
 
     class Meta:
         model = DNSSECPolicy
@@ -174,7 +167,6 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
-            "parental_agents",
             "use_nsec3",
             "nsec3_iterations",
             "nsec3_opt_out",
@@ -219,7 +211,6 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
-            "parental_agents",
             name=_("Parent Delegation"),
         ),
         FieldSet(
@@ -319,10 +310,6 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     parent_propagation_delay = TimePeriodField(
         required=False,
         label=_("Parent Propagation Delay"),
-    )
-    parental_agents = forms.GenericIPAddressField(
-        required=False,
-        label=_("Parental Agent"),
     )
     use_nsec3 = forms.NullBooleanField(
         required=False,
@@ -427,7 +414,6 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
-            "parental_agents",
             "use_nsec3",
             "nsec3_iterations",
             "nsec3_opt_out",
@@ -508,11 +494,6 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Parent Propagation Delay"),
     )
-    parental_agents = SimpleArrayField(
-        required=False,
-        base_field=forms.GenericIPAddressField(),
-        label=_("Parental Agents"),
-    )
     use_nsec3 = forms.NullBooleanField(
         required=False,
         widget=BulkEditNullBooleanSelect(),
@@ -566,7 +547,6 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
-            "parental_agents",
             name=_("Parent Delegation"),
         ),
         FieldSet(

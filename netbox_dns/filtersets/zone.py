@@ -1,4 +1,5 @@
 import netaddr
+from netaddr.core import AddrFormatError
 
 import django_filters
 from django.db.models import Q
@@ -67,6 +68,10 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="dnssec_policy__name",
         to_field_name="name",
         label=_("DNSSEC Policy"),
+    )
+    parental_agents = MultiValueCharFilter(
+        method="filter_parental_agents",
+        label=_("Parental Agents"),
     )
     rfc2317_prefix = MultiValueCharFilter(
         method="filter_rfc2317_prefix",
@@ -166,6 +171,19 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "registry_domain_id",
             "domain_status",
         )
+
+    def filter_parental_agents(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        query_values = []
+        for v in value:
+            try:
+                query_values.append(str(netaddr.IPAddress(v)))
+            except (AddrFormatError, ValueError):
+                pass
+
+        return queryset.filter(parental_agents__overlap=query_values)
 
     def filter_arpa_network(self, queryset, name, value):
         if not value:

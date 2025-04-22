@@ -81,7 +81,6 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
-            "parental_agents",
             "use_nsec3",
             "nsec3_iterations",
             "nsec3_opt_out",

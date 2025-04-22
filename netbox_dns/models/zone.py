@@ -17,6 +17,7 @@ from django.db.models.signals import m2m_changed
 from django.urls import reverse
 from django.dispatch import receiver
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -192,6 +193,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Inline Signing"),
         help_text=_("Use inline signing for DNSSEC"),
         default=True,
+    )
+    parental_agents = ArrayField(
+        base_field=models.GenericIPAddressField(
+            protocol="both",
+        ),
+        blank=True,
+        null=True,
+        default=list,
     )
     registrar = models.ForeignKey(
         verbose_name=_("Registrar"),
