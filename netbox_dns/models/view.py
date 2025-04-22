@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -70,10 +69,6 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @classmethod
     def get_default_view(cls):
         return cls.objects.get(default_view=True)
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:view", kwargs={"pk": self.pk})
 
     def __str__(self):
         return str(self.name)

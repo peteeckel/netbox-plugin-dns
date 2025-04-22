@@ -3,7 +3,6 @@ from dns import name as dns_name
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -103,10 +102,6 @@ class RecordTemplate(NetBoxModel):
 
     def get_status_color(self):
         return RecordStatusChoices.colors.get(self.status)
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:recordtemplate", kwargs={"pk": self.pk})
 
     def validate_name(self):
         try:
