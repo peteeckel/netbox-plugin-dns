@@ -190,6 +190,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             "rfc2317_child_zones",
             "dnssec_policy",
             "inline_signing",
+            "parental_agents",
             "registrar",
             "registry_domain_id",
             "expiration_date",

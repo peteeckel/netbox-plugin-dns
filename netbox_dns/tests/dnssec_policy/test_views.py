@@ -117,7 +117,6 @@ class DNSSECPolicyViewTestCase(
             "cds_digest_types": [DNSSECPolicyDigestChoices.SHA256],
             "parent_ds_ttl": 86400,
             "parent_propagation_delay": 3600,
-            "parental_agents": "10.0.0.42,2001:db8:dead:beef::42",
             "use_nsec3": True,
             "nsec3_iterations": None,
             "nsec3_opt_out": False,
@@ -142,7 +141,6 @@ class DNSSECPolicyViewTestCase(
             "cds_digest_types": [DNSSECPolicyDigestChoices.SHA384],
             "parent_ds_ttl": 86499,
             "parent_propagation_delay": 7200,
-            "parental_agents": "10.0.0.23,2001:db8:dead:beef::23",
             "use_nsec3": False,
             "nsec3_iterations": 1,
             "nsec3_opt_out": True,
@@ -150,16 +148,16 @@ class DNSSECPolicyViewTestCase(
         }
 
         cls.csv_data = (
-            "name,status,dnskey_ttl,max_zone_ttl,create_cdnskey,parental_agents,use_nsec3",
-            f"Test Policy 1,{DNSSECPolicyStatusChoices.STATUS_ACTIVE},86400,43200,true,,true",
-            'Test Policy 2,,86400,43200,false,"10.0.1.23,2001:db8:dead:beef::1:23",true',
-            f"Test Policy 3,{DNSSECPolicyStatusChoices.STATUS_INACTIVE},43200,86400,true,,false",
+            "name,status,dnskey_ttl,max_zone_ttl,create_cdnskey,use_nsec3",
+            f"Test Policy 1,{DNSSECPolicyStatusChoices.STATUS_ACTIVE},86400,43200,true,true",
+            "Test Policy 2,,86400,43200,false,true",
+            f"Test Policy 3,{DNSSECPolicyStatusChoices.STATUS_INACTIVE},43200,86400,true,false",
         )
 
         cls.csv_update_data = (
-            "id,description,use_nsec3,create_cdnskey,parental_agents",
-            f"{cls.dnssec_policies[0].pk},Test Description 1,true,true,",
-            f"{cls.dnssec_policies[1].pk},Test Description 2,false,false,10.0.2.23",
+            "id,description,use_nsec3,create_cdnskey",
+            f"{cls.dnssec_policies[0].pk},Test Description 1,true,true",
+            f"{cls.dnssec_policies[1].pk},Test Description 2,false,false",
         )
 
     maxDiff = None

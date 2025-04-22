@@ -90,6 +90,7 @@ class NetBoxDNSZoneType(NetBoxObjectType):
         | None
     )
     inline_signing: bool
+    parental_agents: List[str]
     registrar: (
         Annotated["NetBoxDNSRegistrarType", strawberry.lazy("netbox_dns.graphql.types")]
         | None
@@ -214,7 +215,6 @@ class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
     cds_digest_types: List[str]
     parent_ds_ttl: BigInt | None
     parent_propagation_delay: BigInt | None
-    parental_agents: List[str]
     use_nsec3: bool
     nsec3_iterations: BigInt | None
     nsec3_opt_out: bool

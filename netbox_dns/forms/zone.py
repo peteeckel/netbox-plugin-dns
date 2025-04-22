@@ -5,6 +5,7 @@ from django.db import transaction
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.forms import SimpleArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
@@ -242,6 +243,12 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         label=_("SOA Serial"),
     )
 
+    parental_agents = SimpleArrayField(
+        required=False,
+        base_field=forms.GenericIPAddressField(),
+        label=_("Parental Agents"),
+    )
+
     rfc2317_prefix = RFC2317NetworkFormField(
         required=False,
         validators=[validate_ipv4, validate_prefix, validate_rfc2317],
@@ -282,6 +289,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         FieldSet(
             "dnssec_policy",
             "inline_signing",
+            "parental_agents",
             name=_("DNSSEC"),
         ),
         FieldSet(
@@ -386,6 +394,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "rfc2317_parent_managed",
             "dnssec_policy",
             "inline_signing",
+            "parental_agents",
             "registrar",
             "registry_domain_id",
             "expiration_date",
@@ -425,6 +434,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         FieldSet(
             "dnssec_policy_id",
             "inline_signing",
+            "parental_agents",
             name=_("DNSSEC"),
         ),
         FieldSet(
@@ -516,6 +526,10 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_("Use Inline Signing"),
+    )
+    parental_agents = forms.GenericIPAddressField(
+        required=False,
+        label=_("Parental Agent"),
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
@@ -756,6 +770,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "soa_minimum",
             "dnssec_policy",
             "inline_signing",
+            "parental_agents",
             "rfc2317_prefix",
             "rfc2317_parent_managed",
             "registrar",
@@ -886,6 +901,11 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         widget=BulkEditNullBooleanSelect(),
         label=_("Use Inline Signing"),
     )
+    parental_agents = SimpleArrayField(
+        required=False,
+        base_field=forms.GenericIPAddressField(),
+        label=_("Parental Agents"),
+    )
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
@@ -962,6 +982,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         FieldSet(
             "dnssec_policy",
             "inline_signing",
+            "parental_agents",
             name=_("DNSSEC"),
         ),
         FieldSet(

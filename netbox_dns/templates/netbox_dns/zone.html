@@ -108,6 +108,16 @@
                         <th scope="row">{% trans "Use Inline Signing" %}</th>
                         <td>{% checkmark object.inline_signing %}</td>
                     </tr>
+                    <tr>
+                        <th scope="row">{% trans "Parental Agents" %}</th>
+                        <td>
+                            <table>
+                                {% for parental_agent in object.parental_agents %}
+                                <tr><td>{{ parental_agent }}</td></tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
                 </table>
             </div>
         {% endif %}

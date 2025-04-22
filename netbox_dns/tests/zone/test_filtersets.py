@@ -86,6 +86,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[0],
                 billing_c=cls.contacts[0],
                 dnssec_policy=cls.dnssec_policies[0],
+                parental_agents=["10.0.0.42", "2001:db8:dead:beef::23"],
                 expiration_date="2025-04-01",
                 domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
             ),
@@ -120,6 +121,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[1],
                 inline_signing=False,
+                parental_agents=["10.0.0.23", "2001:db8:dead:beef::42"],
                 expiration_date="2026-04-01",
                 domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
             ),
@@ -154,6 +156,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 billing_c=cls.contacts[2],
                 dnssec_policy=cls.dnssec_policies[2],
                 inline_signing=False,
+                parental_agents=["10.0.0.42", "2001:db8:dead:beef::42"],
                 expiration_date="2025-04-01",
                 domain_status=ZoneEPPStatusChoices.EPP_STATUS_INACTIVE,
             ),
@@ -404,6 +407,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 10)
         params = {"inline_signing": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_parental_agents(self):
+        params = {"parental_agents": ["10.0.0.42"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"parental_agents": ["10.0.0.23", "2001:db8:dead:beef::23"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_domain_status(self):
         params = {
