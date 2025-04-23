@@ -319,6 +319,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "status",
         "dnssec_policy",
         "inline_signing",
+        "parental_agents",
         "registrar",
         "registry_domain_id",
         "expiration_date",
