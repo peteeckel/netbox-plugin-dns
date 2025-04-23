@@ -194,7 +194,9 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
 
         help_texts = {
             "soa_serial_auto": _("Automatically generate the SOA serial number"),
-            "rfc2317_parent_managed": _("IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"),
+            "rfc2317_parent_managed": _(
+                "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
+            ),
         }
 
         widgets = {
