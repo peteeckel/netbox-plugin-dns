@@ -11,6 +11,7 @@ __all__ = ("RegistrarFilterSet",)
 class RegistrarFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Registrar
+
         fields = (
             "id",
             "name",

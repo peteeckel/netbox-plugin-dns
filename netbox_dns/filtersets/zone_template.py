@@ -20,6 +20,16 @@ __all__ = ("ZoneTemplateFilterSet",)
 
 
 class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+    class Meta:
+        model = ZoneTemplate
+
+        fields = (
+            "id",
+            "name",
+            "description",
+            "soa_rname",
+        )
+
     record_template_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RecordTemplate.objects.all(),
         field_name="record_templates",
@@ -116,15 +126,6 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="contact_id",
         label=_("Billing Contact"),
     )
-
-    class Meta:
-        model = ZoneTemplate
-        fields = (
-            "id",
-            "name",
-            "description",
-            "soa_rname",
-        )
 
     def search(self, queryset, name, value):
         if not value.strip():

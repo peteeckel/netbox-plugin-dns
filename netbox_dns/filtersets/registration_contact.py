@@ -11,6 +11,7 @@ __all__ = ("RegistrationContactFilterSet",)
 class RegistrationContactFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = RegistrationContact
+
         fields = (
             "id",
             "name",

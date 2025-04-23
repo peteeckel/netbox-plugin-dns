@@ -35,6 +35,46 @@ __all__ = (
 
 
 class RecordTemplateForm(TenancyForm, NetBoxModelForm):
+    class Meta:
+        model = RecordTemplate
+
+        fields = (
+            "name",
+            "record_name",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            "tenant_group",
+            "tenant",
+            "tags",
+        )
+
+    fieldsets = (
+        FieldSet(
+            "name",
+            "record_name",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            name=_("Record Template"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -56,44 +96,16 @@ class RecordTemplateForm(TenancyForm, NetBoxModelForm):
         label=_("TTL"),
     )
 
-    fieldsets = (
-        FieldSet(
-            "name",
-            "record_name",
-            "type",
-            "value",
-            "status",
-            "ttl",
-            "disable_ptr",
-            "description",
-            name=_("Record Template"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
-    )
-
-    class Meta:
-        model = RecordTemplate
-
-        fields = (
-            "name",
-            "record_name",
-            "type",
-            "value",
-            "status",
-            "ttl",
-            "disable_ptr",
-            "description",
-            "tenant_group",
-            "tenant",
-            "tags",
-        )
-
 
 class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = RecordTemplate
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
         FieldSet(
             "name",
             "record_name",
@@ -105,8 +117,15 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "description",
             name=_("Attributes"),
         ),
-        FieldSet("zone_template_id", name=_("Zone Templates")),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet(
+            "zone_template_id",
+            name=_("Zone Templates"),
+        ),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
     )
 
     type = forms.MultipleChoiceField(
@@ -153,6 +172,22 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class RecordTemplateImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = RecordTemplate
+
+        fields = (
+            "name",
+            "record_name",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            "tenant",
+            "tags",
+        )
+
     type = CSVChoiceField(
         choices=RecordSelectableTypeChoices,
         required=True,
@@ -178,11 +213,12 @@ class RecordTemplateImportForm(NetBoxModelImportForm):
         label=_("Tenant"),
     )
 
-    class Meta:
-        model = RecordTemplate
 
-        fields = (
-            "name",
+class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
+    model = RecordTemplate
+
+    fieldsets = (
+        FieldSet(
             "record_name",
             "type",
             "value",
@@ -190,13 +226,20 @@ class RecordTemplateImportForm(NetBoxModelImportForm):
             "ttl",
             "disable_ptr",
             "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "tenant_group",
             "tenant",
-            "tags",
-        )
+            name=_("Tenancy"),
+        ),
+    )
 
-
-class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
-    model = RecordTemplate
+    nullable_fields = (
+        "description",
+        "ttl",
+        "tenant",
+    )
 
     record_name = forms.CharField(
         required=False,
@@ -240,18 +283,3 @@ class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Tenant"),
     )
-
-    fieldsets = (
-        FieldSet(
-            "record_name",
-            "type",
-            "value",
-            "status",
-            "ttl",
-            "disable_ptr",
-            "description",
-            name=_("Attributes"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-    )
-    nullable_fields = ("description", "ttl", "tenant")

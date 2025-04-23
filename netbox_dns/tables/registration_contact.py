@@ -10,16 +10,9 @@ __all__ = ("RegistrationContactTable",)
 
 
 class RegistrationContactTable(NetBoxTable):
-    contact_id = tables.Column(
-        verbose_name=_("Contact ID"),
-        linkify=True,
-    )
-    tags = TagColumn(
-        url_name="plugins:netbox_dns:registrationcontact_list",
-    )
-
     class Meta(NetBoxTable.Meta):
         model = RegistrationContact
+
         fields = (
             "name",
             "description",
@@ -35,4 +28,17 @@ class RegistrationContactTable(NetBoxTable):
             "fax_ext",
             "email",
         )
-        default_columns = ("contact_id", "name", "email")
+
+        default_columns = (
+            "contact_id",
+            "name",
+            "email",
+        )
+
+    contact_id = tables.Column(
+        verbose_name=_("Contact ID"),
+        linkify=True,
+    )
+    tags = TagColumn(
+        url_name="plugins:netbox_dns:registrationcontact_list",
+    )

@@ -68,6 +68,24 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
 
 
 class RecordTable(RecordBaseTable):
+    class Meta(NetBoxTable.Meta):
+        model = Record
+
+        fields = (
+            "status",
+            "description",
+        )
+
+        default_columns = (
+            "name",
+            "zone",
+            "ttl",
+            "type",
+            "value",
+            "tags",
+            "active",
+        )
+
     status = ChoiceFieldColumn(
         verbose_name=_("Status"),
     )
@@ -82,24 +100,22 @@ class RecordTable(RecordBaseTable):
         linkify=True,
     )
 
+
+class ManagedRecordTable(RecordBaseTable):
     class Meta(NetBoxTable.Meta):
         model = Record
-        fields = (
-            "status",
-            "description",
-        )
+
+        fields = ()
+
         default_columns = (
             "name",
             "zone",
             "ttl",
             "type",
             "value",
-            "tags",
             "active",
         )
 
-
-class ManagedRecordTable(RecordBaseTable):
     address_record = tables.Column(
         verbose_name=_("Address Record"),
         linkify=True,
@@ -114,18 +130,6 @@ class ManagedRecordTable(RecordBaseTable):
         orderable=False,
     )
     actions = ActionsColumn(actions=("changelog",))
-
-    class Meta(NetBoxTable.Meta):
-        model = Record
-        fields = ()
-        default_columns = (
-            "name",
-            "zone",
-            "ttl",
-            "type",
-            "value",
-            "active",
-        )
 
     def render_related_ip_address(self, record):
         if record.ipam_ip_address is not None:
@@ -151,11 +155,11 @@ class ManagedRecordTable(RecordBaseTable):
 
 
 class RelatedRecordTable(RecordBaseTable):
-    actions = ActionsColumn(actions=())
-
     class Meta(NetBoxTable.Meta):
         model = Record
+
         fields = ()
+
         default_columns = (
             "name",
             "zone",
@@ -163,11 +167,15 @@ class RelatedRecordTable(RecordBaseTable):
             "value",
         )
 
+    actions = ActionsColumn(actions=())
+
 
 class DelegationRecordTable(RecordBaseTable):
     class Meta(NetBoxTable.Meta):
         model = Record
+
         fields = ()
+
         default_columns = (
             "name",
             "zone",

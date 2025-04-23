@@ -24,6 +24,28 @@ __all__ = ("ZoneFilterSet",)
 
 
 class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+    class Meta:
+        model = Zone
+
+        fields = (
+            "id",
+            "name",
+            "description",
+            "default_ttl",
+            "soa_ttl",
+            "soa_rname",
+            "soa_serial",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "soa_serial_auto",
+            "rfc2317_parent_managed",
+            "inline_signing",
+            "registry_domain_id",
+            "domain_status",
+        )
+
     status = django_filters.MultipleChoiceFilter(
         choices=ZoneStatusChoices,
     )
@@ -150,27 +172,6 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     active = django_filters.BooleanFilter(
         label=_("Zone is active"),
     )
-
-    class Meta:
-        model = Zone
-        fields = (
-            "id",
-            "name",
-            "description",
-            "default_ttl",
-            "soa_ttl",
-            "soa_rname",
-            "soa_serial",
-            "soa_refresh",
-            "soa_retry",
-            "soa_expire",
-            "soa_minimum",
-            "soa_serial_auto",
-            "rfc2317_parent_managed",
-            "inline_signing",
-            "registry_domain_id",
-            "domain_status",
-        )
 
     def filter_parental_agents(self, queryset, name, value):
         if not value:

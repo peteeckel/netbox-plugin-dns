@@ -17,6 +17,7 @@ __all__ = ("DNSSECPolicyFilterSet",)
 class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = DNSSECPolicy
+
         fields = (
             "id",
             "name",

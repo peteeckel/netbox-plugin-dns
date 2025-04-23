@@ -17,6 +17,41 @@ __all__ = ("ZoneTemplateSerializer",)
 
 
 class ZoneTemplateSerializer(NetBoxModelSerializer):
+    class Meta:
+        model = ZoneTemplate
+
+        fields = (
+            "id",
+            "url",
+            "name",
+            "description",
+            "display",
+            "nameservers",
+            "soa_mname",
+            "soa_rname",
+            "dnssec_policy",
+            "registrar",
+            "registrant",
+            "tech_c",
+            "admin_c",
+            "billing_c",
+            "active",
+            "tags",
+            "created",
+            "last_updated",
+            "custom_fields",
+            "tenant",
+            "record_templates",
+        )
+
+        brief_fields = (
+            "id",
+            "url",
+            "name",
+            "display",
+            "description",
+        )
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zonetemplate-detail"
     )
@@ -87,7 +122,11 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
         read_only=True,
         allow_null=True,
     )
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )
 
     def create(self, validated_data):
         nameservers = validated_data.pop("nameservers", None)
@@ -114,36 +153,3 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
             zone_template.record_templates.set(record_templates)
 
         return zone_template
-
-    class Meta:
-        model = ZoneTemplate
-        fields = (
-            "id",
-            "url",
-            "name",
-            "description",
-            "display",
-            "nameservers",
-            "soa_mname",
-            "soa_rname",
-            "dnssec_policy",
-            "registrar",
-            "registrant",
-            "tech_c",
-            "admin_c",
-            "billing_c",
-            "active",
-            "tags",
-            "created",
-            "last_updated",
-            "custom_fields",
-            "tenant",
-            "record_templates",
-        )
-        brief_fields = (
-            "id",
-            "url",
-            "name",
-            "display",
-            "description",
-        )

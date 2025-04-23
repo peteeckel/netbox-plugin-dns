@@ -115,6 +115,47 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
 
 
 class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+    class Meta:
+        verbose_name = _("Record")
+        verbose_name_plural = _("Records")
+
+        ordering = (
+            "fqdn",
+            "zone",
+            "name",
+            "type",
+            "value",
+            "status",
+        )
+
+    objects = RecordManager()
+    raw_objects = RestrictedQuerySet.as_manager()
+
+    clone_fields = (
+        "zone",
+        "type",
+        "name",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "description",
+        "tenant",
+    )
+
+    def __str__(self):
+        try:
+            fqdn = dns_name.from_text(
+                self.name, origin=dns_name.from_text(self.zone.name)
+            ).relativize(dns_name.root)
+            name = fqdn.to_unicode()
+        except dns_name.IDNAException:
+            name = fqdn.to_text()
+        except dns_name.LabelTooLong:
+            name = f"{self.name[:59]}..."
+
+        return f"{name} [{self.type}]"
+
     unique_ptr_qs = Q(
         Q(disable_ptr=False),
         Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
@@ -213,47 +254,6 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
         blank=True,
     )
-
-    objects = RecordManager()
-    raw_objects = RestrictedQuerySet.as_manager()
-
-    clone_fields = (
-        "zone",
-        "type",
-        "name",
-        "value",
-        "status",
-        "ttl",
-        "disable_ptr",
-        "description",
-        "tenant",
-    )
-
-    class Meta:
-        verbose_name = _("Record")
-        verbose_name_plural = _("Records")
-
-        ordering = (
-            "fqdn",
-            "zone",
-            "name",
-            "type",
-            "value",
-            "status",
-        )
-
-    def __str__(self):
-        try:
-            fqdn = dns_name.from_text(
-                self.name, origin=dns_name.from_text(self.zone.name)
-            ).relativize(dns_name.root)
-            name = fqdn.to_unicode()
-        except dns_name.IDNAException:
-            name = fqdn.to_text()
-        except dns_name.LabelTooLong:
-            name = f"{self.name[:59]}..."
-
-        return f"{name} [{self.type}]"
 
     @property
     def display_name(self):
@@ -932,6 +932,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 @register_search
 class RecordIndex(SearchIndex):
     model = Record
+
     fields = (
         ("fqdn", 100),
         ("name", 120),

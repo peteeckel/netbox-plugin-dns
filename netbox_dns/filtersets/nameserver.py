@@ -12,6 +12,15 @@ __all__ = ("NameServerFilterSet",)
 
 
 class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+    class Meta:
+        model = NameServer
+
+        fields = (
+            "id",
+            "name",
+            "description",
+        )
+
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
@@ -23,10 +32,6 @@ class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=Zone.objects.all(),
         label=_("SOA Zones"),
     )
-
-    class Meta:
-        model = NameServer
-        fields = ("id", "name", "description")
 
     def search(self, queryset, name, value):
         if not value.strip():

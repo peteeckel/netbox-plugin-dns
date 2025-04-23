@@ -13,20 +13,9 @@ __all__ = ("NameServerSerializer",)
 
 
 class NameServerSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:nameserver-detail"
-    )
-    zones = NestedZoneSerializer(
-        many=True,
-        read_only=True,
-        required=False,
-        default=None,
-        help_text=_("Zones served by the authoritative nameserver"),
-    )
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
-
     class Meta:
         model = NameServer
+
         fields = (
             "id",
             "url",
@@ -40,4 +29,27 @@ class NameServerSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name", "description")
+
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "description",
+        )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:nameserver-detail"
+    )
+    zones = NestedZoneSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        default=None,
+        help_text=_("Zones served by the authoritative nameserver"),
+    )
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )

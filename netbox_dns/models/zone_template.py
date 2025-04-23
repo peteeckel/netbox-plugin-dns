@@ -18,6 +18,40 @@ __all__ = (
 
 
 class ZoneTemplate(NetBoxModel):
+    class Meta:
+        verbose_name = _("Zone Template")
+        verbose_name_plural = _("Zone Templates")
+
+        ordering = ("name",)
+
+    clone_fields = (
+        "description",
+        "nameservers",
+        "record_templates",
+        "dnssec_policy",
+        "registrar",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+        "tenant",
+    )
+
+    template_fields = (
+        "soa_mname",
+        "soa_rname",
+        "dnssec_policy",
+        "registrar",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+        "tenant",
+    )
+
+    def __str__(self):
+        return str(self.name)
+
     name = models.CharField(
         verbose_name=_("Template Name"),
         unique=True,
@@ -111,40 +145,6 @@ class ZoneTemplate(NetBoxModel):
         null=True,
     )
 
-    clone_fields = (
-        "description",
-        "nameservers",
-        "record_templates",
-        "dnssec_policy",
-        "registrar",
-        "registrant",
-        "admin_c",
-        "tech_c",
-        "billing_c",
-        "tenant",
-    )
-
-    template_fields = (
-        "soa_mname",
-        "soa_rname",
-        "dnssec_policy",
-        "registrar",
-        "registrant",
-        "admin_c",
-        "tech_c",
-        "billing_c",
-        "tenant",
-    )
-
-    class Meta:
-        verbose_name = _("Zone Template")
-        verbose_name_plural = _("Zone Templates")
-
-        ordering = ("name",)
-
-    def __str__(self):
-        return str(self.name)
-
     def apply_to_zone_data(self, data):
         fields_changed = False
         for field in self.template_fields:
@@ -183,6 +183,7 @@ class ZoneTemplate(NetBoxModel):
 @register_search
 class ZoneTemplateIndex(SearchIndex):
     model = ZoneTemplate
+
     fields = (
         ("name", 100),
         ("tenant", 300),

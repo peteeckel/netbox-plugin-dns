@@ -11,6 +11,16 @@ __all__ = ("NameServerTable",)
 
 
 class NameServerTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = NameServer
+
+        fields = ("description",)
+
+        default_columns = (
+            "name",
+            "tags",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -21,11 +31,3 @@ class NameServerTable(TenancyColumnsMixin, NetBoxTable):
 
     def render_name(self, value, record):
         return record.display_name
-
-    class Meta(NetBoxTable.Meta):
-        model = NameServer
-        fields = ("description",)
-        default_columns = (
-            "name",
-            "tags",
-        )
