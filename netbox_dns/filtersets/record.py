@@ -18,6 +18,20 @@ __all__ = ("RecordFilterSet",)
 
 
 class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+    class Meta:
+        model = Record
+
+        fields = (
+            "id",
+            "name",
+            "fqdn",
+            "description",
+            "ttl",
+            "value",
+            "disable_ptr",
+            "managed",
+        )
+
     fqdn = MultiValueCharFilter(
         method="filter_fqdn",
     )
@@ -81,19 +95,6 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
 
     managed = django_filters.BooleanFilter()
-
-    class Meta:
-        model = Record
-        fields = (
-            "id",
-            "name",
-            "fqdn",
-            "description",
-            "ttl",
-            "value",
-            "disable_ptr",
-            "managed",
-        )
 
     def filter_fqdn(self, queryset, name, value):
         if not value:

@@ -22,6 +22,35 @@ __all__ = (
 
 
 class RecordTemplate(NetBoxModel):
+    class Meta:
+        verbose_name = _("Record Template")
+        verbose_name_plural = _("Record Templates")
+
+        ordering = ("name",)
+
+    clone_fields = (
+        "record_name",
+        "description",
+        "type",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "tenant",
+    )
+
+    template_fields = (
+        "type",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "tenant",
+    )
+
+    def __str__(self):
+        return str(self.name)
+
     name = models.CharField(
         verbose_name=_("Template Name"),
         unique=True,
@@ -70,35 +99,6 @@ class RecordTemplate(NetBoxModel):
         blank=True,
         null=True,
     )
-
-    clone_fields = (
-        "record_name",
-        "description",
-        "type",
-        "value",
-        "status",
-        "ttl",
-        "disable_ptr",
-        "tenant",
-    )
-
-    template_fields = (
-        "type",
-        "value",
-        "status",
-        "ttl",
-        "disable_ptr",
-        "tenant",
-    )
-
-    class Meta:
-        verbose_name = _("Record Template")
-        verbose_name_plural = _("Record Templates")
-
-        ordering = ("name",)
-
-    def __str__(self):
-        return str(self.name)
 
     def get_status_color(self):
         return RecordStatusChoices.colors.get(self.status)
@@ -186,6 +186,7 @@ class RecordTemplate(NetBoxModel):
 @register_search
 class RecordTemplateIndex(SearchIndex):
     model = RecordTemplate
+
     fields = (
         ("name", 100),
         ("record_name", 120),

@@ -37,19 +37,9 @@ __all__ = (
 
 
 class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
-    lifetime = TimePeriodField(
-        required=False,
-    )
-
-    fieldsets = (
-        FieldSet("name", "description", name=_("Attributes")),
-        FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
-    )
-
     class Meta:
         model = DNSSECKeyTemplate
+
         fields = (
             "name",
             "description",
@@ -62,15 +52,65 @@ class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
             "tags",
         )
 
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "type",
+            "lifetime",
+            "algorithm",
+            "key_size",
+            name=_("Key Properties"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
+    )
+
+    lifetime = TimePeriodField(
+        required=False,
+    )
+
 
 class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = DNSSECKeyTemplate
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "description", name=_("Attributes")),
-        FieldSet("policiy_id", name=_("Policies")),
-        FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
+        FieldSet(
+            "name",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "policiy_id",
+            name=_("Policies"),
+        ),
+        FieldSet(
+            "type",
+            "lifetime",
+            "algorithm",
+            "key_size",
+            name=_("Key Properties"),
+        ),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
     )
 
     name = forms.CharField(
@@ -109,19 +149,9 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
-    lifetime = TimePeriodField(
-        required=False,
-        label=_("Lifetime"),
-    )
-    tenant = CSVModelChoiceField(
-        queryset=Tenant.objects.all(),
-        to_field_name="name",
-        required=False,
-        label=_("Tenant"),
-    )
-
     class Meta:
         model = DNSSECKeyTemplate
+
         fields = (
             "name",
             "description",
@@ -133,9 +163,51 @@ class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
             "tags",
         )
 
+    lifetime = TimePeriodField(
+        required=False,
+        label=_("Lifetime"),
+    )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        to_field_name="name",
+        required=False,
+        label=_("Tenant"),
+    )
+
 
 class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
     model = DNSSECKeyTemplate
+
+    fieldsets = (
+        FieldSet(
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "type",
+            "lifetime",
+            "algorithm",
+            "key_size",
+            name=_("Key Properties"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+    )
+
+    fields = (
+        "algorithm",
+        "key_size",
+    )
+
+    nullable_fields = (
+        "description",
+        "tenant",
+        "lifetime",
+        "key_size",
+    )
 
     type = forms.ChoiceField(
         choices=add_blank_choice(DNSSECKeyTemplateTypeChoices),
@@ -171,19 +243,3 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Tenant"),
     )
-
-    fieldsets = (
-        FieldSet(
-            "description",
-            name=_("Attributes"),
-        ),
-        FieldSet("type", "lifetime", "algorithm", "key_size", name=_("Key Properties")),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-    )
-
-    fields = (
-        "algorithm",
-        "key_size",
-    )
-
-    nullable_fields = ("description", "tenant", "lifetime", "key_size")

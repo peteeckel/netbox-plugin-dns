@@ -24,20 +24,7 @@ __all__ = (
 class RegistrarForm(NetBoxModelForm):
     class Meta:
         model = Registrar
-        fieldsets = (
-            FieldSet(
-                "name",
-                "iana_id",
-                "description",
-                "address",
-                "referral_url",
-                "whois_server",
-                "abuse_email",
-                "abuse_phone",
-                name=_("Registrar"),
-            ),
-            FieldSet("tags", name=_("Tags")),
-        )
+
         fields = (
             "name",
             "iana_id",
@@ -50,12 +37,40 @@ class RegistrarForm(NetBoxModelForm):
             "tags",
         )
 
+    fieldsets = (
+        FieldSet(
+            "name",
+            "iana_id",
+            "description",
+            "address",
+            "referral_url",
+            "whois_server",
+            "abuse_email",
+            "abuse_phone",
+            name=_("Registrar"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
+    )
+
 
 class RegistrarFilterForm(NetBoxModelFilterSetForm):
     model = Registrar
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "iana_id", "description", name=_("Attributes")),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
+        FieldSet(
+            "name",
+            "iana_id",
+            "description",
+            name=_("Attributes"),
+        ),
         FieldSet(
             "address",
             "referral_url",
@@ -104,6 +119,7 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
 class RegistrarImportForm(NetBoxModelImportForm):
     class Meta:
         model = Registrar
+
         fields = (
             "name",
             "iana_id",
@@ -119,6 +135,29 @@ class RegistrarImportForm(NetBoxModelImportForm):
 
 class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
     model = Registrar
+
+    fieldsets = (
+        FieldSet(
+            "iana_id",
+            "description",
+            "address",
+            "referral_url",
+            "whois_server",
+            "abuse_email",
+            "abuse_phone",
+            name=_("Attributes"),
+        ),
+    )
+
+    nullable_fields = (
+        "iana_id",
+        "description",
+        "address",
+        "referral_url",
+        "whois_server",
+        "abuse_email",
+        "abuse_phone",
+    )
 
     iana_id = forms.IntegerField(
         required=False,
@@ -147,27 +186,4 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
     abuse_phone = forms.CharField(
         required=False,
         label=_("Abuse Phone"),
-    )
-
-    fieldsets = (
-        FieldSet(
-            "iana_id",
-            "description",
-            "address",
-            "referral_url",
-            "whois_server",
-            "abuse_email",
-            "abuse_phone",
-            name=_("Attributes"),
-        ),
-    )
-
-    nullable_fields = (
-        "iana_id",
-        "description",
-        "address",
-        "referral_url",
-        "whois_server",
-        "abuse_email",
-        "abuse_phone",
     )

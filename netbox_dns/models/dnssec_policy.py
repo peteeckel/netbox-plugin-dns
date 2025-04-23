@@ -17,6 +17,22 @@ __all__ = (
 
 
 class DNSSECPolicy(ContactsMixin, NetBoxModel):
+    class Meta:
+        verbose_name = _("DNSSEC Policy")
+        verbose_name_plural = _("DNSSEC Policies")
+
+        ordering = ("name",)
+
+    clone_fields = (
+        "name",
+        "key_templates",
+        "description",
+        "tenant",
+    )
+
+    def __str__(self):
+        return str(self.name)
+
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
@@ -148,22 +164,6 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         null=True,
     )
 
-    clone_fields = (
-        "name",
-        "key_templates",
-        "description",
-        "tenant",
-    )
-
-    class Meta:
-        verbose_name = _("DNSSEC Policy")
-        verbose_name_plural = _("DNSSEC Policies")
-
-        ordering = ("name",)
-
-    def __str__(self):
-        return str(self.name)
-
     def get_status_color(self):
         return DNSSECPolicyStatusChoices.colors.get(self.status)
 
@@ -192,6 +192,7 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
 @register_search
 class DNSSECPolicyIndex(SearchIndex):
     model = DNSSECPolicy
+
     fields = (
         ("name", 100),
         ("description", 500),

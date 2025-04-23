@@ -17,6 +17,16 @@ __all__ = ("DNSSECKeyTemplateFilterSet",)
 
 
 class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+    class Meta:
+        model = DNSSECKeyTemplate
+
+        fields = (
+            "id",
+            "name",
+            "description",
+            "lifetime",
+        )
+
     type = django_filters.MultipleChoiceFilter(
         choices=DNSSECKeyTemplateTypeChoices,
     )
@@ -39,10 +49,6 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("DNSSEC Policies"),
     )
-
-    class Meta:
-        model = DNSSECKeyTemplate
-        fields = ("id", "name", "description", "lifetime")
 
     def search(self, queryset, name, value):
         if not value.strip():

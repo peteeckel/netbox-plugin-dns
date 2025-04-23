@@ -82,6 +82,80 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
 
 
 class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+    class Meta:
+        verbose_name = _("Zone")
+        verbose_name_plural = _("Zones")
+
+        ordering = (
+            "view",
+            "name",
+        )
+
+        constraints = [
+            UniqueConstraint(
+                Lower("name"),
+                "view",
+                name="name_view_unique_ci",
+                violation_error_message=_(
+                    "There is already a zone with the same name in this view"
+                ),
+            ),
+        ]
+
+    clone_fields = (
+        "view",
+        "name",
+        "description",
+        "status",
+        "nameservers",
+        "default_ttl",
+        "soa_ttl",
+        "soa_mname",
+        "soa_rname",
+        "soa_refresh",
+        "soa_retry",
+        "soa_expire",
+        "soa_minimum",
+        "tenant",
+    )
+
+    soa_clean_fields = {
+        "description",
+        "status",
+        "dnssec_policy",
+        "inline_signing",
+        "parental_agents",
+        "registrar",
+        "registry_domain_id",
+        "expiration_date",
+        "domain_status",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+        "rfc2317_parent_managed",
+        "tenant",
+    }
+
+    objects = ZoneManager()
+
+    def __str__(self):
+        if self.name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
+            name = ". (root zone)"
+        else:
+            try:
+                name = dns_name.from_text(self.name, origin=None).to_unicode()
+            except DNSException:
+                name = self.name
+
+        try:
+            if not self.view.default_view:
+                return f"[{self.view}] {name}"
+        except ObjectDoesNotExist:
+            return f"[<no view assigned>] {name}"
+
+        return str(name)
+
     def __init__(self, *args, **kwargs):
         kwargs.pop("template", None)
 
@@ -293,79 +367,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
         null=True,
     )
-
-    objects = ZoneManager()
-
-    clone_fields = (
-        "view",
-        "name",
-        "description",
-        "status",
-        "nameservers",
-        "default_ttl",
-        "soa_ttl",
-        "soa_mname",
-        "soa_rname",
-        "soa_refresh",
-        "soa_retry",
-        "soa_expire",
-        "soa_minimum",
-        "tenant",
-    )
-
-    soa_clean_fields = {
-        "description",
-        "status",
-        "dnssec_policy",
-        "inline_signing",
-        "parental_agents",
-        "registrar",
-        "registry_domain_id",
-        "expiration_date",
-        "domain_status",
-        "registrant",
-        "admin_c",
-        "tech_c",
-        "billing_c",
-        "rfc2317_parent_managed",
-        "tenant",
-    }
-
-    class Meta:
-        verbose_name = _("Zone")
-        verbose_name_plural = _("Zones")
-
-        ordering = (
-            "view",
-            "name",
-        )
-        constraints = [
-            UniqueConstraint(
-                Lower("name"),
-                "view",
-                name="name_view_unique_ci",
-                violation_error_message=_(
-                    "There is already a zone with the same name in this view"
-                ),
-            ),
-        ]
-
-    def __str__(self):
-        if self.name == "." and get_plugin_config("netbox_dns", "enable_root_zones"):
-            name = ". (root zone)"
-        else:
-            try:
-                name = dns_name.from_text(self.name, origin=None).to_unicode()
-            except DNSException:
-                name = self.name
-
-        try:
-            if not self.view.default_view:
-                return f"[{self.view}] {name}"
-        except ObjectDoesNotExist:
-            return f"[<no view assigned>] {name}"
-
-        return str(name)
 
     @property
     def fqdn(self):
@@ -1108,6 +1109,7 @@ def update_ns_records(**kwargs):
 @register_search
 class ZoneIndex(SearchIndex):
     model = Zone
+
     fields = (
         ("name", 100),
         ("view", 150),

@@ -20,6 +20,19 @@ __all__ = (
 
 
 class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = DNSSECPolicy
+
+        fields = ("description",)
+
+        default_columns = (
+            "name",
+            "description",
+            "status",
+            "use_nsec3",
+            "tags",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -88,20 +101,19 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
         url_name="plugins:netbox_dns:dnssecpolicy_list",
     )
 
+
+class DNSSECPolicyDisplayTable(TenancyColumnsMixin, NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = DNSSECPolicy
+
         fields = ("description",)
+
         default_columns = (
             "name",
             "description",
             "status",
-            "use_nsec3",
             "tags",
         )
-
-
-class DNSSECPolicyDisplayTable(TenancyColumnsMixin, NetBoxTable):
-    actions = ActionsColumn(actions="")
 
     name = tables.Column(
         verbose_name=_("Name"),
@@ -119,13 +131,4 @@ class DNSSECPolicyDisplayTable(TenancyColumnsMixin, NetBoxTable):
     tags = TagColumn(
         url_name="plugins:netbox_dns:dnssecpolicy_list",
     )
-
-    class Meta(NetBoxTable.Meta):
-        model = DNSSECPolicy
-        fields = ("description",)
-        default_columns = (
-            "name",
-            "description",
-            "status",
-            "tags",
-        )
+    actions = ActionsColumn(actions="")

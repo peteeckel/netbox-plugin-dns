@@ -25,6 +25,21 @@ __all__ = (
 
 
 class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+    class Meta:
+        verbose_name = _("View")
+        verbose_name_plural = _("Views")
+
+        ordering = ("name",)
+
+    clone_fields = (
+        "name",
+        "description",
+        "tenant",
+    )
+
+    def __str__(self):
+        return str(self.name)
+
     name = models.CharField(
         verbose_name=_("Name"),
         unique=True,
@@ -60,24 +75,9 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
     )
 
-    clone_fields = (
-        "name",
-        "description",
-        "tenant",
-    )
-
     @classmethod
     def get_default_view(cls):
         return cls.objects.get(default_view=True)
-
-    def __str__(self):
-        return str(self.name)
-
-    class Meta:
-        verbose_name = _("View")
-        verbose_name_plural = _("Views")
-
-        ordering = ("name",)
 
     def delete(self, *args, **kwargs):
         if self.default_view:
@@ -156,6 +156,7 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 @register_search
 class ViewIndex(SearchIndex):
     model = View
+
     fields = (
         ("name", 100),
         ("description", 500),

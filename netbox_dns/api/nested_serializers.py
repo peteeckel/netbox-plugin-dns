@@ -17,19 +17,19 @@ __all__ = (
 
 
 class NestedZoneSerializer(WritableNestedSerializer):
-    def to_representation(self, instance):
-        # +
-        # Workaround for the problem that the serializer does not return the
-        # annotation "active" when called with "many=False". See issue
-        # https://github.com/peteeckel/netbox-plugin-dns/issues/132
-        #
-        # TODO: Investigate root cause, probably in DRF.
-        # -
-        representation = super().to_representation(instance)
-        if representation.get("active") is None:
-            representation["active"] = instance.is_active
+    class Meta:
+        model = Zone
 
-        return representation
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "view",
+            "status",
+            "active",
+            "rfc2317_prefix",
+        )
 
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"
@@ -47,27 +47,25 @@ class NestedZoneSerializer(WritableNestedSerializer):
         allow_null=True,
     )
 
-    class Meta:
-        model = Zone
-        fields = [
-            "id",
-            "url",
-            "display",
-            "name",
-            "view",
-            "status",
-            "active",
-            "rfc2317_prefix",
-        ]
+    def to_representation(self, instance):
+        # +
+        # Workaround for the problem that the serializer does not return the
+        # annotation "active" when called with "many=False". See issue
+        # https://github.com/peteeckel/netbox-plugin-dns/issues/132
+        #
+        # TODO: Investigate root cause, probably in DRF.
+        # -
+        representation = super().to_representation(instance)
+        if representation.get("active") is None:
+            representation["active"] = instance.is_active
+
+        return representation
 
 
 class NestedZoneTemplateSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:zonetemplate-detail"
-    )
-
     class Meta:
         model = ZoneTemplate
+
         fields = (
             "id",
             "url",
@@ -76,8 +74,29 @@ class NestedZoneTemplateSerializer(WritableNestedSerializer):
             "description",
         )
 
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:zonetemplate-detail"
+    )
+
 
 class NestedRecordSerializer(WritableNestedSerializer):
+    class Meta:
+        model = Record
+
+        fields = (
+            "id",
+            "url",
+            "display",
+            "type",
+            "name",
+            "value",
+            "status",
+            "ttl",
+            "zone",
+            "managed",
+            "active",
+        )
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:record-detail"
     )
@@ -92,30 +111,11 @@ class NestedRecordSerializer(WritableNestedSerializer):
         allow_null=True,
     )
 
-    class Meta:
-        model = Record
-        fields = [
-            "id",
-            "url",
-            "display",
-            "type",
-            "name",
-            "value",
-            "status",
-            "ttl",
-            "zone",
-            "managed",
-            "active",
-        ]
-
 
 class NestedRecordTemplateSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:recordtemplate-detail"
-    )
-
     class Meta:
         model = RecordTemplate
+
         fields = (
             "id",
             "url",
@@ -129,14 +129,15 @@ class NestedRecordTemplateSerializer(WritableNestedSerializer):
             "description",
         )
 
-
-class NestedDNSSECPolicySerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:dnssecpolicy-detail"
+        view_name="plugins-api:netbox_dns-api:recordtemplate-detail"
     )
 
+
+class NestedDNSSECPolicySerializer(WritableNestedSerializer):
     class Meta:
         model = DNSSECPolicy
+
         fields = (
             "id",
             "url",
@@ -145,3 +146,7 @@ class NestedDNSSECPolicySerializer(WritableNestedSerializer):
             "description",
             "status",
         )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:dnssecpolicy-detail"
+    )

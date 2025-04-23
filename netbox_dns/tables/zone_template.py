@@ -14,6 +14,19 @@ __all__ = (
 
 
 class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = ZoneTemplate
+
+        fields = (
+            "soa_rname",
+            "description",
+        )
+
+        default_columns = (
+            "name",
+            "tags",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -50,25 +63,16 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
         linkify=True,
     )
 
-    class Meta(NetBoxTable.Meta):
-        model = ZoneTemplate
-        fields = (
-            "soa_rname",
-            "description",
-        )
-        default_columns = (
-            "name",
-            "tags",
-        )
-
 
 class ZoneTemplateDisplayTable(ZoneTemplateTable):
-    actions = ActionsColumn(actions="")
-
     class Meta(NetBoxTable.Meta):
         model = ZoneTemplate
+
         fields = ("description",)
+
         default_columns = (
             "name",
             "description",
         )
+
+    actions = ActionsColumn(actions="")

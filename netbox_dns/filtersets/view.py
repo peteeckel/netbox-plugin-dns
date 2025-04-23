@@ -14,6 +14,16 @@ __all__ = ("ViewFilterSet",)
 
 
 class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
+    class Meta:
+        model = View
+
+        fields = (
+            "id",
+            "name",
+            "default_view",
+            "description",
+        )
+
     prefix_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Prefix.objects.all(),
         field_name="prefixes",
@@ -26,10 +36,6 @@ class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
         to_field_name="prefix",
         label=_("Prefix"),
     )
-
-    class Meta:
-        model = View
-        fields = ("id", "name", "default_view", "description")
 
     def search(self, queryset, name, value):
         if not value.strip():

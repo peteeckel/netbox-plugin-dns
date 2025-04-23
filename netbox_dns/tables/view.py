@@ -14,6 +14,19 @@ __all__ = (
 
 
 class ViewTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = View
+
+        fields = (
+            "description",
+            "ip_address_filter",
+        )
+
+        default_columns = (
+            "name",
+            "default_view",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -23,21 +36,11 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
     )
     tags = TagColumn(url_name="plugins:netbox_dns:view_list")
 
-    class Meta(NetBoxTable.Meta):
-        model = View
-        fields = ("description", "ip_address_filter")
-        default_columns = ("name", "default_view")
-
 
 class RelatedViewTable(TenancyColumnsMixin, NetBoxTable):
-    actions = ActionsColumn(actions=())
-
-    name = tables.Column(
-        linkify=True,
-    )
-
     class Meta(NetBoxTable.Meta):
         model = View
+
         fields = (
             "name",
             "description",
@@ -45,4 +48,13 @@ class RelatedViewTable(TenancyColumnsMixin, NetBoxTable):
             "tenant_group",
             "tags",
         )
-        default_columns = ("name", "description")
+
+        default_columns = (
+            "name",
+            "description",
+        )
+
+    name = tables.Column(
+        linkify=True,
+    )
+    actions = ActionsColumn(actions=())

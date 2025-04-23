@@ -34,6 +34,37 @@ __all__ = (
 
 
 class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
+    class Meta:
+        model = DNSSECPolicy
+
+        fields = (
+            "name",
+            "description",
+            "status",
+            "key_templates",
+            "dnskey_ttl",
+            "purge_keys",
+            "publish_safety",
+            "retire_safety",
+            "signatures_jitter",
+            "signatures_refresh",
+            "signatures_validity",
+            "signatures_validity_dnskey",
+            "max_zone_ttl",
+            "zone_propagation_delay",
+            "create_cdnskey",
+            "cds_digest_types",
+            "parent_ds_ttl",
+            "parent_propagation_delay",
+            "use_nsec3",
+            "nsec3_iterations",
+            "nsec3_opt_out",
+            "nsec3_salt_size",
+            "tenant_group",
+            "tenant",
+            "tags",
+        )
+
     fieldsets = (
         FieldSet(
             "name",
@@ -69,8 +100,15 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "nsec3_salt_size",
             name=_("Proof of Non-Existence"),
         ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
     )
 
     key_templates = DynamicModelMultipleChoiceField(
@@ -141,41 +179,16 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         placeholder=DNSSECPolicy.get_fallback_setting("parent_propagation_delay"),
     )
 
-    class Meta:
-        model = DNSSECPolicy
-        fields = (
-            "name",
-            "description",
-            "status",
-            "key_templates",
-            "dnskey_ttl",
-            "purge_keys",
-            "publish_safety",
-            "retire_safety",
-            "signatures_jitter",
-            "signatures_refresh",
-            "signatures_validity",
-            "signatures_validity_dnskey",
-            "max_zone_ttl",
-            "zone_propagation_delay",
-            "create_cdnskey",
-            "cds_digest_types",
-            "parent_ds_ttl",
-            "parent_propagation_delay",
-            "use_nsec3",
-            "nsec3_iterations",
-            "nsec3_opt_out",
-            "nsec3_salt_size",
-            "tenant_group",
-            "tenant",
-            "tags",
-        )
-
 
 class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = DNSSECPolicy
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
         FieldSet(
             "name",
             "description",
@@ -215,8 +228,15 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "nsec3_salt_size",
             name=_("Proof of Non-Existence"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
     )
 
     name = forms.CharField(
@@ -329,6 +349,35 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class DNSSECPolicyImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = DNSSECPolicy
+
+        fields = (
+            "name",
+            "description",
+            "key_templates",
+            "dnskey_ttl",
+            "purge_keys",
+            "publish_safety",
+            "retire_safety",
+            "signatures_jitter",
+            "signatures_refresh",
+            "signatures_validity",
+            "signatures_validity_dnskey",
+            "max_zone_ttl",
+            "zone_propagation_delay",
+            "create_cdnskey",
+            "cds_digest_types",
+            "parent_ds_ttl",
+            "parent_propagation_delay",
+            "use_nsec3",
+            "nsec3_iterations",
+            "nsec3_opt_out",
+            "nsec3_salt_size",
+            "tenant",
+            "tags",
+        )
+
     status = CSVChoiceField(
         choices=DNSSECPolicyStatusChoices,
         required=False,
@@ -389,12 +438,17 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
         label=_("Tenant"),
     )
 
-    class Meta:
-        model = DNSSECPolicy
-        fields = (
-            "name",
+
+class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
+    model = DNSSECPolicy
+
+    fieldsets = (
+        FieldSet(
             "description",
             "key_templates",
+            name=_("Attributes"),
+        ),
+        FieldSet(
             "dnskey_ttl",
             "purge_keys",
             "publish_safety",
@@ -405,21 +459,52 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
             "signatures_validity_dnskey",
             "max_zone_ttl",
             "zone_propagation_delay",
+            name=_("Timing"),
+        ),
+        FieldSet(
             "create_cdnskey",
             "cds_digest_types",
             "parent_ds_ttl",
             "parent_propagation_delay",
+            name=_("Parent Delegation"),
+        ),
+        FieldSet(
             "use_nsec3",
             "nsec3_iterations",
             "nsec3_opt_out",
             "nsec3_salt_size",
+            name=_("Proof of Non-Existence"),
+        ),
+        FieldSet(
+            "tenant_group",
             "tenant",
-            "tags",
-        )
+            name=_("Tenancy"),
+        ),
+    )
 
-
-class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
-    model = DNSSECPolicy
+    nullable_fields = (
+        "description",
+        "tenant",
+        "dnskey_ttl",
+        "purge_keys",
+        "publish_safety",
+        "retire_safety",
+        "signatures_jitter",
+        "signatures_refresh",
+        "signatures_validity",
+        "signatures_validity_dnskey",
+        "max_zone_ttl",
+        "zone_propagation_delay",
+        "cds_digest_types",
+        "parent_ds_ttl",
+        "parent_propagation_delay",
+        "nsec3_iterations",
+        "nsec3_opt_out",
+        "nsec3_salt_size",
+        "cds_digest_types",
+        "parent_ds_ttl",
+        "parent_propagation_delay",
+    )
 
     description = forms.CharField(
         max_length=200,
@@ -516,66 +601,6 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Tenant.objects.all(),
         required=False,
         label=_("Tenant"),
-    )
-
-    fieldsets = (
-        FieldSet(
-            "description",
-            "key_templates",
-            name=_("Attributes"),
-        ),
-        FieldSet(
-            "dnskey_ttl",
-            "purge_keys",
-            "publish_safety",
-            "retire_safety",
-            "signatures_jitter",
-            "signatures_refresh",
-            "signatures_validity",
-            "signatures_validity_dnskey",
-            "max_zone_ttl",
-            "zone_propagation_delay",
-            name=_("Timing"),
-        ),
-        FieldSet(
-            "create_cdnskey",
-            "cds_digest_types",
-            "parent_ds_ttl",
-            "parent_propagation_delay",
-            name=_("Parent Delegation"),
-        ),
-        FieldSet(
-            "use_nsec3",
-            "nsec3_iterations",
-            "nsec3_opt_out",
-            "nsec3_salt_size",
-            name=_("Proof of Non-Existence"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-    )
-
-    nullable_fields = (
-        "description",
-        "tenant",
-        "dnskey_ttl",
-        "purge_keys",
-        "publish_safety",
-        "retire_safety",
-        "signatures_jitter",
-        "signatures_refresh",
-        "signatures_validity",
-        "signatures_validity_dnskey",
-        "max_zone_ttl",
-        "zone_propagation_delay",
-        "cds_digest_types",
-        "parent_ds_ttl",
-        "parent_propagation_delay",
-        "nsec3_iterations",
-        "nsec3_opt_out",
-        "nsec3_salt_size",
-        "cds_digest_types",
-        "parent_ds_ttl",
-        "parent_propagation_delay",
     )
 
     def clean_cds_digest_types(self, *args, **kwargs):

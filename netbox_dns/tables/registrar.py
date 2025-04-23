@@ -10,16 +10,9 @@ __all__ = ("RegistrarTable",)
 
 
 class RegistrarTable(NetBoxTable):
-    name = tables.Column(
-        verbose_name=_("Name"),
-        linkify=True,
-    )
-    tags = TagColumn(
-        url_name="plugins:netbox_dns:registrar_list",
-    )
-
     class Meta(NetBoxTable.Meta):
         model = Registrar
+
         fields = (
             "description",
             "iana_id",
@@ -28,4 +21,17 @@ class RegistrarTable(NetBoxTable):
             "abuse_email",
             "abuse_phone",
         )
-        default_columns = ("name", "iana_id", "referral_url")
+
+        default_columns = (
+            "name",
+            "iana_id",
+            "referral_url",
+        )
+
+    name = tables.Column(
+        verbose_name=_("Name"),
+        linkify=True,
+    )
+    tags = TagColumn(
+        url_name="plugins:netbox_dns:registrar_list",
+    )

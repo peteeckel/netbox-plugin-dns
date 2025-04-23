@@ -40,11 +40,15 @@ class RegistrationContactForm(NetBoxModelForm):
             "email",
             name=_("Contact"),
         ),
-        FieldSet("tags", name="Tags"),
+        FieldSet(
+            "tags",
+            name="Tags",
+        ),
     )
 
     class Meta:
         model = RegistrationContact
+
         fields = (
             "name",
             "description",
@@ -68,8 +72,17 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
     model = RegistrationContact
 
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "contact_id", "description", name=_("Attributes")),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
+        FieldSet(
+            "name",
+            "contact_id",
+            "description",
+            name=_("Attributes"),
+        ),
         FieldSet(
             "organization",
             "street",
@@ -80,7 +93,12 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
             name=_("Address"),
         ),
         FieldSet(
-            "phone", "phone_ext", "fax", "fax_ext", "email", name=_("Communication")
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            name=_("Communication"),
         ),
     )
 
@@ -146,6 +164,7 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
 class RegistrationContactImportForm(NetBoxModelImportForm):
     class Meta:
         model = RegistrationContact
+
         fields = (
             "name",
             "description",
@@ -167,6 +186,47 @@ class RegistrationContactImportForm(NetBoxModelImportForm):
 
 class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
     model = RegistrationContact
+
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            name=_("Address"),
+        ),
+        FieldSet(
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            name=_("Communication"),
+        ),
+    )
+
+    nullable_fields = (
+        "name",
+        "description",
+        "organization",
+        "street",
+        "city",
+        "state_province",
+        "postal_code",
+        "country",
+        "phone",
+        "phone_ext",
+        "fax",
+        "fax_ext",
+        "email",
+    )
 
     name = forms.CharField(
         required=False,
@@ -219,41 +279,4 @@ class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
     email = forms.CharField(
         required=False,
         label=_("Email Address"),
-    )
-
-    fieldsets = (
-        FieldSet("name", "description", name=_("Attributes")),
-        FieldSet(
-            "organization",
-            "street",
-            "city",
-            "state_province",
-            "postal_code",
-            "country",
-            name=_("Address"),
-        ),
-        FieldSet(
-            "phone",
-            "phone_ext",
-            "fax",
-            "fax_ext",
-            "email",
-            name=_("Communication"),
-        ),
-    )
-
-    nullable_fields = (
-        "name",
-        "description",
-        "organization",
-        "street",
-        "city",
-        "state_province",
-        "postal_code",
-        "country",
-        "phone",
-        "phone_ext",
-        "fax",
-        "fax_ext",
-        "email",
     )

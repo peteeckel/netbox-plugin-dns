@@ -9,12 +9,9 @@ __all__ = ("RegistrarSerializer",)
 
 
 class RegistrarSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:registrar-detail"
-    )
-
     class Meta:
         model = Registrar
+
         fields = (
             "id",
             "url",
@@ -31,4 +28,16 @@ class RegistrarSerializer(NetBoxModelSerializer):
             "last_updated",
             "custom_fields",
         )
-        brief_fields = ("id", "url", "display", "name", "description", "iana_id")
+
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "description",
+            "iana_id",
+        )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:registrar-detail"
+    )
