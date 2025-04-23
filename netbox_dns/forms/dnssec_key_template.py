@@ -197,11 +197,6 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         ),
     )
 
-    fields = (
-        "algorithm",
-        "key_size",
-    )
-
     nullable_fields = (
         "description",
         "tenant",
@@ -209,6 +204,11 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         "key_size",
     )
 
+    description = forms.CharField(
+        max_length=200,
+        required=False,
+        label=_("Description"),
+    )
     type = forms.ChoiceField(
         choices=add_blank_choice(DNSSECKeyTemplateTypeChoices),
         required=False,
@@ -227,11 +227,6 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
         choices=add_blank_choice(DNSSECKeyTemplateKeySizeChoices),
         required=False,
         label=_("Key Size"),
-    )
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-        label=_("Description"),
     )
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),

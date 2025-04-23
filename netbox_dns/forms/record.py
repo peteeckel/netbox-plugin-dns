@@ -52,6 +52,11 @@ class RecordForm(TenancyForm, NetBoxModelForm):
             "tags",
         )
 
+        labels = {
+            "disable_ptr": _("Disable PTR"),
+            "ttl": _("TTL"),
+        }
+
     fieldsets = (
         FieldSet(
             "name",
@@ -103,15 +108,6 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         choices=add_blank_choice(RecordSelectableTypeChoices),
         required=True,
         label=_("Type"),
-    )
-
-    disable_ptr = forms.BooleanField(
-        required=False,
-        label=_("Disable PTR"),
-    )
-    ttl = TimePeriodField(
-        required=False,
-        label=_("TTL"),
     )
 
 
@@ -218,6 +214,11 @@ class RecordImportForm(NetBoxModelImportForm):
             "tags",
         )
 
+        labels = {
+            "disable_ptr": _("Disable PTR"),
+            "ttl": _("TTL"),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -261,14 +262,6 @@ class RecordImportForm(NetBoxModelImportForm):
         choices=RecordStatusChoices,
         required=False,
         label=_("Status"),
-    )
-    ttl = TimePeriodField(
-        required=False,
-        label=_("TTL"),
-    )
-    disable_ptr = forms.BooleanField(
-        required=False,
-        label=_("Disable PTR"),
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
