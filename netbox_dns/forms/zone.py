@@ -187,6 +187,16 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "tags",
         )
 
+        labels = {
+            "soa_serial_auto": _("Generate SOA Serial"),
+            "rfc2317_parent_managed": _("RFC2317 Parent Managed"),
+        }
+
+        help_texts = {
+            "soa_serial_auto": _("Automatically generate the SOA serial number"),
+            "rfc2317_parent_managed": _("IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"),
+        }
+
         widgets = {
             "expiration_date": DatePicker,
         }
@@ -321,10 +331,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         validators=[MinValueValidator(1)],
         label=_("Default TTL"),
     )
-    description = forms.CharField(
-        required=False,
-        label=_("Description"),
-    )
     soa_ttl = TimePeriodField(
         required=True,
         help_text=_("TTL for the SOA record of the zone"),
@@ -366,11 +372,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         validators=[MinValueValidator(1)],
         label=_("SOA Minimum TTL"),
     )
-    soa_serial_auto = forms.BooleanField(
-        required=False,
-        help_text=_("Automatically generate the SOA serial number"),
-        label=_("Generate SOA Serial"),
-    )
     soa_serial = forms.IntegerField(
         required=False,
         validators=[MinValueValidator(1)],
@@ -388,13 +389,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         validators=[validate_ipv4, validate_prefix, validate_rfc2317],
         help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
         label=_("RFC2317 Prefix"),
-    )
-    rfc2317_parent_managed = forms.BooleanField(
-        required=False,
-        help_text=_(
-            "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
-        ),
-        label=_("RFC2317 Parent Managed"),
     )
 
     def clean_default_ttl(self):
