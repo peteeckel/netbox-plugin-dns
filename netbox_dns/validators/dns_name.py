@@ -49,7 +49,7 @@ def _get_label(tolerate_leading_underscores=False, always_tolerant=False):
 
 
 def _has_invalid_double_dash(name):
-    return bool(re.findall(r"\b(?!xn)..--", name, re.IGNORECASE))
+    return bool(re.findall(r"(^|\.)(?!xn)..--", name, re.IGNORECASE))
 
 
 def validate_fqdn(name, always_tolerant=False):

@@ -542,6 +542,18 @@ class RecordValidationTestCase(TestCase):
                 type=RecordTypeChoices.CNAME,
                 value="_name18a.example.com.",
             ),
+            Record(
+                name="2001-e--1",
+                zone=f_zone,
+                type=RecordTypeChoices.AAAA,
+                value="2001:db8:dead:beef::42",
+            ),
+            Record(
+                name="2.4.0.0.0.0.0.0.0.0.0.0.0.0.0.0",
+                zone=r_zone,
+                type=RecordTypeChoices.PTR,
+                value="2001-e--1.zone1.example.com.",
+            ),
         )
 
         for record in records:
