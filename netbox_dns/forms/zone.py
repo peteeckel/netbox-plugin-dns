@@ -529,7 +529,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     parental_agents = forms.GenericIPAddressField(
         required=False,
-        label=_("Parental Agent"),
+        label=_("Parental Agents"),
     )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
