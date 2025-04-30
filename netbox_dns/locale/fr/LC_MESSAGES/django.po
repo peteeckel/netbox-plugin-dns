@@ -368,7 +368,7 @@ msgstr "Politique DNSSEC"
 #: filtersets/zone.py:74 forms/zone.py:249 forms/zone.py:532 forms/zone.py:907
 #: templates/netbox_dns/zone.html:112
 msgid "Parental Agents"
-msgstr "Agents Parentaux"
+msgstr "Agents du parent"
 
 #: filtersets/zone.py:78 forms/zone.py:256 forms/zone.py:662 forms/zone.py:884
 #: models/zone.py:264 tables/zone.py:48
