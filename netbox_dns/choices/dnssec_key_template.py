@@ -53,6 +53,10 @@ class DNSSECKeyTemplateKeySizeChoices(ChoiceSet):
         (SIZE_4096, 4096),
     ]
 
+    @classmethod
+    def as_enum(cls):
+        return super().as_enum(prefix="SIZE")
+
 
 @initialize_choice_names
 class DNSSECKeyTemplateAlgorithmChoices(ChoiceSet):

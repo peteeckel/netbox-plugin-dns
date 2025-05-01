@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import NameServerFilterSet, ZoneFilterSet
 from netbox_dns.forms import (
@@ -55,13 +54,11 @@ class NameServerView(generic.ObjectView):
 class NameServerEditView(generic.ObjectEditView):
     queryset = NameServer.objects.all()
     form = NameServerForm
-    default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
 @register_model_view(NameServer, "delete")
 class NameServerDeleteView(generic.ObjectDeleteView):
     queryset = NameServer.objects.all()
-    default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
 @register_model_view(NameServer, "bulk_import", detail=False)
@@ -69,7 +66,6 @@ class NameServerBulkImportView(generic.BulkImportView):
     queryset = NameServer.objects.all()
     model_form = NameServerImportForm
     table = NameServerTable
-    default_return_url = "plugins:netbox_dns:nameserver_list"
 
 
 @register_model_view(NameServer, "bulk_edit", path="edit", detail=False)
@@ -85,11 +81,6 @@ class NameServerBulkDeleteView(generic.BulkDeleteView):
     queryset = NameServer.objects.all()
     filterset = NameServerFilterSet
     table = NameServerTable
-
-
-@register_model_view(NameServer, "contacts")
-class NameServerContactsView(ObjectContactsView):
-    queryset = NameServer.objects.all()
 
 
 @register_model_view(NameServer, "zones")

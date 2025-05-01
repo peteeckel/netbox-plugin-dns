@@ -15,47 +15,9 @@ __all__ = ("DNSSECPolicySerializer",)
 
 
 class DNSSECPolicySerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:dnssecpolicy-detail"
-    )
-    key_templates = DNSSECKeyTemplateSerializer(
-        nested=True,
-        many=True,
-        read_only=False,
-        required=False,
-        default=None,
-        help_text=_("Key templates assigned to the policy"),
-    )
-    dnskey_ttl = TimePeriodField(required=False, allow_null=True)
-    purge_keys = TimePeriodField(required=False, allow_null=True)
-    publish_safety = TimePeriodField(required=False, allow_null=True)
-    retire_safety = TimePeriodField(required=False, allow_null=True)
-    signatures_jitter = TimePeriodField(required=False, allow_null=True)
-    signatures_refresh = TimePeriodField(required=False, allow_null=True)
-    signatures_validity = TimePeriodField(required=False, allow_null=True)
-    signatures_validity_dnskey = TimePeriodField(required=False, allow_null=True)
-    max_zone_ttl = TimePeriodField(required=False, allow_null=True)
-    zone_propagation_delay = TimePeriodField(required=False, allow_null=True)
-    parent_ds_ttl = TimePeriodField(required=False, allow_null=True)
-    parent_propagation_delay = TimePeriodField(required=False, allow_null=True)
-    zones = NestedZoneSerializer(
-        many=True,
-        read_only=True,
-        required=False,
-        default=None,
-        help_text=_("Zones this policy is assigned to"),
-    )
-    zone_templates = NestedZoneTemplateSerializer(
-        many=True,
-        read_only=True,
-        required=False,
-        default=None,
-        help_text=_("Zone templates this policy is assigned to"),
-    )
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
-
     class Meta:
         model = DNSSECPolicy
+
         fields = (
             "id",
             "url",
@@ -90,7 +52,94 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
-        brief_fields = ("id", "url", "display", "name", "description", "status")
+
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "description",
+            "status",
+        )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:dnssecpolicy-detail"
+    )
+    key_templates = DNSSECKeyTemplateSerializer(
+        nested=True,
+        many=True,
+        read_only=False,
+        required=False,
+        default=None,
+        help_text=_("Key templates assigned to the policy"),
+    )
+    dnskey_ttl = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    purge_keys = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    publish_safety = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    retire_safety = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    signatures_jitter = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    signatures_refresh = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    signatures_validity = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    signatures_validity_dnskey = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    max_zone_ttl = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    zone_propagation_delay = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    parent_ds_ttl = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    parent_propagation_delay = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    zones = NestedZoneSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        default=None,
+        help_text=_("Zones this policy is assigned to"),
+    )
+    zone_templates = NestedZoneTemplateSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        default=None,
+        help_text=_("Zone templates this policy is assigned to"),
+    )
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )
 
     def create(self, validated_data):
         dnssec_key_templates = validated_data.pop("key_templates", None)

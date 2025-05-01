@@ -3,7 +3,6 @@ from dns import name as dns_name
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -23,6 +22,35 @@ __all__ = (
 
 
 class RecordTemplate(NetBoxModel):
+    class Meta:
+        verbose_name = _("Record Template")
+        verbose_name_plural = _("Record Templates")
+
+        ordering = ("name",)
+
+    clone_fields = (
+        "record_name",
+        "description",
+        "type",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "tenant",
+    )
+
+    template_fields = (
+        "type",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "tenant",
+    )
+
+    def __str__(self):
+        return str(self.name)
+
     name = models.CharField(
         verbose_name=_("Template Name"),
         unique=True,
@@ -72,41 +100,8 @@ class RecordTemplate(NetBoxModel):
         null=True,
     )
 
-    clone_fields = (
-        "record_name",
-        "description",
-        "type",
-        "value",
-        "status",
-        "ttl",
-        "disable_ptr",
-        "tenant",
-    )
-
-    template_fields = (
-        "type",
-        "value",
-        "status",
-        "ttl",
-        "disable_ptr",
-        "tenant",
-    )
-
-    class Meta:
-        verbose_name = _("Record Template")
-        verbose_name_plural = _("Record Templates")
-
-        ordering = ("name",)
-
-    def __str__(self):
-        return str(self.name)
-
     def get_status_color(self):
         return RecordStatusChoices.colors.get(self.status)
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:recordtemplate", kwargs={"pk": self.pk})
 
     def validate_name(self):
         try:
@@ -191,6 +186,7 @@ class RecordTemplate(NetBoxModel):
 @register_search
 class RecordTemplateIndex(SearchIndex):
     model = RecordTemplate
+
     fields = (
         ("name", 100),
         ("record_name", 120),

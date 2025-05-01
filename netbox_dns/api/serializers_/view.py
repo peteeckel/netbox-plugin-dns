@@ -12,6 +12,34 @@ __all__ = ("ViewSerializer",)
 
 
 class ViewSerializer(NetBoxModelSerializer):
+    class Meta:
+        model = View
+
+        fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "default_view",
+            "tags",
+            "description",
+            "created",
+            "last_updated",
+            "custom_fields",
+            "tenant",
+            "prefixes",
+            "ip_address_filter",
+        )
+
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "default_view",
+            "description",
+        )
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:view-detail"
     )
@@ -50,22 +78,3 @@ class ViewSerializer(NetBoxModelSerializer):
             view.prefixes.set(prefixes)
 
         return view
-
-    class Meta:
-        model = View
-        fields = (
-            "id",
-            "url",
-            "display",
-            "name",
-            "default_view",
-            "tags",
-            "description",
-            "created",
-            "last_updated",
-            "custom_fields",
-            "tenant",
-            "prefixes",
-            "ip_address_filter",
-        )
-        brief_fields = ("id", "url", "display", "name", "default_view", "description")

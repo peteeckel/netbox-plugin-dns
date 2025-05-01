@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import ZoneFilterSet, RecordFilterSet
 from netbox_dns.forms import (
@@ -72,13 +71,11 @@ class ZoneView(generic.ObjectView):
 class ZoneEditView(generic.ObjectEditView):
     queryset = Zone.objects.prefetch_related("view", "tags", "nameservers", "soa_mname")
     form = ZoneForm
-    default_return_url = "plugins:netbox_dns:zone_list"
 
 
 @register_model_view(Zone, "delete")
 class ZoneDeleteView(generic.ObjectDeleteView):
     queryset = Zone.objects.all()
-    default_return_url = "plugins:netbox_dns:zone_list"
 
 
 @register_model_view(Zone, "bulk_import", detail=False)
@@ -86,7 +83,6 @@ class ZoneBulkImportView(generic.BulkImportView):
     queryset = Zone.objects.prefetch_related("view", "tags", "nameservers", "soa_mname")
     model_form = ZoneImportForm
     table = ZoneTable
-    default_return_url = "plugins:netbox_dns:zone_list"
 
 
 @register_model_view(Zone, "bulk_edit", path="edit", detail=False)
@@ -95,7 +91,6 @@ class ZoneBulkEditView(generic.BulkEditView):
     filterset = ZoneFilterSet
     table = ZoneTable
     form = ZoneBulkEditForm
-    default_return_url = "plugins:netbox_dns:zone_list"
 
 
 @register_model_view(Zone, "bulk_delete", path="delete", detail=False)
@@ -247,8 +242,3 @@ class ZoneChildZoneListView(generic.ObjectChildrenView):
 
     def get_children(self, request, parent):
         return parent.child_zones
-
-
-@register_model_view(Zone, "contacts")
-class ZoneContactsView(ObjectContactsView):
-    queryset = Zone.objects.all()

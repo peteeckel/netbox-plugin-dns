@@ -15,6 +15,23 @@ __all__ = (
 
 
 class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = RecordTemplate
+
+        fields = (
+            "status",
+            "description",
+        )
+
+        default_columns = (
+            "name",
+            "record_name",
+            "ttl",
+            "type",
+            "value",
+            "tags",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -47,31 +64,16 @@ class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
     def render_unicode_value(self, value):
         return value_to_unicode(value)
 
-    class Meta(NetBoxTable.Meta):
-        model = RecordTemplate
-        fields = (
-            "status",
-            "description",
-        )
-        default_columns = (
-            "name",
-            "record_name",
-            "ttl",
-            "type",
-            "value",
-            "tags",
-        )
-
 
 class RecordTemplateDisplayTable(RecordTemplateTable):
-    actions = ActionsColumn(actions="")
-
     class Meta(NetBoxTable.Meta):
         model = RecordTemplate
+
         fields = (
             "status",
             "description",
         )
+
         default_columns = (
             "name",
             "record_name",
@@ -79,3 +81,5 @@ class RecordTemplateDisplayTable(RecordTemplateTable):
             "type",
             "value",
         )
+
+    actions = ActionsColumn(actions="")

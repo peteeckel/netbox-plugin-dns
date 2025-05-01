@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -13,6 +12,18 @@ __all__ = (
 
 
 class Registrar(NetBoxModel):
+    class Meta:
+        verbose_name = _("Registrar")
+        verbose_name_plural = _("Registrars")
+
+        ordering = (
+            "name",
+            "iana_id",
+        )
+
+    def __str__(self):
+        return str(self.name)
+
     # +
     # Data fields according to https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en
     # -
@@ -57,26 +68,11 @@ class Registrar(NetBoxModel):
         blank=True,
     )
 
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:registrar", kwargs={"pk": self.pk})
-
-    def __str__(self):
-        return str(self.name)
-
-    class Meta:
-        verbose_name = _("Registrar")
-        verbose_name_plural = _("Registrars")
-
-        ordering = (
-            "name",
-            "iana_id",
-        )
-
 
 @register_search
 class RegistrarIndex(SearchIndex):
     model = Registrar
+
     fields = (
         ("name", 100),
         ("iana_id", 100),

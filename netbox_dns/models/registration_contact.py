@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
@@ -15,6 +14,38 @@ __all__ = (
 
 
 class RegistrationContact(NetBoxModel):
+    class Meta:
+        verbose_name = _("Registration Contact")
+        verbose_name_plural = _("Registration Contacts")
+
+        ordering = (
+            "name",
+            "contact_id",
+        )
+
+    clone_fields = (
+        "name",
+        "description",
+        "organization",
+        "street",
+        "city",
+        "state_province",
+        "postal_code",
+        "country",
+        "phone",
+        "phone_ext",
+        "fax",
+        "fax_ext",
+        "email",
+        "tags",
+    )
+
+    def __str__(self):
+        if self.name is not None:
+            return f"{self.contact_id} ({self.name})"
+
+        return self.contact_id
+
     # +
     # Data fields according to https://www.icann.org/resources/pages/rdds-labeling-policy-2017-02-01-en
     # -
@@ -101,42 +132,6 @@ class RegistrationContact(NetBoxModel):
         related_name="netbox_dns_contact_set",
     )
 
-    clone_fields = (
-        "name",
-        "description",
-        "organization",
-        "street",
-        "city",
-        "state_province",
-        "postal_code",
-        "country",
-        "phone",
-        "phone_ext",
-        "fax",
-        "fax_ext",
-        "email",
-        "tags",
-    )
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:registrationcontact", kwargs={"pk": self.pk})
-
-    def __str__(self):
-        if self.name is not None:
-            return f"{self.contact_id} ({self.name})"
-
-        return self.contact_id
-
-    class Meta:
-        verbose_name = _("Registration Contact")
-        verbose_name_plural = _("Registration Contacts")
-
-        ordering = (
-            "name",
-            "contact_id",
-        )
-
     @property
     def zones(self):
         return (
@@ -150,6 +145,7 @@ class RegistrationContact(NetBoxModel):
 @register_search
 class RegistrationContactIndex(SearchIndex):
     model = RegistrationContact
+
     fields = (
         ("name", 100),
         ("contact_id", 100),

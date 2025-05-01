@@ -21,6 +21,64 @@ __all__ = ("ZoneSerializer",)
 
 
 class ZoneSerializer(NetBoxModelSerializer):
+    class Meta:
+        model = Zone
+
+        fields = (
+            "id",
+            "url",
+            "name",
+            "view",
+            "display",
+            "nameservers",
+            "status",
+            "description",
+            "tags",
+            "created",
+            "last_updated",
+            "default_ttl",
+            "soa_ttl",
+            "soa_mname",
+            "soa_rname",
+            "soa_serial",
+            "soa_serial_auto",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "rfc2317_parent_zone",
+            "rfc2317_child_zones",
+            "dnssec_policy",
+            "inline_signing",
+            "parental_agents",
+            "registrar",
+            "registry_domain_id",
+            "expiration_date",
+            "domain_status",
+            "registrant",
+            "tech_c",
+            "admin_c",
+            "billing_c",
+            "active",
+            "custom_fields",
+            "tenant",
+            "template",
+        )
+
+        brief_fields = (
+            "id",
+            "url",
+            "name",
+            "view",
+            "display",
+            "status",
+            "description",
+            "rfc2317_prefix",
+            "active",
+        )
+
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:netbox_dns-api:zone-detail"
     )
@@ -39,8 +97,14 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text=_("Nameservers for the zone"),
     )
-    default_ttl = TimePeriodField(required=False, allow_null=True)
-    soa_ttl = TimePeriodField(required=False, allow_null=True)
+    default_ttl = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    soa_ttl = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
     soa_mname = NameServerSerializer(
         nested=True,
         many=False,
@@ -54,10 +118,22 @@ class ZoneSerializer(NetBoxModelSerializer):
         required=False,
         help_text=_("Contact email for the zone"),
     )
-    soa_refresh = TimePeriodField(required=False, allow_null=True)
-    soa_retry = TimePeriodField(required=False, allow_null=True)
-    soa_expire = TimePeriodField(required=False, allow_null=True)
-    soa_minimum = TimePeriodField(required=False, allow_null=True)
+    soa_refresh = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    soa_retry = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    soa_expire = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    soa_minimum = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
     rfc2317_parent_zone = NestedZoneSerializer(
         many=False,
         read_only=True,
@@ -124,7 +200,11 @@ class ZoneSerializer(NetBoxModelSerializer):
         read_only=True,
         allow_null=True,
     )
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )
 
     def validate(self, data):
         if isinstance(data, dict) and (template := data.get("template")) is not None:
@@ -159,59 +239,3 @@ class ZoneSerializer(NetBoxModelSerializer):
             template.apply_to_zone_relations(zone)
 
         return zone
-
-    class Meta:
-        model = Zone
-        fields = (
-            "id",
-            "url",
-            "name",
-            "view",
-            "display",
-            "nameservers",
-            "status",
-            "description",
-            "tags",
-            "created",
-            "last_updated",
-            "default_ttl",
-            "soa_ttl",
-            "soa_mname",
-            "soa_rname",
-            "soa_serial",
-            "soa_serial_auto",
-            "soa_refresh",
-            "soa_retry",
-            "soa_expire",
-            "soa_minimum",
-            "rfc2317_prefix",
-            "rfc2317_parent_managed",
-            "rfc2317_parent_zone",
-            "rfc2317_child_zones",
-            "dnssec_policy",
-            "inline_signing",
-            "parental_agents",
-            "registrar",
-            "registry_domain_id",
-            "expiration_date",
-            "domain_status",
-            "registrant",
-            "tech_c",
-            "admin_c",
-            "billing_c",
-            "active",
-            "custom_fields",
-            "tenant",
-            "template",
-        )
-        brief_fields = (
-            "id",
-            "url",
-            "name",
-            "view",
-            "display",
-            "status",
-            "description",
-            "rfc2317_prefix",
-            "active",
-        )

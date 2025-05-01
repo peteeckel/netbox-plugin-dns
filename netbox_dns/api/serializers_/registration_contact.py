@@ -9,12 +9,9 @@ __all__ = ("RegistrationContactSerializer",)
 
 
 class RegistrationContactSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:registrationcontact-detail"
-    )
-
     class Meta:
         model = RegistrationContact
+
         fields = (
             "id",
             "url",
@@ -37,4 +34,15 @@ class RegistrationContactSerializer(NetBoxModelSerializer):
             "last_updated",
             "custom_fields",
         )
-        brief_fields = ("id", "url", "display", "name", "description", "contact_id")
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "description",
+            "contact_id",
+        )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:registrationcontact-detail"
+    )

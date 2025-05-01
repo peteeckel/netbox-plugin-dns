@@ -31,6 +31,34 @@ __all__ = (
 
 
 class NameServerForm(TenancyForm, NetBoxModelForm):
+    class Meta:
+        model = NameServer
+
+        fields = (
+            "name",
+            "description",
+            "tags",
+            "tenant_group",
+            "tenant",
+        )
+
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            name=_("Nameserver"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -43,19 +71,29 @@ class NameServerForm(TenancyForm, NetBoxModelForm):
         label=_("Name"),
     )
 
-    fieldsets = (
-        FieldSet("name", "description", name=_("Nameserver")),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
-    )
-
-    class Meta:
-        model = NameServer
-        fields = ("name", "description", "tags", "tenant_group", "tenant")
-
 
 class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = NameServer
+
+    fieldsets = (
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
+        FieldSet(
+            "name",
+            "zone_id",
+            "soa_zone_id",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
+    )
 
     name = forms.CharField(
         required=False,
@@ -79,24 +117,8 @@ class NameServerFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     )
     tag = TagFilterField(NameServer)
 
-    fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "zone_id", "soa_zone_id", "description", name=_("Attributes")),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
-    )
-
 
 class NameServerImportForm(NetBoxModelImportForm):
-    name = forms.CharField(
-        label=_("Name"),
-    )
-    tenant = CSVModelChoiceField(
-        queryset=Tenant.objects.all(),
-        to_field_name="name",
-        required=False,
-        label=_("Tenant"),
-    )
-
     class Meta:
         model = NameServer
 
@@ -107,9 +129,34 @@ class NameServerImportForm(NetBoxModelImportForm):
             "tags",
         )
 
+    name = forms.CharField(
+        label=_("Name"),
+    )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        to_field_name="name",
+        required=False,
+        label=_("Tenant"),
+    )
+
 
 class NameServerBulkEditForm(NetBoxModelBulkEditForm):
     model = NameServer
+
+    fieldsets = (
+        FieldSet(
+            "description",
+            "tenant_group",
+            "tenant",
+            "tags",
+            name=_("Attributes"),
+        ),
+    )
+
+    nullable_fields = (
+        "description",
+        "tenant",
+    )
 
     description = forms.CharField(
         max_length=200,
@@ -126,15 +173,3 @@ class NameServerBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Tenant"),
     )
-
-    fieldsets = (
-        FieldSet(
-            "description",
-            "tenant_group",
-            "tenant",
-            "tags",
-            name=_("Attributes"),
-        ),
-    )
-
-    nullable_fields = ("description", "tenant")

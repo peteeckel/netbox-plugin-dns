@@ -19,6 +19,27 @@ __all__ = (
 
 
 class ZoneTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = Zone
+
+        fields = (
+            "description",
+            "soa_rname",
+            "soa_serial",
+            "inline_signing",
+            "rfc2317_parent_managed",
+            "registry_domain_id",
+            "expiration_date",
+            "domain_status",
+        )
+
+        default_columns = (
+            "name",
+            "view",
+            "status",
+            "tags",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -78,28 +99,9 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
     def render_name(self, value, record):
         return record.display_name
 
-    class Meta(NetBoxTable.Meta):
-        model = Zone
-        fields = (
-            "description",
-            "soa_rname",
-            "soa_serial",
-            "inline_signing",
-            "rfc2317_parent_managed",
-            "registry_domain_id",
-            "expiration_date",
-            "domain_status",
-        )
-        default_columns = (
-            "name",
-            "view",
-            "status",
-            "tags",
-        )
-
 
 class ZoneDisplayTable(ZoneTable):
-    actions = ActionsColumn(actions=("changelog",))
-
     class Meta(ZoneTable.Meta):
         pass
+
+    actions = ActionsColumn(actions=("changelog",))

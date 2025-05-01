@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
-from tenancy.views import ObjectContactsView
 
 from netbox_dns.filtersets import (
     DNSSECPolicyFilterSet,
@@ -78,13 +77,11 @@ class DNSSECPolicyView(generic.ObjectView):
 class DNSSECPolicyEditView(generic.ObjectEditView):
     queryset = DNSSECPolicy.objects.all()
     form = DNSSECPolicyForm
-    default_return_url = "plugins:netbox_dns:dnssecpolicy_list"
 
 
 @register_model_view(DNSSECPolicy, "delete")
 class DNSSECPolicyDeleteView(generic.ObjectDeleteView):
     queryset = DNSSECPolicy.objects.all()
-    default_return_url = "plugins:netbox_dns:dnssecpolicy_list"
 
 
 @register_model_view(DNSSECPolicy, "bulk_import", detail=False)
@@ -92,7 +89,6 @@ class DNSSECPolicyBulkImportView(generic.BulkImportView):
     queryset = DNSSECPolicy.objects.all()
     model_form = DNSSECPolicyImportForm
     table = DNSSECPolicyTable
-    default_return_url = "plugins:netbox_dns:dnssecpolicy_list"
 
 
 @register_model_view(DNSSECPolicy, "bulk_edit", path="edit", detail=False)
@@ -108,11 +104,6 @@ class DNSSECPolicyBulkDeleteView(generic.BulkDeleteView):
     queryset = DNSSECPolicy.objects.all()
     filterset = DNSSECPolicyFilterSet
     table = DNSSECPolicyTable
-
-
-@register_model_view(DNSSECPolicy, "contacts")
-class DNSSECPolicyContactsView(ObjectContactsView):
-    queryset = DNSSECPolicy.objects.all()
 
 
 @register_model_view(DNSSECPolicy, "zones")

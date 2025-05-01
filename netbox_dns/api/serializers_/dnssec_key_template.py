@@ -14,21 +14,9 @@ __all__ = ("DNSSECKeyTemplateSerializer",)
 
 
 class DNSSECKeyTemplateSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:dnsseckeytemplate-detail"
-    )
-    lifetime = TimePeriodField(required=False, allow_null=True)
-    policies = NestedDNSSECPolicySerializer(
-        many=True,
-        read_only=True,
-        required=False,
-        default=None,
-        help_text=_("Policies using this Key Template"),
-    )
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
-
     class Meta:
         model = DNSSECKeyTemplate
+
         fields = (
             "id",
             "url",
@@ -46,6 +34,7 @@ class DNSSECKeyTemplateSerializer(NetBoxModelSerializer):
             "custom_fields",
             "tenant",
         )
+
         brief_fields = (
             "id",
             "url",
@@ -57,3 +46,23 @@ class DNSSECKeyTemplateSerializer(NetBoxModelSerializer):
             "key_size",
             "description",
         )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:dnsseckeytemplate-detail"
+    )
+    lifetime = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    policies = NestedDNSSECPolicySerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        default=None,
+        help_text=_("Policies using this Key Template"),
+    )
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )

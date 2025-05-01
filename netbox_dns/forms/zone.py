@@ -1,5 +1,3 @@
-from packaging.version import Version
-
 from django import forms
 from django.db import transaction
 from django.conf import settings
@@ -23,7 +21,6 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
 )
-from utilities.release import load_release_data
 from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker
 from utilities.forms.rendering import FieldSet
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
@@ -51,8 +48,6 @@ __all__ = (
     "ZoneImportForm",
     "ZoneBulkEditForm",
 )
-
-QUICK_ADD = Version(load_release_data().version) >= Version("4.2.5")
 
 
 class RollbackTransaction(Exception):
@@ -154,114 +149,59 @@ class ZoneTemplateUpdateMixin:
 
 
 class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
-    view = DynamicModelChoiceField(
-        queryset=View.objects.all(),
-        required=True,
-        label=_("View"),
-        quick_add=QUICK_ADD,
-    )
-    name = forms.CharField(
-        required=True,
-        label=_("Name"),
-    )
-    template = DynamicModelChoiceField(
-        queryset=ZoneTemplate.objects.all(),
-        required=False,
-        label=_("Template"),
-    )
-    status = forms.ChoiceField(
-        choices=ZoneStatusChoices,
-        required=False,
-        label=_("Status"),
-    )
-    nameservers = DynamicModelMultipleChoiceField(
-        queryset=NameServer.objects.all(),
-        required=False,
-        label=_("Nameservers"),
-        quick_add=QUICK_ADD,
-    )
-    default_ttl = TimePeriodField(
-        required=False,
-        help_text=_("Default TTL for new records in this zone"),
-        validators=[MinValueValidator(1)],
-        label=_("Default TTL"),
-    )
-    description = forms.CharField(
-        required=False,
-        label=_("Description"),
-    )
-    soa_ttl = TimePeriodField(
-        required=True,
-        help_text=_("TTL for the SOA record of the zone"),
-        validators=[MinValueValidator(1)],
-        label=_("SOA TTL"),
-    )
-    soa_mname = DynamicModelChoiceField(
-        queryset=NameServer.objects.all(),
-        help_text=_("Primary nameserver this zone"),
-        required=False,
-        label=_("SOA MName"),
-        quick_add=QUICK_ADD,
-    )
-    soa_rname = forms.CharField(
-        required=False,
-        help_text=_("Mailbox of the zone's administrator"),
-        label=_("SOA RName"),
-    )
-    soa_refresh = TimePeriodField(
-        required=True,
-        help_text=_("Refresh interval for secondary nameservers"),
-        validators=[MinValueValidator(1)],
-        label=_("SOA Refresh"),
-    )
-    soa_retry = TimePeriodField(
-        required=True,
-        help_text=_("Retry interval for secondary nameservers"),
-        validators=[MinValueValidator(1)],
-        label=_("SOA Retry"),
-    )
-    soa_expire = TimePeriodField(
-        required=True,
-        validators=[MinValueValidator(1)],
-        help_text=_("Expire time after which the zone is considered unavailable"),
-        label=_("SOA Expire"),
-    )
-    soa_minimum = TimePeriodField(
-        required=True,
-        help_text=_("Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"),
-        validators=[MinValueValidator(1)],
-        label=_("SOA Minimum TTL"),
-    )
-    soa_serial_auto = forms.BooleanField(
-        required=False,
-        help_text=_("Automatically generate the SOA serial number"),
-        label=_("Generate SOA Serial"),
-    )
-    soa_serial = forms.IntegerField(
-        required=False,
-        validators=[MinValueValidator(1)],
-        label=_("SOA Serial"),
-    )
+    class Meta:
+        model = Zone
 
-    parental_agents = SimpleArrayField(
-        required=False,
-        base_field=forms.GenericIPAddressField(),
-        label=_("Parental Agents"),
-    )
+        fields = (
+            "name",
+            "view",
+            "status",
+            "template",
+            "nameservers",
+            "default_ttl",
+            "description",
+            "soa_ttl",
+            "soa_mname",
+            "soa_rname",
+            "soa_serial_auto",
+            "soa_serial",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "dnssec_policy",
+            "inline_signing",
+            "parental_agents",
+            "registrar",
+            "registry_domain_id",
+            "expiration_date",
+            "domain_status",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            "tenant_group",
+            "tenant",
+            "tags",
+        )
 
-    rfc2317_prefix = RFC2317NetworkFormField(
-        required=False,
-        validators=[validate_ipv4, validate_prefix, validate_rfc2317],
-        help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
-        label=_("RFC2317 Prefix"),
-    )
-    rfc2317_parent_managed = forms.BooleanField(
-        required=False,
-        help_text=_(
-            "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
-        ),
-        label=_("RFC2317 Parent Managed"),
-    )
+        labels = {
+            "soa_serial_auto": _("Generate SOA Serial"),
+            "rfc2317_parent_managed": _("RFC2317 Parent Managed"),
+        }
+
+        help_texts = {
+            "soa_serial_auto": _("Automatically generate the SOA serial number"),
+            "rfc2317_parent_managed": _(
+                "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
+            ),
+        }
+
+        widgets = {
+            "expiration_date": DatePicker,
+        }
 
     fieldsets = (
         FieldSet(
@@ -308,8 +248,15 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "billing_c",
             name=_("Domain Registration"),
         ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
     )
 
     def __init__(self, *args, **kwargs):
@@ -356,6 +303,96 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
                     name__in=default_nameservers
                 )
 
+    view = DynamicModelChoiceField(
+        queryset=View.objects.all(),
+        required=True,
+        label=_("View"),
+    )
+    name = forms.CharField(
+        required=True,
+        label=_("Name"),
+    )
+    template = DynamicModelChoiceField(
+        queryset=ZoneTemplate.objects.all(),
+        required=False,
+        label=_("Template"),
+    )
+    status = forms.ChoiceField(
+        choices=ZoneStatusChoices,
+        required=False,
+        label=_("Status"),
+    )
+    nameservers = DynamicModelMultipleChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label=_("Nameservers"),
+    )
+    default_ttl = TimePeriodField(
+        required=False,
+        help_text=_("Default TTL for new records in this zone"),
+        validators=[MinValueValidator(1)],
+        label=_("Default TTL"),
+    )
+    soa_ttl = TimePeriodField(
+        required=True,
+        help_text=_("TTL for the SOA record of the zone"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA TTL"),
+    )
+    soa_mname = DynamicModelChoiceField(
+        queryset=NameServer.objects.all(),
+        help_text=_("Primary nameserver this zone"),
+        required=False,
+        label=_("SOA MName"),
+    )
+    soa_rname = forms.CharField(
+        required=False,
+        help_text=_("Mailbox of the zone's administrator"),
+        label=_("SOA RName"),
+    )
+    soa_refresh = TimePeriodField(
+        required=True,
+        help_text=_("Refresh interval for secondary nameservers"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA Refresh"),
+    )
+    soa_retry = TimePeriodField(
+        required=True,
+        help_text=_("Retry interval for secondary nameservers"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA Retry"),
+    )
+    soa_expire = TimePeriodField(
+        required=True,
+        validators=[MinValueValidator(1)],
+        help_text=_("Expire time after which the zone is considered unavailable"),
+        label=_("SOA Expire"),
+    )
+    soa_minimum = TimePeriodField(
+        required=True,
+        help_text=_("Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"),
+        validators=[MinValueValidator(1)],
+        label=_("SOA Minimum TTL"),
+    )
+    soa_serial = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(1)],
+        label=_("SOA Serial"),
+    )
+
+    parental_agents = SimpleArrayField(
+        required=False,
+        base_field=forms.GenericIPAddressField(),
+        label=_("Parental Agents"),
+    )
+
+    rfc2317_prefix = RFC2317NetworkFormField(
+        required=False,
+        validators=[validate_ipv4, validate_prefix, validate_rfc2317],
+        help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
+        label=_("RFC2317 Prefix"),
+    )
+
     def clean_default_ttl(self):
         return (
             self.cleaned_data["default_ttl"]
@@ -370,52 +407,16 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         else:
             return name
 
-    class Meta:
-        model = Zone
-
-        fields = (
-            "name",
-            "view",
-            "status",
-            "template",
-            "nameservers",
-            "default_ttl",
-            "description",
-            "soa_ttl",
-            "soa_mname",
-            "soa_rname",
-            "soa_serial_auto",
-            "soa_serial",
-            "soa_refresh",
-            "soa_retry",
-            "soa_expire",
-            "soa_minimum",
-            "rfc2317_prefix",
-            "rfc2317_parent_managed",
-            "dnssec_policy",
-            "inline_signing",
-            "parental_agents",
-            "registrar",
-            "registry_domain_id",
-            "expiration_date",
-            "domain_status",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            "tenant_group",
-            "tenant",
-            "tags",
-        )
-        widgets = {
-            "expiration_date": DatePicker,
-        }
-
 
 class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Zone
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
         FieldSet(
             "view_id",
             "status",
@@ -455,7 +456,11 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "billing_c_id",
             name=_("Registration"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
     )
 
     view_id = DynamicModelMultipleChoiceField(
@@ -584,6 +589,43 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
+    class Meta:
+        model = Zone
+
+        fields = (
+            "view",
+            "name",
+            "status",
+            "template",
+            "nameservers",
+            "default_ttl",
+            "description",
+            "soa_ttl",
+            "soa_mname",
+            "soa_rname",
+            "soa_serial_auto",
+            "soa_serial",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "dnssec_policy",
+            "inline_signing",
+            "parental_agents",
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            "registrar",
+            "registry_domain_id",
+            "expiration_date",
+            "domain_status",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            "tenant",
+            "tags",
+        )
+
     view = CSVModelChoiceField(
         queryset=View.objects.all(),
         required=False,
@@ -748,43 +790,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         label=_("Template"),
     )
 
-    class Meta:
-        model = Zone
-
-        fields = (
-            "view",
-            "name",
-            "status",
-            "template",
-            "nameservers",
-            "default_ttl",
-            "description",
-            "soa_ttl",
-            "soa_mname",
-            "soa_rname",
-            "soa_serial_auto",
-            "soa_serial",
-            "soa_refresh",
-            "soa_retry",
-            "soa_expire",
-            "soa_minimum",
-            "dnssec_policy",
-            "inline_signing",
-            "parental_agents",
-            "rfc2317_prefix",
-            "rfc2317_parent_managed",
-            "registrar",
-            "registry_domain_id",
-            "expiration_date",
-            "domain_status",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            "tenant",
-            "tags",
-        )
-
     def clean_view(self):
         view = self.cleaned_data.get("view")
         if view is None:
@@ -808,6 +813,73 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
 
 
 class ZoneBulkEditForm(NetBoxModelBulkEditForm):
+    model = Zone
+
+    fieldsets = (
+        FieldSet(
+            "view",
+            "status",
+            "nameservers",
+            "default_ttl",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "soa_ttl",
+            "soa_mname",
+            "soa_rname",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "soa_serial_auto",
+            "soa_serial",
+            name=_("SOA"),
+        ),
+        FieldSet(
+            "dnssec_policy",
+            "inline_signing",
+            "parental_agents",
+            name=_("DNSSEC"),
+        ),
+        FieldSet(
+            "rfc2317_prefix",
+            "rfc2317_parent_managed",
+            name=_("RFC2317"),
+        ),
+        FieldSet(
+            "registrar",
+            "registry_domain_id",
+            "expiration_date",
+            "domain_status",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            name=_("Domain Registration"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+    )
+
+    nullable_fields = (
+        "description",
+        "nameservers",
+        "rfc2317_prefix",
+        "registrar",
+        "expiration_date",
+        "domain_status",
+        "registry_domain_id",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+        "tenant",
+    )
+
     view = DynamicModelChoiceField(
         queryset=View.objects.all(),
         required=False,
@@ -954,67 +1026,4 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Tenant.objects.all(),
         required=False,
         label=_("Tenant"),
-    )
-
-    model = Zone
-
-    fieldsets = (
-        FieldSet(
-            "view",
-            "status",
-            "nameservers",
-            "default_ttl",
-            "description",
-            name=_("Attributes"),
-        ),
-        FieldSet(
-            "soa_ttl",
-            "soa_mname",
-            "soa_rname",
-            "soa_refresh",
-            "soa_retry",
-            "soa_expire",
-            "soa_minimum",
-            "soa_serial_auto",
-            "soa_serial",
-            name=_("SOA"),
-        ),
-        FieldSet(
-            "dnssec_policy",
-            "inline_signing",
-            "parental_agents",
-            name=_("DNSSEC"),
-        ),
-        FieldSet(
-            "rfc2317_prefix",
-            "rfc2317_parent_managed",
-            name=_("RFC2317"),
-        ),
-        FieldSet(
-            "registrar",
-            "registry_domain_id",
-            "expiration_date",
-            "domain_status",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            name=_("Domain Registration"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-    )
-
-    nullable_fields = (
-        "description",
-        "nameservers",
-        "rfc2317_prefix",
-        "registrar",
-        "expiration_date",
-        "domain_status",
-        "registry_domain_id",
-        "registrant",
-        "admin_c",
-        "tech_c",
-        "billing_c",
-        "tenant",
     )

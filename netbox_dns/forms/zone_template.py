@@ -1,5 +1,3 @@
-from packaging.version import Version
-
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -9,7 +7,6 @@ from netbox.forms import (
     NetBoxModelImportForm,
     NetBoxModelForm,
 )
-from utilities.release import load_release_data
 from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
     TagFilterField,
@@ -38,44 +35,8 @@ __all__ = (
     "ZoneTemplateBulkEditForm",
 )
 
-QUICK_ADD = Version(load_release_data().version) >= Version("4.2.5")
-
 
 class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
-    nameservers = DynamicModelMultipleChoiceField(
-        queryset=NameServer.objects.all(),
-        required=False,
-        quick_add=QUICK_ADD,
-    )
-    soa_mname = DynamicModelChoiceField(
-        queryset=NameServer.objects.all(),
-        required=False,
-        label=_("MName"),
-        quick_add=QUICK_ADD,
-    )
-    record_templates = DynamicModelMultipleChoiceField(
-        queryset=RecordTemplate.objects.all(),
-        required=False,
-        quick_add=QUICK_ADD,
-    )
-
-    fieldsets = (
-        FieldSet("name", "description", "nameservers", name=_("Zone Template")),
-        FieldSet("soa_mname", "soa_rname", name=_("SOA")),
-        FieldSet("record_templates", name=_("Record Templates")),
-        FieldSet("dnssec_policy", name=_("DNSSEC")),
-        FieldSet(
-            "registrar",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            name=_("Domain Registration"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
-    )
-
     class Meta:
         model = ZoneTemplate
 
@@ -96,19 +57,96 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
             "tenant",
             "tags",
         )
+
         labels = {
             "soa_rname": _("RName"),
         }
 
+    fieldsets = (
+        FieldSet(
+            "name",
+            "description",
+            "nameservers",
+            name=_("Zone Template"),
+        ),
+        FieldSet(
+            "soa_mname",
+            "soa_rname",
+            name=_("SOA"),
+        ),
+        FieldSet(
+            "record_templates",
+            name=_("Record Templates"),
+        ),
+        FieldSet(
+            "dnssec_policy",
+            name=_("DNSSEC"),
+        ),
+        FieldSet(
+            "registrar",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            name=_("Domain Registration"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
+    )
+
+    nameservers = DynamicModelMultipleChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        quick_add=True,
+    )
+    soa_mname = DynamicModelChoiceField(
+        queryset=NameServer.objects.all(),
+        required=False,
+        label=_("MName"),
+        quick_add=True,
+    )
+    record_templates = DynamicModelMultipleChoiceField(
+        queryset=RecordTemplate.objects.all(),
+        required=False,
+        quick_add=True,
+    )
+
 
 class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = ZoneTemplate
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
-        FieldSet("name", "nameserver_id", "description", name=_("Attributes")),
-        FieldSet("soa_mname_id", "soa_rname", name=_("SOA")),
-        FieldSet("record_template_id", name=_("Record Templates")),
-        FieldSet("dnssec_policy", name=_("DNSSEC")),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
+        FieldSet(
+            "name",
+            "nameserver_id",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "soa_mname_id",
+            "soa_rname",
+            name=_("SOA"),
+        ),
+        FieldSet(
+            "record_template_id",
+            name=_("Record Templates"),
+        ),
+        FieldSet(
+            "dnssec_policy",
+            name=_("DNSSEC"),
+        ),
         FieldSet(
             "registrar_id",
             "registrant_id",
@@ -117,7 +155,11 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "billing_c_id",
             name=_("Registration"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
     )
 
     name = forms.CharField(
@@ -189,6 +231,26 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class ZoneTemplateImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = ZoneTemplate
+
+        fields = (
+            "name",
+            "nameservers",
+            "soa_mname",
+            "soa_rname",
+            "record_templates",
+            "dnssec_policy",
+            "description",
+            "registrar",
+            "registrant",
+            "admin_c",
+            "tech_c",
+            "billing_c",
+            "tenant",
+            "tags",
+        )
+
     nameservers = CSVModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         to_field_name="name",
@@ -268,28 +330,59 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
         label=_("Tenant"),
     )
 
-    class Meta:
-        model = ZoneTemplate
 
-        fields = (
-            "name",
+class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
+    model = ZoneTemplate
+
+    fieldsets = (
+        FieldSet(
             "nameservers",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
             "soa_mname",
             "soa_rname",
+            name=_("SOA"),
+        ),
+        FieldSet(
             "record_templates",
+            name=_("Record Templates"),
+        ),
+        FieldSet(
             "dnssec_policy",
-            "description",
+            name=_("DNSSEC"),
+        ),
+        FieldSet(
             "registrar",
             "registrant",
             "admin_c",
             "tech_c",
             "billing_c",
+            name=_("Domain Registration"),
+        ),
+        FieldSet(
+            "tenant_group",
             "tenant",
-            "tags",
-        )
+            name=_("Tenancy"),
+        ),
+    )
 
+    nullable_fields = (
+        "description",
+        "nameservers",
+        "soa_mname",
+        "soa_rname",
+        "record_templates",
+        "dnssec_policy",
+        "registrar",
+        "registrant",
+        "admin_c",
+        "tech_c",
+        "billing_c",
+        "tenant",
+    )
 
-class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
@@ -300,7 +393,11 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("MName"),
     )
-    soa_rname = forms.CharField(max_length=255, required=False, label=_("RName"))
+    soa_rname = forms.CharField(
+        max_length=255,
+        required=False,
+        label=_("RName"),
+    )
     record_templates = DynamicModelMultipleChoiceField(
         queryset=RecordTemplate.objects.all(),
         required=False,
@@ -348,51 +445,4 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Tenant.objects.all(),
         required=False,
         label=_("Tenant"),
-    )
-
-    model = ZoneTemplate
-
-    fieldsets = (
-        FieldSet(
-            "nameservers",
-            "description",
-            name=_("Attributes"),
-        ),
-        FieldSet(
-            "soa_mname",
-            "soa_rname",
-            name=_("SOA"),
-        ),
-        FieldSet(
-            "record_templates",
-            name=_("Record Templates"),
-        ),
-        FieldSet(
-            "dnssec_policy",
-            name=_("DNSSEC"),
-        ),
-        FieldSet(
-            "registrar",
-            "registrant",
-            "admin_c",
-            "tech_c",
-            "billing_c",
-            name=_("Domain Registration"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-    )
-
-    nullable_fields = (
-        "description",
-        "nameservers",
-        "soa_mname",
-        "soa_rname",
-        "record_templates",
-        "dnssec_policy",
-        "registrar",
-        "registrant",
-        "admin_c",
-        "tech_c",
-        "billing_c",
-        "tenant",
     )

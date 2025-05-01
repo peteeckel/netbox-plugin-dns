@@ -35,6 +35,7 @@ The main focus of the plugin is to ensure the quality of the data stored in it. 
 * Support for [RFC 2317](https://datatracker.ietf.org/doc/html/rfc2317) delegation of PTR zones for IPv4 subnets longer than 24 bits
 * Templating for zones and records enables faster creations of zones with given boilerplate object relations, such as name servers, tags, tenants or registration information, or records like standard SPF or MX records that are the same for a subset of zones
 * IPAM DNSsync can be used to automatically create address and pointer records for IP addresses by assigning prefixes to DNS views. When an IP address has a DNS name assigned and there are zones with matching names in the DNS views linked to the IP address' prefix, a matching DNS record will be created in these zones
+* DNSSEC support for storing configuration data relevant to DNSSEC operation in NetBox DNS
 
 Other main features include:
 
@@ -50,7 +51,7 @@ For integration with a large number of DNS server implementations integration to
 
 ## Requirements
 
-* NetBox 4.2.0 or higher
+* NetBox 4.3.0 or higher
 * Python 3.10 or higher
 
 ## Compatibility with NetBox Versions
@@ -63,6 +64,7 @@ NetBox Version | NetBox DNS Version | Comment
 4.0 - 4.1      | 1.0                | Supports legacy IPAM Coupling
 4.0 - 4.1      | 1.1                | Supports IPAM DNSsync
 4.2            | 1.2                |
+4.3            | 1.3                |
 
 ## Installation & Configuration
 

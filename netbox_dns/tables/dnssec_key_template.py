@@ -1,7 +1,6 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-
 from netbox.tables import (
     NetBoxTable,
     ChoiceFieldColumn,
@@ -16,6 +15,19 @@ __all__ = ("DNSSECKeyTemplateTable",)
 
 
 class DNSSECKeyTemplateTable(TenancyColumnsMixin, NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = DNSSECKeyTemplate
+
+        fields = ("description",)
+
+        default_columns = (
+            "name",
+            "type",
+            "algorithm",
+            "key_size",
+            "tags",
+        )
+
     name = tables.Column(
         verbose_name=_("Name"),
         linkify=True,
@@ -35,14 +47,3 @@ class DNSSECKeyTemplateTable(TenancyColumnsMixin, NetBoxTable):
     tags = TagColumn(
         url_name="plugins:netbox_dns:dnsseckeytemplate_list",
     )
-
-    class Meta(NetBoxTable.Meta):
-        model = DNSSECKeyTemplate
-        fields = ("description",)
-        default_columns = (
-            "name",
-            "type",
-            "algorithm",
-            "key_size",
-            "tags",
-        )

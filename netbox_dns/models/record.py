@@ -8,7 +8,6 @@ from dns import rdata
 from django.core.exceptions import ValidationError
 from django.db import transaction, models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
-from django.urls import reverse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
@@ -116,6 +115,47 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
 
 
 class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+    class Meta:
+        verbose_name = _("Record")
+        verbose_name_plural = _("Records")
+
+        ordering = (
+            "fqdn",
+            "zone",
+            "name",
+            "type",
+            "value",
+            "status",
+        )
+
+    objects = RecordManager()
+    raw_objects = RestrictedQuerySet.as_manager()
+
+    clone_fields = (
+        "zone",
+        "type",
+        "name",
+        "value",
+        "status",
+        "ttl",
+        "disable_ptr",
+        "description",
+        "tenant",
+    )
+
+    def __str__(self):
+        try:
+            fqdn = dns_name.from_text(
+                self.name, origin=dns_name.from_text(self.zone.name)
+            ).relativize(dns_name.root)
+            name = fqdn.to_unicode()
+        except dns_name.IDNAException:
+            name = fqdn.to_text()
+        except dns_name.LabelTooLong:
+            name = f"{self.name[:59]}..."
+
+        return f"{name} [{self.type}]"
+
     unique_ptr_qs = Q(
         Q(disable_ptr=False),
         Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
@@ -215,57 +255,12 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         blank=True,
     )
 
-    objects = RecordManager()
-    raw_objects = RestrictedQuerySet.as_manager()
-
-    clone_fields = (
-        "zone",
-        "type",
-        "name",
-        "value",
-        "status",
-        "ttl",
-        "disable_ptr",
-        "description",
-        "tenant",
-    )
-
-    class Meta:
-        verbose_name = _("Record")
-        verbose_name_plural = _("Records")
-
-        ordering = (
-            "fqdn",
-            "zone",
-            "name",
-            "type",
-            "value",
-            "status",
-        )
-
-    def __str__(self):
-        try:
-            fqdn = dns_name.from_text(
-                self.name, origin=dns_name.from_text(self.zone.name)
-            ).relativize(dns_name.root)
-            name = fqdn.to_unicode()
-        except dns_name.IDNAException:
-            name = fqdn.to_text()
-        except dns_name.LabelTooLong:
-            name = f"{self.name[:59]}..."
-
-        return f"{name} [{self.type}]"
-
     @property
     def display_name(self):
         return name_to_unicode(self.name)
 
     def get_status_color(self):
         return RecordStatusChoices.colors.get(self.status)
-
-    # TODO: Remove in version 1.3.0 (NetBox #18555)
-    def get_absolute_url(self):
-        return reverse("plugins:netbox_dns:record", kwargs={"pk": self.pk})
 
     @property
     def value_fqdn(self):
@@ -937,6 +932,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 @register_search
 class RecordIndex(SearchIndex):
     model = Record
+
     fields = (
         ("fqdn", 100),
         ("name", 120),

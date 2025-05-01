@@ -14,20 +14,9 @@ __all__ = ("RecordTemplateSerializer",)
 
 
 class RecordTemplateSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="plugins-api:netbox_dns-api:recordtemplate-detail"
-    )
-    ttl = TimePeriodField(required=False, allow_null=True)
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
-    zone_templates = NestedZoneTemplateSerializer(
-        many=True,
-        read_only=True,
-        required=False,
-        help_text=_("Zone templates using the record template"),
-    )
-
     class Meta:
         model = RecordTemplate
+
         fields = (
             "id",
             "url",
@@ -47,6 +36,7 @@ class RecordTemplateSerializer(NetBoxModelSerializer):
             "tenant",
             "zone_templates",
         )
+
         brief_fields = (
             "id",
             "url",
@@ -59,3 +49,22 @@ class RecordTemplateSerializer(NetBoxModelSerializer):
             "ttl",
             "description",
         )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:recordtemplate-detail"
+    )
+    ttl = TimePeriodField(
+        required=False,
+        allow_null=True,
+    )
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+    )
+    zone_templates = NestedZoneTemplateSerializer(
+        many=True,
+        read_only=True,
+        required=False,
+        help_text=_("Zone templates using the record template"),
+    )

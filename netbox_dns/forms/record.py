@@ -35,6 +35,52 @@ __all__ = (
 
 
 class RecordForm(TenancyForm, NetBoxModelForm):
+    class Meta:
+        model = Record
+
+        fields = (
+            "name",
+            "zone",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            "tenant_group",
+            "tenant",
+            "tags",
+        )
+
+        labels = {
+            "disable_ptr": _("Disable PTR"),
+            "ttl": _("TTL"),
+        }
+
+    fieldsets = (
+        FieldSet(
+            "name",
+            "view",
+            "zone",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            name=_("Record"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+        FieldSet(
+            "tags",
+            name=_("Tags"),
+        ),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -64,54 +110,16 @@ class RecordForm(TenancyForm, NetBoxModelForm):
         label=_("Type"),
     )
 
-    disable_ptr = forms.BooleanField(
-        required=False,
-        label=_("Disable PTR"),
-    )
-    ttl = TimePeriodField(
-        required=False,
-        label=_("TTL"),
-    )
-
-    fieldsets = (
-        FieldSet(
-            "name",
-            "view",
-            "zone",
-            "type",
-            "value",
-            "status",
-            "ttl",
-            "disable_ptr",
-            "description",
-            name="Record",
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-        FieldSet("tags", name=_("Tags")),
-    )
-
-    class Meta:
-        model = Record
-
-        fields = (
-            "name",
-            "zone",
-            "type",
-            "value",
-            "status",
-            "ttl",
-            "disable_ptr",
-            "description",
-            "tenant_group",
-            "tenant",
-            "tags",
-        )
-
 
 class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Record
+
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "q",
+            "filter_id",
+            "tag",
+        ),
         FieldSet(
             "name",
             "view_id",
@@ -126,7 +134,11 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "active",
             name=_("Attributes"),
         ),
-        FieldSet("tenant_group_id", "tenant_id", name=_("Tenancy")),
+        FieldSet(
+            "tenant_group_id",
+            "tenant_id",
+            name=_("Tenancy"),
+        ),
     )
 
     type = forms.MultipleChoiceField(
@@ -186,6 +198,27 @@ class RecordFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
 
 class RecordImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = Record
+
+        fields = (
+            "zone",
+            "view",
+            "type",
+            "name",
+            "value",
+            "ttl",
+            "disable_ptr",
+            "description",
+            "tenant",
+            "tags",
+        )
+
+        labels = {
+            "disable_ptr": _("Disable PTR"),
+            "ttl": _("TTL"),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -230,14 +263,6 @@ class RecordImportForm(NetBoxModelImportForm):
         required=False,
         label=_("Status"),
     )
-    ttl = TimePeriodField(
-        required=False,
-        label=_("TTL"),
-    )
-    disable_ptr = forms.BooleanField(
-        required=False,
-        label=_("Disable PTR"),
-    )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name="name",
@@ -253,25 +278,33 @@ class RecordImportForm(NetBoxModelImportForm):
 
         return is_valid
 
-    class Meta:
-        model = Record
-
-        fields = (
-            "zone",
-            "view",
-            "type",
-            "name",
-            "value",
-            "ttl",
-            "disable_ptr",
-            "description",
-            "tenant",
-            "tags",
-        )
-
 
 class RecordBulkEditForm(NetBoxModelBulkEditForm):
     model = Record
+
+    fieldsets = (
+        FieldSet(
+            "zone",
+            "type",
+            "value",
+            "status",
+            "ttl",
+            "disable_ptr",
+            "description",
+            name=_("Attributes"),
+        ),
+        FieldSet(
+            "tenant_group",
+            "tenant",
+            name=_("Tenancy"),
+        ),
+    )
+
+    nullable_fields = (
+        "description",
+        "ttl",
+        "tenant",
+    )
 
     zone = DynamicModelChoiceField(
         queryset=Zone.objects.all(),
@@ -316,18 +349,3 @@ class RecordBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Tenant"),
     )
-
-    fieldsets = (
-        FieldSet(
-            "zone",
-            "type",
-            "value",
-            "status",
-            "ttl",
-            "disable_ptr",
-            "description",
-            name=_("Attributes"),
-        ),
-        FieldSet("tenant_group", "tenant", name=_("Tenancy")),
-    )
-    nullable_fields = ("description", "ttl", "tenant")
