@@ -52,7 +52,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
         default=None,
         help_text=_("Zone templates this policy is assigned to"),
     )
-    tenant = TenantSerializer(required=False, allow_null=True)
+    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
     class Meta:
         model = DNSSECPolicy

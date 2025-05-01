@@ -23,7 +23,7 @@ class NameServerSerializer(NetBoxModelSerializer):
         default=None,
         help_text=_("Zones served by the authoritative nameserver"),
     )
-    tenant = TenantSerializer(required=False, allow_null=True)
+    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
     class Meta:
         model = NameServer

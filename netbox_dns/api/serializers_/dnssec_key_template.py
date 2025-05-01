@@ -25,7 +25,7 @@ class DNSSECKeyTemplateSerializer(NetBoxModelSerializer):
         default=None,
         help_text=_("Policies using this Key Template"),
     )
-    tenant = TenantSerializer(required=False, allow_null=True)
+    tenant = TenantSerializer(nested=True, required=False, allow_null=True)
 
     class Meta:
         model = DNSSECKeyTemplate
