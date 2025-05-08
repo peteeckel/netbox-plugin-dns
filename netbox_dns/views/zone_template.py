@@ -37,10 +37,12 @@ class ZoneTemplateView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         if instance.record_templates.exists():
+            record_template_table = RecordTemplateDisplayTable(
+                data=instance.record_templates.all()
+            )
+            record_template_table.configure(request)
             return {
-                "record_template_table": RecordTemplateDisplayTable(
-                    data=instance.record_templates.all()
-                )
+                "record_template_table": record_template_table,
             }
 
         return {}

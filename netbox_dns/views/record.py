@@ -141,11 +141,17 @@ class RecordView(generic.ObjectView):
 
         if instance.type == RecordTypeChoices.CNAME:
             try:
-                context["cname_target_table"] = self.get_value_records(instance)
+                cname_target_table = self.get_value_records(instance)
+                if cname_target_table is not None:
+                    cname_target_table.configure(request)
+                context["cname_target_table"] = cname_target_table
             except CNAMEWarning as exc:
                 context["cname_warning"] = str(exc)
         else:
-            context["cname_table"] = self.get_cname_records(instance)
+            cname_table = self.get_cname_records(instance)
+            if cname_table is not None:
+                cname_table.configure(request)
+            context["cname_table"] = cname_table
 
         if not instance.managed:
             name = dns_name.from_text(instance.name, origin=None)

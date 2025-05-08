@@ -37,9 +37,9 @@ class DNSSECKeyTemplateView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         if instance.policies.exists():
-            return {
-                "policy_table": DNSSECPolicyDisplayTable(data=instance.policies.all())
-            }
+            policy_table = DNSSECPolicyDisplayTable(data=instance.policies.all())
+            policy_table.configure(request)
+            return {"policy_table": policy_table}
 
         return {}
 
