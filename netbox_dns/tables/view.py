@@ -57,4 +57,5 @@ class RelatedViewTable(TenancyColumnsMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
+    tags = TagColumn(url_name="plugins:netbox_dns:view_list")
     actions = ActionsColumn(actions=())
