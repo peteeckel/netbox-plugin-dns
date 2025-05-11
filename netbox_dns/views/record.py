@@ -156,6 +156,7 @@ class RecordView(generic.ObjectView):
 
                 if Zone.objects.filter(
                     active=True,
+                    view=instance.zone.view,
                     name__iregex=regex_from_list(
                         get_parent_zone_names(
                             instance.fqdn,
