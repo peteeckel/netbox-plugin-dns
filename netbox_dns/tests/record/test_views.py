@@ -272,6 +272,26 @@ class RecordViewTestCase(
             "Record is masked by a child zone and may not be visible in DNS",
         )
 
+    def test_warning_mask_record_different_view_ok(self):
+        self.add_permissions("netbox_dns.view_record")
+
+        zone = Zone.objects.create(name="example.com", **self.zone_data)
+        record = Record.objects.create(
+            name="zone3",
+            zone=zone,
+            type=RecordTypeChoices.AAAA,
+            value="fe80:dead:beef::42",
+        )
+
+        url = reverse("plugins:netbox_dns:record", kwargs={"pk": record.pk})
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertNotRegex(
+            response.content.decode(),
+            "Record is masked by a child zone and may not be visible in DNS",
+        )
+
     def test_warning_mask_record_ns_ok(self):
         self.add_permissions("netbox_dns.view_record")
 
