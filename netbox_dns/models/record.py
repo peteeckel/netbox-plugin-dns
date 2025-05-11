@@ -654,6 +654,36 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 }
             )
 
+    def check_unique_ptr_record(self):
+        if (
+            self.disable_ptr
+            or not self.is_active
+            or not self.is_address_record
+            or not (ptr_zone := self.ptr_zone)
+            or not get_plugin_config("netbox_dns", "enforce_unique_records", False)
+        ):
+            return
+
+        ptr_record = Record.objects.filter(
+            zone__view=self.zone.view,
+            zone=self.ptr_zone,
+            name=self.get_ptr_name(ptr_zone),
+            value=self.fqdn,
+            status__in=RECORD_ACTIVE_STATUS_LIST,
+        )
+
+        if not self._state.adding and self.ptr_record is not None:
+            ptr_record = ptr_record.exclude(pk=self.ptr_record.pk)
+
+        if ptr_record.exists():
+            raise ValidationError(
+                {
+                    "value": _(
+                        "There is already an active PTR record for {value} with value {fqdn}."
+                    ).format(fqdn=self.fqdn, value=self.value)
+                }
+            )
+
     @property
     def absolute_value(self):
         if self.type in RecordTypeChoices.CUSTOM_TYPES:
@@ -797,6 +827,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self.validate_name(new_zone=new_zone)
         self.validate_value()
         self.check_unique_record(new_zone=new_zone)
+        self.check_unique_ptr_record()
         if self._state.adding:
             self.check_unique_rrset_ttl()
 

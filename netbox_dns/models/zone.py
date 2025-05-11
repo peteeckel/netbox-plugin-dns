@@ -664,6 +664,27 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 }
             )
 
+    def check_ptr_records(self):
+        if self._state.adding:
+            return
+
+        validation_errors = []
+
+        address_records = self.records.filter(
+            type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+            disable_ptr=False,
+            status__in=RECORD_ACTIVE_STATUS_LIST,
+        )
+
+        for record in address_records:
+            try:
+                record.check_unique_ptr_record()
+            except ValidationError as exc:
+                validation_errors.append(exc)
+
+        if validation_errors:
+            raise ValidationError(validation_errors)
+
     def get_auto_serial(self):
         records = Record.objects.filter(zone_id=self.pk).exclude(
             type=RecordTypeChoices.SOA
@@ -887,6 +908,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         if self.is_reverse_zone:
             self.arpa_network = self.network_from_name
+
+        self.check_ptr_records()
 
         if self.is_rfc2317_zone:
             if self.arpa_network is not None:
