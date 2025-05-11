@@ -353,6 +353,21 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def is_delegation_record(self):
         return self in self.zone.delegation_records
 
+    def get_ptr_name(self, ptr_zone=None):
+        if ptr_zone is None:
+            ptr_zone = self.ptr_zone
+
+        if ptr_zone.is_rfc2317_zone:
+            ptr_name = self.rfc2317_ptr_name
+        else:
+            ptr_name = (
+                dns_name.from_text(ipaddress.ip_address(self.value).reverse_pointer)
+                .relativize(dns_name.from_text(ptr_zone.name))
+                .to_text()
+            )
+
+        return ptr_name
+
     def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone
 
@@ -368,15 +383,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     self.ptr_record = None
             return
 
-        if ptr_zone.is_rfc2317_zone:
-            ptr_name = self.rfc2317_ptr_name
-        else:
-            ptr_name = (
-                dns_name.from_text(ipaddress.ip_address(self.value).reverse_pointer)
-                .relativize(dns_name.from_text(ptr_zone.name))
-                .to_text()
-            )
-
+        ptr_name = self.get_ptr_name(ptr_zone)
         ptr_value = self.fqdn
         ptr_record = self.ptr_record
 
