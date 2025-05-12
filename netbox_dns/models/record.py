@@ -353,6 +353,21 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def is_delegation_record(self):
         return self in self.zone.delegation_records
 
+    def get_ptr_name(self, ptr_zone=None):
+        if ptr_zone is None:
+            ptr_zone = self.ptr_zone
+
+        if ptr_zone.is_rfc2317_zone:
+            ptr_name = self.rfc2317_ptr_name
+        else:
+            ptr_name = (
+                dns_name.from_text(ipaddress.ip_address(self.value).reverse_pointer)
+                .relativize(dns_name.from_text(ptr_zone.name))
+                .to_text()
+            )
+
+        return ptr_name
+
     def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone
 
@@ -368,15 +383,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     self.ptr_record = None
             return
 
-        if ptr_zone.is_rfc2317_zone:
-            ptr_name = self.rfc2317_ptr_name
-        else:
-            ptr_name = (
-                dns_name.from_text(ipaddress.ip_address(self.value).reverse_pointer)
-                .relativize(dns_name.from_text(ptr_zone.name))
-                .to_text()
-            )
-
+        ptr_name = self.get_ptr_name(ptr_zone)
         ptr_value = self.fqdn
         ptr_record = self.ptr_record
 
@@ -647,6 +654,36 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 }
             )
 
+    def check_unique_ptr_record(self):
+        if (
+            self.disable_ptr
+            or not self.is_active
+            or not self.is_address_record
+            or not (ptr_zone := self.ptr_zone)
+            or not get_plugin_config("netbox_dns", "enforce_unique_records", False)
+        ):
+            return
+
+        ptr_record = Record.objects.filter(
+            zone__view=self.zone.view,
+            zone=self.ptr_zone,
+            name=self.get_ptr_name(ptr_zone),
+            value=self.fqdn,
+            status__in=RECORD_ACTIVE_STATUS_LIST,
+        )
+
+        if not self._state.adding and self.ptr_record is not None:
+            ptr_record = ptr_record.exclude(pk=self.ptr_record.pk)
+
+        if ptr_record.exists():
+            raise ValidationError(
+                {
+                    "value": _(
+                        "There is already an active PTR record for {value} with value {fqdn}."
+                    ).format(fqdn=self.fqdn, value=self.value)
+                }
+            )
+
     @property
     def absolute_value(self):
         if self.type in RecordTypeChoices.CUSTOM_TYPES:
@@ -790,6 +827,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         self.validate_name(new_zone=new_zone)
         self.validate_value()
         self.check_unique_record(new_zone=new_zone)
+        self.check_unique_ptr_record()
         if self._state.adding:
             self.check_unique_rrset_ttl()
 
