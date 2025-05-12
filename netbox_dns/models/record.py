@@ -206,11 +206,11 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=False,
         default=False,
     )
-    ptr_record = models.OneToOneField(
+    ptr_record = models.ForeignKey(
         verbose_name=_("PTR Record"),
         to="self",
-        on_delete=models.SET_NULL,
-        related_name="address_record",
+        on_delete=models.PROTECT,
+        related_name="address_records",
         null=True,
         blank=True,
     )

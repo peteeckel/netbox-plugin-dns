@@ -35,7 +35,7 @@ class RecordSerializer(NetBoxModelSerializer):
             "managed",
             "disable_ptr",
             "ptr_record",
-            "address_record",
+            "address_records",
             "active",
             "custom_fields",
             "tenant",
@@ -71,14 +71,14 @@ class RecordSerializer(NetBoxModelSerializer):
         read_only=True,
         required=False,
         allow_null=True,
-        help_text=_("PTR record generated from an address"),
+        help_text=_("PTR record related to an address"),
     )
-    address_record = NestedRecordSerializer(
-        many=False,
+    address_records = NestedRecordSerializer(
+        many=True,
         read_only=True,
         required=False,
         allow_null=True,
-        help_text=_("Address record defining the PTR"),
+        help_text=_("Address records related to the PTR"),
     )
     zone = NestedZoneSerializer(
         many=False,

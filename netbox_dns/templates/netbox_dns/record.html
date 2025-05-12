@@ -116,22 +116,24 @@
                     <td>{{ object.ptr_record|linkify }}</td>
                 </tr>
                 {% endif %}
-                {% if object.address_record %}
+                {% if object.address_records.exists %}
                 <tr>
-                    <th scope="row">{% trans "Address Record" %}</th>
-                    <td>{{ object.address_record|linkify }}</td>
-                </tr>
-                {% if object.address_record.ipam_ip_address %}
-                <tr>
-                    <th scope="row">{% trans "IPAM IP Address" %}</th>
-                    <td>{{ object.address_record.ipam_ip_address|linkify }}</td>
+                    <th scope="row">{% trans "Address Records" %}</th>
+                    <td>
+                        <table>
+                            {% for address_record in object.address_records.all %}
+                            <tr>
+                                <td>{{ address_record|linkify:"name" }}.{{ address_record.zone|linkify:"name" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
                 </tr>
                 {% endif %}
-                {% endif %}
-                {% if object.ipam_ip_address %}
+                {% if ipam_ip_address %}
                 <tr>
                     <th scope="row">{% trans "IPAM IP Address" %}</th>
-                    <td>{{ object.ipam_ip_address|linkify }}</td>
+                    <td>{{ ipam_ip_address|linkify }}</td>
                 </tr>
                 {% endif %}
                 <tr>

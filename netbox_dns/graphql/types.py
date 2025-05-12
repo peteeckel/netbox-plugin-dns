@@ -165,10 +165,9 @@ class NetBoxDNSRecordType(NetBoxObjectType):
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
         | None
     )
-    address_record: (
+    address_records: List[
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
-        | None
-    )
+    ]
     rfc2317_ptr_records: List[
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
     ]
