@@ -28,7 +28,6 @@ from netbox_dns.choices import (
     RecordClassChoices,
 )
 
-
 __all__ = (
     "Record",
     "RecordIndex",
@@ -143,6 +142,11 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "tenant",
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._cleanup_ptr_record = None
+
     def __str__(self):
         try:
             fqdn = dns_name.from_text(
@@ -209,7 +213,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     ptr_record = models.ForeignKey(
         verbose_name=_("PTR Record"),
         to="self",
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         related_name="address_records",
         null=True,
         blank=True,
@@ -254,6 +258,14 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         null=True,
         blank=True,
     )
+
+    @property
+    def cleanup_ptr_record(self):
+        return self._cleanup_ptr_record
+
+    @cleanup_ptr_record.setter
+    def cleanup_ptr_record(self, ptr_record):
+        self._cleanup_ptr_record = ptr_record
 
     @property
     def display_name(self):
@@ -348,6 +360,21 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def is_delegation_record(self):
         return self in self.zone.delegation_records
 
+    def refresh_ptr_record(
+        self, ptr_record=None, update_rfc2317_cname=True, save_zone_serial=True
+    ):
+        if ptr_record is None:
+            return
+
+        if not ptr_record.address_records.exists():
+            if ptr_record.rfc2317_cname_record is not None:
+                ptr_record.remove_from_rfc2317_cname_record()
+
+            ptr_record.delete(save_zone_serial=save_zone_serial)
+
+        elif update_rfc2317_cname:
+            ptr_record.update_rfc2317_cname_record(save_zone_serial=save_zone_serial)
+
     def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone
 
@@ -357,10 +384,8 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             or not self.is_active
             or self.name.startswith("*")
         ):
-            if self.ptr_record is not None:
-                with transaction.atomic():
-                    self.ptr_record.delete()
-                    self.ptr_record = None
+            self.cleanup_ptr_record = self.ptr_record
+            self.ptr_record = None
             return
 
         if ptr_zone.is_rfc2317_zone:
@@ -373,7 +398,14 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             )
 
         ptr_value = self.fqdn
-        ptr_record = self.ptr_record
+        if ptr_record := self.ptr_record:
+            if (
+                ptr_record.zone == ptr_zone
+                and ptr_record.name == ptr_name
+                and ptr_record.value == ptr_value
+                and ptr_record.ttl == self.ttl
+            ):
+                return
 
         if ptr_record is not None:
             if (
@@ -384,24 +416,36 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     save_zone_serial=save_zone_serial
                 )
 
+        try:
+            ptr_record = Record.objects.get(
+                name=ptr_name,
+                zone=ptr_zone,
+                type=RecordTypeChoices.PTR,
+                value=ptr_value,
+            )
+        except Record.DoesNotExist:
+            pass
+
         with transaction.atomic():
             if ptr_record is not None:
                 if ptr_record.zone.pk != ptr_zone.pk:
                     if ptr_record.rfc2317_cname_record is not None:
                         ptr_record.rfc2317_cname_record.delete()
-                    ptr_record.delete(save_zone_serial=save_zone_serial)
-                    ptr_record = None
+                        ptr_record.rfc2317_cname_record = None
+
+                if ptr_record.address_records.count() == 1:
+                    ptr_record.zone = ptr_zone
+                    ptr_record.name = ptr_name
+                    ptr_record.value = ptr_value
+                    ptr_record.ttl = self.ttl
+                    ptr_record.save(
+                        update_rfc2317_cname=update_rfc2317_cname,
+                        save_zone_serial=save_zone_serial,
+                    )
 
                 else:
-                    if (
-                        ptr_record.name != ptr_name
-                        or ptr_record.value != ptr_value
-                        or ptr_record.ttl != self.ttl
-                    ):
-                        ptr_record.name = ptr_name
-                        ptr_record.value = ptr_value
-                        ptr_record.ttl = self.ttl
-                        ptr_record.save(save_zone_serial=save_zone_serial)
+                    self.ptr_record = ptr_record
+                    return
 
             if ptr_record is None:
                 ptr_record = Record(
@@ -905,12 +949,18 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 save_zone_serial=save_zone_serial,
             )
         elif self.ptr_record is not None:
-            self.ptr_record.delete()
+            self.cleanup_ptr_record = self.ptr_record
             self.ptr_record = None
 
         changed_fields = self.changed_fields
         if changed_fields is None or changed_fields:
             super().save(*args, **kwargs)
+
+            self.refresh_ptr_record(
+                self.cleanup_ptr_record,
+                update_rfc2317_cname=update_rfc2317_cname,
+                save_zone_serial=save_zone_serial,
+            )
 
             if self.type != RecordTypeChoices.SOA and self.zone.soa_serial_auto:
                 self.zone.update_serial(save_zone_serial=save_zone_serial)
@@ -919,10 +969,15 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if self.rfc2317_cname_record:
             self.remove_from_rfc2317_cname_record(save_zone_serial=save_zone_serial)
 
-        if self.ptr_record:
-            self.ptr_record.delete()
+        ptr_record = self.ptr_record
 
         super().delete(*args, **kwargs)
+
+        self.refresh_ptr_record(
+            ptr_record,
+            update_rfc2317_cname=True,
+            save_zone_serial=save_zone_serial,
+        )
 
         _zone = self.zone
         if _zone.soa_serial_auto:
