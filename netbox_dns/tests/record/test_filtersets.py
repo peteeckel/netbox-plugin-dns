@@ -186,7 +186,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             value="10.0.1.42",
         )
 
-        ptr_record = Record.objects.get(address_record=address_record)
+        ptr_record = Record.objects.get(address_records=address_record)
         params = {"ptr_record_id": [ptr_record.pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         self.assertEqual(
@@ -211,7 +211,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             value="10.0.1.23",
         )
 
-        ptr_record = Record.objects.get(address_record=address_record)
+        ptr_record = Record.objects.get(address_records=address_record)
         cname_record = ptr_record.rfc2317_cname_record
         params = {"rfc2317_cname_record_id": [cname_record.pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
