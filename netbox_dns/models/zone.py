@@ -1036,7 +1036,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             for address_record in address_records:
                 address_record.ptr_record.delete()
 
-            ptr_records = self.records.filter(address_record__isnull=False)
+            ptr_records = self.records.filter(address_records__isnull=False)
             update_records = list(
                 Record.objects.filter(ptr_record__in=ptr_records).values_list(
                     "pk", flat=True

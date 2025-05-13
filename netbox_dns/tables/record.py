@@ -116,9 +116,14 @@ class ManagedRecordTable(RecordBaseTable):
             "active",
         )
 
-    address_record = tables.Column(
-        verbose_name=_("Address Record"),
+    address_records = tables.ManyToManyColumn(
+        verbose_name=_("Address Records"),
         linkify=True,
+        transform=lambda obj: (
+            obj.fqdn.rstrip(".")
+            if obj.zone.view.default_view
+            else f"[{obj.zone.view.name}] {obj.fqdn.rstrip('.')}"
+        ),
     )
     ipam_ip_address = tables.Column(
         verbose_name=_("IPAM IP Address"),
@@ -134,12 +139,16 @@ class ManagedRecordTable(RecordBaseTable):
     def render_related_ip_address(self, record):
         if record.ipam_ip_address is not None:
             address = record.ipam_ip_address
-        elif (
-            hasattr(record, "address_record")
-            and record.address_record.ipam_ip_address is not None
-        ):
-            address = record.address_record.ipam_ip_address
-        else:
+        elif hasattr(record, "address_records"):
+            address_record = record.address_records.filter(
+                ipam_ip_address__isnull=False
+            ).first()
+            if address_record is not None:
+                address = address_record.ipam_ip_address
+            else:
+                address = None
+
+        if address is None:
             return format_html("&mdash;")
 
         return format_html(f"<a href='{address.get_absolute_url()}'>{address}</a>")
@@ -147,11 +156,14 @@ class ManagedRecordTable(RecordBaseTable):
     def value_related_ip_address(self, record):
         if record.ipam_ip_address is not None:
             return record.ipam_ip_address
-        elif (
-            hasattr(record, "address_record")
-            and record.address_record.ipam_ip_address is not None
-        ):
-            return record.address_record.ipam_ip_address
+        elif hasattr(record, "address_records"):
+            address_record = record.address_records.filter(
+                ipam_ip_address__isnull=False
+            ).first()
+            if address_record is not None:
+                return address_record.ipam_ip_address
+
+            return None
 
 
 class RelatedRecordTable(RecordBaseTable):

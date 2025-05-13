@@ -63,10 +63,10 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         label=_("View the Parent Zone belongs to"),
     )
     address_record_id = django_filters.ModelMultipleChoiceFilter(
-        field_name="address_record",
+        field_name="address_records",
         queryset=Record.objects.all(),
         to_field_name="id",
-        label=_("Address Record"),
+        label=_("Address Records"),
     )
     ptr_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="ptr_record",

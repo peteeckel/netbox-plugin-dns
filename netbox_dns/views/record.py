@@ -51,7 +51,7 @@ class RecordListView(generic.ObjectListView):
 @register_model_view(Record, "list_managed", path="managed", detail=False)
 class ManagedRecordListView(generic.ObjectListView):
     queryset = Record.objects.filter(managed=True).prefetch_related(
-        "ipam_ip_address", "address_record"
+        "ipam_ip_address", "address_records"
     )
     filterset = RecordFilterSet
     filterset_form = RecordFilterForm
@@ -152,6 +152,15 @@ class RecordView(generic.ObjectView):
             if cname_table is not None:
                 cname_table.configure(request)
             context["cname_table"] = cname_table
+
+        if instance.ipam_ip_address is not None:
+            context["ipam_ip_address"] = instance.ipam_ip_address
+        elif instance.address_records is not None:
+            address_record = instance.address_records.filter(
+                ipam_ip_address__isnull=False
+            ).first()
+            if address_record is not None:
+                context["ipam_ip_address"] = address_record.ipam_ip_address
 
         if not instance.managed:
             name = dns_name.from_text(instance.name, origin=None)
