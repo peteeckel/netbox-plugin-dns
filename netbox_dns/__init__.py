@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from netbox.plugins import PluginConfig
 from netbox.plugins.utils import get_plugin_config
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 
 def _check_list(setting):
