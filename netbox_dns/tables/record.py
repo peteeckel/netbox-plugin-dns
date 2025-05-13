@@ -119,6 +119,7 @@ class ManagedRecordTable(RecordBaseTable):
     address_records = tables.ManyToManyColumn(
         verbose_name=_("Address Records"),
         linkify=True,
+        linkify_item=True,
         transform=lambda obj: (
             obj.fqdn.rstrip(".")
             if obj.zone.view.default_view
