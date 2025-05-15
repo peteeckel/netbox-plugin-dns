@@ -445,43 +445,35 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 )
                 return
 
-            # +
-            # The PTR record is in use for a different address record as well, so
-            # we can't change it.
-            # -
-            else:
-                ptr_record = None
-
         # +
         # Either there was no PTR record or the existing PTR record could not be re-used,
         # so we need to either get find a matching PTR record or create a new one.
         # -
-        if ptr_record is None:
-            try:
-                ptr_record = Record.objects.get(
-                    name=ptr_name,
-                    zone=ptr_zone,
-                    type=RecordTypeChoices.PTR,
-                    value=ptr_value,
-                )
+        try:
+            ptr_record = Record.objects.get(
+                name=ptr_name,
+                zone=ptr_zone,
+                type=RecordTypeChoices.PTR,
+                value=ptr_value,
+            )
 
-            except Record.DoesNotExist:
-                # +
-                # No existing PTR record could be found in the database, create a new
-                # one from scratch.
-                # -
-                ptr_record = Record(
-                    zone_id=ptr_zone.pk,
-                    type=RecordTypeChoices.PTR,
-                    name=ptr_name,
-                    ttl=self.ttl,
-                    value=ptr_value,
-                    managed=True,
-                )
-                ptr_record.save(
-                    update_rfc2317_cname=update_rfc2317_cname,
-                    save_zone_serial=save_zone_serial,
-                )
+        # +
+        # If no existing PTR record could be found in the database, create a new
+        # one from scratch.
+        # -
+        except Record.DoesNotExist:
+            ptr_record = Record(
+                zone_id=ptr_zone.pk,
+                type=RecordTypeChoices.PTR,
+                name=ptr_name,
+                ttl=self.ttl,
+                value=ptr_value,
+                managed=True,
+            )
+            ptr_record.save(
+                update_rfc2317_cname=update_rfc2317_cname,
+                save_zone_serial=save_zone_serial,
+            )
 
         self.ptr_record = ptr_record
 
