@@ -1197,6 +1197,64 @@ class RecordAutoPTRTestCase(TestCase):
                 name=reverse_name(address, r_zone),
             )
 
+    def test_ipv4_use_existing_ptr(self):
+        f_zone1 = self.zones[0]
+        f_zone2 = self.zones[11]
+        r_zone = self.zones[1]
+
+        name1 = "test1"
+        name2 = "test2"
+        name3 = "test1.zone1"
+        name4 = "test2.zone1"
+        address1 = "10.0.1.42"
+        address2 = "10.0.1.23"
+
+        f_record1 = Record.objects.create(
+            zone=f_zone1,
+            name=name1,
+            type=RecordTypeChoices.A,
+            value=address1,
+        )
+        f_record2 = Record.objects.create(
+            zone=f_zone1,
+            name=name2,
+            type=RecordTypeChoices.A,
+            value=address2,
+        )
+        f_record3 = Record.objects.create(
+            zone=f_zone2,
+            name=name3,
+            type=RecordTypeChoices.A,
+            value=address1,
+        )
+
+        r_record1 = Record.objects.get(
+            type=RecordTypeChoices.PTR,
+            zone=r_zone,
+            name=reverse_name(address1, r_zone),
+        )
+        r_record2 = Record.objects.get(
+            type=RecordTypeChoices.PTR,
+            zone=r_zone,
+            name=reverse_name(address2, r_zone),
+        )
+
+        self.assertEqual(r_record1.address_records.count(), 2)
+        self.assertEqual(r_record2.address_records.count(), 1)
+        self.assertIn(f_record1, r_record1.address_records.all())
+        self.assertIn(f_record3, r_record1.address_records.all())
+        self.assertIn(f_record2, r_record2.address_records.all())
+
+        f_record3.name = name4
+        f_record3.value = address2
+        f_record3.save()
+
+        self.assertEqual(r_record1.address_records.count(), 1)
+        self.assertEqual(r_record2.address_records.count(), 2)
+        self.assertIn(f_record1, r_record1.address_records.all())
+        self.assertIn(f_record2, r_record2.address_records.all())
+        self.assertIn(f_record3, r_record2.address_records.all())
+
     def test_ipv6_multiple_address_records_one_ptr(self):
         f_zone1 = self.zones[0]
         f_zone2 = self.zones[11]
@@ -1348,3 +1406,61 @@ class RecordAutoPTRTestCase(TestCase):
                 zone=r_zone,
                 name=reverse_name(address, r_zone),
             )
+
+    def test_ipv6_use_existing_ptr(self):
+        f_zone1 = self.zones[0]
+        f_zone2 = self.zones[11]
+        r_zone = self.zones[6]
+
+        name1 = "test1"
+        name2 = "test2"
+        name3 = "test1.zone1"
+        name4 = "test2.zone1"
+        address1 = "fe80:dead:beef:1::23"
+        address2 = "fe80:dead:beef:1::42"
+
+        f_record1 = Record.objects.create(
+            zone=f_zone1,
+            name=name1,
+            type=RecordTypeChoices.AAAA,
+            value=address1,
+        )
+        f_record2 = Record.objects.create(
+            zone=f_zone1,
+            name=name2,
+            type=RecordTypeChoices.AAAA,
+            value=address2,
+        )
+        f_record3 = Record.objects.create(
+            zone=f_zone2,
+            name=name3,
+            type=RecordTypeChoices.AAAA,
+            value=address1,
+        )
+
+        r_record1 = Record.objects.get(
+            type=RecordTypeChoices.PTR,
+            zone=r_zone,
+            name=reverse_name(address1, r_zone),
+        )
+        r_record2 = Record.objects.get(
+            type=RecordTypeChoices.PTR,
+            zone=r_zone,
+            name=reverse_name(address2, r_zone),
+        )
+
+        self.assertEqual(r_record1.address_records.count(), 2)
+        self.assertEqual(r_record2.address_records.count(), 1)
+        self.assertIn(f_record1, r_record1.address_records.all())
+        self.assertIn(f_record3, r_record1.address_records.all())
+        self.assertIn(f_record2, r_record2.address_records.all())
+
+        f_record3.name = name4
+        f_record3.value = address2
+        f_record3.save()
+
+        self.assertEqual(r_record1.address_records.count(), 1)
+        self.assertEqual(r_record2.address_records.count(), 2)
+        self.assertIn(f_record1, r_record1.address_records.all())
+        self.assertIn(f_record2, r_record2.address_records.all())
+        self.assertIn(f_record3, r_record2.address_records.all())

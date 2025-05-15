@@ -6,7 +6,7 @@ from dns import name as dns_name
 from dns import rdata
 
 from django.core.exceptions import ValidationError
-from django.db import transaction, models
+from django.db import models
 from django.db.models import Q, ExpressionWrapper, BooleanField, Min
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -378,6 +378,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     def update_ptr_record(self, update_rfc2317_cname=True, save_zone_serial=True):
         ptr_zone = self.ptr_zone
 
+        # +
+        # Check whether a PTR record is optioned for and return if that is not the
+        # case.
+        # -
         if (
             ptr_zone is None
             or self.disable_ptr
@@ -388,6 +392,10 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             self.ptr_record = None
             return
 
+        # +
+        # Determine the ptr_name and ptr_value related to the ptr_zone. RFC2317
+        # PTR names and zones need to be handled differently.
+        # -
         if ptr_zone.is_rfc2317_zone:
             ptr_name = self.rfc2317_ptr_name
         else:
@@ -396,9 +404,12 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 .relativize(dns_name.from_text(ptr_zone.name))
                 .to_text()
             )
-
         ptr_value = self.fqdn
-        if ptr_record := self.ptr_record:
+
+        # +
+        # If there is an existing and matching PTR record there is nothing to be done.
+        # -
+        if (ptr_record := self.ptr_record) is not None:
             if (
                 ptr_record.zone == ptr_zone
                 and ptr_record.name == ptr_name
@@ -407,47 +418,58 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             ):
                 return
 
-        if ptr_record is not None:
+            # +
+            # If there is an RFC2317 CNAME for the PTR record and it is either
+            # not required or needs to be changed, remove it.
+            # -
             if (
-                not ptr_record.zone.is_rfc2317_zone
-                and ptr_record.rfc2317_cname_record is not None
-            ):
+                ptr_record.zone.pk != ptr_zone.pk or not ptr_record.zone.is_rfc2317_zone
+            ) and ptr_record.rfc2317_cname_record is not None:
                 ptr_record.rfc2317_cname_record.delete(
                     save_zone_serial=save_zone_serial
                 )
+                ptr_record.rfc2317_cname_record = None
 
-        try:
-            ptr_record = Record.objects.get(
-                name=ptr_name,
-                zone=ptr_zone,
-                type=RecordTypeChoices.PTR,
-                value=ptr_value,
-            )
-        except Record.DoesNotExist:
-            pass
+            # +
+            # If the PTR record is used exclusively by the address record it can be
+            # modified to match the new name, zone, value and TTL.
+            # -
+            if ptr_record.address_records.count() == 1:
+                ptr_record.zone = ptr_zone
+                ptr_record.name = ptr_name
+                ptr_record.value = ptr_value
+                ptr_record.ttl = self.ttl
+                ptr_record.save(
+                    update_rfc2317_cname=update_rfc2317_cname,
+                    save_zone_serial=save_zone_serial,
+                )
+                return
 
-        with transaction.atomic():
-            if ptr_record is not None:
-                if ptr_record.zone.pk != ptr_zone.pk:
-                    if ptr_record.rfc2317_cname_record is not None:
-                        ptr_record.rfc2317_cname_record.delete()
-                        ptr_record.rfc2317_cname_record = None
+            # +
+            # The PTR record is in use for a different address record as well, so
+            # we can't change it.
+            # -
+            else:
+                ptr_record = None
 
-                if ptr_record.address_records.count() == 1:
-                    ptr_record.zone = ptr_zone
-                    ptr_record.name = ptr_name
-                    ptr_record.value = ptr_value
-                    ptr_record.ttl = self.ttl
-                    ptr_record.save(
-                        update_rfc2317_cname=update_rfc2317_cname,
-                        save_zone_serial=save_zone_serial,
-                    )
+        # +
+        # Either there was no PTR record or the existing PTR record could not be re-used,
+        # so we need to either get find a matching PTR record or create a new one.
+        # -
+        if ptr_record is None:
+            try:
+                ptr_record = Record.objects.get(
+                    name=ptr_name,
+                    zone=ptr_zone,
+                    type=RecordTypeChoices.PTR,
+                    value=ptr_value,
+                )
 
-                else:
-                    self.ptr_record = ptr_record
-                    return
-
-            if ptr_record is None:
+            except Record.DoesNotExist:
+                # +
+                # No existing PTR record could be found in the database, create a new
+                # one from scratch.
+                # -
                 ptr_record = Record(
                     zone_id=ptr_zone.pk,
                     type=RecordTypeChoices.PTR,
