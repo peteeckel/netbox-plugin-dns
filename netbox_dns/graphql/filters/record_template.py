@@ -20,7 +20,7 @@ from netbox_dns.models import RecordTemplate
 __all__ = ("NetBoxDNSRecordTemplateFilter",)
 
 
-@strawberry_django.filter(RecordTemplate, lookups=True)
+@strawberry_django.filter_type(RecordTemplate, lookups=True)
 class NetBoxDNSRecordTemplateFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):

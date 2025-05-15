@@ -9,7 +9,7 @@ from netbox_dns.models import RegistrationContact
 __all__ = ("NetBoxDNSRegistrationContactFilter",)
 
 
-@strawberry_django.filter(RegistrationContact, lookups=True)
+@strawberry_django.filter_type(RegistrationContact, lookups=True)
 class NetBoxDNSRegistrationContactFilter(NetBoxModelFilterMixin):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
     description: FilterLookup[str] | None = strawberry_django.filter_field()

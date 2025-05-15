@@ -21,7 +21,7 @@ from netbox_dns.graphql.filter_lookups import PolicyDigestArrayLookup
 __all__ = ("NetBoxDNSDNSSECPolicyFilter", "PolicyDigestArrayLookup")
 
 
-@strawberry_django.filter(DNSSECPolicy, lookups=True)
+@strawberry_django.filter_type(DNSSECPolicy, lookups=True)
 class NetBoxDNSDNSSECPolicyFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):

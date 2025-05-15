@@ -16,7 +16,7 @@ from netbox_dns.models import NameServer
 __all__ = ("NetBoxDNSNameServerFilter",)
 
 
-@strawberry_django.filter(NameServer, lookups=True)
+@strawberry_django.filter_type(NameServer, lookups=True)
 class NetBoxDNSNameServerFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):

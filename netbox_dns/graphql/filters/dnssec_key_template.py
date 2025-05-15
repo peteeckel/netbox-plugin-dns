@@ -23,7 +23,7 @@ from netbox_dns.models import DNSSECKeyTemplate
 __all__ = ("NetBoxDNSDNSSECKeyTemplateFilter",)
 
 
-@strawberry_django.filter(DNSSECKeyTemplate, lookups=True)
+@strawberry_django.filter_type(DNSSECKeyTemplate, lookups=True)
 class NetBoxDNSDNSSECKeyTemplateFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):

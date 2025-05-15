@@ -16,7 +16,7 @@ from netbox_dns.models import View
 __all__ = ("NetBoxDNSViewFilter",)
 
 
-@strawberry_django.filter(View, lookups=True)
+@strawberry_django.filter_type(View, lookups=True)
 class NetBoxDNSViewFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):
