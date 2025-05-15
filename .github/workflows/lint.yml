@@ -17,3 +17,8 @@ jobs:
             with:
                 options: "--check"
                 src: "netbox_dns"
+
+          - name: Check conformance to Ruff standards
+            uses: astral-sh/ruff-action@7a9e8edffe9b60ed319de05d26e8ebb64ef5a247
+            with:
+                version: "latest"
