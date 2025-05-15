@@ -21,7 +21,7 @@ from netbox_dns.models import ZoneTemplate
 __all__ = ("NetBoxDNSZoneTemplateFilter",)
 
 
-@strawberry_django.filter(ZoneTemplate, lookups=True)
+@strawberry_django.filter_type(ZoneTemplate, lookups=True)
 class NetBoxDNSZoneTemplateFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):

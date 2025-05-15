@@ -15,7 +15,7 @@ from netbox_dns.models import Registrar
 __all__ = ("NetBoxDNSRegistrarFilter",)
 
 
-@strawberry_django.filter(Registrar, lookups=True)
+@strawberry_django.filter_type(Registrar, lookups=True)
 class NetBoxDNSRegistrarFilter(NetBoxModelFilterMixin):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
     description: FilterLookup[str] | None = strawberry_django.filter_field()

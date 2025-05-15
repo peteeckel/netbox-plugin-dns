@@ -23,7 +23,7 @@ from netbox_dns.models import Zone
 __all__ = ("NetBoxDNSZoneFilter",)
 
 
-@strawberry_django.filter(Zone, lookups=True)
+@strawberry_django.filter_type(Zone, lookups=True)
 class NetBoxDNSZoneFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):

@@ -24,7 +24,7 @@ from netbox_dns.models import Record
 __all__ = ("NetBoxDNSRecordFilter",)
 
 
-@strawberry_django.filter(Record, lookups=True)
+@strawberry_django.filter_type(Record, lookups=True)
 class NetBoxDNSRecordFilter(
     ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
 ):
