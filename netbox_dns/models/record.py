@@ -245,7 +245,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     ipam_ip_address = models.ForeignKey(
         verbose_name=_("IPAM IP Address"),
         to="ipam.IPAddress",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="netbox_dns_records",
         blank=True,
         null=True,

@@ -10,7 +10,7 @@ from django.db.models import Q
 from netbox.context import current_request
 from ipam.models import IPAddress, Prefix
 
-from netbox_dns.choices import RecordStatusChoices
+from netbox_dns.choices import RecordStatusChoices, RecordTypeChoices
 
 from .dns import get_parent_zone_names
 from .conversions import regex_from_list
@@ -213,10 +213,28 @@ def update_dns_records(ip_address, view=None, force=False):
 
 
 def delete_dns_records(ip_address, view=None):
-    if view is None:
+    from netbox_dns.models import Record
+
+    if current_request.get() is None:
         address_records = ip_address.netbox_dns_records.all()
     else:
-        address_records = ip_address.netbox_dns_records.filter(zone__view=view)
+        # +
+        # This is a dirty hack made necessary by NetBox grand idea of manipulating
+        # objects in its event handling code, removing references to related objects
+        # in pre_delete() before our pre_delete() handler has the chance to handle
+        # them.
+        #
+        # TODO: Find something better. This is really awful.
+        # -
+        address_records = Record.objects.filter(
+            type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+            managed=True,
+            ip_address=ip_address.address.ip,
+            ipam_ip_address__isnull=True,
+        )
+
+    if view is not None:
+        address_records &= Record.objects.filter(zone__view=view)
 
     if not address_records.exists():
         return False
