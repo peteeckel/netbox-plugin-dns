@@ -974,6 +974,9 @@ class DNSsyncIPAddressTestCase(TestCase):
             self.assertEqual(record6.status, RecordStatusChoices.STATUS_INACTIVE)
 
     def test_delete_ip_address(self):
+        Zone.objects.create(name="0.0.10.in-addr.arpa", **self.zone_data)
+        Zone.objects.create(name="f.e.e.b.d.a.e.d.0.8.e.f.ip6.arpa", **self.zone_data)
+
         ipv4_address = IPAddress.objects.create(
             address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
         )
@@ -984,9 +987,29 @@ class DNSsyncIPAddressTestCase(TestCase):
 
         self.assertTrue(Record.objects.filter(ipam_ip_address=ipv4_address).exists())
         self.assertTrue(Record.objects.filter(ipam_ip_address=ipv6_address).exists())
+        self.assertTrue(
+            Record.objects.filter(
+                type=RecordTypeChoices.PTR, value="name1.zone1.example.com."
+            ).exists()
+        )
+        self.assertTrue(
+            Record.objects.filter(
+                type=RecordTypeChoices.PTR, value="name2.zone1.example.com."
+            ).exists()
+        )
 
         ipv4_address.delete()
         ipv6_address.delete()
 
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A).exists())
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.AAAA).exists())
+        self.assertFalse(
+            Record.objects.filter(
+                type=RecordTypeChoices.PTR, value="name1.zone1.example.com."
+            ).exists()
+        )
+        self.assertFalse(
+            Record.objects.filter(
+                type=RecordTypeChoices.PTR, value="name2.zone1.example.com."
+            ).exists()
+        )
