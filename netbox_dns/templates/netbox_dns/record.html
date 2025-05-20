@@ -6,6 +6,13 @@
 {% load i18n %}
 
 {% block control-buttons %}
+{% if perms.netbox_dns.add_record and object.type != "CNAME" %}
+<a href="{% url 'plugins:netbox_dns:record_add' %}?view={{ object.zone.view.pk }}&zone={{ object.zone.pk }}&value={{ object.fqdn }}&type=CNAME&return_url={{ object.get_absolute_url }}">
+    <button type="submit" class="btn btn-primary" name="add-record">
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i>{% trans "Add CNAME" %}
+    </button>
+</a>
+{% endif %}
 {% if object.managed %}
 {% else %}
 {{ block.super }}
