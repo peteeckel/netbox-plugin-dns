@@ -5,7 +5,9 @@ description = "NetBox DNS is a NetBox plugin for managing DNS data."
 authors = [
     {name="Peter Eckel", email="pete@netbox-dns.org"},
 ]
-license = {file="LICENCE"}
+license-files = [
+    "LICENSE"
+]
 readme = "README.md"
 keywords = ["netbox", "netbox-plugin", "dns"]
 classifiers = [
