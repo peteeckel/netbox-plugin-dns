@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *model_names, **options):
         orphaned_ptr_records = Record.objects.filter(
             type=RecordTypeChoices.PTR,
-            address_records__isnull=True,
+            address_record__isnull=True,
             managed=True,
         )
 
