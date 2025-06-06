@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-30 10:39+0000\n"
+"POT-Creation-Date: 2025-06-06 08:34+0000\n"
 "PO-Revision-Date: 2025-03-17 08:06+0000\n"
 "Last-Translator: Jean Benoit <jean@unistra.fr>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
@@ -59,12 +59,12 @@ msgid "Zones served by the authoritative nameserver"
 msgstr "Zones servies par le serveur de nom faisant autorité"
 
 #: api/serializers_/record.py:74
-msgid "PTR record generated from an address"
-msgstr "Enregistrement PTR généré depuis une adresse IP"
+msgid "PTR record related to an address"
+msgstr ""
 
 #: api/serializers_/record.py:81
-msgid "Address record defining the PTR"
-msgstr "Enregistrement A correspondant au PTR"
+msgid "Address records related to the PTR"
+msgstr ""
 
 #: api/serializers_/record.py:98
 msgid "IPAddress linked to the record"
@@ -279,16 +279,16 @@ msgid "View the Parent Zone belongs to"
 msgstr "Vue de la zone parente"
 
 #: filtersets/record.py:69 tables/record.py:120
-#: templates/netbox_dns/record.html:121
-msgid "Address Record"
-msgstr "Enregistrement de type adresse"
+#: templates/netbox_dns/record.html:128
+msgid "Address Records"
+msgstr ""
 
 #: filtersets/record.py:75 filtersets/record.py:81
 msgid "Pointer Record"
 msgstr "Enregistrement PTR"
 
-#: filtersets/record.py:87 models/record.py:242 tables/record.py:124
-#: templates/netbox_dns/record.html:126 templates/netbox_dns/record.html:133
+#: filtersets/record.py:87 models/record.py:246 tables/record.py:130
+#: templates/netbox_dns/record.html:142
 msgid "IPAM IP Address"
 msgstr "Adresse IP de l'IPAM"
 
@@ -540,11 +540,11 @@ msgstr "Durée de vie"
 #: forms/record_template.py:284 forms/view.py:265 forms/view.py:302
 #: forms/zone.py:784 forms/zone.py:1028 forms/zone_template.py:330
 #: forms/zone_template.py:447 models/dnssec_key_template.py:82
-#: models/dnssec_policy.py:159 models/nameserver.py:70 models/record.py:228
+#: models/dnssec_policy.py:159 models/nameserver.py:70 models/record.py:232
 #: models/record_template.py:95 models/view.py:70 models/zone.py:363
 #: models/zone_template.py:140 templates/netbox_dns/dnsseckeytemplate.html:39
 #: templates/netbox_dns/dnssecpolicy.html:42
-#: templates/netbox_dns/nameserver.html:28 templates/netbox_dns/record.html:94
+#: templates/netbox_dns/nameserver.html:28 templates/netbox_dns/record.html:101
 #: templates/netbox_dns/recordtemplate.html:36
 #: templates/netbox_dns/view.html:26 templates/netbox_dns/zone.html:41
 #: templates/netbox_dns/zonetemplate.html:26
@@ -558,12 +558,12 @@ msgstr "Entité"
 #: forms/registration_contact.py:111 forms/registration_contact.py:237
 #: forms/view.py:292 forms/zone.py:493 forms/zone.py:906
 #: forms/zone_template.py:407 models/dnssec_key_template.py:51
-#: models/dnssec_policy.py:42 models/nameserver.py:65 models/record.py:223
+#: models/dnssec_policy.py:42 models/nameserver.py:65 models/record.py:227
 #: models/record_template.py:66 models/registrar.py:37
 #: models/registration_contact.py:65 models/view.py:50 models/zone.py:180
 #: models/zone_template.py:62 templates/netbox_dns/dnsseckeytemplate.html:17
 #: templates/netbox_dns/dnssecpolicy.html:12
-#: templates/netbox_dns/nameserver.html:22 templates/netbox_dns/record.html:88
+#: templates/netbox_dns/nameserver.html:22 templates/netbox_dns/record.html:95
 #: templates/netbox_dns/recordtemplate.html:30
 #: templates/netbox_dns/registrar.html:16
 #: templates/netbox_dns/registrationcontact.html:16
@@ -710,7 +710,7 @@ msgstr "Attributions"
 #: forms/record.py:326 forms/record_template.py:151
 #: forms/record_template.py:199 forms/record_template.py:260 forms/zone.py:323
 #: forms/zone.py:474 forms/zone.py:641 forms/zone.py:891
-#: models/dnssec_policy.py:47 models/record.py:193 models/record_template.py:79
+#: models/dnssec_policy.py:47 models/record.py:197 models/record_template.py:79
 #: models/zone.py:185 tables/dnssec_policy.py:41 tables/dnssec_policy.py:123
 #: tables/record.py:90 tables/zone.py:56
 #: templates/netbox_dns/dnssecpolicy.html:17
@@ -752,7 +752,7 @@ msgstr "Taille salt NSEC3"
 #: forms/record.py:151 forms/record_template.py:142 forms/registrar.py:86
 #: forms/registration_contact.py:107 forms/registration_contact.py:233
 #: forms/zone.py:313 forms/zone.py:478 models/dnssec_key_template.py:47
-#: models/dnssec_policy.py:37 models/nameserver.py:60 models/record.py:165
+#: models/dnssec_policy.py:37 models/nameserver.py:60 models/record.py:169
 #: models/record_template.py:61 models/registrar.py:31
 #: models/registration_contact.py:59 models/view.py:44 models/zone.py:175
 #: tables/dnssec_key_template.py:32 tables/dnssec_policy.py:37
@@ -760,7 +760,7 @@ msgstr "Taille salt NSEC3"
 #: tables/record_template.py:36 tables/registrar.py:32 tables/view.py:31
 #: tables/zone.py:44 tables/zone_template.py:31
 #: templates/netbox_dns/dnsseckeytemplate.html:12
-#: templates/netbox_dns/nameserver.html:11 templates/netbox_dns/record.html:43
+#: templates/netbox_dns/nameserver.html:11 templates/netbox_dns/record.html:50
 #: templates/netbox_dns/recordtemplate.html:19
 #: templates/netbox_dns/registrar.html:11
 #: templates/netbox_dns/registrationcontact.html:11
@@ -772,8 +772,8 @@ msgstr "Nom"
 #: forms/record.py:56 forms/record.py:164 forms/record.py:218
 #: forms/record.py:335 forms/record_template.py:92 forms/record_template.py:159
 #: forms/record_template.py:207 forms/record_template.py:269
-#: models/record.py:218 models/record_template.py:90 tables/record.py:93
-#: tables/record_template.py:58 templates/netbox_dns/record.html:109
+#: models/record.py:222 models/record_template.py:90 tables/record.py:93
+#: tables/record_template.py:58 templates/netbox_dns/record.html:116
 #: templates/netbox_dns/recordtemplate.html:65
 msgid "Disable PTR"
 msgstr "Désactiver le PTR"
@@ -781,20 +781,20 @@ msgstr "Désactiver le PTR"
 #: forms/record.py:57 forms/record.py:173 forms/record.py:219
 #: forms/record.py:330 forms/record_template.py:96 forms/record_template.py:155
 #: forms/record_template.py:203 forms/record_template.py:264
-#: models/record.py:200 models/record_template.py:85 tables/record.py:57
-#: tables/record_template.py:55 templates/netbox_dns/record.html:104
+#: models/record.py:204 models/record_template.py:85 tables/record.py:57
+#: tables/record_template.py:55 templates/netbox_dns/record.html:111
 #: templates/netbox_dns/recordtemplate.html:60
 #: templates/netbox_dns/zone.html:133
 msgid "TTL"
 msgstr "TTL"
 
-#: forms/record.py:71 models/record.py:119 templates/netbox_dns/record.html:40
+#: forms/record.py:71 models/record.py:118 templates/netbox_dns/record.html:47
 msgid "Record"
 msgstr "Enregistrement"
 
 #: forms/record.py:105 forms/record.py:183 forms/record.py:241
-#: forms/record.py:312 forms/zone.py:215 models/record.py:170 models/zone.py:86
-#: tables/record.py:28 templates/netbox_dns/record.html:59
+#: forms/record.py:312 forms/zone.py:215 models/record.py:174 models/zone.py:86
+#: tables/record.py:28 templates/netbox_dns/record.html:66
 #: templates/netbox_dns/zone.html:11
 msgid "Zone"
 msgstr "Zone"
@@ -802,22 +802,22 @@ msgstr "Zone"
 #: forms/record.py:110 forms/record.py:147 forms/record.py:259
 #: forms/record.py:317 forms/record_template.py:88 forms/record_template.py:134
 #: forms/record_template.py:194 forms/record_template.py:251
-#: models/dnssec_key_template.py:57 models/record.py:184
+#: models/dnssec_key_template.py:57 models/record.py:188
 #: models/record_template.py:71 tables/record.py:37
 #: tables/record_template.py:43 templates/netbox_dns/dnsseckeytemplate.html:22
-#: templates/netbox_dns/record.html:67
+#: templates/netbox_dns/record.html:74
 #: templates/netbox_dns/recordtemplate.html:46
 msgid "Type"
 msgstr "Type"
 
-#: forms/record.py:155 models/record.py:176 tables/record.py:44
+#: forms/record.py:155 models/record.py:180 tables/record.py:44
 msgid "FQDN"
 msgstr "FQDN"
 
 #: forms/record.py:159 forms/record.py:321 forms/record_template.py:146
-#: forms/record_template.py:255 models/record.py:189
+#: forms/record_template.py:255 models/record.py:193
 #: models/record_template.py:75 tables/record.py:48
-#: tables/record_template.py:46 templates/netbox_dns/record.html:71
+#: tables/record_template.py:46 templates/netbox_dns/record.html:78
 #: templates/netbox_dns/recordtemplate.html:50
 msgid "Value"
 msgstr "Valeur"
@@ -1228,70 +1228,70 @@ msgstr "Validité des signatures pour DNSKEY"
 msgid "There is already a nameserver with this name"
 msgstr "Il y a déjà un serveur de nom avec ce nom"
 
-#: models/record.py:120 navigation.py:71 views/zone.py:141
+#: models/record.py:119 navigation.py:71 views/zone.py:141
 msgid "Records"
 msgstr "Enregistrements"
 
-#: models/record.py:205
+#: models/record.py:209
 msgid "Managed"
 msgstr "Asservi"
 
-#: models/record.py:210 tables/record.py:99
-#: templates/netbox_dns/record.html:115
+#: models/record.py:214 tables/record.py:99
+#: templates/netbox_dns/record.html:122
 msgid "PTR Record"
 msgstr "Enregistrement PTR"
 
-#: models/record.py:219 models/record_template.py:91
+#: models/record.py:223 models/record_template.py:91
 msgid "Disable PTR record creation"
 msgstr "Désactiver la création de l'enregistrement PTR"
 
-#: models/record.py:236 tables/record.py:128
+#: models/record.py:240 tables/record.py:134
 msgid "Related IP Address"
 msgstr "Adresse IP associée"
 
-#: models/record.py:237
+#: models/record.py:241
 msgid "IP address related to an address (A/AAAA) or PTR record"
 msgstr "Adresse IP liée à un enregistrement A/AAAA ou PTR"
 
-#: models/record.py:250
+#: models/record.py:254
 msgid "RFC2317 CNAME Record"
 msgstr "Enregistrement CNAME RCF2317"
 
-#: models/record.py:552
+#: models/record.py:610
 #, python-brace-format
 msgid "{name} is not a name in {zone}"
 msgstr "{name} n'est pas dans la zone {zone}"
 
-#: models/record.py:638
+#: models/record.py:696
 #, python-brace-format
 msgid "There is already an active {type} record for name {name} in zone {zone} with value {value}."
 msgstr "Il y a déjà un enregistrement de type '{type}' avec le nom '{name}' dans la zone '{zone}' avec la valeur '{value}'."
 
-#: models/record.py:739
+#: models/record.py:797
 #, python-brace-format
 msgid "There is at least one active {type} record for name {name} in zone {zone} and TTL is different ({ttls})."
 msgstr "Il y a au moins un enregistrement actif de type '{type}' avec le nom '{name}' dans la zone '{zone}' avec un TTL différent ({ttls})"
 
-#: models/record.py:827
+#: models/record.py:885
 #, python-brace-format
 msgid "There is already an active record for name {name} in zone {zone}, RFC2317 CNAME is not allowed."
 msgstr "Il y a déjà un enregistrement avec le nom '{name}' dans la zone '{zone}', un CNAME RFC2317 n'est pas autorisé."
 
-#: models/record.py:836
+#: models/record.py:894
 msgid "SOA records are only allowed with name @ and are created automatically by NetBox DNS"
 msgstr "L'enregistrement SOA ne sont autorisé qu'avec le nom '@' et sont gérés automatiquement par NetBox"
 
-#: models/record.py:846
+#: models/record.py:904
 #, python-brace-format
 msgid "There is already an active record for name {name} in zone {zone}, CNAME is not allowed."
 msgstr "Il y a déjà un enregistrement avec le nom '{name}' dans la zone '{zone}', un CNAME n'est pas autorisé"
 
-#: models/record.py:858
+#: models/record.py:916
 #, python-brace-format
 msgid "There is already an active CNAME record for name {name} in zone {zone}, no other record allowed."
 msgstr "Il y a déjà un enregistrement de type 'CNAME' avec le nom '{name}' dans la zone '{zone}'. Un autre enregistrement avec le même nom ne peut pas être ajouté"
 
-#: models/record.py:868
+#: models/record.py:926
 #, python-brace-format
 msgid "There is already an active {type} record for name {name} in zone {zone}, more than one are not allowed."
 msgstr "Il y a déjà un enregistrement de type '{type}' avec le nom '{name}' dans la zone '{zone}'. Plus d'un enregistrement de ce type ne peut pas être ajouté."
@@ -1432,7 +1432,7 @@ msgstr "Ajouter"
 msgid "Import"
 msgstr "Importer"
 
-#: navigation.py:91 templates/netbox_dns/record.html:18
+#: navigation.py:91 templates/netbox_dns/record.html:25
 #: templates/netbox_dns/record/managed.html:4 views/zone.py:161
 msgid "Managed Records"
 msgstr "Enregistrements asservis"
@@ -1478,12 +1478,12 @@ msgid "DNS Views"
 msgstr "Vues DNS"
 
 #: tables/record.py:52 tables/record_template.py:50
-#: templates/netbox_dns/record.html:76
+#: templates/netbox_dns/record.html:83
 #: templates/netbox_dns/recordtemplate.html:55
 msgid "Unicode Value"
 msgstr "Valeur Unicode"
 
-#: template_content.py:123
+#: template_content.py:134
 msgid "DNS Address Records"
 msgstr "Enregistrement DNS de type adresse"
 
@@ -1501,30 +1501,34 @@ msgstr "Politique"
 msgid "Using NSEC3 options is not recommended (see %(link)s)"
 msgstr "Utiliser les options NSEC3 n'est pas recommandé (cf. %(link)s)"
 
-#: templates/netbox_dns/nameserver.html:16 templates/netbox_dns/record.html:54
+#: templates/netbox_dns/nameserver.html:16 templates/netbox_dns/record.html:61
 #: templates/netbox_dns/recordtemplate.html:24
 #: templates/netbox_dns/zone.html:19
 msgid "IDN"
 msgstr "IDN"
 
-#: templates/netbox_dns/record.html:48 templates/netbox_dns/record.html:82
+#: templates/netbox_dns/record.html:12
+msgid "Add CNAME"
+msgstr ""
+
+#: templates/netbox_dns/record.html:55 templates/netbox_dns/record.html:89
 #: templates/netbox_dns/zone/registration.html:23
 msgid "Warning"
 msgstr "Avertissement"
 
-#: templates/netbox_dns/record.html:146
+#: templates/netbox_dns/record.html:155
 msgid "CNAME Target"
 msgstr "Cible du CNAME"
 
-#: templates/netbox_dns/record.html:148
+#: templates/netbox_dns/record.html:157
 msgid "CNAME Targets"
 msgstr "Cibles du CNAME"
 
-#: templates/netbox_dns/record.html:157
+#: templates/netbox_dns/record.html:166
 msgid "CNAME"
 msgstr "CNAME"
 
-#: templates/netbox_dns/record.html:159
+#: templates/netbox_dns/record.html:168
 msgid "CNAMEs"
 msgstr "CNAMEs"
 
@@ -1744,7 +1748,7 @@ msgstr "Aucune clé pour signer les zones (CSK ou ZSK) n'est attribuée."
 msgid "There is no matching target record for CNAME value {value}"
 msgstr "La cible pour l'enregistrement CNAME '{value}' n'existe pas"
 
-#: views/record.py:167
+#: views/record.py:183
 msgid "Record is masked by a child zone and may not be visible in DNS"
 msgstr "L'enregistrement est masqué par une zone enfant et peut ne pas être visible dans le DNS"
 
