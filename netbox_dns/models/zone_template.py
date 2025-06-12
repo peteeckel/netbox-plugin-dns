@@ -28,6 +28,8 @@ class ZoneTemplate(NetBoxModel):
         "description",
         "nameservers",
         "record_templates",
+        "soa_mname",
+        "soa_rname",
         "dnssec_policy",
         "registrar",
         "registrant",
