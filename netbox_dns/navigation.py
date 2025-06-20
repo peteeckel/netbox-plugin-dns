@@ -26,26 +26,6 @@ view_menu_item = PluginMenuItem(
     ),
 )
 
-zone_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:zone_list",
-    link_text=_("Zones"),
-    permissions=["netbox_dns.view_zone"],
-    buttons=(
-        PluginMenuButton(
-            "plugins:netbox_dns:zone_add",
-            _("Add"),
-            "mdi mdi-plus-thick",
-            permissions=["netbox_dns.add_zone"],
-        ),
-        PluginMenuButton(
-            "plugins:netbox_dns:zone_bulk_import",
-            _("Import"),
-            "mdi mdi-upload",
-            permissions=["netbox_dns.add_zone"],
-        ),
-    ),
-)
-
 nameserver_menu_item = PluginMenuItem(
     link="plugins:netbox_dns:nameserver_list",
     link_text=_("Nameservers"),
@@ -62,6 +42,26 @@ nameserver_menu_item = PluginMenuItem(
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_nameserver"],
+        ),
+    ),
+)
+
+zone_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:zone_list",
+    link_text=_("Zones"),
+    permissions=["netbox_dns.view_zone"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:zone_add",
+            _("Add"),
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_zone"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:zone_bulk_import",
+            _("Import"),
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_zone"],
         ),
     ),
 )
@@ -90,46 +90,6 @@ managed_record_menu_item = PluginMenuItem(
     link="plugins:netbox_dns:record_list_managed",
     link_text=_("Managed Records"),
     permissions=["netbox_dns.view_record"],
-)
-
-dnsseckeytemplate_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:dnsseckeytemplate_list",
-    link_text=_("DNSSEC Key Templates"),
-    permissions=["netbox_dns.view_dnsseckeytemplate"],
-    buttons=(
-        PluginMenuButton(
-            "plugins:netbox_dns:dnsseckeytemplate_add",
-            _("Add"),
-            "mdi mdi-plus-thick",
-            permissions=["netbox_dns.add_dnsseckeytemplate"],
-        ),
-        PluginMenuButton(
-            "plugins:netbox_dns:dnsseckeytemplate_bulk_import",
-            _("Import"),
-            "mdi mdi-upload",
-            permissions=["netbox_dns.add_dnsseckeytemplate"],
-        ),
-    ),
-)
-
-dnssecpolicy_menu_item = PluginMenuItem(
-    link="plugins:netbox_dns:dnssecpolicy_list",
-    link_text=_("DNSSEC Policies"),
-    permissions=["netbox_dns.view_dnssecpolicy"],
-    buttons=(
-        PluginMenuButton(
-            "plugins:netbox_dns:dnssecpolicy_add",
-            _("Add"),
-            "mdi mdi-plus-thick",
-            permissions=["netbox_dns.add_dnssecpolicy"],
-        ),
-        PluginMenuButton(
-            "plugins:netbox_dns:dnssecpolicy_bulk_import",
-            _("Import"),
-            "mdi mdi-upload",
-            permissions=["netbox_dns.add_dnssecpolicy"],
-        ),
-    ),
 )
 
 zonetemplate_menu_item = PluginMenuItem(
@@ -168,6 +128,46 @@ recordtemplate_menu_item = PluginMenuItem(
             _("Import"),
             "mdi mdi-upload",
             permissions=["netbox_dns.add_recordtemplate"],
+        ),
+    ),
+)
+
+dnsseckeytemplate_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:dnsseckeytemplate_list",
+    link_text=_("DNSSEC Key Templates"),
+    permissions=["netbox_dns.view_dnsseckeytemplate"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:dnsseckeytemplate_add",
+            _("Add"),
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_dnsseckeytemplate"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:dnsseckeytemplate_bulk_import",
+            _("Import"),
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_dnsseckeytemplate"],
+        ),
+    ),
+)
+
+dnssecpolicy_menu_item = PluginMenuItem(
+    link="plugins:netbox_dns:dnssecpolicy_list",
+    link_text=_("DNSSEC Policies"),
+    permissions=["netbox_dns.view_dnssecpolicy"],
+    buttons=(
+        PluginMenuButton(
+            "plugins:netbox_dns:dnssecpolicy_add",
+            _("Add"),
+            "mdi mdi-plus-thick",
+            permissions=["netbox_dns.add_dnssecpolicy"],
+        ),
+        PluginMenuButton(
+            "plugins:netbox_dns:dnssecpolicy_bulk_import",
+            _("Import"),
+            "mdi mdi-upload",
+            permissions=["netbox_dns.add_dnssecpolicy"],
         ),
     ),
 )
@@ -221,17 +221,10 @@ if top_level_menu:
                 _("DNS Configuration"),
                 (
                     view_menu_item,
-                    zone_menu_item,
                     nameserver_menu_item,
+                    zone_menu_item,
                     record_menu_item,
                     managed_record_menu_item,
-                ),
-            ),
-            (
-                _("DNSSEC"),
-                (
-                    dnsseckeytemplate_menu_item,
-                    dnssecpolicy_menu_item,
                 ),
             ),
             (
@@ -239,6 +232,13 @@ if top_level_menu:
                 (
                     zonetemplate_menu_item,
                     recordtemplate_menu_item,
+                ),
+            ),
+            (
+                _("DNSSEC"),
+                (
+                    dnsseckeytemplate_menu_item,
+                    dnssecpolicy_menu_item,
                 ),
             ),
             (
