@@ -137,6 +137,13 @@
                     <th scope="row">{% trans "MName" %}</th>
                     <td>{{ object.soa_mname|linkify }}</td>
                 </tr>
+                {% if mname_warning %}
+                <tr>
+                    <th class="text-warning" scope="row">{% trans "Warning" %}</th>
+                    <td class="text-warning">{{ mname_warning }}</td>
+                </tr>
+                {% endif %}
+
                 <tr>
                     <th scope="row">{% trans "RName" %}</th>
                     <td>{{ object.soa_rname }}</td>

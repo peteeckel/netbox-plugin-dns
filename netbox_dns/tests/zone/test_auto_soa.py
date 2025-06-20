@@ -3,7 +3,12 @@ from dns import rdata
 from django.test import TestCase
 
 from netbox_dns.models import NameServer, Record, Zone
-from netbox_dns.choices import RecordClassChoices, RecordTypeChoices
+from netbox_dns.choices import (
+    RecordClassChoices,
+    RecordTypeChoices,
+    RecordStatusChoices,
+    ZoneStatusChoices,
+)
 
 
 def parse_soa_value(soa):
@@ -169,3 +174,116 @@ class ZoneAutoSOATestCase(TestCase):
         soa_record = Record.objects.get(type=RecordTypeChoices.SOA, zone=zone)
 
         self.assertEqual(ttl, soa_record.ttl)
+
+    def test_zone_soa_mname_no_warning(self):
+        zone = self.zone
+
+        mname_warning = zone.check_soa_mname()
+        self.assertIsNone(mname_warning)
+
+    def test_zone_with_soa_mname_and_address_no_warning(self):
+        zone = self.zone
+        nameserver = self.nameservers[0]
+
+        ns_zone = Zone.objects.create(
+            name="example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+        )
+
+        Record.objects.create(
+            zone=ns_zone,
+            name="ns1",
+            type=RecordTypeChoices.AAAA,
+            value="2001:db8:1::1",
+        )
+
+        mname_warning = zone.check_soa_mname()
+        self.assertIsNone(mname_warning)
+
+    def test_zone_zone_with_soa_mname_and_inactive_address_warning(self):
+        zone = self.zone
+        nameserver = self.nameservers[0]
+
+        ns_zone = Zone.objects.create(
+            name="example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+        )
+
+        Record.objects.create(
+            zone=ns_zone,
+            name="ns1",
+            type=RecordTypeChoices.AAAA,
+            value="2001:db8:1::1",
+            status=RecordStatusChoices.STATUS_INACTIVE,
+        )
+
+        mname_warning = zone.check_soa_mname()
+        self.assertEqual(
+            f"Nameserver {nameserver.name} does not have an active address record in zone {ns_zone.name}",
+            mname_warning,
+        )
+
+    def test_zone_inactive_zone_with_soa_mname_warning(self):
+        zone = self.zone
+        nameserver = self.nameservers[0]
+
+        ns_zone = Zone.objects.create(
+            name="example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+            status=ZoneStatusChoices.STATUS_RESERVED,
+        )
+
+        mname_warning = zone.check_soa_mname()
+        self.assertEqual(
+            f"Nameserver {nameserver.name} does not have an active address record in zone {ns_zone.name}",
+            mname_warning,
+        )
+
+    def test_zone_inactive_zone_with_soa_mname_and_address_no_warning(self):
+        zone = self.zone
+        nameserver = self.nameservers[0]
+
+        ns_zone = Zone.objects.create(
+            name="example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+            status=ZoneStatusChoices.STATUS_RESERVED,
+        )
+
+        Record.objects.create(
+            zone=ns_zone,
+            name="ns1",
+            type=RecordTypeChoices.AAAA,
+            value="2001:db8:1::1",
+        )
+
+        mname_warning = zone.check_soa_mname()
+        self.assertIsNone(mname_warning)
+
+    def test_zone_inactive_zone_with_soa_mname_and_inactive_address_warning(self):
+        zone = self.zone
+        nameserver = self.nameservers[0]
+
+        ns_zone = Zone.objects.create(
+            name="example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+            status=ZoneStatusChoices.STATUS_RESERVED,
+        )
+
+        Record.objects.create(
+            zone=ns_zone,
+            name="ns1",
+            type=RecordTypeChoices.AAAA,
+            value="2001:db8:1::1",
+            status=RecordStatusChoices.STATUS_INACTIVE,
+        )
+
+        mname_warning = zone.check_soa_mname()
+        self.assertEqual(
+            f"Nameserver {nameserver.name} does not have an active address record in zone {ns_zone.name}",
+            mname_warning,
+        )

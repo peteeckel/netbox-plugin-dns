@@ -585,6 +585,30 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 managed=True,
             )
 
+    def _check_nameserver_address_records(self, nameserver):
+        name = dns_name.from_text(nameserver.name, origin=None)
+        parent = name.parent()
+
+        if len(parent) < 2:
+            return None
+
+        try:
+            ns_zone = Zone.objects.get(view_id=self.view.pk, name=parent.to_text())
+        except ObjectDoesNotExist:
+            return None
+
+        relative_name = name.relativize(parent).to_text()
+        address_records = ns_zone.records.filter(
+            Q(status__in=RECORD_ACTIVE_STATUS_LIST),
+            Q(Q(name=f"{nameserver.name}.") | Q(name=relative_name)),
+            Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
+        )
+
+        if not address_records.exists():
+            return _(
+                "Nameserver {ns} does not have an active address record in zone {zone}"
+            ).format(ns=nameserver.name, zone=ns_zone)
+
     def check_nameservers(self):
         nameservers = self.nameservers.all()
 
@@ -597,32 +621,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             )
 
         for _nameserver in nameservers:
-            name = dns_name.from_text(_nameserver.name, origin=None)
-            parent = name.parent()
-
-            if len(parent) < 2:
-                continue
-
-            try:
-                ns_zone = Zone.objects.get(view_id=self.view.pk, name=parent.to_text())
-            except ObjectDoesNotExist:
-                continue
-
-            relative_name = name.relativize(parent).to_text()
-            address_records = ns_zone.records.filter(
-                Q(status__in=RECORD_ACTIVE_STATUS_LIST),
-                Q(Q(name=f"{_nameserver.name}.") | Q(name=relative_name)),
-                Q(Q(type=RecordTypeChoices.A) | Q(type=RecordTypeChoices.AAAA)),
-            )
-
-            if not address_records:
-                ns_warnings.append(
-                    _(
-                        "Nameserver {nameserver} does not have an active address record in zone {zone}"
-                    ).format(nameserver=_nameserver.name, zone=ns_zone)
-                )
+            warning = self._check_nameserver_address_records(_nameserver)
+            if warning is not None:
+                ns_warnings.append(warning)
 
         return ns_warnings, ns_errors
+
+    def check_soa_mname(self):
+        return self._check_nameserver_address_records(self.soa_mname)
 
     def check_expiration(self):
         if self.expiration_date is None:
