@@ -97,7 +97,7 @@ class ZoneAutoNSTestCase(TestCase):
         ns_record = Record.objects.create(
             zone=ns_zone,
             name="ns1",
-            type="A",
+            type=RecordTypeChoices.A,
             value="10.0.0.23",
             ttl=86400,
         )
@@ -118,7 +118,7 @@ class ZoneAutoNSTestCase(TestCase):
         ns_record = Record.objects.create(
             zone=ns_zone,
             name="ns1",
-            type="A",
+            type=RecordTypeChoices.A,
             value="10.0.0.23",
             ttl=86400,
             status=RecordStatusChoices.STATUS_INACTIVE,
