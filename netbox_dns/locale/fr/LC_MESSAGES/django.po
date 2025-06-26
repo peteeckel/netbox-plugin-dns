@@ -60,7 +60,7 @@ msgstr "Zones servies par le serveur de nom faisant autorité"
 
 #: api/serializers_/record.py:74
 msgid "PTR record related to an address"
-msgstr ""
+msgstr "Enregistrement PTR relié à une adresse IP"
 
 #: api/serializers_/record.py:81
 msgid "Address records related to the PTR"
@@ -281,7 +281,7 @@ msgstr "Vue de la zone parente"
 #: filtersets/record.py:69 tables/record.py:120
 #: templates/netbox_dns/record.html:128
 msgid "Address Records"
-msgstr ""
+msgstr "Address Records"
 
 #: filtersets/record.py:75 filtersets/record.py:81
 msgid "Pointer Record"
@@ -1485,7 +1485,7 @@ msgstr "Valeur Unicode"
 
 #: template_content.py:134
 msgid "DNS Address Records"
-msgstr "Enregistrement DNS de type adresse"
+msgstr "Enregistrements DNS de type adresse"
 
 #: templates/netbox_dns/dnsseckeytemplate.html:9
 msgid "DNSSEC Key"
@@ -1509,7 +1509,7 @@ msgstr "IDN"
 
 #: templates/netbox_dns/record.html:12
 msgid "Add CNAME"
-msgstr ""
+msgstr "Ajouter un CNAME"
 
 #: templates/netbox_dns/record.html:55 templates/netbox_dns/record.html:89
 #: templates/netbox_dns/zone/registration.html:23
