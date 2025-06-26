@@ -1,5 +1,5 @@
 from django import forms
-from django.db import transaction
+from django.db import models, transaction
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
@@ -101,7 +101,14 @@ class ZoneTemplateUpdateMixin:
                     custom_fields = {}
                     for key, value in zone_data.copy().items():
                         if key.startswith("cf_"):
-                            custom_fields[key[3:]] = value
+                            if isinstance(value, models.Model):
+                                custom_fields[key[3:]] = value.pk
+                            elif isinstance(value, models.QuerySet):
+                                custom_fields[key[3:]] = list(
+                                    value.values_list("pk", flat=True)
+                                )
+                            else:
+                                custom_fields[key[3:]] = value
                             zone_data.pop(key)
                     if custom_fields:
                         zone_data["custom_field_data"] = custom_fields
