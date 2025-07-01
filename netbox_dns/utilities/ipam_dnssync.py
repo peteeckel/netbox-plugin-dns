@@ -227,10 +227,15 @@ def delete_dns_records(ip_address, view=None):
         # TODO: Find something better. This is really awful.
         # -
         address_records = Record.objects.filter(
-            type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
-            managed=True,
-            ip_address=ip_address.address.ip,
-            ipam_ip_address__isnull=True,
+            Q(
+                Q(ipam_ip_address=ip_address)
+                | Q(
+                    type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+                    managed=True,
+                    ip_address=ip_address.address,
+                    ipam_ip_address__isnull=True,
+                )
+            ),
         )
 
     if view is not None:

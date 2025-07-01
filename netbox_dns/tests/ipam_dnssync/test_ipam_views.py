@@ -1281,3 +1281,36 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
 
         self.assertNotIn(view, prefix.netbox_dns_views.all())
         self.assertNotIn(prefix, view.prefixes.all())
+
+    def test_delete_ipaddress(self):
+        view = self.views[0]
+        zone = self.zones[0]
+        prefix = self.prefixes[0]
+
+        address = "2001:db8::1/64"
+        name = "name1.zone1.example.com"
+
+        view.prefixes.add(prefix)
+
+        ip_address = IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
+        record = Record.objects.get(ipam_ip_address=ip_address)
+        self.assertEqual(record.type, RecordTypeChoices.AAAA)
+        self.assertEqual(record.fqdn, f"{name}.")
+        self.assertEqual(record.value, address.split("/")[0])
+        self.assertEqual(record.zone, zone)
+
+        self.add_permissions("ipam.delete_ipaddress")
+
+        url = reverse("ipam:ipaddress_delete", kwargs={"pk": ip_address.pk})
+
+        request = {
+            "data": {"confirm": True},
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_302_FOUND)
+
+        self.assertFalse(Record.objects.filter(pk=record.pk).exists())
