@@ -699,3 +699,29 @@ class DNSsyncIPAMAPITestCase(APITestCase):
         self.assertEqual(record.fqdn, f"{name1}.")
         self.assertEqual(record.value, address.split("/")[0])
         self.assertEqual(record.zone, zone)
+
+    def test_delete_ipaddress(self):
+        view = self.views[0]
+        zone = self.zones[0]
+        prefix = self.prefixes[0]
+
+        address = "2001:db8::1/64"
+        name = "name1.zone1.example.com"
+
+        view.prefixes.add(prefix)
+
+        ip_address = IPAddress.objects.create(address=IPNetwork(address), dns_name=name)
+        record = Record.objects.get(ipam_ip_address=ip_address)
+        self.assertEqual(record.type, RecordTypeChoices.AAAA)
+        self.assertEqual(record.fqdn, f"{name}.")
+        self.assertEqual(record.value, address.split("/")[0])
+        self.assertEqual(record.zone, zone)
+
+        self.add_permissions("ipam.delete_ipaddress")
+
+        url = reverse("ipam-api:ipaddress-detail", kwargs={"pk": ip_address.pk})
+
+        response = self.client.delete(url, **self.header)
+        self.assertHttpStatus(response, status.HTTP_204_NO_CONTENT)
+
+        self.assertFalse(Record.objects.filter(pk=record.pk).exists())
