@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 name=record.name,
                 zone=record.zone,
                 type=record.type,
-            ).exclude(type=RecordTypeChoices.PTR, maanged=True)
+            ).exclude(type=RecordTypeChoices.PTR, managed=True)
 
             if records.count() == 1:
                 if options.get("verbosity") > 2:
