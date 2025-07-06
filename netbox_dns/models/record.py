@@ -439,6 +439,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 ptr_record.name = ptr_name
                 ptr_record.value = ptr_value
                 ptr_record.ttl = self.ttl
+                ptr_record.managed = True
                 ptr_record.save(
                     update_rfc2317_cname=update_rfc2317_cname,
                     save_zone_serial=save_zone_serial,
@@ -447,7 +448,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         # +
         # Either there was no PTR record or the existing PTR record could not be re-used,
-        # so we need to either get find a matching PTR record or create a new one.
+        # so we need to either find a matching PTR record or create a new one.
         # -
         try:
             ptr_record = Record.objects.get(
