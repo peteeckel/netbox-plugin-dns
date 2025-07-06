@@ -846,6 +846,9 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if self._state.adding:
             self.check_unique_rrset_ttl()
 
+        if not self.is_address_record:
+            self.disable_ptr = False
+
         if not self.is_active:
             return
 
