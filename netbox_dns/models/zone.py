@@ -550,7 +550,11 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         try:
             soa_record = self.records.get(type=RecordTypeChoices.SOA, name=soa_name)
 
-            if soa_record.ttl != soa_ttl or soa_record.value != soa_rdata.to_text():
+            if (
+                soa_record.ttl != soa_ttl
+                or soa_record.value != soa_rdata.to_text()
+                or not soa_record.managed
+            ):
                 soa_record.ttl = soa_ttl
                 soa_record.value = soa_rdata.to_text()
                 soa_record.managed = True
