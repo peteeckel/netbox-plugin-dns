@@ -12,7 +12,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--force",
             action="store_true",
-            help="Update records even if DNS name was not changed (required for rebuilding filtered views",
+            help="Update records even if DNS name was not changed (required for rebuilding filtered views)",
         )
 
     def handle(self, *model_names, **options):

@@ -107,7 +107,7 @@ class RecordViewTestCase(
             "value": "Test",
             "status": RecordStatusChoices.STATUS_INACTIVE,
             "ttl": 86420,
-            "disable_ptr": True,
+            "disable_ptr": False,
             "description": "New Description",
         }
 
