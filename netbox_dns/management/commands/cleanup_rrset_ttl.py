@@ -22,11 +22,12 @@ class Command(BaseCommand):
         )
 
     def handle(self, *model_names, **options):
-        self.cleanup_rrset_ttl(**options)
+        self._cleanup_rrset_ttl(**options)
 
-        self.stdout.write("RRSet cleanup completed.")
+    def _cleanup_rrset_ttl(self, **options):
+        if options.get("verbosity"):
+            self.stdout.write("Cleaning up diverging RRset TTL values")
 
-    def cleanup_rrset_ttl(self, **options):
         ttl_records = (
             Record.objects.filter(ttl__isnull=False)
             .exclude(type=RecordTypeChoices.SOA)
@@ -41,7 +42,9 @@ class Command(BaseCommand):
 
             if records.count() == 1:
                 if options.get("verbosity") > 2:
-                    self.stdout.write(f"Ignoring single record {record.pk} ({record})")
+                    self.stdout.write(
+                        f"Ignoring single record '{record.pk}' ('{record}')"
+                    )
                 continue
 
             if options.get("max"):
@@ -52,7 +55,10 @@ class Command(BaseCommand):
             for record in records.exclude(ttl=ttl):
                 if options.get("verbosity") > 1:
                     self.stdout.write(
-                        f"Updating TTL for record {record.pk} ({record}) to {ttl}"
+                        f"Setting TTL for record '{record.pk}' ('{record}') to {ttl}"
                     )
                 record.ttl = ttl
                 record.save(update_fields=["ttl"], update_rrset_ttl=False)
+
+        if options.get("verbosity"):
+            self.stdout.write("RRSet TTL cleanup completed.")
