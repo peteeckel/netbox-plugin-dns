@@ -419,6 +419,26 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 return
 
             # +
+            # If the existing PTR record no longer matches the address record,
+            # check whether there is an existing PTR record that does. In that
+            # case, mark the old PTR record for cleanup and use the existing one.
+            # -
+            try:
+                existing_ptr_record = Record.objects.get(
+                    name=ptr_name,
+                    zone=ptr_zone,
+                    type=RecordTypeChoices.PTR,
+                    value=ptr_value,
+                )
+
+                self.cleanup_ptr_record = self.ptr_record
+                self.ptr_record = existing_ptr_record
+                ptr_record = self.ptr_record
+
+            except Record.DoesNotExist:
+                pass
+
+            # +
             # If there is an RFC2317 CNAME for the PTR record and it is either
             # not required or needs to be changed, remove it.
             # -
