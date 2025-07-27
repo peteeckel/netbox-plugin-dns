@@ -177,6 +177,8 @@ def update_dns_records(ip_address, view=None, force=False):
             address_records = ip_address.netbox_dns_records.filter(zone__view=view)
 
         for record in address_records:
+            record.snapshot()
+
             if record.zone not in zones or ip_address.custom_field_data.get(
                 "ipaddress_dns_disabled"
             ):
