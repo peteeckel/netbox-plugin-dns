@@ -555,6 +555,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 or soa_record.value != soa_rdata.to_text()
                 or not soa_record.managed
             ):
+                soa_record.snapshot()
                 soa_record.ttl = soa_ttl
                 soa_record.value = soa_rdata.to_text()
                 soa_record.managed = True

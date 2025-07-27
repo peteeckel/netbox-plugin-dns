@@ -455,6 +455,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             # modified to match the new name, zone, value and TTL.
             # -
             if ptr_record.address_records.count() == 1:
+                ptr_record.snapshot()
                 ptr_record.zone = ptr_zone
                 ptr_record.name = ptr_name
                 ptr_record.value = ptr_value
