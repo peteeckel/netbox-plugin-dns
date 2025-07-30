@@ -186,7 +186,7 @@ class Command(BaseCommand):
 
         for record in orphaned_ptr_records:
             if options.get("verbosity") > 1:
-                self.stdout.write("Removing orphaned PTR record '{record}'")
+                self.stdout.write(f"Removing orphaned PTR record '{record}'")
             record.delete()
 
     def _record_remove_orphaned_address_records(self, **options):
@@ -201,5 +201,5 @@ class Command(BaseCommand):
 
         for record in orphaned_address_records:
             if options.get("verbosity") > 1:
-                self.stdout.write("Removing orphaned address record '{record}'")
+                self.stdout.write(f"Removing orphaned address record '{record}'")
             record.delete()
