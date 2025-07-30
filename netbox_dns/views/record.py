@@ -68,7 +68,9 @@ class RecordView(generic.ObjectView):
         value_fqdn = dns_name.from_text(instance.value_fqdn)
 
         cname_targets = Record.objects.filter(
-            zone__view=instance.zone.view, fqdn=value_fqdn
+            zone__view=instance.zone.view,
+            fqdn=value_fqdn,
+            active=True,
         )
 
         if cname_targets:
@@ -98,6 +100,7 @@ class RecordView(generic.ObjectView):
                 zone__view=instance.zone.view,
                 value=instance.fqdn,
                 type=RecordTypeChoices.CNAME,
+                active=True,
             )
         )
 
@@ -112,6 +115,7 @@ class RecordView(generic.ObjectView):
                 zone__view=instance.zone.view,
                 type=RecordTypeChoices.CNAME,
                 zone=parent_zone,
+                active=True,
             )
             cname_records = cname_records.union(
                 {
