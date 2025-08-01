@@ -187,15 +187,14 @@ def update_dns_records(ip_address, view=None, force=False):
                 continue
 
             record.update_fqdn()
-            if not _match_data(ip_address, record) or force:
-                updated, deleted = record.update_from_ip_address(ip_address)
+            updated, deleted = record.update_from_ip_address(ip_address)
 
-                if deleted:
-                    record.delete()
-                    updated = True
-                elif updated:
-                    record.save()
-                    updated = True
+            if deleted:
+                record.delete()
+                updated = True
+            elif updated:
+                record.save()
+                updated = True
 
         zones = Zone.objects.filter(pk__in=[zone.pk for zone in zones]).exclude(
             pk__in=set(ip_address.netbox_dns_records.values_list("zone", flat=True))
