@@ -9,6 +9,9 @@ from django.conf import settings
 
 from ipam.models import IPAddress, Prefix
 from ipam.choices import IPAddressStatusChoices
+from extras.models import CustomField
+from extras.choices import CustomFieldTypeChoices
+from core.models import ObjectType
 
 from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
@@ -27,7 +30,7 @@ class DNSsyncIPAddressTestCase(TestCase):
             "soa_rname": "hostmaster.example.com",
         }
 
-        view = View.get_default_view()
+        cls.view = View.get_default_view()
 
         cls.zone = Zone.objects.create(name="zone1.example.com", **cls.zone_data)
         cls.reverse4_zone = Zone.objects.create(
@@ -43,8 +46,8 @@ class DNSsyncIPAddressTestCase(TestCase):
         )
         Prefix.objects.bulk_create(prefixes)
 
-        view.prefixes.add(prefixes[0])
-        view.prefixes.add(prefixes[1])
+        cls.view.prefixes.add(prefixes[0])
+        cls.view.prefixes.add(prefixes[1])
 
     def test_create_ip_address(self):
         ipv4_address = IPAddress.objects.create(
@@ -1073,3 +1076,85 @@ class DNSsyncIPAddressTestCase(TestCase):
                 type=RecordTypeChoices.PTR, value="name2.zone1.example.com."
             ).exists()
         )
+
+    def test_modify_ip_address_match_filter(self):
+        self.view.ip_address_filter = {"dns_name__startswith": "name2."}
+        self.view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("2001:db8::1/64"),
+            dns_name="name1.zone1.example.com",
+        )
+
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        ip_address.dns_name = "name2.zone1.example.com"
+        ip_address.save()
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+    def test_modify_ip_address_not_match_filter(self):
+        self.view.ip_address_filter = {"dns_name__startswith": "name1."}
+        self.view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("2001:db8::1/64"),
+            dns_name="name1.zone1.example.com",
+        )
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        ip_address.dns_name = "name2.zone1.example.com"
+        ip_address.save()
+
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+    def test_modify_ip_address_cf_match_filter(self):
+        cf = CustomField.objects.create(
+            name="ipaddress_dns",
+            type=CustomFieldTypeChoices.TYPE_BOOLEAN,
+            default=False,
+            required=False,
+        )
+        cf.object_types.set([ObjectType.objects.get_for_model(IPAddress)])
+
+        self.view.ip_address_filter = {"custom_field_data__ipaddress_dns": True}
+        self.view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("2001:db8::1/64"),
+            dns_name="name1.zone1.example.com",
+            custom_field_data={"ipaddress_dns": False},
+        )
+
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        ip_address.custom_field_data = {"ipaddress_dns": True}
+        ip_address.save()
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+    def test_modify_ip_address_cf_not_match_filter(self):
+        cf = CustomField.objects.create(
+            name="ipaddress_dns",
+            type=CustomFieldTypeChoices.TYPE_BOOLEAN,
+            default=False,
+            required=False,
+        )
+        cf.object_types.set([ObjectType.objects.get_for_model(IPAddress)])
+
+        self.view.ip_address_filter = {"custom_field_data__ipaddress_dns": True}
+        self.view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork("2001:db8::1/64"),
+            dns_name="name1.zone1.example.com",
+            custom_field_data={"ipaddress_dns": True},
+        )
+
+        self.assertTrue(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        ip_address.custom_field_data = {"ipaddress_dns": False}
+        ip_address.save()
+
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
