@@ -88,7 +88,7 @@ class NetBoxDNSManagementRebuildDNSsyncTestCase(TestCase):
         )
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.PTR).exists())
 
-        management.call_command("rebuild_dnssync", verbosity=0, force=False)
+        management.call_command("rebuild_dnssync", verbosity=0)
 
         for ip_address in ip_addresses:
             self.assertTrue(
@@ -118,7 +118,7 @@ class NetBoxDNSManagementRebuildDNSsyncTestCase(TestCase):
             ).exists()
         )
 
-    def test_rebuild_dnssync_force(self):
+    def test_rebuild_dnssync_with_filter(self):
         nameserver = NameServer.objects.create(name="ns1.example.com")
         zone = Zone.objects.create(
             name="zone1.example.com",
@@ -169,7 +169,7 @@ class NetBoxDNSManagementRebuildDNSsyncTestCase(TestCase):
                 ).exists()
             )
 
-        management.call_command("rebuild_dnssync", verbosity=0, force=True)
+        management.call_command("rebuild_dnssync", verbosity=0)
 
         self.assertTrue(
             Record.objects.filter(
