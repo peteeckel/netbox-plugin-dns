@@ -650,7 +650,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             expiration_error = _("The registration for this domain has expired.")
         elif (self.expiration_date - date.today()).days < expiration_warning_days:
             expiration_warning = _(
-                f"The registration for his domain will expire less than {expiration_warning_days} days."
+                f"The registration for this domain will expire in less than {expiration_warning_days} days."
             )
 
         return expiration_warning, expiration_error

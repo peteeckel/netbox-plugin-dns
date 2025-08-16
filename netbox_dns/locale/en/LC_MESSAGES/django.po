@@ -1379,7 +1379,7 @@ msgstr ""
 
 #: models/zone.py:642
 #, python-brace-format
-msgid "The registration for his domain will expire less than {expiration_warning_days} days."
+msgid "The registration for this domain will expire in less than {expiration_warning_days} days."
 msgstr ""
 
 #: models/zone.py:658
