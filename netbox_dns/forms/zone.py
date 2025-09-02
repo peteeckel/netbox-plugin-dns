@@ -83,9 +83,9 @@ class ZoneTemplateUpdateMixin:
             self.cleaned_data["tags"] = template.tags.all()
 
         for field in template.template_fields:
-            if self.cleaned_data.get(field) in (None, "") and getattr(
+            if self.cleaned_data.get(field) in (None, "", []) and getattr(
                 template, field
-            ) not in (None, ""):
+            ) not in (None, "", []):
                 self.cleaned_data[field] = getattr(template, field)
 
         self._check_soa_mname()

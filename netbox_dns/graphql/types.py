@@ -290,6 +290,7 @@ class NetBoxDNSZoneTemplateType(NetBoxObjectType):
         ]
         | None
     )
+    parental_agents: List[str]
     record_templates: List[
         Annotated[
             "NetBoxDNSRecordTemplateType", strawberry.lazy("netbox_dns.graphql.types")
