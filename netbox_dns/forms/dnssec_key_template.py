@@ -15,7 +15,8 @@ from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
-from utilities.forms import add_blank_choice
+from utilities.forms.widgets import HTMXSelect
+from utilities.forms import add_blank_choice, get_field_value
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -52,6 +53,10 @@ class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
             "tags",
         )
 
+        widgets = {
+            "algorithm": HTMXSelect(),
+        }
+
     fieldsets = (
         FieldSet(
             "name",
@@ -75,6 +80,13 @@ class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
             name=_("Tags"),
         ),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        algorithm = get_field_value(self, "algorithm")
+        if algorithm != DNSSECKeyTemplateAlgorithmChoices.RSASHA256:
+            del self.fields["key_size"]
 
     lifetime = TimePeriodField(
         required=False,

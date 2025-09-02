@@ -21,9 +21,13 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
 )
-from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker
+from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker, HTMXSelect
 from utilities.forms.rendering import FieldSet
-from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, add_blank_choice
+from utilities.forms import (
+    BOOLEAN_WITH_BLANK_CHOICES,
+    add_blank_choice,
+    get_field_value,
+)
 from tenancy.models import Tenant, TenantGroup
 from tenancy.forms import TenancyForm, TenancyFilterForm
 
@@ -207,6 +211,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         }
 
         widgets = {
+            "dnssec_policy": HTMXSelect(),
+            "registrar": HTMXSelect(),
             "expiration_date": DatePicker,
         }
 
@@ -309,6 +315,15 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
                 self.initial["nameservers"] = NameServer.objects.filter(
                     name__in=default_nameservers
                 )
+
+        if not get_field_value(self, "dnssec_policy"):
+            del self.fields["inline_signing"]
+            del self.fields["parental_agents"]
+
+        if not get_field_value(self, "registrar"):
+            del self.fields["registry_domain_id"]
+            del self.fields["expiration_date"]
+            del self.fields["domain_status"]
 
     view = DynamicModelChoiceField(
         queryset=View.objects.all(),

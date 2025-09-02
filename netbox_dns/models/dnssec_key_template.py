@@ -91,6 +91,9 @@ class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
         return DNSSECKeyTemplateTypeChoices.colors.get(self.type)
 
     def clean(self, *args, **kwargs):
+        if self.algorithm != DNSSECKeyTemplateAlgorithmChoices.RSASHA256:
+            self.key_size = self._meta.get_field("key_size").get_default()
+
         super().clean(*args, **kwargs)
 
         validate_key_template(self)
