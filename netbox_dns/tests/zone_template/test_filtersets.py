@@ -98,6 +98,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[0],
                 billing_c=cls.contacts[0],
                 dnssec_policy=cls.dnssec_policies[0],
+                parental_agents=["2001:db8:42::42", "2001:db8:23::23"],
             ),
             ZoneTemplate(
                 name="Zone Template 2",
@@ -110,6 +111,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[0],
+                parental_agents=["2001:db8:42::42", "2001:db8:42::23"],
             ),
             ZoneTemplate(
                 name="Zone Template 3",
@@ -122,6 +124,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[1],
+                parental_agents=["2001:db8:42::42", "2001:db8:42::23"],
             ),
             ZoneTemplate(
                 name="Zone Template 4",
@@ -134,6 +137,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[1],
+                parental_agents=["2001:db8:42::42", "2001:db8:23::23"],
             ),
             ZoneTemplate(
                 name="Zone Template 5",
@@ -280,6 +284,12 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ]
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_parental_agents(self):
+        params = {"parental_agents": ["2001:db8:23::23", "2001:db8:42::42"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {"parental_agents": ["2001:db8:23::23"]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):
         params = {"tenant_id": [self.tenants[0].pk, self.tenants[1].pk]}
