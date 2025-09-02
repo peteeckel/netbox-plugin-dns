@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-06 08:34+0000\n"
+"POT-Creation-Date: 2025-09-02 18:31+0000\n"
 "PO-Revision-Date: 2024-09-29 12:06+0000\n"
 "Last-Translator: Peter Eckel <pete@netbox-dns.org>\n"
 "Language-Team: LANGUAGE  <language@netbox-dns.org>\n"
@@ -78,12 +78,12 @@ msgstr ""
 msgid "IPAM Prefixes assigned to the View"
 msgstr ""
 
-#: api/serializers_/zone.py:98 api/serializers_/zone_template.py:63
+#: api/serializers_/zone.py:98 api/serializers_/zone_template.py:64
 msgid "Nameservers for the zone"
 msgstr ""
 
-#: api/serializers_/zone.py:113 api/serializers_/zone_template.py:70
-#: forms/zone.py:665
+#: api/serializers_/zone.py:113 api/serializers_/zone_template.py:71
+#: forms/zone.py:672
 msgid "Primary nameserver for the zone"
 msgstr ""
 
@@ -103,23 +103,23 @@ msgstr ""
 msgid "DNSSEC policy to apply to the zone"
 msgstr ""
 
-#: api/serializers_/zone.py:161 api/serializers_/zone_template.py:90
+#: api/serializers_/zone.py:161 api/serializers_/zone_template.py:91
 msgid "Registrar the domain is registered with"
 msgstr ""
 
-#: api/serializers_/zone.py:168 api/serializers_/zone_template.py:97
+#: api/serializers_/zone.py:168 api/serializers_/zone_template.py:98
 msgid "Registrant of the domain"
 msgstr ""
 
-#: api/serializers_/zone.py:175 api/serializers_/zone_template.py:104
+#: api/serializers_/zone.py:175 api/serializers_/zone_template.py:105
 msgid "Administrative contact for the domain"
 msgstr ""
 
-#: api/serializers_/zone.py:182 api/serializers_/zone_template.py:111
+#: api/serializers_/zone.py:182 api/serializers_/zone_template.py:112
 msgid "Technical contact for the domain"
 msgstr ""
 
-#: api/serializers_/zone.py:189 api/serializers_/zone_template.py:118
+#: api/serializers_/zone.py:189 api/serializers_/zone_template.py:119
 msgid "Billing contact for the domain"
 msgstr ""
 
@@ -127,11 +127,11 @@ msgstr ""
 msgid "Template to apply to the zone"
 msgstr ""
 
-#: api/serializers_/zone_template.py:76
+#: api/serializers_/zone_template.py:77
 msgid "Record templates assigned to the zone template"
 msgstr ""
 
-#: api/serializers_/zone_template.py:83
+#: api/serializers_/zone_template.py:84
 msgid "DNSSEC policy assigned to the zone template"
 msgstr ""
 
@@ -167,7 +167,7 @@ msgid "ZSK"
 msgstr ""
 
 #: choices/dnssec_policy.py:38 choices/record.py:102 choices/zone.py:22
-#: forms/record.py:191 forms/zone.py:489 tables/record.py:60
+#: forms/record.py:191 forms/zone.py:496 tables/record.py:60
 msgid "Active"
 msgstr ""
 
@@ -216,7 +216,7 @@ msgid "DNSSEC Policy IDs"
 msgstr ""
 
 #: filtersets/dnssec_key_template.py:50 models/dnssec_policy.py:22
-#: navigation.py:117
+#: navigation.py:157
 msgid "DNSSEC Policies"
 msgstr ""
 
@@ -227,7 +227,7 @@ msgid "CDS Digest Types"
 msgstr ""
 
 #: filtersets/dnssec_policy.py:56 models/dnssec_key_template.py:25
-#: navigation.py:97
+#: navigation.py:137
 msgid "DNSSEC Key Templates"
 msgstr ""
 
@@ -237,7 +237,7 @@ msgstr ""
 
 #: filtersets/dnssec_policy.py:68 filtersets/nameserver.py:28
 #: forms/dnssec_policy.py:263 forms/nameserver.py:106 models/zone.py:87
-#: navigation.py:31 views/dnssec_policy.py:119 views/nameserver.py:96
+#: navigation.py:51 views/dnssec_policy.py:119 views/nameserver.py:96
 #: views/registrar.py:86 views/registration_contact.py:89 views/view.py:106
 msgid "Zones"
 msgstr ""
@@ -248,7 +248,7 @@ msgstr ""
 
 #: filtersets/dnssec_policy.py:80 forms/dnssec_policy.py:269
 #: forms/record_template.py:122 forms/record_template.py:169
-#: models/zone_template.py:23 navigation.py:137
+#: models/zone_template.py:24 navigation.py:97
 #: templates/netbox_dns/recordtemplate.html:86 views/dnssec_policy.py:139
 msgid "Zone Templates"
 msgstr ""
@@ -265,8 +265,8 @@ msgstr ""
 msgid "Parent Zone ID"
 msgstr ""
 
-#: filtersets/record.py:52 forms/zone.py:522 templates/netbox_dns/zone.html:25
-#: templates/netbox_dns/zone.html:194
+#: filtersets/record.py:52 forms/zone.py:529 templates/netbox_dns/zone.html:25
+#: templates/netbox_dns/zone.html:201
 msgid "Parent Zone"
 msgstr ""
 
@@ -300,8 +300,8 @@ msgstr ""
 msgid "Record is active"
 msgstr ""
 
-#: filtersets/record_template.py:39 forms/zone_template.py:70
-#: models/zone_template.py:22 templates/netbox_dns/recordtemplate.html:84
+#: filtersets/record_template.py:39 forms/zone_template.py:72
+#: models/zone_template.py:23 templates/netbox_dns/recordtemplate.html:84
 #: templates/netbox_dns/zonetemplate.html:12
 msgid "Zone Template"
 msgstr ""
@@ -314,8 +314,8 @@ msgstr ""
 msgid "Prefix ID"
 msgstr ""
 
-#: filtersets/view.py:37 forms/view.py:231 forms/zone.py:511
-#: templates/netbox_dns/zone.html:185
+#: filtersets/view.py:37 forms/view.py:231 forms/zone.py:518
+#: templates/netbox_dns/zone.html:192
 msgid "Prefix"
 msgstr ""
 
@@ -324,53 +324,55 @@ msgid "View ID"
 msgstr ""
 
 #: filtersets/zone.py:60 forms/record.py:97 forms/record.py:178
-#: forms/record.py:250 forms/view.py:117 forms/zone.py:309 forms/zone.py:469
-#: forms/zone.py:636 forms/zone.py:886 models/view.py:29 models/zone.py:168
+#: forms/record.py:250 forms/view.py:117 forms/zone.py:316 forms/zone.py:476
+#: forms/zone.py:643 forms/zone.py:893 models/view.py:29 models/zone.py:168
 #: tables/record.py:32 tables/zone.py:48 templates/netbox_dns/view.html:8
 #: templates/netbox_dns/zone.html:30
 msgid "View"
 msgstr ""
 
-#: filtersets/zone.py:66 filtersets/zone_template.py:49
+#: filtersets/zone.py:66 filtersets/zone_template.py:53
 msgid "Nameservers ID"
 msgstr ""
 
-#: filtersets/zone.py:72 filtersets/zone_template.py:55 forms/nameserver.py:49
+#: filtersets/zone.py:72 filtersets/zone_template.py:59 forms/nameserver.py:49
 #: models/nameserver.py:32 models/zone.py:192
 #: templates/netbox_dns/nameserver.html:8
 msgid "Nameserver"
 msgstr ""
 
-#: filtersets/zone.py:76 filtersets/zone_template.py:61
+#: filtersets/zone.py:76 filtersets/zone_template.py:65
 msgid "SOA MName ID"
 msgstr ""
 
-#: filtersets/zone.py:82 filtersets/zone_template.py:67 forms/zone.py:346
-#: forms/zone.py:666 forms/zone.py:916 forms/zone_template.py:264
-#: models/zone.py:209 models/zone_template.py:73 tables/zone.py:52
+#: filtersets/zone.py:82 filtersets/zone_template.py:71 forms/zone.py:353
+#: forms/zone.py:673 forms/zone.py:923 forms/zone_template.py:273
+#: models/zone.py:209 models/zone_template.py:78 tables/zone.py:52
 #: tables/zone_template.py:35 templates/netbox_dns/zonetemplate.html:46
 msgid "SOA MName"
 msgstr ""
 
-#: filtersets/zone.py:86 filtersets/zone_template.py:71
-#: forms/zone_template.py:198
+#: filtersets/zone.py:86 filtersets/zone_template.py:75
+#: forms/zone_template.py:202
 msgid "DNSSEC Policy ID"
 msgstr ""
 
-#: filtersets/zone.py:92 filtersets/zone_template.py:77 forms/zone.py:528
-#: forms/zone.py:720 forms/zone.py:969 forms/zone_template.py:279
-#: forms/zone_template.py:412 models/dnssec_policy.py:21 models/zone.py:258
-#: models/zone_template.py:92 tables/zone.py:65 tables/zone_template.py:42
+#: filtersets/zone.py:92 filtersets/zone_template.py:81 forms/zone.py:535
+#: forms/zone.py:727 forms/zone.py:976 forms/zone_template.py:288
+#: forms/zone_template.py:422 models/dnssec_policy.py:21 models/zone.py:258
+#: models/zone_template.py:97 tables/zone.py:65 tables/zone_template.py:42
 #: templates/netbox_dns/dnssecpolicy.html:8
 msgid "DNSSEC Policy"
 msgstr ""
 
-#: filtersets/zone.py:96 forms/zone.py:386 forms/zone.py:537 forms/zone.py:979
-#: templates/netbox_dns/zone.html:112
+#: filtersets/zone.py:96 filtersets/zone_template.py:85 forms/zone.py:393
+#: forms/zone.py:544 forms/zone.py:986 forms/zone_template.py:206
+#: forms/zone_template.py:427 templates/netbox_dns/zone.html:112
+#: templates/netbox_dns/zonetemplate.html:65
 msgid "Parental Agents"
 msgstr ""
 
-#: filtersets/zone.py:100 forms/zone.py:393 forms/zone.py:704 forms/zone.py:956
+#: filtersets/zone.py:100 forms/zone.py:400 forms/zone.py:711 forms/zone.py:963
 #: models/zone.py:337 tables/zone.py:69
 msgid "RFC2317 Prefix"
 msgstr ""
@@ -380,70 +382,70 @@ msgstr ""
 msgid "RFC2317 Parent Zone"
 msgstr ""
 
-#: filtersets/zone.py:116 filtersets/zone_template.py:81
+#: filtersets/zone.py:116 filtersets/zone_template.py:89
 msgid "Registrar ID"
 msgstr ""
 
-#: filtersets/zone.py:122 filtersets/zone_template.py:87 forms/registrar.py:50
-#: forms/zone.py:543 forms/zone.py:733 forms/zone.py:984
-#: forms/zone_template.py:204 forms/zone_template.py:288
-#: forms/zone_template.py:417 models/registrar.py:16 models/zone.py:279
-#: models/zone_template.py:100 tables/zone.py:76 tables/zone_template.py:46
+#: filtersets/zone.py:122 filtersets/zone_template.py:95 forms/registrar.py:50
+#: forms/zone.py:550 forms/zone.py:740 forms/zone.py:991
+#: forms/zone_template.py:212 forms/zone_template.py:297
+#: forms/zone_template.py:432 models/registrar.py:16 models/zone.py:279
+#: models/zone_template.py:113 tables/zone.py:76 tables/zone_template.py:46
 #: templates/netbox_dns/registrar.html:8
 #: templates/netbox_dns/zone/registration.html:10
-#: templates/netbox_dns/zonetemplate.html:76
+#: templates/netbox_dns/zonetemplate.html:86
 msgid "Registrar"
 msgstr ""
 
-#: filtersets/zone.py:130 filtersets/zone_template.py:91
+#: filtersets/zone.py:130 filtersets/zone_template.py:99
 msgid "Registrant ID"
 msgstr ""
 
-#: filtersets/zone.py:136 filtersets/zone_template.py:97 forms/zone.py:568
-#: forms/zone.py:751 forms/zone.py:1003 forms/zone_template.py:210
-#: forms/zone_template.py:297 forms/zone_template.py:422 models/zone.py:305
-#: models/zone_template.py:108 tables/zone.py:83 tables/zone_template.py:50
+#: filtersets/zone.py:136 filtersets/zone_template.py:105 forms/zone.py:575
+#: forms/zone.py:758 forms/zone.py:1010 forms/zone_template.py:218
+#: forms/zone_template.py:306 forms/zone_template.py:437 models/zone.py:305
+#: models/zone_template.py:121 tables/zone.py:83 tables/zone_template.py:50
 #: templates/netbox_dns/zone/registration.html:37
-#: templates/netbox_dns/zonetemplate.html:80
+#: templates/netbox_dns/zonetemplate.html:90
 msgid "Registrant"
 msgstr ""
 
-#: filtersets/zone.py:140 filtersets/zone_template.py:101
+#: filtersets/zone.py:140 filtersets/zone_template.py:109
 msgid "Administrative Contact ID"
 msgstr ""
 
-#: filtersets/zone.py:146 filtersets/zone_template.py:107 forms/zone.py:574
-#: forms/zone.py:760 forms/zone.py:1008 forms/zone_template.py:216
-#: forms/zone_template.py:306 forms/zone_template.py:427 models/zone.py:313
-#: models/zone_template.py:116 tables/zone.py:87 tables/zone_template.py:54
+#: filtersets/zone.py:146 filtersets/zone_template.py:115 forms/zone.py:581
+#: forms/zone.py:767 forms/zone.py:1015 forms/zone_template.py:224
+#: forms/zone_template.py:315 forms/zone_template.py:442 models/zone.py:313
+#: models/zone_template.py:129 tables/zone.py:87 tables/zone_template.py:54
 #: templates/netbox_dns/zone/registration.html:41
-#: templates/netbox_dns/zonetemplate.html:84
+#: templates/netbox_dns/zonetemplate.html:94
 msgid "Administrative Contact"
 msgstr ""
 
-#: filtersets/zone.py:150 filtersets/zone_template.py:111
+#: filtersets/zone.py:150 filtersets/zone_template.py:119
 msgid "Technical Contact ID"
 msgstr ""
 
-#: filtersets/zone.py:156 filtersets/zone_template.py:117 forms/zone.py:580
-#: forms/zone.py:769 forms/zone.py:1013 forms/zone_template.py:222
-#: forms/zone_template.py:315 forms/zone_template.py:432 models/zone.py:321
-#: models/zone_template.py:124 tables/zone.py:91 tables/zone_template.py:58
+#: filtersets/zone.py:156 filtersets/zone_template.py:125 forms/zone.py:587
+#: forms/zone.py:776 forms/zone.py:1020 forms/zone_template.py:230
+#: forms/zone_template.py:324 forms/zone_template.py:447 models/zone.py:321
+#: models/zone_template.py:137 tables/zone.py:91 tables/zone_template.py:58
 #: templates/netbox_dns/zone/registration.html:45
-#: templates/netbox_dns/zonetemplate.html:88
+#: templates/netbox_dns/zonetemplate.html:98
 msgid "Technical Contact"
 msgstr ""
 
-#: filtersets/zone.py:160 filtersets/zone_template.py:121
+#: filtersets/zone.py:160 filtersets/zone_template.py:129
 msgid "Billing Contact ID"
 msgstr ""
 
-#: filtersets/zone.py:166 filtersets/zone_template.py:127 forms/zone.py:586
-#: forms/zone.py:778 forms/zone.py:1018 forms/zone_template.py:228
-#: forms/zone_template.py:324 forms/zone_template.py:437 models/zone.py:329
-#: models/zone_template.py:132 tables/zone.py:95 tables/zone_template.py:62
+#: filtersets/zone.py:166 filtersets/zone_template.py:135 forms/zone.py:593
+#: forms/zone.py:785 forms/zone.py:1025 forms/zone_template.py:236
+#: forms/zone_template.py:333 forms/zone_template.py:452 models/zone.py:329
+#: models/zone_template.py:145 tables/zone.py:95 tables/zone_template.py:62
 #: templates/netbox_dns/zone/registration.html:49
-#: templates/netbox_dns/zonetemplate.html:92
+#: templates/netbox_dns/zonetemplate.html:102
 msgid "Billing Contact"
 msgstr ""
 
@@ -455,13 +457,13 @@ msgstr ""
 msgid "Zone is active"
 msgstr ""
 
-#: filtersets/zone_template.py:37
+#: filtersets/zone_template.py:41
 msgid "Record Template ID"
 msgstr ""
 
-#: filtersets/zone_template.py:43 forms/record_template.py:65
+#: filtersets/zone_template.py:47 forms/record_template.py:65
 #: models/record_template.py:26 templates/netbox_dns/recordtemplate.html:12
-#: templates/netbox_dns/zonetemplate.html:103
+#: templates/netbox_dns/zonetemplate.html:113
 msgid "Record Template"
 msgstr ""
 
@@ -472,8 +474,8 @@ msgstr ""
 #: forms/record_template.py:118 forms/record_template.py:229
 #: forms/registrar.py:72 forms/registrar.py:148
 #: forms/registration_contact.py:84 forms/registration_contact.py:194
-#: forms/view.py:197 forms/view.py:275 forms/zone.py:427 forms/zone.py:825
-#: forms/zone_template.py:135 forms/zone_template.py:341
+#: forms/view.py:197 forms/view.py:275 forms/zone.py:434 forms/zone.py:832
+#: forms/zone_template.py:138 forms/zone_template.py:350
 msgid "Attributes"
 msgstr ""
 
@@ -488,16 +490,16 @@ msgstr ""
 #: forms/nameserver.py:94 forms/record.py:76 forms/record.py:140
 #: forms/record.py:299 forms/record_template.py:70 forms/record_template.py:127
 #: forms/record_template.py:234 forms/view.py:126 forms/view.py:205
-#: forms/view.py:280 forms/zone.py:254 forms/zone.py:462 forms/zone.py:864
-#: forms/zone_template.py:96 forms/zone_template.py:161
-#: forms/zone_template.py:367
+#: forms/view.py:280 forms/zone.py:261 forms/zone.py:469 forms/zone.py:871
+#: forms/zone_template.py:99 forms/zone_template.py:165
+#: forms/zone_template.py:377
 msgid "Tenancy"
 msgstr ""
 
 #: forms/dnssec_key_template.py:75 forms/dnssec_policy.py:110
 #: forms/dnssec_policy.py:238 forms/nameserver.py:58 forms/record.py:80
 #: forms/record_template.py:74 forms/registrar.py:54 forms/view.py:130
-#: forms/zone.py:258 forms/zone_template.py:100
+#: forms/zone.py:265 forms/zone_template.py:103
 msgid "Tags"
 msgstr ""
 
@@ -509,13 +511,13 @@ msgstr ""
 #: forms/dnssec_key_template.py:125 forms/dnssec_policy.py:256
 #: forms/dnssec_policy.py:262 forms/dnssec_policy.py:268
 #: forms/nameserver.py:105 forms/nameserver.py:111 forms/record_template.py:168
-#: forms/zone.py:483 forms/zone.py:521 forms/zone.py:527 forms/zone.py:542
-#: forms/zone.py:567 forms/zone.py:573 forms/zone.py:579 forms/zone.py:585
-#: forms/zone_template.py:172 forms/zone_template.py:178
-#: forms/zone_template.py:188 forms/zone_template.py:197
-#: forms/zone_template.py:203 forms/zone_template.py:209
-#: forms/zone_template.py:215 forms/zone_template.py:221
-#: forms/zone_template.py:227
+#: forms/zone.py:490 forms/zone.py:528 forms/zone.py:534 forms/zone.py:549
+#: forms/zone.py:574 forms/zone.py:580 forms/zone.py:586 forms/zone.py:592
+#: forms/zone_template.py:176 forms/zone_template.py:182
+#: forms/zone_template.py:192 forms/zone_template.py:201
+#: forms/zone_template.py:211 forms/zone_template.py:217
+#: forms/zone_template.py:223 forms/zone_template.py:229
+#: forms/zone_template.py:235
 msgid "None"
 msgstr ""
 
@@ -538,11 +540,11 @@ msgstr ""
 #: forms/nameserver.py:139 forms/nameserver.py:174 forms/record.py:270
 #: forms/record.py:350 forms/record_template.py:213
 #: forms/record_template.py:284 forms/view.py:265 forms/view.py:302
-#: forms/zone.py:784 forms/zone.py:1028 forms/zone_template.py:330
-#: forms/zone_template.py:447 models/dnssec_key_template.py:82
+#: forms/zone.py:791 forms/zone.py:1035 forms/zone_template.py:339
+#: forms/zone_template.py:462 models/dnssec_key_template.py:82
 #: models/dnssec_policy.py:159 models/nameserver.py:70 models/record.py:232
 #: models/record_template.py:95 models/view.py:70 models/zone.py:363
-#: models/zone_template.py:140 templates/netbox_dns/dnsseckeytemplate.html:39
+#: models/zone_template.py:153 templates/netbox_dns/dnsseckeytemplate.html:39
 #: templates/netbox_dns/dnssecpolicy.html:42
 #: templates/netbox_dns/nameserver.html:28 templates/netbox_dns/record.html:101
 #: templates/netbox_dns/recordtemplate.html:36
@@ -556,12 +558,12 @@ msgstr ""
 #: forms/record.py:340 forms/record_template.py:163
 #: forms/record_template.py:274 forms/registrar.py:94 forms/registrar.py:168
 #: forms/registration_contact.py:111 forms/registration_contact.py:237
-#: forms/view.py:292 forms/zone.py:493 forms/zone.py:906
-#: forms/zone_template.py:407 models/dnssec_key_template.py:51
+#: forms/view.py:292 forms/zone.py:500 forms/zone.py:913
+#: forms/zone_template.py:417 models/dnssec_key_template.py:51
 #: models/dnssec_policy.py:42 models/nameserver.py:65 models/record.py:227
 #: models/record_template.py:66 models/registrar.py:37
 #: models/registration_contact.py:65 models/view.py:50 models/zone.py:180
-#: models/zone_template.py:62 templates/netbox_dns/dnsseckeytemplate.html:17
+#: models/zone_template.py:67 templates/netbox_dns/dnsseckeytemplate.html:17
 #: templates/netbox_dns/dnssecpolicy.html:12
 #: templates/netbox_dns/nameserver.html:22 templates/netbox_dns/record.html:95
 #: templates/netbox_dns/recordtemplate.html:30
@@ -590,7 +592,7 @@ msgstr ""
 
 #: forms/dnssec_key_template.py:234 forms/dnssec_policy.py:598
 #: forms/nameserver.py:169 forms/record.py:345 forms/record_template.py:279
-#: forms/view.py:297 forms/zone.py:1023 forms/zone_template.py:442
+#: forms/view.py:297 forms/zone.py:1030 forms/zone_template.py:457
 msgid "Tenant Group"
 msgstr ""
 
@@ -708,8 +710,8 @@ msgstr ""
 #: forms/dnssec_policy.py:251 forms/dnssec_policy.py:384
 #: forms/dnssec_policy.py:517 forms/record.py:169 forms/record.py:264
 #: forms/record.py:326 forms/record_template.py:151
-#: forms/record_template.py:199 forms/record_template.py:260 forms/zone.py:323
-#: forms/zone.py:474 forms/zone.py:641 forms/zone.py:891
+#: forms/record_template.py:199 forms/record_template.py:260 forms/zone.py:330
+#: forms/zone.py:481 forms/zone.py:648 forms/zone.py:898
 #: models/dnssec_policy.py:47 models/record.py:197 models/record_template.py:79
 #: models/zone.py:185 tables/dnssec_policy.py:41 tables/dnssec_policy.py:123
 #: tables/record.py:90 tables/zone.py:56
@@ -751,7 +753,7 @@ msgstr ""
 #: forms/nameserver.py:71 forms/nameserver.py:100 forms/nameserver.py:133
 #: forms/record.py:151 forms/record_template.py:142 forms/registrar.py:86
 #: forms/registration_contact.py:107 forms/registration_contact.py:233
-#: forms/zone.py:313 forms/zone.py:478 models/dnssec_key_template.py:47
+#: forms/zone.py:320 forms/zone.py:485 models/dnssec_key_template.py:47
 #: models/dnssec_policy.py:37 models/nameserver.py:60 models/record.py:169
 #: models/record_template.py:61 models/registrar.py:31
 #: models/registration_contact.py:59 models/view.py:44 models/zone.py:175
@@ -793,7 +795,7 @@ msgid "Record"
 msgstr ""
 
 #: forms/record.py:105 forms/record.py:183 forms/record.py:241
-#: forms/record.py:312 forms/zone.py:215 models/record.py:174 models/zone.py:86
+#: forms/record.py:312 forms/zone.py:222 models/record.py:174 models/zone.py:86
 #: tables/record.py:28 templates/netbox_dns/record.html:66
 #: templates/netbox_dns/zone.html:11
 msgid "Zone"
@@ -827,7 +829,7 @@ msgstr ""
 msgid "Zone %(value)s not found"
 msgstr ""
 
-#: forms/record.py:252 forms/zone.py:634
+#: forms/record.py:252 forms/zone.py:641
 #, python-format
 msgid "View %(value)s not found"
 msgstr ""
@@ -836,8 +838,8 @@ msgstr ""
 msgid "This field is required if the zone is not in the default view"
 msgstr ""
 
-#: forms/record_template.py:138 forms/zone_template.py:167
-#: models/record_template.py:55 models/zone_template.py:56
+#: forms/record_template.py:138 forms/zone_template.py:171
+#: models/record_template.py:55 models/zone_template.py:61
 #: templates/netbox_dns/recordtemplate.html:15
 msgid "Template Name"
 msgstr ""
@@ -995,223 +997,223 @@ msgstr ""
 msgid "Assigned DNS Views"
 msgstr ""
 
-#: forms/zone.py:65 models/zone.py:784
+#: forms/zone.py:65 models/zone.py:795
 msgid "soa_mname not set and no template or default value defined"
 msgstr ""
 
-#: forms/zone.py:191 forms/zone.py:507 forms/zone.py:675 forms/zone.py:925
+#: forms/zone.py:198 forms/zone.py:514 forms/zone.py:682 forms/zone.py:932
 #: models/zone.py:253
 msgid "Generate SOA Serial"
 msgstr ""
 
-#: forms/zone.py:192 forms/zone.py:711 forms/zone.py:964 models/zone.py:343
+#: forms/zone.py:199 forms/zone.py:718 forms/zone.py:971 models/zone.py:343
 msgid "RFC2317 Parent Managed"
 msgstr ""
 
-#: forms/zone.py:196 models/zone.py:254
+#: forms/zone.py:203 models/zone.py:254
 msgid "Automatically generate the SOA serial number"
 msgstr ""
 
-#: forms/zone.py:198 forms/zone.py:709 forms/zone.py:962
+#: forms/zone.py:205 forms/zone.py:716 forms/zone.py:969
 msgid "IPv4 reverse zone for delegating the RFC2317 PTR records is managed in NetBox DNS"
 msgstr ""
 
-#: forms/zone.py:227 forms/zone.py:433 forms/zone.py:837
-#: forms/zone_template.py:75 forms/zone_template.py:140
-#: forms/zone_template.py:346
+#: forms/zone.py:234 forms/zone.py:440 forms/zone.py:844
+#: forms/zone_template.py:77 forms/zone_template.py:143
+#: forms/zone_template.py:355
 msgid "SOA"
 msgstr ""
 
-#: forms/zone.py:233 forms/zone.py:439 forms/zone.py:843
-#: forms/zone_template.py:83 forms/zone_template.py:148
-#: forms/zone_template.py:354 navigation.py:231
+#: forms/zone.py:240 forms/zone.py:446 forms/zone.py:850
+#: forms/zone_template.py:86 forms/zone_template.py:152
+#: forms/zone_template.py:364 navigation.py:238
 #: templates/netbox_dns/zone.html:101 templates/netbox_dns/zonetemplate.html:58
 msgid "DNSSEC"
 msgstr ""
 
-#: forms/zone.py:238 forms/zone.py:445 forms/zone.py:848
-#: templates/netbox_dns/zone.html:182
+#: forms/zone.py:245 forms/zone.py:452 forms/zone.py:855
+#: templates/netbox_dns/zone.html:189
 msgid "RFC2317"
 msgstr ""
 
-#: forms/zone.py:249 forms/zone.py:859 forms/zone_template.py:91
-#: forms/zone_template.py:362 navigation.py:245
+#: forms/zone.py:256 forms/zone.py:866 forms/zone_template.py:94
+#: forms/zone_template.py:372 navigation.py:245
 #: templates/netbox_dns/zone/registration.html:7
-#: templates/netbox_dns/zonetemplate.html:73
+#: templates/netbox_dns/zonetemplate.html:83
 msgid "Domain Registration"
 msgstr ""
 
-#: forms/zone.py:318 forms/zone.py:790
+#: forms/zone.py:325 forms/zone.py:797
 msgid "Template"
 msgstr ""
 
-#: forms/zone.py:328 forms/zone.py:484 forms/zone.py:647 forms/zone.py:896
-#: forms/zone_template.py:173 forms/zone_template.py:258
-#: forms/zone_template.py:389 models/nameserver.py:33
-#: models/zone_template.py:67 navigation.py:51
+#: forms/zone.py:335 forms/zone.py:491 forms/zone.py:654 forms/zone.py:903
+#: forms/zone_template.py:177 forms/zone_template.py:267
+#: forms/zone_template.py:399 models/nameserver.py:33
+#: models/zone_template.py:72 navigation.py:31
 #: templates/netbox_dns/zone.html:55 templates/netbox_dns/zonetemplate.html:36
 msgid "Nameservers"
 msgstr ""
 
-#: forms/zone.py:332
+#: forms/zone.py:339
 msgid "Default TTL for new records in this zone"
 msgstr ""
 
-#: forms/zone.py:334 forms/zone.py:651 forms/zone.py:901 models/zone.py:198
+#: forms/zone.py:341 forms/zone.py:658 forms/zone.py:908 models/zone.py:198
 #: tables/zone.py:62 templates/netbox_dns/zone.html:93
 msgid "Default TTL"
 msgstr ""
 
-#: forms/zone.py:338 forms/zone.py:655
+#: forms/zone.py:345 forms/zone.py:662
 msgid "TTL for the SOA record of the zone"
 msgstr ""
 
-#: forms/zone.py:340 forms/zone.py:656 forms/zone.py:911 models/zone.py:203
+#: forms/zone.py:347 forms/zone.py:663 forms/zone.py:918 models/zone.py:203
 msgid "SOA TTL"
 msgstr ""
 
-#: forms/zone.py:344
+#: forms/zone.py:351
 msgid "Primary nameserver this zone"
 msgstr ""
 
-#: forms/zone.py:350 forms/zone.py:670
+#: forms/zone.py:357 forms/zone.py:677
 msgid "Mailbox of the zone's administrator"
 msgstr ""
 
-#: forms/zone.py:351 forms/zone.py:671 forms/zone.py:920 models/zone.py:217
-#: models/zone_template.py:81 templates/netbox_dns/zonetemplate.html:50
+#: forms/zone.py:358 forms/zone.py:678 forms/zone.py:927 models/zone.py:217
+#: models/zone_template.py:86 templates/netbox_dns/zonetemplate.html:50
 msgid "SOA RName"
 msgstr ""
 
-#: forms/zone.py:355 forms/zone.py:683
+#: forms/zone.py:362 forms/zone.py:690
 msgid "Refresh interval for secondary nameservers"
 msgstr ""
 
-#: forms/zone.py:357 forms/zone.py:684 forms/zone.py:935 models/zone.py:229
+#: forms/zone.py:364 forms/zone.py:691 forms/zone.py:942 models/zone.py:229
 msgid "SOA Refresh"
 msgstr ""
 
-#: forms/zone.py:361 forms/zone.py:688
+#: forms/zone.py:368 forms/zone.py:695
 msgid "Retry interval for secondary nameservers"
 msgstr ""
 
-#: forms/zone.py:363 forms/zone.py:689 forms/zone.py:940 models/zone.py:235
+#: forms/zone.py:370 forms/zone.py:696 forms/zone.py:947 models/zone.py:235
 msgid "SOA Retry"
 msgstr ""
 
-#: forms/zone.py:368 forms/zone.py:693
+#: forms/zone.py:375 forms/zone.py:700
 msgid "Expire time after which the zone is considered unavailable"
 msgstr ""
 
-#: forms/zone.py:369 forms/zone.py:694 forms/zone.py:945 models/zone.py:241
+#: forms/zone.py:376 forms/zone.py:701 forms/zone.py:952 models/zone.py:241
 msgid "SOA Expire"
 msgstr ""
 
-#: forms/zone.py:373 forms/zone.py:698
+#: forms/zone.py:380 forms/zone.py:705
 msgid "Minimum TTL for negative results, e.g. NXRRSET, NXDOMAIN"
 msgstr ""
 
-#: forms/zone.py:375 forms/zone.py:699 forms/zone.py:950 models/zone.py:247
+#: forms/zone.py:382 forms/zone.py:706 forms/zone.py:957 models/zone.py:247
 msgid "SOA Minimum TTL"
 msgstr ""
 
-#: forms/zone.py:380 forms/zone.py:679 forms/zone.py:930 models/zone.py:223
+#: forms/zone.py:387 forms/zone.py:686 forms/zone.py:937 models/zone.py:223
 msgid "SOA Serial"
 msgstr ""
 
-#: forms/zone.py:392 forms/zone.py:703 forms/zone.py:955 models/zone.py:338
+#: forms/zone.py:399 forms/zone.py:710 forms/zone.py:962 models/zone.py:338
 msgid "RFC2317 IPv4 prefix with a length of at least 25 bits"
 msgstr ""
 
-#: forms/zone.py:457 forms/zone_template.py:156 views/zone.py:117
+#: forms/zone.py:464 forms/zone_template.py:160 views/zone.py:119
 msgid "Registration"
 msgstr ""
 
-#: forms/zone.py:498 forms/zone_template.py:112 forms/zone_template.py:179
-#: forms/zone_template.py:394 templates/netbox_dns/zone.html:137
+#: forms/zone.py:505 forms/zone_template.py:115 forms/zone_template.py:183
+#: forms/zone_template.py:404 templates/netbox_dns/zone.html:137
 msgid "MName"
 msgstr ""
 
-#: forms/zone.py:502 forms/zone_template.py:62 forms/zone_template.py:183
-#: forms/zone_template.py:399 templates/netbox_dns/zone.html:141
+#: forms/zone.py:509 forms/zone_template.py:64 forms/zone_template.py:187
+#: forms/zone_template.py:409 templates/netbox_dns/zone.html:148
 msgid "RName"
 msgstr ""
 
-#: forms/zone.py:516 templates/netbox_dns/zone.html:189
+#: forms/zone.py:523 templates/netbox_dns/zone.html:196
 msgid "Parent Managed"
 msgstr ""
 
-#: forms/zone.py:533 forms/zone.py:724 forms/zone.py:974
+#: forms/zone.py:540 forms/zone.py:731 forms/zone.py:981
 #: templates/netbox_dns/zone.html:108
 msgid "Use Inline Signing"
 msgstr ""
 
-#: forms/zone.py:547 forms/zone.py:737 forms/zone.py:988 models/zone.py:287
+#: forms/zone.py:554 forms/zone.py:744 forms/zone.py:995 models/zone.py:287
 #: templates/netbox_dns/zone/registration.html:14
 msgid "Registry Domain ID"
 msgstr ""
 
-#: forms/zone.py:551
+#: forms/zone.py:558
 msgid "Expiration Date after"
 msgstr ""
 
-#: forms/zone.py:556
+#: forms/zone.py:563
 msgid "Expiration Date before"
 msgstr ""
 
-#: forms/zone.py:562 forms/zone.py:742 forms/zone.py:998 models/zone.py:298
+#: forms/zone.py:569 forms/zone.py:749 forms/zone.py:1005 models/zone.py:298
 #: tables/zone.py:80 templates/netbox_dns/zone/registration.html:33
 msgid "Domain Status"
 msgstr ""
 
-#: forms/zone.py:663
+#: forms/zone.py:670
 #, python-format
 msgid "Nameserver %(value)s not found"
 msgstr ""
 
-#: forms/zone.py:718 forms/zone_template.py:277
+#: forms/zone.py:725 forms/zone_template.py:286
 #, python-format
 msgid "DNSSEC policy %(value)s not found"
 msgstr ""
 
-#: forms/zone.py:731 forms/zone_template.py:286
+#: forms/zone.py:738 forms/zone_template.py:295
 #, python-format
 msgid "Registrar %(value)s not found"
 msgstr ""
 
-#: forms/zone.py:749 forms/zone_template.py:295
+#: forms/zone.py:756 forms/zone_template.py:304
 #, python-format
 msgid "Registrant contact ID %(value)s not found"
 msgstr ""
 
-#: forms/zone.py:758 forms/zone_template.py:304
+#: forms/zone.py:765 forms/zone_template.py:313
 #, python-format
 msgid "Administrative contact ID %(value)s not found"
 msgstr ""
 
-#: forms/zone.py:767 forms/zone_template.py:313
+#: forms/zone.py:774 forms/zone_template.py:322
 #, python-format
 msgid "Technical contact ID %(value)s not found"
 msgstr ""
 
-#: forms/zone.py:776
+#: forms/zone.py:783
 msgid "Billing contact ID not found"
 msgstr ""
 
-#: forms/zone.py:992 models/zone.py:293
+#: forms/zone.py:999 models/zone.py:293
 #: templates/netbox_dns/zone/registration.html:18
 msgid "Expiration Date"
 msgstr ""
 
-#: forms/zone_template.py:79 forms/zone_template.py:144
-#: forms/zone_template.py:189 forms/zone_template.py:270
-#: forms/zone_template.py:350 forms/zone_template.py:404
-#: models/record_template.py:27 models/zone_template.py:86 navigation.py:157
-#: templates/netbox_dns/zonetemplate.html:105
+#: forms/zone_template.py:81 forms/zone_template.py:147
+#: forms/zone_template.py:193 forms/zone_template.py:279
+#: forms/zone_template.py:359 forms/zone_template.py:414
+#: models/record_template.py:27 models/zone_template.py:91 navigation.py:117
+#: templates/netbox_dns/zonetemplate.html:115
 msgid "Record Templates"
 msgstr ""
 
-#: forms/zone_template.py:322
+#: forms/zone_template.py:331
 #, python-format
 msgid "Billing contact ID %(value)s not found"
 msgstr ""
@@ -1228,7 +1230,7 @@ msgstr ""
 msgid "There is already a nameserver with this name"
 msgstr ""
 
-#: models/record.py:119 navigation.py:71 views/zone.py:141
+#: models/record.py:119 navigation.py:71 views/zone.py:143
 msgid "Records"
 msgstr ""
 
@@ -1257,41 +1259,41 @@ msgstr ""
 msgid "RFC2317 CNAME Record"
 msgstr ""
 
-#: models/record.py:610
+#: models/record.py:632
 #, python-brace-format
 msgid "{name} is not a name in {zone}"
 msgstr ""
 
-#: models/record.py:696
+#: models/record.py:718
 #, python-brace-format
 msgid "There is already an active {type} record for name {name} in zone {zone} with value {value}."
 msgstr ""
 
-#: models/record.py:797
+#: models/record.py:819
 #, python-brace-format
 msgid "There is at least one active {type} record for name {name} in zone {zone} and TTL is different ({ttls})."
 msgstr ""
 
-#: models/record.py:885
+#: models/record.py:910
 #, python-brace-format
 msgid "There is already an active record for name {name} in zone {zone}, RFC2317 CNAME is not allowed."
 msgstr ""
 
-#: models/record.py:894
+#: models/record.py:919
 msgid "SOA records are only allowed with name @ and are created automatically by NetBox DNS"
 msgstr ""
 
-#: models/record.py:904
+#: models/record.py:929
 #, python-brace-format
 msgid "There is already an active record for name {name} in zone {zone}, CNAME is not allowed."
 msgstr ""
 
-#: models/record.py:916
+#: models/record.py:941
 #, python-brace-format
 msgid "There is already an active CNAME record for name {name} in zone {zone}, no other record allowed."
 msgstr ""
 
-#: models/record.py:926
+#: models/record.py:951
 #, python-brace-format
 msgid "There is already an active {type} record for name {name} in zone {zone}, more than one are not allowed."
 msgstr ""
@@ -1363,59 +1365,59 @@ msgstr ""
 msgid "Network related to a reverse lookup zone (.arpa)"
 msgstr ""
 
-#: models/zone.py:596
+#: models/zone.py:614
+#, python-brace-format
+msgid "Nameserver {ns} does not have an active address record in zone {zone}"
+msgstr ""
+
+#: models/zone.py:625
 #, python-brace-format
 msgid "No nameservers are configured for zone {zone}"
 msgstr ""
 
-#: models/zone.py:621
-#, python-brace-format
-msgid "Nameserver {nameserver} does not have an active address record in zone {zone}"
-msgstr ""
-
-#: models/zone.py:639
+#: models/zone.py:650
 msgid "The registration for this domain has expired."
 msgstr ""
 
-#: models/zone.py:642
+#: models/zone.py:653
 #, python-brace-format
 msgid "The registration for this domain will expire in less than {expiration_warning_days} days."
 msgstr ""
 
-#: models/zone.py:658
+#: models/zone.py:669
 #, python-brace-format
 msgid "soa_serial must not decrease for zone {zone}."
 msgstr ""
 
-#: models/zone.py:776
+#: models/zone.py:787
 #, python-brace-format
 msgid "Default soa_mname instance {nameserver} does not exist"
 msgstr ""
 
-#: models/zone.py:817
+#: models/zone.py:828
 msgid "soa_rname not set and no template or default value defined"
 msgstr ""
 
-#: models/zone.py:836
+#: models/zone.py:847
 #, python-brace-format
 msgid "soa_serial is not defined and soa_serial_auto is disabled for zone {zone}."
 msgstr ""
 
-#: models/zone.py:856
+#: models/zone.py:867
 #, python-brace-format
 msgid "Enabling soa_serial_auto would decrease soa_serial for zone {zone}."
 msgstr ""
 
-#: models/zone.py:892
+#: models/zone.py:903
 msgid "A regular reverse zone can not be used as an RFC2317 zone."
 msgstr ""
 
-#: models/zone.py:904
+#: models/zone.py:915
 #, python-brace-format
 msgid "Parent zone not found in view {view}."
 msgstr ""
 
-#: models/zone.py:922
+#: models/zone.py:933
 #, python-brace-format
 msgid "RFC2317 prefix overlaps with zone {zone}."
 msgstr ""
@@ -1433,7 +1435,7 @@ msgid "Import"
 msgstr ""
 
 #: navigation.py:91 templates/netbox_dns/record.html:25
-#: templates/netbox_dns/record/managed.html:4 views/zone.py:161
+#: templates/netbox_dns/record/managed.html:4 views/zone.py:163
 msgid "Managed Records"
 msgstr ""
 
@@ -1441,7 +1443,7 @@ msgstr ""
 msgid "DNS Configuration"
 msgstr ""
 
-#: navigation.py:238
+#: navigation.py:231
 msgid "Templates"
 msgstr ""
 
@@ -1512,6 +1514,7 @@ msgid "Add CNAME"
 msgstr ""
 
 #: templates/netbox_dns/record.html:55 templates/netbox_dns/record.html:89
+#: templates/netbox_dns/zone.html:142
 #: templates/netbox_dns/zone/registration.html:23
 msgid "Warning"
 msgstr ""
@@ -1609,28 +1612,28 @@ msgstr ""
 msgid "Zone SOA"
 msgstr ""
 
-#: templates/netbox_dns/zone.html:146
+#: templates/netbox_dns/zone.html:153
 msgid "Serial (auto-generated)"
 msgstr ""
 
-#: templates/netbox_dns/zone.html:158
+#: templates/netbox_dns/zone.html:165
 msgctxt "SOA"
 msgid "Serial"
 msgstr ""
 
-#: templates/netbox_dns/zone.html:163
+#: templates/netbox_dns/zone.html:170
 msgid "Refresh"
 msgstr ""
 
-#: templates/netbox_dns/zone.html:167
+#: templates/netbox_dns/zone.html:174
 msgid "Retry"
 msgstr ""
 
-#: templates/netbox_dns/zone.html:171
+#: templates/netbox_dns/zone.html:178
 msgid "Expire"
 msgstr ""
 
-#: templates/netbox_dns/zone.html:175
+#: templates/netbox_dns/zone.html:182
 msgid "Minimum TTL"
 msgstr ""
 
@@ -1743,27 +1746,27 @@ msgstr ""
 msgid "No key for signing zones (CSK or ZSK) is assigned."
 msgstr ""
 
-#: views/record.py:88
+#: views/record.py:90
 #, python-brace-format
 msgid "There is no matching target record for CNAME value {value}"
 msgstr ""
 
-#: views/record.py:183
+#: views/record.py:187
 msgid "Record is masked by a child zone and may not be visible in DNS"
 msgstr ""
 
-#: views/zone.py:180
+#: views/zone.py:182
 msgid "Delegation Records"
 msgstr ""
 
-#: views/zone.py:199
+#: views/zone.py:201
 msgid "Parent Delegation Records"
 msgstr ""
 
-#: views/zone.py:218
+#: views/zone.py:220
 msgid "RFC2317 Child Zones"
 msgstr ""
 
-#: views/zone.py:237
+#: views/zone.py:239
 msgid "Child Zones"
 msgstr ""
