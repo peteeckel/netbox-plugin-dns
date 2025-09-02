@@ -174,6 +174,8 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
                 dnssec_policy=cls.dnssec_policies[2],
+                expiration_date="2026-04-01",
+                domain_status=ZoneEPPStatusChoices.EPP_STATUS_INACTIVE,
             ),
             Zone(
                 name="0.0.10.in-addr.arpa",
@@ -183,8 +185,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 soa_rname="hostmaster.example.com",
                 soa_serial_auto=True,
                 inline_signing=True,
-                expiration_date="2026-04-01",
-                domain_status=ZoneEPPStatusChoices.EPP_STATUS_INACTIVE,
             ),
             Zone(
                 name="1.0.10.in-addr.arpa",

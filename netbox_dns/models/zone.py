@@ -800,6 +800,17 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         super().clean_fields(exclude=exclude)
 
     def clean(self, *args, **kwargs):
+        if not self.dnssec_policy:
+            self.inline_signing = self._meta.get_field("inline_signing").get_default()
+            self.parental_agents = self._meta.get_field("parental_agents").get_default()
+
+        if not self.registrar:
+            self.registry_domain_id = self._meta.get_field(
+                "registry_domain_id"
+            ).get_default()
+            self.expiration_date = self._meta.get_field("expiration_date").get_default()
+            self.domain_status = self._meta.get_field("domain_status").get_default()
+
         if self.soa_ttl is None:
             self.soa_ttl = self.default_ttl
 

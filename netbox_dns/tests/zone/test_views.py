@@ -3,7 +3,7 @@ from datetime import date
 from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import NameServer, View, Zone
+from netbox_dns.models import NameServer, View, Zone, Registrar
 from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
 
 
@@ -31,6 +31,8 @@ class ZoneViewTestCase(
             NameServer(name="ns3.example.com"),
         )
         NameServer.objects.bulk_create(nameservers)
+
+        registrar = Registrar.objects.create(name="Test Registrar")
 
         zone_data = {
             **Zone.get_defaults(),
@@ -78,6 +80,7 @@ class ZoneViewTestCase(
             "soa_ttl": 43200,
             "soa_minimum": 1800,
             "soa_serial_auto": False,
+            "registrar": registrar.pk,
             "expiration_date": date(2025, 4, 1),
             "domain_status": ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
         }
