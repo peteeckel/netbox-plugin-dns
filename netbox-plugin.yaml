@@ -1,15 +1,18 @@
 version: 0.1
 package_name: netbox-plugin-dns
 compatibility:
+  - release: 1.4.0
+    netbox_min: 4.3.2
+    netbox_max: 4.4.0
   - release: 1.3.6
     netbox_min: 4.3.2
-    netbox_max: 4.3.7
+    netbox_max: 4.4.0
   - release: 1.3.5
     netbox_min: 4.3.2
-    netbox_max: 4.3.7
+    netbox_max: 4.4.0
   - release: 1.3.4
     netbox_min: 4.3.2
-    netbox_max: 4.3.7
+    netbox_max: 4.4.0
   - release: 1.3.3
     netbox_min: 4.3.2
     netbox_max: 4.3.2
