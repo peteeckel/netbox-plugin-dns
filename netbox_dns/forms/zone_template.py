@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.contrib.postgres.forms import SimpleArrayField
 
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -46,6 +47,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
             "soa_mname",
             "soa_rname",
             "dnssec_policy",
+            "parental_agents",
             "record_templates",
             "description",
             "registrar",
@@ -80,6 +82,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
         ),
         FieldSet(
             "dnssec_policy",
+            "parental_agents",
             name=_("DNSSEC"),
         ),
         FieldSet(
@@ -145,6 +148,7 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         ),
         FieldSet(
             "dnssec_policy",
+            "parental_agents",
             name=_("DNSSEC"),
         ),
         FieldSet(
@@ -197,6 +201,10 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         null_option=_("None"),
         label=_("DNSSEC Policy ID"),
     )
+    parental_agents = forms.GenericIPAddressField(
+        required=False,
+        label=_("Parental Agents"),
+    )
     registrar_id = DynamicModelMultipleChoiceField(
         queryset=Registrar.objects.all(),
         required=False,
@@ -241,6 +249,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
             "soa_rname",
             "record_templates",
             "dnssec_policy",
+            "parental_agents",
             "description",
             "registrar",
             "registrant",
@@ -351,6 +360,7 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         ),
         FieldSet(
             "dnssec_policy",
+            "parental_agents",
             name=_("DNSSEC"),
         ),
         FieldSet(
@@ -410,6 +420,11 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         queryset=DNSSECPolicy.objects.all(),
         required=False,
         label=_("DNSSEC Policy"),
+    )
+    parental_agents = SimpleArrayField(
+        required=False,
+        base_field=forms.GenericIPAddressField(),
+        label=_("Parental Agents"),
     )
     registrar = DynamicModelChoiceField(
         queryset=Registrar.objects.all(),

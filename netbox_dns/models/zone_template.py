@@ -4,6 +4,7 @@ from dns.exception import DNSException
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -31,6 +32,7 @@ class ZoneTemplate(NetBoxModel):
         "soa_mname",
         "soa_rname",
         "dnssec_policy",
+        "parental_agents",
         "registrar",
         "registrant",
         "admin_c",
@@ -43,6 +45,7 @@ class ZoneTemplate(NetBoxModel):
         "soa_mname",
         "soa_rname",
         "dnssec_policy",
+        "parental_agents",
         "registrar",
         "registrant",
         "admin_c",
@@ -97,6 +100,14 @@ class ZoneTemplate(NetBoxModel):
         related_name="zone_templates",
         blank=True,
         null=True,
+    )
+    parental_agents = ArrayField(
+        base_field=models.GenericIPAddressField(
+            protocol="both",
+        ),
+        blank=True,
+        null=True,
+        default=list,
     )
     registrar = models.ForeignKey(
         verbose_name=_("Registrar"),

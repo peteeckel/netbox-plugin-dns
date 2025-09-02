@@ -30,6 +30,7 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
             "soa_mname",
             "soa_rname",
             "dnssec_policy",
+            "parental_agents",
             "registrar",
             "registrant",
             "tech_c",
