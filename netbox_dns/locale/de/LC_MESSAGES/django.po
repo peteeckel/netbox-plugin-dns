@@ -1369,7 +1369,7 @@ msgstr "Zugrundeliegendes Netz einer Revese-Lookup-Zone (.arpa)"
 #, fuzzy, python-brace-format
 #| msgid "Nameserver {nameserver} does not have an active address record in zone {zone}"
 msgid "Nameserver {ns} does not have an active address record in zone {zone}"
-msgstr "Nameserver {nameserver} hat keinen aktiven Adressdatensatz in Zone {zone}"
+msgstr "Nameserver {ns} hat keinen aktiven Adressdatensatz in Zone {zone}"
 
 #: models/zone.py:625
 #, python-brace-format
