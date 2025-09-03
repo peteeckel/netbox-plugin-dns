@@ -64,7 +64,7 @@ msgstr "Enregistrement PTR relié à une adresse IP"
 
 #: api/serializers_/record.py:81
 msgid "Address records related to the PTR"
-msgstr ""
+msgstr "Enregistrement adresse (A/AAAA) lié au PTR"
 
 #: api/serializers_/record.py:98
 msgid "IPAddress linked to the record"
@@ -1369,7 +1369,7 @@ msgstr "Réseau associé à une zone inverse (.arpa)"
 #, fuzzy, python-brace-format
 #| msgid "Nameserver {nameserver} does not have an active address record in zone {zone}"
 msgid "Nameserver {ns} does not have an active address record in zone {zone}"
-msgstr "Le serveur de nom '{nameserver}' n'a aucun enregistrement de type adresse (A/AAAA) dans la zone '{zone}'"
+msgstr "Le serveur de nom '{ns}' n'a aucun enregistrement de type adresse (A/AAAA) dans la zone '{zone}'"
 
 #: models/zone.py:625
 #, python-brace-format
@@ -1383,7 +1383,7 @@ msgstr "L'enregistrement de ce domaine a expiré."
 #: models/zone.py:653
 #, python-brace-format
 msgid "The registration for this domain will expire in less than {expiration_warning_days} days."
-msgstr "L'enregistrement de son domaine expirera dans moins de {expiration_warning_days} jours."
+msgstr "L'enregistrement de ce domaine expirera dans moins de {expiration_warning_days} jours."
 
 #: models/zone.py:669
 #, python-brace-format
