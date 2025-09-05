@@ -157,7 +157,6 @@ class ZoneManagedRecordListView(generic.ObjectChildrenView):
     table = ManagedRecordTable
     filterset = RecordFilterSet
     template_name = "netbox_dns/zone/managed_record.html"
-    actions = {"changelog": {"view"}}
 
     tab = ViewTab(
         label=_("Managed Records"),
