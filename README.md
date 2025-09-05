@@ -64,7 +64,8 @@ NetBox Version | NetBox DNS Version | Comment
 4.0 - 4.1      | 1.0                | Supports legacy IPAM Coupling
 4.0 - 4.1      | 1.1                | Supports IPAM DNSsync
 4.2            | 1.2                |
-4.3            | 1.3                |
+4.3            | 1.3 - 1.4          |
+4.4            | 1.4                |
 
 ## Installation & Configuration
 
