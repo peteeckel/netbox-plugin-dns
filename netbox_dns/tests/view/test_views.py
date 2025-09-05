@@ -2,7 +2,7 @@ from ipam.models import Prefix
 from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import View
+from netbox_dns.models import View, NameServer, Zone
 
 
 class ViewViewTestCase(
@@ -24,11 +24,11 @@ class ViewViewTestCase(
 
     @classmethod
     def setUpTestData(cls):
-        views = [
+        cls.views = [
             View(name="external"),
             View(name="internal"),
         ]
-        View.objects.bulk_create(views)
+        View.objects.bulk_create(cls.views)
 
         prefixes = (
             Prefix(prefix="10.13.1.0/24"),
@@ -60,8 +60,30 @@ class ViewViewTestCase(
 
         cls.csv_update_data = (
             "id,name,description,prefixes",
-            f"{views[0].pk},new-internal,test1,",
-            f'{views[1].pk},new-external,test2,"{prefixes[1].id},{prefixes[2].id}"',
+            f"{cls.views[0].pk},new-internal,test1,",
+            f'{cls.views[1].pk},new-external,test2,"{prefixes[1].id},{prefixes[2].id}"',
         )
 
     maxDiff = None
+
+    def test_zones_viewtab(self):
+        view = self.views[0]
+
+        nameserver = NameServer.objects.create(name="ns1.example.com")
+        Zone.objects.create(
+            view=view,
+            name="zone1.example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+        )
+
+        self.add_permissions(
+            "netbox_dns.view_view",
+        )
+
+        request = {
+            "path": self._get_url("zones", instance=view),
+        }
+
+        response = self.client.get(**request)
+        self.assertHttpStatus(response, 200)

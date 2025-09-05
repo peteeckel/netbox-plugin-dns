@@ -4,7 +4,13 @@ from rest_framework import status
 from utilities.testing import ViewTestCases, create_tags, post_data
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate
+from netbox_dns.models import (
+    DNSSECPolicy,
+    DNSSECKeyTemplate,
+    Zone,
+    NameServer,
+    ZoneTemplate,
+)
 from netbox_dns.choices import (
     DNSSECPolicyDigestChoices,
     DNSSECPolicyStatusChoices,
@@ -1002,3 +1008,44 @@ class DNSSECPolicyViewTestCase(
 
         policy.refresh_from_db()
         self.assertEqual(policy.parent_propagation_delay, 42 * 86400)
+
+    def test_zones_viewtab(self):
+        policy = self.dnssec_policies[0]
+
+        nameserver = NameServer.objects.create(name="ns1.example.com")
+        Zone.objects.create(
+            name="zone1.example.com",
+            soa_mname=nameserver,
+            soa_rname="hostmaster.example.com",
+            dnssec_policy=policy,
+        )
+
+        self.add_permissions(
+            "netbox_dns.view_dnssecpolicy",
+        )
+
+        request = {
+            "path": self._get_url("zones", instance=policy),
+        }
+
+        response = self.client.get(**request)
+        self.assertHttpStatus(response, 200)
+
+    def test_zonetemplates_viewtab(self):
+        policy = self.dnssec_policies[0]
+
+        ZoneTemplate.objects.create(
+            name="Test Zone Template 1",
+            dnssec_policy=policy,
+        )
+
+        self.add_permissions(
+            "netbox_dns.view_dnssecpolicy",
+        )
+
+        request = {
+            "path": self._get_url("zonetemplates", instance=policy),
+        }
+
+        response = self.client.get(**request)
+        self.assertHttpStatus(response, 200)
