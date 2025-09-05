@@ -1,7 +1,7 @@
 from utilities.testing import ViewTestCases, create_tags
 
 from netbox_dns.tests.custom import ModelViewTestCase
-from netbox_dns.models import NameServer
+from netbox_dns.models import NameServer, Zone
 
 
 class NameServerViewTestCase(
@@ -53,3 +53,45 @@ class NameServerViewTestCase(
         )
 
     maxDiff = None
+
+    def test_zones_viewtab(self):
+        soa_nameserver = self.nameservers[0]
+        nameserver = self.nameservers[1]
+
+        zone = Zone.objects.create(
+            name="zone1.example.com",
+            soa_mname=soa_nameserver,
+            soa_rname="hostmaster.example.com",
+        )
+        zone.nameservers.set([nameserver])
+
+        self.add_permissions(
+            "netbox_dns.view_nameserver",
+        )
+
+        request = {
+            "path": self._get_url("zones", instance=nameserver),
+        }
+
+        response = self.client.get(**request)
+        self.assertHttpStatus(response, 200)
+
+    def test_soa_zones_viewtab(self):
+        soa_nameserver = self.nameservers[0]
+
+        Zone.objects.create(
+            name="zone1.example.com",
+            soa_mname=soa_nameserver,
+            soa_rname="hostmaster.example.com",
+        )
+
+        self.add_permissions(
+            "netbox_dns.view_nameserver",
+        )
+
+        request = {
+            "path": self._get_url("soa_zones", instance=soa_nameserver),
+        }
+
+        response = self.client.get(**request)
+        self.assertHttpStatus(response, 200)
