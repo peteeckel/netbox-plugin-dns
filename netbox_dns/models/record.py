@@ -51,6 +51,17 @@ def record_data_from_ip_address(ip_address, zone):
         return None
 
     if (
+        # +
+        # TODO: This code does not work if the ip_address object contains relevant changes
+        # that have not been saved yet. This is the cause for issue #688 and needs to be
+        # fixed.
+        #
+        # Problem: View filters are transformed into a queryset, and there does not seem
+        # to be an obvious way to check that an existing object matches the conditions in
+        # a queryset without saving it first.
+        #
+        # Saving it is, however, not an option during the validation of an import form.
+        # -
         zone.view.ip_address_filter is not None
         and not IPAddress.objects.filter(
             Q(pk=ip_address.pk), get_query_from_filter(zone.view.ip_address_filter)
