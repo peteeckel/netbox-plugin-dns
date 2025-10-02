@@ -5,7 +5,7 @@
 
 {% for zone in used_zones -%}
 zone "{{ zone.name }}" {
-        type master;
+        type primary;
         file "/etc/bind/zones/{{ zone.view.name }}/{{ zone.name }}.zone";
 	allow-update { none; };
 };
