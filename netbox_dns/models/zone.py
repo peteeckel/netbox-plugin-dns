@@ -25,6 +25,7 @@ from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 from ipam.models import IPAddress
+from ipam.choices import IPAddressFamilyChoices
 
 from netbox_dns.choices import (
     RecordClassChoices,
@@ -970,10 +971,16 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             zones = self.view.zones.filter(
                 arpa_network__net_contains_or_equals=self.arpa_network
             )
+
+            if self.arpa_network.version == IPAddressFamilyChoices.FAMILY_4:
+                record_type = RecordTypeChoices.A
+            else:
+                record_type = RecordTypeChoices.AAAA
+
             address_records = Record.objects.filter(
                 Q(ptr_record__isnull=True, zone__view=self.view)
                 | Q(ptr_record__zone__in=zones),
-                type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
+                type=record_type,
                 disable_ptr=False,
             )
 
