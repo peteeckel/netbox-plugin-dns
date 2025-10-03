@@ -365,3 +365,50 @@ class ViewZoneTestCase(TestCase):
         self.views[2].delete()
 
         self.assertEqual(View.objects.filter(name="view3").exists(), False)
+
+    def test_issue_708_save_unrelated_records(self):
+        # +
+        # The issue was caused by a duplicate address record in a zone that had
+        # no associated PTR record with enforce_unque_records set to True.
+        #
+        # Creating a new reverse zone in another view caused NetBox DNS to try
+        # to save the record, which raised an exception because of the duplicate.
+        # While this is *not* the issue, saving the unrelated record is a performance
+        # problem that needs to be addressed.
+        # -
+        view4 = View.objects.create(name="view4")
+
+        zone1 = Zone.objects.create(
+            name="zone1.example.com", view=self.views[2], **self.zone_data
+        )
+        zone2 = Zone.objects.create(
+            name="zone1.example.com", view=view4, **self.zone_data
+        )
+
+        records = (
+            Record(
+                zone=zone1,
+                type=RecordTypeChoices.A,
+                name="name1",
+                value="10.0.1.42",
+            ),
+            Record(
+                zone=zone1,
+                type=RecordTypeChoices.A,
+                name="name1",
+                value="10.0.1.42",
+            ),
+            Record(
+                zone=zone2,
+                type=RecordTypeChoices.A,
+                name="name1",
+                value="10.0.1.42",
+            ),
+        )
+        with self.settings(
+            PLUGINS_CONFIG={"netbox_dns": {"enforce_unique_records": False}}
+        ):
+            for record in records:
+                record.save()
+
+        Zone.objects.create(name="1.0.10.in-addr.arpa", view=view4, **self.zone_data)
