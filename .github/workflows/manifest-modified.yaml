@@ -1,5 +1,8 @@
 name: NetBox plugin manifest modified
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]

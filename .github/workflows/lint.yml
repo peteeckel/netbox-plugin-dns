@@ -4,6 +4,9 @@ on:
   - push
   - pull_request
 
+permissions:
+  contents: read
+
 jobs:
     lint:
         runs-on: ubuntu-latest
@@ -13,12 +16,12 @@ jobs:
             uses: actions/checkout@main
 
           - name: Check conformance to Black standards
-            uses: psf/black@stable
+            uses: psf/black@903bef54aa72e111c034ccec9997aac82bafbacc
             with:
                 options: "--check"
                 src: "netbox_dns"
 
           - name: Check conformance to Ruff standards
-            uses: astral-sh/ruff-action@7a9e8edffe9b60ed319de05d26e8ebb64ef5a247
+            uses: astral-sh/ruff-action@6576144cee480b9d2fc567667a9868f2c3725d1b
             with:
                 version: "latest"
