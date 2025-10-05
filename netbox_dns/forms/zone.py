@@ -453,6 +453,7 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         ),
         FieldSet(
             "dnssec_policy_id",
+            "inline_signing",
             "parental_agents",
             name=_("DNSSEC"),
         ),
@@ -544,6 +545,11 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         null_option=_("None"),
         label=_("DNSSEC Policy"),
+    )
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("DNSSEC Policy uses inline signing"),
     )
     parental_agents = forms.GenericIPAddressField(
         required=False,
@@ -846,7 +852,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         ),
         FieldSet(
             "dnssec_policy",
-            "inline_signing",
             "parental_agents",
             name=_("DNSSEC"),
         ),
@@ -975,11 +980,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         queryset=DNSSECPolicy.objects.all(),
         required=False,
         label=_("DNSSEC Policy"),
-    )
-    inline_signing = forms.NullBooleanField(
-        required=False,
-        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
-        label=_("DNSSEC Policy uses inline signing"),
     )
     parental_agents = SimpleArrayField(
         required=False,
