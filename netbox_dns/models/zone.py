@@ -978,9 +978,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 record_type = RecordTypeChoices.AAAA
 
             address_records = Record.objects.filter(
-                Q(ptr_record__isnull=True, zone__view=self.view)
+                Q(
+                    ptr_record__isnull=True,
+                    zone__view=self.view,
+                    ip_address__isnull=False,
+                    ip_address__contained=self.arpa_network,
+                    type=record_type,
+                )
                 | Q(ptr_record__zone__in=zones),
-                type=record_type,
                 disable_ptr=False,
             )
 
@@ -1009,7 +1014,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 arpa_network__net_contains=self.rfc2317_prefix
             )
             address_records = Record.objects.filter(
-                Q(ptr_record__isnull=True)
+                Q(ptr_record__isnull=True, ip_address__contained=self.rfc2317_prefix)
                 | Q(ptr_record__zone__in=zones)
                 | Q(ptr_record__zone=self),
                 type=RecordTypeChoices.A,
