@@ -23,12 +23,16 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = DNSSECPolicy
 
-        fields = ("description",)
+        fields = (
+            "description",
+            "inline_signing",
+        )
 
         default_columns = (
             "name",
             "description",
             "status",
+            "inline_signing",
             "use_nsec3",
             "tags",
         )

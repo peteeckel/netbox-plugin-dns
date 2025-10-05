@@ -26,6 +26,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "description",
             "status",
             "tags",
+            "inline_signing",
             "key_templates",
             "zones",
             "zone_templates",
@@ -60,6 +61,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "name",
             "description",
             "status",
+            "inline_signing",
         )
 
     url = serializers.HyperlinkedIdentityField(

@@ -183,7 +183,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "rfc2317_prefix",
             "rfc2317_parent_managed",
             "dnssec_policy",
-            "inline_signing",
             "parental_agents",
             "registrar",
             "registry_domain_id",
@@ -241,7 +240,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         ),
         FieldSet(
             "dnssec_policy",
-            "inline_signing",
             "parental_agents",
             name=_("DNSSEC"),
         ),
@@ -317,7 +315,6 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
                 )
 
         if not get_field_value(self, "dnssec_policy"):
-            del self.fields["inline_signing"]
             del self.fields["parental_agents"]
 
         if not get_field_value(self, "registrar"):
@@ -456,7 +453,6 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         ),
         FieldSet(
             "dnssec_policy_id",
-            "inline_signing",
             "parental_agents",
             name=_("DNSSEC"),
         ),
@@ -549,11 +545,6 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         null_option=_("None"),
         label=_("DNSSEC Policy"),
     )
-    inline_signing = forms.NullBooleanField(
-        required=False,
-        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
-        label=_("Use Inline Signing"),
-    )
     parental_agents = forms.GenericIPAddressField(
         required=False,
         label=_("Parental Agents"),
@@ -632,7 +623,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "soa_expire",
             "soa_minimum",
             "dnssec_policy",
-            "inline_signing",
             "parental_agents",
             "rfc2317_prefix",
             "rfc2317_parent_managed",
@@ -740,10 +730,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "invalid_choice": _("DNSSEC policy %(value)s not found"),
         },
         label=_("DNSSEC Policy"),
-    )
-    inline_signing = forms.BooleanField(
-        required=False,
-        label=_("Use Inline Signing"),
     )
     registrar = CSVModelChoiceField(
         queryset=Registrar.objects.all(),
@@ -992,8 +978,8 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
     )
     inline_signing = forms.NullBooleanField(
         required=False,
-        widget=BulkEditNullBooleanSelect(),
-        label=_("Use Inline Signing"),
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("DNSSEC Policy uses inline signing"),
     )
     parental_agents = SimpleArrayField(
         required=False,

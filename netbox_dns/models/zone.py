@@ -124,7 +124,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "description",
         "status",
         "dnssec_policy",
-        "inline_signing",
         "parental_agents",
         "registrar",
         "registry_domain_id",
@@ -262,11 +261,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         related_name="zones",
         blank=True,
         null=True,
-    )
-    inline_signing = models.BooleanField(
-        verbose_name=_("Inline Signing"),
-        help_text=_("Use inline signing for DNSSEC"),
-        default=True,
     )
     parental_agents = ArrayField(
         base_field=models.GenericIPAddressField(
@@ -432,6 +426,13 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @property
     def is_rfc2317_zone(self):
         return self.rfc2317_prefix is not None
+
+    @property
+    def inline_signing(self):
+        if self.dnssec_policy is None:
+            return None
+
+        return self.dnssec_policy.inline_signing
 
     def get_rfc2317_parent_zone(self):
         if not self.is_rfc2317_zone:
@@ -802,7 +803,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
     def clean(self, *args, **kwargs):
         if not self.dnssec_policy:
-            self.inline_signing = self._meta.get_field("inline_signing").get_default()
             self.parental_agents = self._meta.get_field("parental_agents").get_default()
 
         if not self.registrar:

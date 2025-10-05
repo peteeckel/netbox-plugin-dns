@@ -18,6 +18,10 @@
                         <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
                     </tr>
                     <tr>
+                        <th scope="row">{% trans "Use Inline Signing" %}</th>
+                        <td>{% checkmark object.inline_signing %}</td>
+                    </tr>
+                    <tr>
                         <th scope="row">{% trans "Key Templates" %}</th>
                         <td>
                             <table>

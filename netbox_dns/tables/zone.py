@@ -26,7 +26,6 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "description",
             "soa_rname",
             "soa_serial",
-            "inline_signing",
             "rfc2317_parent_managed",
             "registry_domain_id",
             "expiration_date",

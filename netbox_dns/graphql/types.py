@@ -89,7 +89,7 @@ class NetBoxDNSZoneType(NetBoxObjectType):
         ]
         | None
     )
-    inline_signing: bool
+    inline_signing: bool | None
     parental_agents: List[str]
     registrar: (
         Annotated["NetBoxDNSRegistrarType", strawberry.lazy("netbox_dns.graphql.types")]
@@ -194,6 +194,7 @@ class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
     description: str | None
     status: str
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
+    inline_signing: bool
     key_templates: List[
         Annotated[
             "NetBoxDNSDNSSECKeyTemplateType",

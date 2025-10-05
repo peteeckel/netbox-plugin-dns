@@ -195,6 +195,7 @@ class ZoneSerializer(NetBoxModelSerializer):
         default=None,
         help_text=_("Template to apply to the zone"),
     )
+    inline_signing = serializers.SerializerMethodField()
     active = serializers.BooleanField(
         required=False,
         read_only=True,
@@ -211,6 +212,9 @@ class ZoneSerializer(NetBoxModelSerializer):
             template.apply_to_zone_data(data)
 
         return super().validate(data)
+
+    def get_inline_signing(self, instance):
+        return instance.inline_signing
 
     def create(self, validated_data):
         template = validated_data.pop("template", None)

@@ -145,6 +145,7 @@ class NestedDNSSECPolicySerializer(WritableNestedSerializer):
             "name",
             "description",
             "status",
+            "inline_signing",
         )
 
     url = serializers.HyperlinkedIdentityField(
