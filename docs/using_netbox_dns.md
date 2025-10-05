@@ -378,7 +378,7 @@ PLUGINS_CONFIG = {
 }
 ```
 
-The default value for 'Generate SOA Serial' (`soa_serial_auto`) is `True` and cannot be modified via the zone default settings. The default setting for SOA SERIAL (`soa_serial`) is only applied if the automatic generation of SOA serial numbers is disabled. The list of default nameservers is only observed when new zones are created or imported via the GUI, not when `Zone` objects are created using scripts.
+The default value for 'Generate SOA Serial' (`soa_serial_auto`) is `True` and cannot be modified via the zone default settings. The default setting for SOA SERIAL (`soa_serial`) is only applied if the automatic generation of SOA serial numbers is disabled. The list of default nameservers is only observed when new zones are created or imported via the GUI, not when `Zone` objects are created using scripts and only if the actual nameserver objects exist.
 
 After changing the configuration, NetBox must be restarted for the changes to take effect.
 
