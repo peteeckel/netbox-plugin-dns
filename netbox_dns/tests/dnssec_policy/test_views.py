@@ -72,6 +72,7 @@ class DNSSECPolicyViewTestCase(
         cls.dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 4",
+                inline_signing=True,
                 status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
                 dnskey_ttl=3600,
                 purge_keys=7776000,
@@ -94,9 +95,11 @@ class DNSSECPolicyViewTestCase(
             ),
             DNSSECPolicy(
                 name="Test Policy 5",
+                inline_signing=True,
             ),
             DNSSECPolicy(
                 name="Test Policy 6",
+                inline_signing=False,
                 max_zone_ttl=43200,
                 create_cdnskey=True,
                 use_nsec3=False,
@@ -108,6 +111,7 @@ class DNSSECPolicyViewTestCase(
 
         cls.form_data = {
             "name": "Test Policy 1",
+            "inline_signing": True,
             "status": DNSSECPolicyStatusChoices.STATUS_ACTIVE,
             "dnskey_ttl": 3600,
             "purge_keys": 7776000,
@@ -132,6 +136,7 @@ class DNSSECPolicyViewTestCase(
 
         cls.bulk_edit_data = {
             "description": "Update Description",
+            "inline_signing": False,
             "status": DNSSECPolicyStatusChoices.STATUS_INACTIVE,
             "dnskey_ttl": 7200,
             "purge_keys": 7776999,
@@ -154,16 +159,16 @@ class DNSSECPolicyViewTestCase(
         }
 
         cls.csv_data = (
-            "name,status,dnskey_ttl,max_zone_ttl,create_cdnskey,use_nsec3",
-            f"Test Policy 1,{DNSSECPolicyStatusChoices.STATUS_ACTIVE},86400,43200,true,true",
-            "Test Policy 2,,86400,43200,false,true",
-            f"Test Policy 3,{DNSSECPolicyStatusChoices.STATUS_INACTIVE},43200,86400,true,false",
+            "name,status,dnskey_ttl,max_zone_ttl,create_cdnskey,use_nsec3,inline_signing",
+            f"Test Policy 1,{DNSSECPolicyStatusChoices.STATUS_ACTIVE},86400,43200,true,true,false",
+            "Test Policy 2,,86400,43200,false,true,true",
+            f"Test Policy 3,{DNSSECPolicyStatusChoices.STATUS_INACTIVE},43200,86400,true,false,true",
         )
 
         cls.csv_update_data = (
-            "id,description,use_nsec3,create_cdnskey",
-            f"{cls.dnssec_policies[0].pk},Test Description 1,true,true",
-            f"{cls.dnssec_policies[1].pk},Test Description 2,false,false",
+            "id,description,use_nsec3,create_cdnskey,inline_signing",
+            f"{cls.dnssec_policies[0].pk},Test Description 1,true,true,true",
+            f"{cls.dnssec_policies[1].pk},Test Description 2,false,false,trie",
         )
 
     maxDiff = None

@@ -23,6 +23,7 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "name",
             "description",
             "status",
+            "inline_signing",
             "dnskey_ttl",
             "purge_keys",
             "publish_safety",

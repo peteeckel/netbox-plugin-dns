@@ -65,9 +65,9 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         RegistrationContact.objects.bulk_create(cls.contacts)
 
         cls.dnssec_policies = (
-            DNSSECPolicy(name="Test Policy 1"),
-            DNSSECPolicy(name="Test Policy 2"),
-            DNSSECPolicy(name="Test Policy 3"),
+            DNSSECPolicy(name="Test Policy 1", inline_signing=True),
+            DNSSECPolicy(name="Test Policy 2", inline_signing=True),
+            DNSSECPolicy(name="Test Policy 3", inline_signing=False),
         )
         DNSSECPolicy.objects.bulk_create(cls.dnssec_policies)
 
@@ -120,7 +120,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[1],
-                inline_signing=False,
                 parental_agents=["10.0.0.23", "2001:db8:dead:beef::42"],
                 expiration_date="2026-04-01",
                 domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
@@ -139,7 +138,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[1],
                 billing_c=cls.contacts[1],
                 dnssec_policy=cls.dnssec_policies[1],
-                inline_signing=False,
             ),
             Zone(
                 name="zone2.example.com",
@@ -155,7 +153,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 admin_c=cls.contacts[2],
                 billing_c=cls.contacts[2],
                 dnssec_policy=cls.dnssec_policies[2],
-                inline_signing=False,
                 parental_agents=["10.0.0.42", "2001:db8:dead:beef::42"],
                 expiration_date="2025-04-01",
                 domain_status=ZoneEPPStatusChoices.EPP_STATUS_INACTIVE,
@@ -184,7 +181,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 soa_mname=cls.nameservers[2],
                 soa_rname="hostmaster.example.com",
                 soa_serial_auto=True,
-                inline_signing=True,
             ),
             Zone(
                 name="1.0.10.in-addr.arpa",
@@ -193,7 +189,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 soa_mname=cls.nameservers[2],
                 soa_rname="hostmaster.example.com",
                 soa_serial_auto=True,
-                inline_signing=True,
             ),
             Zone(
                 name="0-31.0.0.10.in-addr.arpa",
@@ -402,12 +397,6 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
-    def test_inline_signing(self):
-        params = {"inline_signing": True}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 10)
-        params = {"inline_signing": False}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-
     def test_parental_agents(self):
         params = {"parental_agents": ["10.0.0.42"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
@@ -435,3 +424,9 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
         params = {"expiration_date_after": "2026-06-01"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
+
+    def test_inline_signing(self):
+        params = {"inline_signing": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {"inline_signing": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 9)

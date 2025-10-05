@@ -91,7 +91,6 @@ class NetBoxDNSZoneFilter(
         ]
         | None
     )
-    inline_signing: FilterLookup[bool] | None = strawberry_django.filter_field()
 
     registrar: (
         Annotated[

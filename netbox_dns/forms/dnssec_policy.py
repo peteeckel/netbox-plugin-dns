@@ -41,6 +41,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "name",
             "description",
             "status",
+            "inline_signing",
             "key_templates",
             "dnskey_ttl",
             "purge_keys",
@@ -71,6 +72,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
             "description",
             "status",
             "key_templates",
+            "inline_signing",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -194,6 +196,7 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "description",
             "status",
             "key_template_id",
+            "inline_signing",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -249,6 +252,11 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         choices=DNSSECPolicyStatusChoices,
         required=False,
         label=_("Status"),
+    )
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("Use Inline Signing"),
     )
     key_template_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
@@ -355,6 +363,7 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
         fields = (
             "name",
             "description",
+            "inline_signing",
             "key_templates",
             "dnskey_ttl",
             "purge_keys",
@@ -382,6 +391,10 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
         choices=DNSSECPolicyStatusChoices,
         required=False,
         label=_("Status"),
+    )
+    inline_signing = forms.BooleanField(
+        required=False,
+        label=_("Use Inline Signing"),
     )
     dnskey_ttl = TimePeriodField(
         required=False,
@@ -446,6 +459,7 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         FieldSet(
             "description",
             "key_templates",
+            "inline_signing",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -515,6 +529,11 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         choices=add_blank_choice(DNSSECPolicyStatusChoices),
         required=False,
         label=_("Status"),
+    )
+    inline_signing = forms.NullBooleanField(
+        required=False,
+        widget=BulkEditNullBooleanSelect(),
+        label=_("Use Inline Signing"),
     )
     dnskey_ttl = TimePeriodField(
         required=False,

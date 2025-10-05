@@ -31,6 +31,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             DNSSECPolicy(
                 name="Test Policy 1",
                 status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+                inline_signing=True,
                 dnskey_ttl=3600,
                 purge_keys=7776000,
                 publish_safety=7200,
@@ -53,6 +54,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             DNSSECPolicy(
                 name="Test Policy 2",
                 status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
+                inline_signing=True,
                 dnskey_ttl=7200,
                 purge_keys=7776000,
                 publish_safety=3600,
@@ -75,6 +77,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             DNSSECPolicy(
                 name="Test Policy 3",
                 status=DNSSECPolicyStatusChoices.STATUS_INACTIVE,
+                inline_signing=False,
                 dnskey_ttl=3600,
                 purge_keys=7776001,
                 publish_safety=3600,
@@ -158,6 +161,12 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"status": [DNSSECPolicyStatusChoices.STATUS_ACTIVE]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"status": [DNSSECPolicyStatusChoices.STATUS_INACTIVE]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
+    def test_inline_signing(self):
+        params = {"inline_signing": True}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"inline_signing": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_dnskey_ttl(self):

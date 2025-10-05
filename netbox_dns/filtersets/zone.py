@@ -41,9 +41,9 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "soa_minimum",
             "soa_serial_auto",
             "rfc2317_parent_managed",
-            "inline_signing",
             "registry_domain_id",
             "domain_status",
+            "inline_signing",
         )
 
     status = django_filters.MultipleChoiceFilter(
@@ -172,6 +172,10 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     active = django_filters.BooleanFilter(
         label=_("Zone is active"),
     )
+    inline_signing = django_filters.BooleanFilter(
+        label=_("Zone is using a DNSSEC policy with inline signing"),
+        method="filter_inline_signing",
+    )
 
     def filter_parental_agents(self, queryset, name, value):
         if not value:
@@ -213,6 +217,22 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
         except (netaddr.AddrFormatError, ValueError):
             return queryset.none()
+
+    def filter_inline_signing(self, queryset, name, value):
+        if value is None:
+            return queryset
+
+        if value:
+            return queryset.filter(
+                dnssec_policy__isnull=False, dnssec_policy__inline_signing=True
+            )
+        else:
+            return queryset.filter(
+                Q(
+                    Q(dnssec_policy__isnull=True)
+                    | Q(dnssec_policy__inline_signing=False)
+                )
+            )
 
     def search(self, queryset, name, value):
         if not value.strip():

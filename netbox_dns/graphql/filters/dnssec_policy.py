@@ -34,6 +34,7 @@ class NetBoxDNSDNSSECPolicyFilter(
         ]
         | None
     ) = strawberry_django.filter_field()
+    inline_signing: FilterLookup[bool] | None = strawberry_django.filter_field()
     key_templates: (
         Annotated[
             "NetBoxDNSDNSSECKeyTemplateFilter",

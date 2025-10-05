@@ -51,6 +51,11 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
         null=False,
     )
 
+    inline_signing = models.BooleanField(
+        verbose_name=_("Inline Signing"),
+        help_text=_("Use inline signing"),
+        default=True,
+    )
     key_templates = models.ManyToManyField(
         verbose_name=_("Key Templates"),
         to="DNSSECKeyTemplate",

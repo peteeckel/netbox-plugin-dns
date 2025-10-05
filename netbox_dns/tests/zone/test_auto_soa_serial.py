@@ -738,17 +738,6 @@ class ZoneAutoSOASerialTestCase(TestCase):
 
         self.assertEqual(zone.soa_serial, old_soa_serial)
 
-    def test_update_inline_signing_no_soa_change(self):
-        zone = self.zones[0]
-
-        old_soa_serial = zone.soa_serial
-
-        zone.inline_signing = False
-        zone.save()
-        zone.refresh_from_db()
-
-        self.assertEqual(zone.soa_serial, old_soa_serial)
-
     def test_update_registrar_no_soa_change(self):
         zone = self.zones[0]
         registrar = Registrar.objects.create(name="Test Registrar")
