@@ -113,6 +113,14 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         ),
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not self.initial.get("use_nsec3"):
+            self.initial["nsec3_iterations"] = None
+            self.initial["nsec3_opt_out"] = None
+            self.initial["nsec3_salt_size"] = None
+
     key_templates = DynamicModelMultipleChoiceField(
         queryset=DNSSECKeyTemplate.objects.all(),
         required=False,
@@ -180,6 +188,21 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         label=_("Parent Propagation Delay"),
         placeholder=DNSSECPolicy.get_fallback_setting("parent_propagation_delay"),
     )
+    nsec3_opt_out = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_("NSEC3 Opt-Out"),
+    )
+
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+
+        if not self.cleaned_data.get("use_nsec3"):
+            self.cleaned_data["nsec3_iterations"] = None
+            self.cleaned_data["nsec3_opt_out"] = None
+            self.cleaned_data["nsec3_salt_size"] = None
+
+        return self.cleaned_data
 
 
 class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
