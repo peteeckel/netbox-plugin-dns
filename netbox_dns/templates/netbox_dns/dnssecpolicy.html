@@ -138,7 +138,11 @@
                         </tr>
                         <tr>
                             <th scope="row">{% trans "NSEC3 Opt Out" %}</th>
-                            <td>{% checkmark object.nsec3_opt_out %}</td>
+                            {% if object.nsec3_opt_out is None %}
+                                <td>{{ ''|placeholder }}</td>
+                            {% else %}
+                                <td>{% checkmark object.nsec3_opt_out %}</td>
+                            {% endif %}
                         </tr>
                         <tr>
                             <th scope="row">{% trans "NSEC3 Salt Size" %}</th>

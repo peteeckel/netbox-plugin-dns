@@ -217,7 +217,7 @@ class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
     parent_propagation_delay: BigInt | None
     use_nsec3: bool
     nsec3_iterations: BigInt | None
-    nsec3_opt_out: bool
+    nsec3_opt_out: bool | None
     nsec3_salt_size: BigInt | None
 
 

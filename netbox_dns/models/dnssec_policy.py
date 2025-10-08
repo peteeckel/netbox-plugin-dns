@@ -150,9 +150,8 @@ class DNSSECPolicy(ContactsMixin, NetBoxModel):
     )
     nsec3_opt_out = models.BooleanField(
         verbose_name=_("NSEC3 Opt-Out"),
-        blank=False,
-        null=False,
-        default=False,
+        blank=True,
+        null=True,
     )
     nsec3_salt_size = models.PositiveIntegerField(
         verbose_name=_("NSEC3 Salt Size"),
