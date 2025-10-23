@@ -177,7 +177,39 @@ Upon successful execution, the script should have the following result:
 * The Zone will be created and all SOA fields will be populated from the source zone's SOA record.
 * All records present in the source zone will be created, with the exception of the following record types: `SOA`, `NSEC3`, `NSEC3PARAM`, `CDS`, `RRSIG`, and BIND RR type 65534.
 
-A different approach to the task of importing data from existing zones has been implemented by Matt Kollross (@kollross) and made available, together with some other useful tools he implemented for NetBox and NetBox DNS, in [this GitHub repository](https://github.com/ncsa/neteng-netbox-tools). 
+A different approach to the task of importing data from existing zones has been implemented by Matt Kollross (@kollross) and made available, together with some other useful tools he implemented for NetBox and NetBox DNS, in [this GitHub repository](https://github.com/ncsa/neteng-netbox-tools).
 
 ### Caveat
 This is **not** production quality code. It does not contain proper error handling and is only very superficially tested. Using it in production will potentially lead to data loss or corruption. The code is meant to serve as an example for users' own development and it's entirely within the users' responsibility to ensure the integrity and correctness of their data.
+
+## DNS Name Record Updater
+
+This script is part of `DNS_IPAM_Updater.py`. It exports data from IPAM and creates records in the DNS section.
+
+While running from the web UI, you need to specify the view, and VRF is not required. If you try to run it from an API call, you need to specify the VRF (`null` if none) and the **view ID**.
+
+A simple code example in python:
+
+```python
+import requests
+import json
+
+token = '<API_TOKEN>'
+nb_protocol = '<HTTP>'
+nb_host = '<NETBOX_HOST>'
+nb_port = '<NETBOX_PORT>'
+
+# Build the URL for the API request
+headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Token '+ token
+}
+
+## Export IPAM to DNS -- CHANGE ID OF SCRIPT AND COMMIT IF NECESSARY
+url = nb_protocol+'://'+nb_host+':'+nb_port+"/api/extras/scripts/2/"
+payload = '{"data": "vrf": null, "view": 1, "overwrite": true}, "commit": false}'
+
+response = requests.request("POST", url, headers=headers, data=payload)
+pretty_json = json.loads(response.text)
+print (json.dumps(pretty_json, indent=4))
+```
