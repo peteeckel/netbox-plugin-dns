@@ -6,6 +6,7 @@ from netbox.tables import (
     NetBoxTable,
     TagColumn,
     ActionsColumn,
+    columns,
 )
 from tenancy.tables import TenancyColumnsMixin
 
@@ -30,6 +31,7 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
             "registry_domain_id",
             "expiration_date",
             "domain_status",
+            "comments",
         )
 
         default_columns = (
@@ -94,6 +96,7 @@ class ZoneTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Billing Contact"),
         linkify=True,
     )
+    comments = columns.MarkdownColumn()
 
     def render_name(self, value, record):
         return record.display_name

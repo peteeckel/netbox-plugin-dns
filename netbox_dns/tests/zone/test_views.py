@@ -87,20 +87,21 @@ class ZoneViewTestCase(
             "registrar": cls.registrar.pk,
             "expiration_date": date(2025, 4, 1),
             "domain_status": ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
+            "comments": r"## Test\n\nThis is a test comment",
         }
 
         cls.csv_data = (
-            "name,status,soa_mname,soa_rname,nameservers,domain_status",
-            "zone4.example.com,active,ns1.example.com,hostmaster.example.com,,",
-            "zone5.example.com,active,ns1.example.com,hostmaster.example.com,,",
-            "zone6.example.com,active,ns1.example.com,hostmaster.example.com,,",
-            f'zone7.example.com,active,ns1.example.com,hostmaster.example.com,"ns2.example.com,ns3.example.com",{ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED}',
+            "name,status,soa_mname,soa_rname,nameservers,domain_status,comments",
+            "zone4.example.com,active,ns1.example.com,hostmaster.example.com,,,Test Comment 1",
+            "zone5.example.com,active,ns1.example.com,hostmaster.example.com,,,",
+            "zone6.example.com,active,ns1.example.com,hostmaster.example.com,,,Test Comment 3",
+            f'zone7.example.com,active,ns1.example.com,hostmaster.example.com,"ns2.example.com,ns3.example.com",{ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED},',
         )
 
         cls.csv_update_data = (
-            "id,status,description,view,nameservers,domain_status",
-            f"{cls.zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,,{nameservers[1].name},{ZoneEPPStatusChoices.EPP_STATUS_OK}",
-            f'{cls.zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{views[0].name},"{nameservers[1].name},{nameservers[2].name}",',
+            "id,status,description,view,nameservers,domain_status,comments",
+            f"{cls.zones[0].pk},{ZoneStatusChoices.STATUS_PARKED},test-zone1,,{nameservers[1].name},{ZoneEPPStatusChoices.EPP_STATUS_OK},",
+            f'{cls.zones[1].pk},{ZoneStatusChoices.STATUS_ACTIVE},test-zone2,{views[0].name},"{nameservers[1].name},{nameservers[2].name}",,"Update test comment"',
         )
 
     def test_records_viewtab(self):

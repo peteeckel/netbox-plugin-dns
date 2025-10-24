@@ -20,6 +20,7 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
+    CommentField,
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker, HTMXSelect
 from utilities.forms.rendering import FieldSet
@@ -194,6 +195,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             "billing_c",
             "tenant_group",
             "tenant",
+            "comments",
             "tags",
         )
 
@@ -411,6 +413,8 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
         label=_("RFC2317 Prefix"),
     )
+
+    comments = CommentField()
 
     def clean_default_ttl(self):
         return (
@@ -641,6 +645,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "tech_c",
             "billing_c",
             "tenant",
+            "comments",
             "tags",
         )
 
@@ -891,6 +896,7 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         "tech_c",
         "billing_c",
         "tenant",
+        "comments",
     )
 
     view = DynamicModelChoiceField(
@@ -1035,3 +1041,4 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Tenant"),
     )
+    comments = CommentField()

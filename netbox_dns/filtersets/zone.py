@@ -248,5 +248,6 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             | Q(admin_c__name__icontains=value)
             | Q(tech_c__name__icontains=value)
             | Q(billing_c__name__icontains=value)
+            | Q(comments__icontains=value)
         )
         return queryset.filter(qs_filter)

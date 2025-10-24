@@ -141,5 +141,7 @@ class NetBoxDNSZoneFilter(
     rfc2317_parent_zone_id: ID | None = strawberry_django.filter_field()
     rfc2317_parent_managed: FilterLookup[bool] | None = strawberry_django.filter_field()
 
+    comments: FilterLookup[str] | None = strawberry_django.filter_field()
+
     arpa_network: FilterLookup[str] | None = strawberry_django.filter_field()
     active: FilterLookup[bool] | None = strawberry_django.filter_field()

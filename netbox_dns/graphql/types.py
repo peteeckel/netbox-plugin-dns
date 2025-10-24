@@ -136,6 +136,9 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     rfc2317_child_zones: List[
         Annotated["NetBoxDNSRecordType", strawberry.lazy("netbox_dns.graphql.types")]
     ]
+
+    comments: str | None
+
     arpa_network: str | None
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
 
