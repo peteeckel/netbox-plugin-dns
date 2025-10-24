@@ -1,29 +1,20 @@
 {% load render_table from django_tables2 %}
 {% load perms %}
-{% load i18n %}
 
 {% if perms.netbox_dns.view_record %}
-    {% if related_address_records %}
+    {% if address_record_table %}
         <div class="card">
-            {% if related_address_records.rows|length == 1 %}
-                <h2 class="card-header">{% trans "Related DNS Address Record" %}</h2>
-            {% else %}
-                <h2 class="card-header">{% trans "Related DNS Address Records" %}</h2>
-            {% endif %}
+            <h2 class="card-header">{{ address_card_title }}</h2>
             <div class="table-responsive">
-                {% render_table related_address_records 'inc/table.html' %}
+                {% render_table address_record_table 'inc/table.html' %}
             </div>
         </div>
     {% endif %}
-    {% if related_pointer_records %}
+    {% if pointer_record_table %}
         <div class="card">
-            {% if related_pointer_records.rows|length == 1 %}
-                <h2 class="card-header">{% trans "Related DNS Pointer Record" %}</h2>
-            {% else %}
-                <h2 class="card-header">{% trans "Related DNS Pointer Records" %}</h2>
-            {% endif %}
+            <h2 class="card-header">{{ pointer_card_title }}</h2>
             <div class="table-responsive">
-                {% render_table related_pointer_records 'inc/table.html' %}
+                {% render_table pointer_record_table 'inc/table.html' %}
             </div>
         </div>
     {% endif %}

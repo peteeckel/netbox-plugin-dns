@@ -48,8 +48,18 @@ class RelatedDNSRecords(PluginTemplateExtension):
         return self.render(
             "netbox_dns/record/related.html",
             extra_context={
-                "related_address_records": address_record_table,
-                "related_pointer_records": pointer_record_table,
+                "address_card_title": (
+                    _("Synchronized Address Records")
+                    if len(address_records) > 1
+                    else _("Synchronized Address Record")
+                ),
+                "address_record_table": address_record_table,
+                "pointer_card_title": (
+                    _("Synchronized Pointer Records")
+                    if len(pointer_records) > 1
+                    else _("Synchronized Pointer Record")
+                ),
+                "pointer_record_table": pointer_record_table,
             },
         )
 
@@ -99,11 +109,11 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
         address_records = Record.objects.filter(
             type__in=(RecordTypeChoices.A, RecordTypeChoices.AAAA),
             ip_address=ip_address.address.ip,
-        )
+        ).exclude(ipam_ip_address=ip_address)
         pointer_records = Record.objects.filter(
             type=RecordTypeChoices.PTR,
             ip_address=ip_address.address.ip,
-        )
+        ).exclude(address_records__ipam_ip_address__in=[ip_address])
 
         if address_records:
             address_record_table = RelatedRecordTable(
@@ -124,8 +134,18 @@ class IPRelatedDNSRecords(PluginTemplateExtension):
         return self.render(
             "netbox_dns/record/related.html",
             extra_context={
-                "related_address_records": address_record_table,
-                "related_pointer_records": pointer_record_table,
+                "address_card_title": (
+                    _("Related Address Records")
+                    if len(address_records) > 1
+                    else _("Related Address Record")
+                ),
+                "address_record_table": address_record_table,
+                "pointer_card_title": (
+                    _("Related Pointer Records")
+                    if len(pointer_records) > 1
+                    else _("Related Pointer Record")
+                ),
+                "pointer_record_table": pointer_record_table,
             },
         )
 
