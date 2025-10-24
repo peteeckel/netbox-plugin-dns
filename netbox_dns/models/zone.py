@@ -135,6 +135,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         "billing_c",
         "rfc2317_parent_managed",
         "tenant",
+        "comments",
     }
 
     objects = ZoneManager()
@@ -361,6 +362,10 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         related_name="netbox_dns_zones",
         blank=True,
         null=True,
+    )
+    comments = models.TextField(
+        verbose_name=_("Comments"),
+        blank=True,
     )
 
     @property

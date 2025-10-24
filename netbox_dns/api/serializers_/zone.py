@@ -61,6 +61,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             "tech_c",
             "admin_c",
             "billing_c",
+            "comments",
             "active",
             "custom_fields",
             "tenant",

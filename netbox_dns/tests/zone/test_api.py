@@ -86,6 +86,7 @@ class ZoneAPITestCase(
                 billing_c=contacts[3],
                 domain_status=ZoneEPPStatusChoices.EPP_STATUS_CLIENT_TRANSFER_PROHIBITED,
                 expiration_date="2025-04-01",
+                comments=r"## Test\n\nThis is a test comment",
             ),
             Zone(name="zone2.example.com", **zone_data, registrar=registrars[0]),
             Zone(
@@ -130,6 +131,7 @@ class ZoneAPITestCase(
                 "nameservers": [nameserver.pk for nameserver in nameservers[1:3]],
                 **zone_data,
                 "soa_mname": nameservers[0].pk,
+                "comments": r"## Test\n\nThis is a test comment",
             },
             {
                 "name": "zone8.example.com",
@@ -149,6 +151,7 @@ class ZoneAPITestCase(
                 **zone_data,
                 "view": views[0].pk,
                 "soa_mname": nameservers[0].pk,
+                "comments": r"## Test\n\nThis is another test comment",
             },
             {
                 "name": "zone9.example.com",
@@ -173,4 +176,5 @@ class ZoneAPITestCase(
             "admin_c": contacts[2].pk,
             "tech_c": contacts[1].pk,
             "billing_c": contacts[0].pk,
+            "comments": r"## Test\n\nThis is a test comment",
         }
