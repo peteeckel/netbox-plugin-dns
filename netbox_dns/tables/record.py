@@ -8,6 +8,7 @@ from netbox.tables import (
     ChoiceFieldColumn,
     TagColumn,
     ActionsColumn,
+    BooleanColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
@@ -56,7 +57,7 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     ttl = tables.Column(
         verbose_name=_("TTL"),
     )
-    active = tables.BooleanColumn(
+    active = BooleanColumn(
         verbose_name=_("Active"),
     )
 
@@ -89,7 +90,7 @@ class RecordTable(RecordBaseTable):
     status = ChoiceFieldColumn(
         verbose_name=_("Status"),
     )
-    disable_ptr = tables.BooleanColumn(
+    disable_ptr = BooleanColumn(
         verbose_name=_("Disable PTR"),
     )
     tags = TagColumn(

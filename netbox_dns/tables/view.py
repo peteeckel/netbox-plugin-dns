@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import NetBoxTable, TagColumn, ActionsColumn
+from netbox.tables import ActionsColumn, BooleanColumn, NetBoxTable, TagColumn
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import View
@@ -31,7 +31,7 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("Name"),
         linkify=True,
     )
-    default_view = tables.BooleanColumn(
+    default_view = BooleanColumn(
         verbose_name=_("Default View"),
     )
     tags = TagColumn(url_name="plugins:netbox_dns:view_list")
