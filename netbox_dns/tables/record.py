@@ -9,6 +9,7 @@ from netbox.tables import (
     TagColumn,
     ActionsColumn,
     BooleanColumn,
+    TemplateColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
@@ -45,11 +46,11 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("FQDN"),
         linkify=True,
     )
-    value = tables.TemplateColumn(
+    value = TemplateColumn(
         verbose_name=_("Value"),
         template_code="{{ value|truncatechars:64 }}",
     )
-    unicode_value = tables.TemplateColumn(
+    unicode_value = TemplateColumn(
         verbose_name=_("Unicode Value"),
         template_code="{{ value|truncatechars:64 }}",
         accessor="value",

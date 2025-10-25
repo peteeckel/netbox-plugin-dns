@@ -1,7 +1,13 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import ActionsColumn, BooleanColumn, NetBoxTable, TagColumn
+from netbox.tables import (
+    ActionsColumn,
+    BooleanColumn,
+    NetBoxTable,
+    TagColumn,
+    TemplateColumn,
+)
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import RecordTemplate
@@ -42,11 +48,11 @@ class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
     type = tables.Column(
         verbose_name=_("Type"),
     )
-    value = tables.TemplateColumn(
+    value = TemplateColumn(
         verbose_name=_("Value"),
         template_code="{{ value|truncatechars:64 }}",
     )
-    unicode_value = tables.TemplateColumn(
+    unicode_value = TemplateColumn(
         verbose_name=_("Unicode Value"),
         template_code="{{ value|truncatechars:64 }}",
         accessor="value",
