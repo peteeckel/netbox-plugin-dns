@@ -7,6 +7,7 @@ from netbox.tables import (
     TagColumn,
     ChoiceFieldColumn,
     ActionsColumn,
+    BooleanColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
@@ -77,7 +78,7 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
     zone_propagation_delay = tables.Column(
         verbose_name=_("Zone Propagation Delay"),
     )
-    create_cdnskey = tables.BooleanColumn(
+    create_cdnskey = BooleanColumn(
         verbose_name=_("Create CDNSKEY"),
     )
     cds_digest_types = tables.Column(
@@ -89,13 +90,13 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
     parent_propagation_delay = tables.Column(
         verbose_name=_("Parent Propagation Delay"),
     )
-    use_nsec3 = tables.BooleanColumn(
+    use_nsec3 = BooleanColumn(
         verbose_name=_("Use NSEC3"),
     )
     nsec3_iterations = tables.Column(
         verbose_name=_("NSEC3 Iterations"),
     )
-    nsec3_opt_out = tables.BooleanColumn(
+    nsec3_opt_out = BooleanColumn(
         verbose_name=_("NSEC3 Opt Out"),
     )
     nsec3_salt_size = tables.Column(
@@ -126,10 +127,10 @@ class DNSSECPolicyDisplayTable(TenancyColumnsMixin, NetBoxTable):
     status = ChoiceFieldColumn(
         verbose_name=_("Status"),
     )
-    create_cdnskey = tables.BooleanColumn(
+    create_cdnskey = BooleanColumn(
         verbose_name=_("Create CDNSKEY"),
     )
-    use_nsec3 = tables.BooleanColumn(
+    use_nsec3 = BooleanColumn(
         verbose_name=_("Use NSEC3"),
     )
     tags = TagColumn(
