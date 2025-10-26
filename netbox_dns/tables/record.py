@@ -8,6 +8,8 @@ from netbox.tables import (
     ChoiceFieldColumn,
     TagColumn,
     ActionsColumn,
+    BooleanColumn,
+    TemplateColumn,
 )
 from tenancy.tables import TenancyColumnsMixin
 
@@ -44,11 +46,11 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
         verbose_name=_("FQDN"),
         linkify=True,
     )
-    value = tables.TemplateColumn(
+    value = TemplateColumn(
         verbose_name=_("Value"),
         template_code="{{ value|truncatechars:64 }}",
     )
-    unicode_value = tables.TemplateColumn(
+    unicode_value = TemplateColumn(
         verbose_name=_("Unicode Value"),
         template_code="{{ value|truncatechars:64 }}",
         accessor="value",
@@ -56,7 +58,7 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
     ttl = tables.Column(
         verbose_name=_("TTL"),
     )
-    active = tables.BooleanColumn(
+    active = BooleanColumn(
         verbose_name=_("Active"),
     )
 
@@ -89,7 +91,7 @@ class RecordTable(RecordBaseTable):
     status = ChoiceFieldColumn(
         verbose_name=_("Status"),
     )
-    disable_ptr = tables.BooleanColumn(
+    disable_ptr = BooleanColumn(
         verbose_name=_("Disable PTR"),
     )
     tags = TagColumn(
