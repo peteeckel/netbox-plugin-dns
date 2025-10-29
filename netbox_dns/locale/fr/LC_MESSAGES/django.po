@@ -459,7 +459,7 @@ msgstr "La zone est active"
 
 #: filtersets/zone.py:176
 msgid "Zone is using a DNSSEC policy with inline signing"
-msgstr ""
+msgstr "La zone utilise une politique DNSSEC avec de la signature inline"
 
 #: filtersets/zone_template.py:41
 msgid "Record Template ID"
@@ -1154,7 +1154,7 @@ msgstr "La zone parente est asservie"
 
 #: forms/zone.py:556
 msgid "DNSSEC Policy uses inline signing"
-msgstr ""
+msgstr "La Politique DNSSEC utilise la signature inline"
 
 #: forms/zone.py:570 forms/zone.py:756 forms/zone.py:1002 models/zone.py:283
 #: templates/netbox_dns/zone/registration.html:14
@@ -1236,7 +1236,7 @@ msgstr "Signature intégrée (in line)"
 
 #: models/dnssec_policy.py:56
 msgid "Use inline signing"
-msgstr ""
+msgstr "Utiliser la signature inline"
 
 #: models/dnssec_policy.py:101
 msgid "Signatures Validity for DNSKEY"
@@ -1375,7 +1375,7 @@ msgstr "Réseau associé à une zone inverse (.arpa)"
 
 #: models/zone.py:367
 msgid "Comments"
-msgstr ""
+msgstr "Commentaires"
 
 #: models/zone.py:621
 msgid "Nameserver {ns} does not have an active address record in zone {zone}"
@@ -1498,31 +1498,31 @@ msgstr "Valeur Unicode"
 
 #: template_content.py:52
 msgid "Synchronized Address Records"
-msgstr ""
+msgstr "Enregistrements de type adresse synchronisés"
 
 #: template_content.py:54
 msgid "Synchronized Address Record"
-msgstr ""
+msgstr "Enregistrement de type adresse synchronisé"
 
 #: template_content.py:58
 msgid "Synchronized Pointer Records"
-msgstr ""
+msgstr "Enregistrements de type PTR synchronisés"
 
 #: template_content.py:60
 msgid "Synchronized Pointer Record"
-msgstr ""
+msgstr "Enregistrement de type PTR synchronisé"
 
 #: template_content.py:138
 msgid "Related Address Records"
-msgstr ""
+msgstr "Enregistrements de type adresse liés"
 
 #: template_content.py:140
 msgid "Related Address Record"
-msgstr ""
+msgstr "Enregistrement de type adresse lié"
 
 #: template_content.py:144
 msgid "Related Pointer Records"
-msgstr ""
+msgstr "Enregistrements de type PTR liés"
 
 #: template_content.py:146
 msgid "Related Pointer Record"
