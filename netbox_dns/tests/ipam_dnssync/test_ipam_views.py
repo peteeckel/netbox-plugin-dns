@@ -7,6 +7,9 @@ from rest_framework import status
 
 from ipam.models import IPAddress, Prefix, VRF
 from ipam.choices import IPAddressStatusChoices
+from extras.models import CustomField
+from extras.choices import CustomFieldTypeChoices
+from core.models import ObjectType
 
 from utilities.testing import post_data
 
@@ -485,6 +488,56 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
         request_data = {
             "address": address,
             "dns_name": name,
+            **self.default_ipaddress_data,
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertRegex(
+            response.content.decode(), "There is already an active CNAME record"
+        )
+
+        self.assertFalse(IPAddress.objects.filter(dns_name=name).exists())
+        self.assertFalse(Record.objects.filter(type=RecordTypeChoices.AAAA).exists())
+
+    def test_create_ipaddress_invalid_record_filter(self):
+        view = self.views[0]
+        zone = self.zones[0]
+        prefix = self.prefixes[0]
+
+        cf = CustomField.objects.create(
+            name="ipaddress_dns",
+            type=CustomFieldTypeChoices.TYPE_BOOLEAN,
+            default=False,
+            required=False,
+        )
+        cf.object_types.set([ObjectType.objects.get_for_model(IPAddress)])
+
+        address = "2001:db8::1/64"
+        name = "name1.zone1.example.com"
+
+        view.prefixes.add(prefix)
+        view.ip_address_filter = {"custom_field_data__ipaddress_dns": True}
+        view.save()
+
+        Record.objects.create(
+            name="name1", zone=zone, type=RecordTypeChoices.CNAME, value="@"
+        )
+
+        self.add_permissions("ipam.add_ipaddress")
+
+        url = reverse("ipam:ipaddress_add")
+
+        request_data = {
+            "address": address,
+            "dns_name": name,
+            "cf_ipaddress_dns": True,
             **self.default_ipaddress_data,
         }
         request = {
@@ -1082,6 +1135,62 @@ class DNSsyncIPAMViewTestCase(ModelViewTestCase):
         self.assertEqual(record.fqdn, f"{name1}.")
         self.assertEqual(record.value, address.split("/")[0])
         self.assertEqual(record.zone, zone)
+
+    def test_update_ipaddress_cf_invalid_record_filter(self):
+        view = self.views[0]
+        zone = self.zones[0]
+        prefix = self.prefixes[0]
+
+        cf = CustomField.objects.create(
+            name="ipaddress_dns",
+            type=CustomFieldTypeChoices.TYPE_BOOLEAN,
+            default=False,
+            required=False,
+        )
+        cf.object_types.set([ObjectType.objects.get_for_model(IPAddress)])
+
+        address = "2001:db8::1/64"
+        name = "name1.zone1.example.com"
+
+        view.prefixes.add(prefix)
+        view.ip_address_filter = {"custom_field_data__ipaddress_dns": True}
+        view.save()
+
+        ip_address = IPAddress.objects.create(
+            address=IPNetwork(address),
+            dns_name=name,
+            custom_field_data={"ipaddress_dns": False},
+        )
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
+
+        Record.objects.create(
+            name="name1", zone=zone, type=RecordTypeChoices.CNAME, value="@"
+        )
+
+        self.add_permissions("ipam.change_ipaddress")
+
+        url = reverse("ipam:ipaddress_edit", kwargs={"pk": ip_address.pk})
+
+        request_data = {
+            "address": address,
+            "dns_name": name,
+            "cf_ipaddress_dns": True,
+            **self.default_ipaddress_data,
+        }
+        request = {
+            "data": post_data(request_data),
+        }
+
+        response = self.client.get(path=url)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+
+        response = self.client.post(path=url, **request)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertRegex(
+            response.content.decode(), "There is already an active CNAME record"
+        )
+
+        self.assertFalse(Record.objects.filter(ipam_ip_address=ip_address).exists())
 
     def test_update_prefix_assign_view(self):
         view = self.views[0]
