@@ -12,14 +12,13 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from netbox.models import NetBoxModel
-from ipam.models import IPAddress
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 from utilities.querysets import RestrictedQuerySet
 
 from netbox_dns.fields import AddressField
-from netbox_dns.utilities import arpa_to_prefix, name_to_unicode, get_query_from_filter
+from netbox_dns.utilities import arpa_to_prefix, name_to_unicode, check_filter
 from netbox_dns.validators import validate_generic_name, validate_record_value
 from netbox_dns.mixins import ObjectModificationMixin
 from netbox_dns.choices import (
@@ -50,15 +49,9 @@ def record_data_from_ip_address(ip_address, zone):
         # -
         return None
 
-    if (
-        zone.view.ip_address_filter is not None
-        and not IPAddress.objects.filter(
-            Q(pk=ip_address.pk), get_query_from_filter(zone.view.ip_address_filter)
-        ).exists()
+    if zone.view.ip_address_filter is not None and not check_filter(
+        ip_address, zone.view.ip_address_filter
     ):
-        # +
-        # IP address does not match the filter
-        # -
         return None
 
     data = {

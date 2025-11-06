@@ -27,6 +27,7 @@ __all__ = (
     "get_ip_addresses_by_zone",
     "check_record_permission",
     "get_query_from_filter",
+    "check_filter",
 )
 
 
@@ -360,3 +361,10 @@ def get_query_from_filter(ip_address_filter):
             return Q()
 
     return query
+
+
+def check_filter(ip_address, ip_address_filter):
+    query = get_query_from_filter(ip_address_filter)
+    against = ip_address._get_field_expression_map(meta=IPAddress._meta)
+
+    return query.check(against)
