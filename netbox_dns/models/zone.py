@@ -198,13 +198,11 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     default_ttl = models.PositiveIntegerField(
         verbose_name=_("Default TTL"),
         blank=True,
-        validators=[MinValueValidator(1)],
     )
     soa_ttl = models.PositiveIntegerField(
         verbose_name=_("SOA TTL"),
         blank=False,
         null=False,
-        validators=[MinValueValidator(1)],
     )
     soa_mname = models.ForeignKey(
         verbose_name=_("SOA MName"),
@@ -248,7 +246,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("SOA Minimum TTL"),
         blank=False,
         null=False,
-        validators=[MinValueValidator(1)],
     )
     soa_serial_auto = models.BooleanField(
         verbose_name=_("Generate SOA Serial"),
