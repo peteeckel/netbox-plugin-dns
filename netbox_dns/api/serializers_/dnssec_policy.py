@@ -22,6 +22,7 @@ class DNSSECPolicySerializer(NetBoxModelSerializer):
             "id",
             "url",
             "display",
+            "display_url",
             "name",
             "description",
             "status",

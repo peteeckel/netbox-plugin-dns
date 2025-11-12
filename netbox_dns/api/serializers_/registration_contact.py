@@ -16,6 +16,7 @@ class RegistrationContactSerializer(NetBoxModelSerializer):
             "id",
             "url",
             "display",
+            "display_url",
             "name",
             "description",
             "contact_id",

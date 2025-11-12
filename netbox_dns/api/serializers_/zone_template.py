@@ -26,6 +26,7 @@ class ZoneTemplateSerializer(NetBoxModelSerializer):
             "name",
             "description",
             "display",
+            "display_url",
             "nameservers",
             "soa_mname",
             "soa_rname",

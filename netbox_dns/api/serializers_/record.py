@@ -22,6 +22,7 @@ class RecordSerializer(NetBoxModelSerializer):
             "url",
             "zone",
             "display",
+            "display_url",
             "type",
             "name",
             "fqdn",

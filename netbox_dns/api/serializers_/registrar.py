@@ -16,6 +16,7 @@ class RegistrarSerializer(NetBoxModelSerializer):
             "id",
             "url",
             "display",
+            "display_url",
             "name",
             "description",
             "iana_id",
