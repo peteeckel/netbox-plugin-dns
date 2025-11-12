@@ -19,6 +19,7 @@ class ViewSerializer(NetBoxModelSerializer):
             "id",
             "url",
             "display",
+            "display_url",
             "name",
             "default_view",
             "tags",

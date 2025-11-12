@@ -30,6 +30,7 @@ class ZoneSerializer(NetBoxModelSerializer):
             "name",
             "view",
             "display",
+            "display_url",
             "nameservers",
             "status",
             "description",

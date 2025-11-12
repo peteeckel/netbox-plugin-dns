@@ -20,6 +20,7 @@ class NameServerSerializer(NetBoxModelSerializer):
             "id",
             "url",
             "display",
+            "display_url",
             "name",
             "description",
             "tags",

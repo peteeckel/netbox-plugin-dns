@@ -21,6 +21,7 @@ class RecordTemplateSerializer(NetBoxModelSerializer):
             "id",
             "url",
             "display",
+            "display_url",
             "type",
             "name",
             "record_name",
