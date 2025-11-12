@@ -4,6 +4,7 @@ from dns import name as dns_name
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import MaxValueValidator
 
 from netbox.models import NetBoxModel
 from netbox.search import SearchIndex, register_search
@@ -85,6 +86,7 @@ class RecordTemplate(NetBoxModel):
         verbose_name=_("TTL"),
         null=True,
         blank=True,
+        validators=[MaxValueValidator(2147483647)],
     )
     disable_ptr = models.BooleanField(
         verbose_name=_("Disable PTR"),

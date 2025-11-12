@@ -8,6 +8,7 @@ from netbox.tables import (
     ChoiceFieldColumn,
     ActionsColumn,
     BooleanColumn,
+    columns,
 )
 from tenancy.tables import TenancyColumnsMixin
 
@@ -81,7 +82,7 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
     create_cdnskey = BooleanColumn(
         verbose_name=_("Create CDNSKEY"),
     )
-    cds_digest_types = tables.Column(
+    cds_digest_types = columns.ArrayColumn(
         verbose_name=_("CDS Digest Types"),
     )
     parent_ds_ttl = tables.Column(
