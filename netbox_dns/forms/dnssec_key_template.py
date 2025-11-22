@@ -108,7 +108,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             name=_("Attributes"),
         ),
         FieldSet(
-            "policiy_id",
+            "policy_id",
             name=_("Policies"),
         ),
         FieldSet(
@@ -135,7 +135,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         queryset=DNSSECPolicy.objects.all(),
         required=False,
         null_option=_("None"),
-        label=_("Policies"),
+        label=_("Policy"),
     )
     type = forms.MultipleChoiceField(
         choices=DNSSECKeyTemplateTypeChoices,
