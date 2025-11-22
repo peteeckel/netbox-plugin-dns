@@ -1,4 +1,4 @@
-name: Test with all supported NetBox versions
+name: Test with all supported Python versions
 
 on:
   - push
