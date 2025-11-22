@@ -194,4 +194,5 @@ class RecordTemplateIndex(SearchIndex):
         ("record_name", 120),
         ("value", 150),
         ("type", 200),
+        ("description", 500),
     )

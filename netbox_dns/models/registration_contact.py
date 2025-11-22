@@ -151,4 +151,5 @@ class RegistrationContactIndex(SearchIndex):
         ("contact_id", 100),
         ("email", 200),
         ("organization", 500),
+        ("description", 500),
     )
