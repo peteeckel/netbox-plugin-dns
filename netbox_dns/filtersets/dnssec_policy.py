@@ -20,8 +20,6 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
         fields = (
             "id",
-            "name",
-            "description",
             "status",
             "inline_signing",
             "dnskey_ttl",
@@ -43,6 +41,12 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "nsec3_salt_size",
         )
 
+    name = django_filters.CharFilter(
+        label=_("Name"),
+    )
+    description = django_filters.CharFilter(
+        label=_("Description"),
+    )
     status = django_filters.MultipleChoiceFilter(
         choices=DNSSECPolicyStatusChoices,
     )
@@ -50,41 +54,56 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         method="filter_cds_digest_types",
         label=_("CDS Digest Types"),
     )
+
     key_template = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates__name",
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Key Templates"),
+        label=_("DNSSEC Key Template"),
+    )
+    key_template_name = django_filters.CharFilter(
+        field_name="key_templates__name",
+        distinct=True,
+        label=_("DNSSEC Key Template Name"),
     )
     key_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates",
         queryset=DNSSECKeyTemplate.objects.all(),
-        to_field_name="id",
-        label=_("DNSSEC Key Template IDs"),
+        label=_("DNSSEC Key Template ID"),
     )
+
     zone = django_filters.ModelMultipleChoiceFilter(
         field_name="zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zones"),
+        label=_("Zone"),
+    )
+    zone_name = django_filters.CharFilter(
+        field_name="zones__name",
+        distinct=True,
+        label=_("Zone Name"),
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        to_field_name="id",
-        label=_("Zone IDs"),
+        label=_("Zone ID"),
     )
+
     zone_template = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates__name",
         queryset=ZoneTemplate.objects.all(),
         to_field_name="name",
-        label=_("Zone Templates"),
+        label=_("Zone Template"),
+    )
+    zone_template_name = django_filters.CharFilter(
+        field_name="zone_templates__name",
+        distinct=True,
+        label=_("Zone Template Name"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates",
         queryset=ZoneTemplate.objects.all(),
-        to_field_name="id",
-        label=_("Zone Template IDs"),
+        label=_("Zone Template ID"),
     )
 
     def filter_cds_digest_types(self, queryset, name, value):

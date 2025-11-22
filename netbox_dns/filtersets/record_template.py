@@ -18,30 +18,47 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
         fields = (
             "id",
-            "name",
-            "record_name",
-            "value",
-            "description",
-            "ttl",
             "disable_ptr",
         )
 
+    name = django_filters.CharFilter(
+        label=_("Name"),
+    )
+    record_name = django_filters.CharFilter(
+        label=_("Record Name"),
+    )
+    description = django_filters.CharFilter(
+        label=_("Description"),
+    )
+    ttl = django_filters.CharFilter(
+        label=_("TTL"),
+    )
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
+        label=_("Type"),
     )
     status = django_filters.MultipleChoiceFilter(
         choices=RecordStatusChoices,
+        label=_("Status"),
     )
+    value = django_filters.CharFilter(
+        label=_("Value"),
+    )
+
     zone_template = django_filters.ModelMultipleChoiceFilter(
-        queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates__name",
+        queryset=ZoneTemplate.objects.all(),
         to_field_name="name",
         label=_("Zone Template"),
     )
+    zone_template_name = django_filters.CharFilter(
+        field_name="zone_templates__name",
+        distinct=True,
+        label=_("Zone Template"),
+    )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates",
-        to_field_name="id",
+        queryset=ZoneTemplate.objects.all(),
         label=_("Zone Template ID"),
     )
 

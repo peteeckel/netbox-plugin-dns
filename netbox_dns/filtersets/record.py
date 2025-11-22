@@ -23,17 +23,21 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
         fields = (
             "id",
-            "name",
-            "fqdn",
-            "description",
-            "ttl",
-            "value",
             "disable_ptr",
             "managed",
         )
 
-    fqdn = MultiValueCharFilter(
-        method="filter_fqdn",
+    name = django_filters.CharFilter(
+        label=_("Name"),
+    )
+    fqdn = django_filters.CharFilter(
+        label=_("FQDN"),
+    )
+    description = django_filters.CharFilter(
+        label=_("Description"),
+    )
+    ttl = django_filters.CharFilter(
+        label=_("TTL"),
     )
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
@@ -41,51 +45,60 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=RecordStatusChoices,
     )
+
+    zone = django_filters.ModelMultipleChoiceFilter(
+        field_name="zone__name",
+        queryset=Zone.objects.all(),
+        to_field_name="name",
+        label=_("Zone"),
+    )
+    zone_name = django_filters.CharFilter(
+        field_name="zone__name",
+        label=_("Zone Name"),
+    )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
-        label=_("Parent Zone ID"),
+        label=_("Zone ID"),
     )
-    zone = django_filters.ModelMultipleChoiceFilter(
-        queryset=Zone.objects.all(),
-        field_name="zone__name",
+
+    view = django_filters.ModelMultipleChoiceFilter(
+        field_name="zone__view__name",
+        queryset=View.objects.all(),
         to_field_name="name",
-        label=_("Parent Zone"),
+        label=_("View"),
+    )
+    view_name = django_filters.CharFilter(
+        field_name="zone__view__name",
+        label=_("View Name"),
     )
     view_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=View.objects.all(),
         field_name="zone__view",
-        label=_("ID of the View the Parent Zone belongs to"),
-    )
-    view = django_filters.ModelMultipleChoiceFilter(
         queryset=View.objects.all(),
-        field_name="zone__view__name",
-        to_field_name="name",
-        label=_("View the Parent Zone belongs to"),
+        label=_("View ID"),
     )
+
+    value = django_filters.CharFilter(
+        label=_("Value"),
+    )
+
     address_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="address_records",
         queryset=Record.objects.all(),
-        to_field_name="id",
         label=_("Address Records"),
     )
     ptr_record_id = django_filters.ModelMultipleChoiceFilter(
-        field_name="ptr_record",
         queryset=Record.objects.all(),
-        to_field_name="id",
         label=_("Pointer Record"),
     )
     rfc2317_cname_record_id = django_filters.ModelMultipleChoiceFilter(
-        field_name="rfc2317_cname_record",
         queryset=Record.objects.all(),
-        to_field_name="id",
         label=_("Pointer Record"),
     )
     ipam_ip_address_id = django_filters.ModelMultipleChoiceFilter(
-        field_name="ipam_ip_address",
         queryset=IPAddress.objects.all(),
-        to_field_name="id",
         label=_("IPAM IP Address"),
     )
+
     ip_address = MultiValueCharFilter(
         method="filter_ip_address",
         label=_("IP Address"),
@@ -95,18 +108,6 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     )
 
     managed = django_filters.BooleanFilter()
-
-    def filter_fqdn(self, queryset, name, value):
-        if not value:
-            return queryset
-
-        fqdns = []
-        for fqdn in value:
-            if not fqdn.endswith("."):
-                fqdn = fqdn + "."
-            fqdns.append(fqdn)
-
-        return queryset.filter(fqdn__in=fqdns)
 
     def filter_ip_address(self, queryset, name, value):
         if not value:

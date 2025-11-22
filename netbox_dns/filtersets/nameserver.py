@@ -15,22 +15,47 @@ class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = NameServer
 
-        fields = (
-            "id",
-            "name",
-            "description",
-        )
+        fields = ("id",)
 
+    name = django_filters.CharFilter(
+        label=_("Name"),
+    )
+    description = django_filters.CharFilter(
+        label=_("Description"),
+    )
+
+    zone = django_filters.ModelMultipleChoiceFilter(
+        field_name="zones__name",
+        queryset=Zone.objects.all(),
+        to_field_name="name",
+        label=_("Zone"),
+    )
+    zone_name = django_filters.CharFilter(
+        field_name="zones__name",
+        distinct=True,
+        label=_("Zone Name"),
+    )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        to_field_name="id",
-        label=_("Zones"),
+        label=_("Zone"),
+    )
+
+    soa_zone = django_filters.ModelMultipleChoiceFilter(
+        field_name="soa_zones__name",
+        queryset=Zone.objects.all(),
+        to_field_name="name",
+        label=_("SOA Zone"),
+    )
+    soa_zone_name = django_filters.CharFilter(
+        field_name="soa_zones__name",
+        distinct=True,
+        label=_("SOA Zone"),
     )
     soa_zone_id = django_filters.ModelMultipleChoiceFilter(
-        method="filter_soa_zones",
+        field_name="soa_zones",
         queryset=Zone.objects.all(),
-        label=_("SOA Zones"),
+        label=_("SOA Zone ID"),
     )
 
     def search(self, queryset, name, value):
@@ -38,9 +63,3 @@ class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             return queryset
         qs_filter = Q(Q(name__icontains=value) | Q(description__icontains=value))
         return queryset.filter(qs_filter)
-
-    def filter_soa_zones(self, queryset, name, value):
-        if not value:
-            return queryset
-        soa_mnames = {zone.soa_mname.pk for zone in value}
-        return queryset.filter(pk__in=soa_mnames)
