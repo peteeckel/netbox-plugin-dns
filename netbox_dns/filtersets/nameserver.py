@@ -36,7 +36,7 @@ class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
-        qs_filter = Q(name__icontains=value)
+        qs_filter = Q(Q(name__icontains=value) | Q(description__icontains=value))
         return queryset.filter(qs_filter)
 
     def filter_soa_zones(self, queryset, name, value):

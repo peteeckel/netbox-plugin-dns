@@ -35,6 +35,7 @@ class RegistrationContactFilterSet(NetBoxModelFilterSet):
             return queryset
         qs_filter = (
             Q(name__icontains=value)
+            | Q(description__icontains=value)
             | Q(contact_id__icontains=value)
             | Q(organization__icontains=value)
             | Q(city__icontains=value)

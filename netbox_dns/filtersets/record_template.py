@@ -50,6 +50,7 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             return queryset
         qs_filter = (
             Q(name__icontains=value)
+            | Q(description__icontains=value)
             | Q(record_name__icontains=value)
             | Q(value__icontains=value)
         )
