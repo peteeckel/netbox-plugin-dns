@@ -127,6 +127,7 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             return queryset
         qs_filter = (
             Q(fqdn__icontains=value)
+            | Q(description__icontains=value)
             | Q(value__icontains=value)
             | Q(zone__name__icontains=value)
         )

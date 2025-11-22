@@ -76,4 +76,5 @@ class RegistrarIndex(SearchIndex):
     fields = (
         ("name", 100),
         ("iana_id", 100),
+        ("description", 500),
     )

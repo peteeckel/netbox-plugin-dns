@@ -29,6 +29,7 @@ class RegistrarFilterSet(NetBoxModelFilterSet):
             return queryset
         qs_filter = (
             Q(name__icontains=value)
+            | Q(description__icontains=value)
             | Q(iana_id=value)
             | Q(referral_url__icontains=value)
             | Q(whois_server__icontains=value)

@@ -1028,4 +1028,5 @@ class RecordIndex(SearchIndex):
         ("value", 150),
         ("zone", 200),
         ("type", 200),
+        ("description", 500),
     )

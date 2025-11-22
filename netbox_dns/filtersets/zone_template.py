@@ -153,6 +153,7 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             return queryset
         qs_filter = (
             Q(name__icontains=value)
+            | Q(description__icontains=value)
             | Q(soa_rname__icontains=value)
             | Q(registrar__name__icontains=value)
             | Q(registry_domain_id__icontains=value)
