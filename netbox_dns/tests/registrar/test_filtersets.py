@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import Registrar
+from netbox_dns.models import Registrar, NameServer, Zone
 from netbox_dns.filtersets import RegistrarFilterSet
 
 
@@ -43,8 +43,27 @@ class RegistrarFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         Registrar.objects.bulk_create(cls.registrars)
 
+        cls.zone_data = {
+            "soa_rname": "hostmaster.example.com",
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
+        }
+
+        cls.zones = (
+            Zone(
+                name="zone1.example.com", registrar=cls.registrars[0], **cls.zone_data
+            ),
+            Zone(
+                name="zone2.example.com", registrar=cls.registrars[0], **cls.zone_data
+            ),
+            Zone(
+                name="zone3.example.com", registrar=cls.registrars[1], **cls.zone_data
+            ),
+        )
+        for zone in cls.zones:
+            zone.save()
+
     def test_name(self):
-        params = {"name": ["ACME 2 Corporation", "ACME 2 Trust"]}
+        params = {"name__iregex": r"ACME 2 (Corporation|Trust)"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_iana_id(self):
@@ -72,3 +91,15 @@ class RegistrarFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
     def test_abuse_phone(self):
         params = {"abuse_phone": ["+49.555.5555", "+49.555.1111"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
+    def test_zone(self):
+        params = {"zone_id": [self.zones[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"zone": [self.zones[1].name, self.zones[2].name]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_zone_name(self):
+        params = {"zone_name": self.zones[1].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"zone_name__iregex": r"zone[123]\.example\.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)

@@ -241,7 +241,7 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             )
 
     def test_name(self):
-        params = {"name": ["zone1.example.com", "zone2.example.com"]}
+        params = {"name__iregex": r"zone[12].example.com"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_view(self):
@@ -249,6 +249,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
         params = {"view_id": [self.views[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_view_name(self):
+        params = {"view_name": self.views[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"view_name__iregex": r"View [12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 12)
 
     def test_active(self):
         params = {"active": True}
@@ -270,16 +276,28 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"nameserver_id": [self.nameservers[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
+    def test_nameserver_name(self):
+        params = {"nameserver_name": self.nameservers[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"nameserver_name__iregex": r"ns[12]\.example\.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
+
     def test_soa_mname(self):
         params = {"soa_mname": ["ns1.example.com", "ns2.example.com"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
         params = {"soa_mname_id": [self.nameservers[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
+    def test_soa_mname_name(self):
+        params = {"soa_mname_name": self.nameservers[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"soa_mname_name__isw": "ns2"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
     def test_soa_rname(self):
-        params = {"soa_rname": ["hostmaster.example.com"]}
+        params = {"soa_rname": "hostmaster.example.com"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 9)
-        params = {"soa_rname": ["hostmaster2.example.com"]}
+        params = {"soa_rname__isw": "hostmaster2"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_arpa_network(self):
@@ -302,6 +320,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"rfc2317_parent_zone_id": [self.zones[6].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
+    def test_rfc2317_parent_zone_name(self):
+        params = {"rfc2317_parent_zone_name": "0.0.10.in-addr.arpa"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"rfc2317_parent_zone_name__isw": "0.10.in-addr.arpa"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
+
     def test_rfc2317_parent_managed(self):
         params = {"rfc2317_parent_managed": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 12)
@@ -318,6 +342,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"registrar_id": [self.registrars[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
+    def test_registrar_name(self):
+        params = {"registrar_name": self.registrars[1].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"registrar_name__iew": "trust"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
     def test_registry_domain_id(self):
         params = {
             "registry_domain_id": ["acme-002-2323", "acme-003-4223", "acme-002-7654"]
@@ -330,11 +360,23 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"registrant_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
+    def test_registrant_contact_id(self):
+        params = {"registrant_contact_id": self.contacts[1].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"registrant_contact_id__isw": "08"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
     def test_admin_c(self):
         params = {"admin_c": [self.contacts[1].contact_id]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
         params = {"admin_c_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_admin_c_contact_id(self):
+        params = {"admin_c_contact_id": self.contacts[2].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"admin_c_contact_id__iew": "15"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tech_c(self):
         params = {"tech_c": [self.contacts[2].contact_id]}
@@ -345,6 +387,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"tech_c_id": [self.contacts[0].pk, self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_tech_c_contact_id(self):
+        params = {"tech_c_contact_id": self.contacts[2].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"tech_c_contact_id__iew": "15"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_billing_c(self):
         params = {"billing_c": [self.contacts[0].contact_id]}
@@ -361,6 +409,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         params = {"billing_c_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_billing_c_contact_id(self):
+        params = {"billing_c_contact_id": self.contacts[0].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"billing_c_contact_id__ic": "815"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):
         params = {"tenant_id": [self.tenants[0].pk, self.tenants[1].pk]}
@@ -395,6 +449,12 @@ class ZoneFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 self.dnssec_policies[1].name,
             ]
         }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_dnssec_policy_name(self):
+        params = {"dnssec_policy_name": "Test Policy 1"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"dnssec_policy_name__iregex": r"Test Policy [12]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_parental_agents(self):

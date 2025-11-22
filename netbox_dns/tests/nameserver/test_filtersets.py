@@ -62,7 +62,7 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
 
     def test_name(self):
-        params = {"name": ["ns1.example.com", "ns2.example.com"]}
+        params = {"name__iregex": r"ns[12]\.example\.com"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):
@@ -81,15 +81,21 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
-    def test_zones(self):
+    def test_zone(self):
         params = {"zone_id": [self.zones[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"zone_id": [self.zones[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"zone_id": [self.zones[2].pk]}
+        params = {"zone": [self.zones[2].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
-    def test_soa_zones(self):
+    def test_zone_name(self):
+        params = {"zone_name": self.zones[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"zone_name__iregex": r"zone[24]\.example\.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_soa_zone(self):
         params = {"soa_zone_id": [self.zones[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         self.assertEqual(
@@ -106,4 +112,10 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             self.filterset(params, self.queryset).qs.first().pk, self.nameservers[1].pk
         )
         params = {"soa_zone_id": [self.zones[0].pk, self.zones[2].pk, self.zones[2].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_soa_zone_name(self):
+        params = {"soa_zone_name": self.zones[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"soa_zone_name__iregex": r"zone[13]\.example\.com"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)

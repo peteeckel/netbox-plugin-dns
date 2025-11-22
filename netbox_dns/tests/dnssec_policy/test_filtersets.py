@@ -154,7 +154,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies[2].key_templates.set([cls.dnssec_key_templates[1]])
 
     def test_name(self):
-        params = {"name": ["Test Policy 1", "Test Policy 2"]}
+        params = {"name__iregex": r"Test Policy [12]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_status(self):
@@ -268,10 +268,22 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"zone": [self.zones[0].name, self.zones[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
+    def test_zone_name(self):
+        params = {"zone_name": self.zones[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"zone_name__iregex": "zone[12].*"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
     def test_zone_template(self):
         params = {"zone_template_id": [self.zone_templates[0].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
         params = {
             "zone_template": [self.zone_templates[0].name, self.zone_templates[1].name]
         }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_zone_template_name(self):
+        params = {"zone_template_name": self.zone_templates[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"zone_template_name__iregex": ".*[12]$"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)

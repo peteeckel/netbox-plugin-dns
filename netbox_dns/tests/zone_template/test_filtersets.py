@@ -180,8 +180,52 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 [cls.record_templates[1].pk, cls.record_templates[2].pk]
             )
 
+        cls.record_templates = (
+            RecordTemplate(
+                name="Test Record Template 1",
+                record_name="name1",
+                type=RecordTypeChoices.AAAA,
+                value="fe80::dead:beef",
+            ),
+            RecordTemplate(
+                name="Test Record Template 2",
+                record_name="name2",
+                type=RecordTypeChoices.A,
+                value="10.0.0.42",
+            ),
+            RecordTemplate(
+                name="Test Record Template 3",
+                record_name="name3",
+                type=RecordTypeChoices.AAAA,
+                value="fe80::dead:beef",
+            ),
+            RecordTemplate(
+                name="Test Record Template 4",
+                record_name="name1",
+                type=RecordTypeChoices.AAAA,
+                value="fe80::dead:beef",
+            ),
+            RecordTemplate(
+                name="Test Record Template 5",
+                record_name="name2",
+                type=RecordTypeChoices.A,
+                value="10.0.0.42",
+            ),
+            RecordTemplate(
+                name="Test Record Template 6",
+                record_name="name3",
+                type=RecordTypeChoices.AAAA,
+                value="fe80::dead:beef",
+            ),
+        )
+        RecordTemplate.objects.bulk_create(cls.record_templates)
+
+        cls.zone_templates[0].record_templates.set(cls.record_templates[0:3])
+        cls.zone_templates[1].record_templates.set(cls.record_templates[0:6])
+        cls.zone_templates[2].record_templates.set(cls.record_templates[3:6])
+
     def test_name(self):
-        params = {"name": ["Zone Template 1", "Zone Template 3", "FooBar"]}
+        params = {"name__iregex": r"(Zone Template [12]|FooBar)"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_nameserver(self):
@@ -198,30 +242,48 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"nameserver_id": [self.nameservers[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
+    def test_nameserver_name(self):
+        params = {"nameserver_name": self.nameservers[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"nameserver_name__iregex": r"ns[12]\.example\.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
+
     def test_soa_mname(self):
         params = {"soa_mname": [self.nameservers[0].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
         params = {"soa_mname_id": [self.nameservers[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
-    def test_soa_rname(self):
-        params = {"soa_rname": ["hostmaster.example.com"]}
+    def test_soa_mname_name(self):
+        params = {"soa_mname_name": self.nameservers[0].name}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"soa_rname": ["hostmaster2.example.com"]}
+        params = {"soa_mname_name__isw": "ns2"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_soa_rname(self):
+        params = {"soa_rname": "hostmaster.example.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"soa_rname": "hostmaster2.example.com"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_record_template(self):
         params = {"record_template": [self.record_templates[0].name]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"record_template": [self.record_templates[1].name]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"record_template": [self.record_templates[2].name]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"record_template_id": [self.record_templates[0].pk]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"record_template_id": [self.record_templates[1].pk]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
-        params = {"record_template_id": [self.record_templates[2].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"record_template_id": [self.record_templates[4].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_record_template_name(self):
+        params = {"record_template_name": self.record_templates[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"record_template_name__iregex": r"^.*[14]$"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_registrar(self):
@@ -234,17 +296,35 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"registrar_id": [self.registrars[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
+    def test_registrar_name(self):
+        params = {"registrar_name": self.registrars[1].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"registrar_name__iew": "trust"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
     def test_registrant(self):
         params = {"registrant": [self.contacts[1].contact_id]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
         params = {"registrant_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
+    def test_registrant_contact_id(self):
+        params = {"registrant_contact_id": self.contacts[1].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"registrant_contact_id__isw": "08"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
     def test_admin_c(self):
         params = {"admin_c": [self.contacts[1].contact_id]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
         params = {"admin_c_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_admin_c_contact_id(self):
+        params = {"admin_c_contact_id": self.contacts[2].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"admin_c_contact_id__iew": "15"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tech_c(self):
         params = {"tech_c": [self.contacts[2].contact_id]}
@@ -255,6 +335,12 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"tech_c_id": [self.contacts[0].pk, self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_tech_c_contact_id(self):
+        params = {"tech_c_contact_id": self.contacts[2].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"tech_c_contact_id__iew": "15"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_billing_c(self):
         params = {"billing_c": [self.contacts[0].contact_id]}
@@ -272,6 +358,12 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"billing_c_id": [self.contacts[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
+    def test_billing_c_contact_id(self):
+        params = {"billing_c_contact_id": self.contacts[0].contact_id}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"billing_c_contact_id__ic": "815"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
     def test_dnssec_policy(self):
         params = {
             "dnssec_policy_id": [self.dnssec_policies[0].pk, self.dnssec_policies[1].pk]
@@ -283,6 +375,12 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 self.dnssec_policies[1].name,
             ]
         }
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_dnssec_policy_name(self):
+        params = {"dnssec_policy_name": "Test Policy 1"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"dnssec_policy_name__iregex": r"Test Policy [12]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_parental_agents(self):

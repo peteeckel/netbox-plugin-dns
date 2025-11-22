@@ -51,7 +51,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies[1].key_templates.set(cls.dnssec_key_templates[2:3])
 
     def test_name(self):
-        params = {"name": ["Test KSK", "Test CSK"]}
+        params = {"name__iregex": r"Test (K|C)SK"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_type(self):
@@ -88,4 +88,10 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         params = {"policy": [self.dnssec_policies[0].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"policy_id": [self.dnssec_policies[1].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
+    def test_policy_name(self):
+        params = {"policy_name": "Policy 1"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"policy_name__iregex": "Policy [23]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)

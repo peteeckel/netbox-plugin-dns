@@ -37,8 +37,20 @@ class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         View.objects.bulk_create(cls.views)
 
+        cls.prefixes = (
+            Prefix(prefix="10.13.1.0/24"),
+            Prefix(prefix="10.23.1.0/24"),
+            Prefix(prefix="10.37.1.0/24"),
+            Prefix(prefix="10.42.1.0/24"),
+        )
+        Prefix.objects.bulk_create(cls.prefixes)
+
+        cls.views[0].prefixes.set(cls.prefixes[0:2])
+        cls.views[1].prefixes.set(cls.prefixes[2:4])
+        cls.views[2].prefixes.set(cls.prefixes[0:4])
+
     def test_name(self):
-        params = {"name": ["View 1", "View 2"]}
+        params = {"name__iregex": r"View [12]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_default_view(self):
@@ -63,24 +75,18 @@ class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
-    def test_prefixes(self):
-        prefixes = (
-            Prefix(prefix="10.13.1.0/24"),
-            Prefix(prefix="10.23.1.0/24"),
-            Prefix(prefix="10.37.1.0/24"),
-            Prefix(prefix="10.42.1.0/24"),
-        )
-        Prefix.objects.bulk_create(prefixes)
-
-        self.views[0].prefixes.set(prefixes[0:2])
-        self.views[1].prefixes.set(prefixes[2:4])
-        self.views[2].prefixes.set(prefixes[0:4])
-
-        params = {"prefix_id": [prefix.pk for prefix in prefixes[0:2]]}
+    def test_prefix(self):
+        params = {"prefix_id": [prefix.pk for prefix in self.prefixes[0:2]]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"prefix_id": [prefix.pk for prefix in prefixes[0:4]]}
+        params = {"prefix_id": [prefix.pk for prefix in self.prefixes[0:4]]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"prefix": [prefix.prefix for prefix in prefixes[0:2]]}
+        params = {"prefix": [prefix.prefix for prefix in self.prefixes[0:2]]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"prefix": [prefixes[3].prefix]}
+        params = {"prefix": [self.prefixes[3].prefix]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_prefix_prefix(self):
+        params = {"prefix_prefix__iregex": r"10\.(13|23)\.1\.0/24"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"prefix_prefix": self.prefixes[3].prefix}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)

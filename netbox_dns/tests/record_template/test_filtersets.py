@@ -90,11 +90,11 @@ class RecordTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.zone_templates[2].record_templates.set(cls.record_templates[3:6])
 
     def test_name(self):
-        params = {"name": ["Test Record Template 1", "Test Record Template 3"]}
+        params = {"name__iregex": r"Test Record Template [13]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_record_name(self):
-        params = {"record_name": ["name1", "name3"]}
+        params = {"record_name__iregex": r"name[13]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_type(self):
@@ -104,11 +104,11 @@ class RecordTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_value(self):
-        params = {"value": ["10.0.0.42"]}
+        params = {"value": "10.0.0.42"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"value": ["fe80::dead:beef"]}
+        params = {"value__isw": "fe80::dead:beef"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {"value": ["fe80::dead:beef", "10.0.0.42"]}
+        params = {"value__iregex": r"^(fe80::dead:beef|10.0.0.42)$"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
 
     def test_tenant(self):
@@ -148,3 +148,9 @@ class RecordTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
         params = {"zone_template_id": [self.zone_templates[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_zone_template_name(self):
+        params = {"zone_template_name": self.zone_templates[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+        params = {"zone_template_name__iregex": r"Zone Template [12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)

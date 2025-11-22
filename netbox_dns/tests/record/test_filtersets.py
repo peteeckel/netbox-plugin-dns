@@ -3,13 +3,13 @@ from django.test import TestCase
 from tenancy.models import Tenant, TenantGroup
 from utilities.testing import ChangeLoggedFilterSetTests
 
-from netbox_dns.models import Zone, NameServer, Record
+from netbox_dns.models import Zone, NameServer, Record, View
 from netbox_dns.choices import ZoneStatusChoices, RecordTypeChoices, RecordStatusChoices
 from netbox_dns.filtersets import RecordFilterSet
 
 
 class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
-    queryset = Record.objects.all()
+    queryset = Record.objects.exclude(type=RecordTypeChoices.SOA)
     filterset = RecordFilterSet
 
     @classmethod
@@ -31,8 +31,15 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
         cls.zone_data = {
             "soa_rname": "hostmaster.example.com",
-            "soa_mname": NameServer.objects.create(name="hostmaster.example.com"),
+            "soa_mname": NameServer.objects.create(name="ns1.example.com"),
         }
+
+        cls.views = (
+            View(name="view1"),
+            View(name="view2"),
+        )
+        for view in cls.views:
+            view.save()
 
         cls.zones = (
             Zone(name="zone1.example.com", **cls.zone_data),
@@ -41,6 +48,8 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 **cls.zone_data,
                 status=ZoneStatusChoices.STATUS_DEPRECATED,
             ),
+            Zone(name="zone3.example.com", view=cls.views[0], **cls.zone_data),
+            Zone(name="zone4.example.com", view=cls.views[1], **cls.zone_data),
         )
         for zone in cls.zones:
             zone.save()
@@ -52,6 +61,18 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
                 type=RecordTypeChoices.AAAA,
                 value="fe80::dead:beef",
                 tenant=cls.tenants[0],
+            ),
+            Record(
+                name="name1",
+                zone=cls.zones[2],
+                type=RecordTypeChoices.AAAA,
+                value="2001:db8:1::42",
+            ),
+            Record(
+                name="name1",
+                zone=cls.zones[3],
+                type=RecordTypeChoices.AAAA,
+                value="2001:db8:2::42",
             ),
             Record(
                 name="name2",
@@ -102,50 +123,58 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             record.save()
 
     def test_name(self):
-        params = {"name": ["name1", "name2"]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {"name__iregex": r"name[12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
+
+    def test_view(self):
+        params = {"view_id": [self.views[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"view": [self.views[0].name, self.views[1].name]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_view_name(self):
+        params = {"view_name": "_default_"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 7)
+        params = {"view_name__iregex": r"view[12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_zone(self):
-        params = {"zone": [self.zones[0]]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+        params = {"zone_id": [self.zones[0].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {"zone": [self.zones[0].name]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_zone_name(self):
+        params = {"zone_name": self.zones[0].name}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        params = {"zone_name__iregex": r"zone[34]\.example\.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_fqdn(self):
-        params = {
-            "fqdn": [
-                "name1.zone1.example.com",
-                "name2.zone1.example.com",
-                "name4.zone1.example.com",
-            ]
-        }
+        params = {"fqdn__iregex": r"name[124].zone1.example.com."}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {
-            "fqdn": [
-                "name1.zone2.example.com.",
-                "name2.zone2.example.com.",
-                "name2.zone1.example",
-            ]
-        }
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"fqdn": "name1.zone2.example.com."}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_type(self):
         params = {"type": [RecordTypeChoices.A]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
         params = {"type": [RecordTypeChoices.AAAA]}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
 
     def test_value(self):
-        params = {"value": ["10.0.0.42"]}
+        params = {"value": "10.0.0.42"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"value": ["fe80::dead:beef"]}
+        params = {"value__isw": "fe80::dead:beef"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {"value": ["fe80::dead:beef", "10.0.0.42"]}
+        params = {"value__iregex": r"^(fe80::dead:beef|10.0.0.42)$"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
 
     def test_managed(self):
         params = {"managed": False}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 7)
         params = {"managed": True}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):
         params = {"tenant_id": [self.tenants[0].pk]}
@@ -168,13 +197,10 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_active(self):
-        # *
-        # Note: SOA records show up here as well!
-        # -
         params = {"active": True}
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {"active": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+        params = {"active": False}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_ptr_record(self):
         Zone.objects.create(name="1.0.10.in-addr.arpa", **self.zone_data)
