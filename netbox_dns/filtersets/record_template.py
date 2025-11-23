@@ -49,17 +49,17 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="zone_templates__name",
         queryset=ZoneTemplate.objects.all(),
         to_field_name="name",
-        label=_("Zone Template"),
+        label=_("Zone Template (name)"),
     )
     zone_template_name = django_filters.CharFilter(
         field_name="zone_templates__name",
         distinct=True,
-        label=_("Zone Template"),
+        label=_("Zone Template (name)"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates",
         queryset=ZoneTemplate.objects.all(),
-        label=_("Zone Template ID"),
+        label=_("Zone Template (ID)"),
     )
 
     def search(self, queryset, name, value):

@@ -50,31 +50,31 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="zone__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Zone (name)"),
     )
     zone_name = django_filters.CharFilter(
         field_name="zone__name",
-        label=_("Zone Name"),
+        label=_("Zone (name)"),
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Zone (id)"),
     )
 
     view = django_filters.ModelMultipleChoiceFilter(
         field_name="zone__view__name",
         queryset=View.objects.all(),
         to_field_name="name",
-        label=_("View"),
+        label=_("View (name)"),
     )
     view_name = django_filters.CharFilter(
         field_name="zone__view__name",
-        label=_("View Name"),
+        label=_("View (name)"),
     )
     view_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zone__view",
         queryset=View.objects.all(),
-        label=_("View ID"),
+        label=_("View (id)"),
     )
 
     value = django_filters.CharFilter(
@@ -84,19 +84,19 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     address_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="address_records",
         queryset=Record.objects.all(),
-        label=_("Address Records"),
+        label=_("Address Record (ID)"),
     )
     ptr_record_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Record.objects.all(),
-        label=_("Pointer Record"),
+        label=_("Pointer Record (ID)"),
     )
     rfc2317_cname_record_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Record.objects.all(),
-        label=_("Pointer Record"),
+        label=_("RFC2317 CNAME Record (ID)"),
     )
     ipam_ip_address_id = django_filters.ModelMultipleChoiceFilter(
         queryset=IPAddress.objects.all(),
-        label=_("IPAM IP Address"),
+        label=_("IPAM IP Address (ID)"),
     )
 
     ip_address = MultiValueCharFilter(

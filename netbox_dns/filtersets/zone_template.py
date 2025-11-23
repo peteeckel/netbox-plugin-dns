@@ -40,49 +40,49 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="record_templates__name",
         queryset=RecordTemplate.objects.all(),
         to_field_name="name",
-        label=_("Record Template"),
+        label=_("Record Template (name)"),
     )
     record_template_name = django_filters.CharFilter(
         field_name="record_templates__name",
         distinct=True,
-        label=_("Record Template Name"),
+        label=_("Record Template (name)"),
     )
     record_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="record_templates",
         queryset=RecordTemplate.objects.all(),
-        label=_("Record Template ID"),
+        label=_("Record Template (ID)"),
     )
 
     nameserver = django_filters.ModelMultipleChoiceFilter(
         field_name="nameservers__name",
         queryset=NameServer.objects.all(),
         to_field_name="name",
-        label=_("Nameserver"),
+        label=_("Nameserver (name)"),
     )
     nameserver_name = django_filters.CharFilter(
         field_name="nameservers__name",
         distinct=True,
-        label=_("Nameserver Name"),
+        label=_("Nameserver (name)"),
     )
     nameserver_id = django_filters.ModelMultipleChoiceFilter(
         field_name="nameservers",
         queryset=NameServer.objects.all(),
-        label=_("Nameservers ID"),
+        label=_("Nameserver (ID)"),
     )
 
     soa_mname = django_filters.ModelMultipleChoiceFilter(
         field_name="soa_mname__name",
         queryset=NameServer.objects.all(),
         to_field_name="name",
-        label=_("SOA MName"),
+        label=_("SOA MName (name)"),
     )
     soa_mname_name = django_filters.CharFilter(
         field_name="soa_mname__name",
-        label=_("SOA MName"),
+        label=_("SOA MName (name)"),
     )
     soa_mname_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
-        label=_("SOA MName ID"),
+        label=_("SOA MName (ID)"),
     )
 
     soa_rname = django_filters.CharFilter(
@@ -93,15 +93,15 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="dnssec_policy__name",
         queryset=DNSSECPolicy.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Policy"),
+        label=_("DNSSEC Policy (name)"),
     )
     dnssec_policy_name = django_filters.CharFilter(
         field_name="dnssec_policy__name",
-        label=_("DNSSEC Policy"),
+        label=_("DNSSEC Policy (name)"),
     )
     dnssec_policy_id = django_filters.ModelMultipleChoiceFilter(
         queryset=DNSSECPolicy.objects.all(),
-        label=_("DNSSEC Policy ID"),
+        label=_("DNSSEC Policy (ID)"),
     )
 
     parental_agents = MultiValueCharFilter(
@@ -113,75 +113,75 @@ class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="registrar__name",
         queryset=Registrar.objects.all(),
         to_field_name="name",
-        label=_("Registrar"),
+        label=_("Registrar (name)"),
     )
     registrar_name = django_filters.CharFilter(
         field_name="registrar__name",
-        label=_("Registrar Name"),
+        label=_("Registrar (name)"),
     )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
-        label=_("Registrar ID"),
+        label=_("Registrar (ID)"),
     )
 
     registrant = django_filters.ModelMultipleChoiceFilter(
         field_name="registrant__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Registrant"),
+        label=_("Registrant (contact_id)"),
     )
     registrant_contact_id = django_filters.CharFilter(
         field_name="registrant__contact_id",
-        label=_("Registrant Contact ID"),
+        label=_("Registrant (contact_id)"),
     )
     registrant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Registrant ID"),
+        label=_("Registrant (ID)"),
     )
 
     admin_c = django_filters.ModelMultipleChoiceFilter(
         field_name="admin_c__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Administrative Contact"),
+        label=_("Admin-C (contact_id)"),
     )
     admin_c_contact_id = django_filters.CharFilter(
         field_name="admin_c__contact_id",
-        label=_("Administrative Contact Contact ID"),
+        label=_("Admin-C (contact_id)"),
     )
     admin_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Administrative Contact ID"),
+        label=_("Admin-C (ID)"),
     )
 
     tech_c = django_filters.ModelMultipleChoiceFilter(
         field_name="tech_c__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Technical Contact"),
+        label=_("Tech-C (contact_id)"),
     )
     tech_c_contact_id = django_filters.CharFilter(
         field_name="tech_c__contact_id",
-        label=_("Technical Contact Contact ID"),
+        label=_("Tech-C (contact_id)"),
     )
     tech_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Technical Contact ID"),
+        label=_("Tech-C (ID)"),
     )
 
     billing_c = django_filters.ModelMultipleChoiceFilter(
         field_name="billing_c__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Billing Contact"),
+        label=_("Billing-C (contact_id)"),
     )
     billing_c_contact_id = django_filters.CharFilter(
         field_name="billing_c__contact_id",
-        label=_("Billing Contact Contact ID"),
+        label=_("Billing-C (contact_id)"),
     )
     billing_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Billing Contact ID"),
+        label=_("Billing-C (ID)"),
     )
 
     def filter_parental_agents(self, queryset, name, value):

@@ -28,21 +28,22 @@ class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     description = django_filters.CharFilter(
         label=_("Description"),
     )
+
     prefix = django_filters.ModelMultipleChoiceFilter(
         field_name="prefixes__prefix",
         queryset=Prefix.objects.all(),
         to_field_name="prefix",
-        label=_("Prefix"),
+        label=_("Prefix (prefix)"),
     )
     prefix_prefix = django_filters.CharFilter(
         field_name="prefixes__prefix",
         distinct=True,
-        label=_("Prefix"),
+        label=_("Prefix (prefix)"),
     )
     prefix_id = django_filters.ModelMultipleChoiceFilter(
         field_name="prefixes",
         queryset=Prefix.objects.all(),
-        label=_("Prefix ID"),
+        label=_("Prefix (ID)"),
     )
 
     def search(self, queryset, name, value):

@@ -43,68 +43,68 @@ class RegistrationContactFilterSet(NetBoxModelFilterSet):
         field_name="admin_c_zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Admin-C Zone (name)"),
     )
     admin_c_zone_name = django_filters.CharFilter(
         field_name="admin_c_zones__name",
         distinct=True,
-        label=_("Zone Name"),
+        label=_("Admin-C Zone (name)"),
     )
     admin_c_zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="admin_c_zones",
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Admin-C Zone (id)"),
     )
 
     billing_c_zone = django_filters.ModelMultipleChoiceFilter(
         field_name="billing_c_zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Billing-C Zone (name)"),
     )
     billing_c_zone_name = django_filters.CharFilter(
         field_name="billing_c_zones__name",
         distinct=True,
-        label=_("Zone Name"),
+        label=_("Billing-C Zone (name)"),
     )
     billing_c_zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="billing_c_zones",
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Billing-C Zone (ID)"),
     )
 
     tech_c_zone = django_filters.ModelMultipleChoiceFilter(
         field_name="tech_c_zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Tech-C Zone (name)"),
     )
     tech_c_zone_name = django_filters.CharFilter(
         field_name="tech_c_zones__name",
         distinct=True,
-        label=_("Zone Name"),
+        label=_("Tech-C Zone (name)"),
     )
     tech_c_zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="tech_c_zones",
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Tech-C Zone (ID)"),
     )
 
     registrant_zone = django_filters.ModelMultipleChoiceFilter(
         field_name="registrant_zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Registrant Zone (name)"),
     )
     registrant_zone_name = django_filters.CharFilter(
         field_name="registrant_zones__name",
         distinct=True,
-        label=_("Zone Name"),
+        label=_("Registrant Zone (name)"),
     )
     registrant_zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="registrant_zones",
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Registrant Zone (ID)"),
     )
 
     def search(self, queryset, name, value):

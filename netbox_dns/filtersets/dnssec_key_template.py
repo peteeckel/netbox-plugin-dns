@@ -45,17 +45,17 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="policies__name",
         queryset=DNSSECPolicy.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Policy"),
+        label=_("DNSSEC Policy (name)"),
     )
     policy_name = django_filters.CharFilter(
         field_name="policies__name",
         distinct=True,
-        label=_("DNSSEC Policy Name"),
+        label=_("DNSSEC Policy (name)"),
     )
     policy_id = django_filters.ModelMultipleChoiceFilter(
         field_name="policies",
         queryset=DNSSECPolicy.objects.all(),
-        label=_("DNSSEC Policy ID"),
+        label=_("DNSSEC Policy (ID)"),
     )
 
     def search(self, queryset, name, value):

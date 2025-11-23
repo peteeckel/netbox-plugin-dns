@@ -29,8 +29,6 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
 
         fields = (
             "id",
-            "name",
-            "description",
             "default_ttl",
             "soa_ttl",
             "soa_serial",
@@ -45,6 +43,12 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "inline_signing",
         )
 
+    name = django_filters.CharFilter(
+        label=_("Name"),
+    )
+    description = django_filters.CharFilter(
+        label=_("Description"),
+    )
     status = django_filters.MultipleChoiceFilter(
         choices=ZoneStatusChoices,
     )
@@ -143,16 +147,15 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="registrar__name",
         queryset=Registrar.objects.all(),
         to_field_name="name",
-        label=_("Registrar"),
+        label=_("Registrar (name)"),
     )
     registrar_name = django_filters.CharFilter(
         field_name="registrar__name",
-        distinct=True,
-        label=_("Registrar Name"),
+        label=_("Registrar (name)"),
     )
     registrar_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Registrar.objects.all(),
-        label=_("Registrar ID"),
+        label=_("Registrar (ID)"),
     )
 
     expiration_date = django_filters.DateFromToRangeFilter(
@@ -167,64 +170,60 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="registrant__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Registrant"),
+        label=_("Registrant (contact_id)"),
     )
     registrant_contact_id = django_filters.CharFilter(
         field_name="registrant__contact_id",
-        distinct=True,
-        label=_("Registrant Contact ID"),
+        label=_("Registrant (contact_id)"),
     )
     registrant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Registrant ID"),
+        label=_("Registrant (ID)"),
     )
 
     admin_c = django_filters.ModelMultipleChoiceFilter(
         field_name="admin_c__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Administrative Contact"),
+        label=_("Admin-C (contact_id)"),
     )
     admin_c_contact_id = django_filters.CharFilter(
         field_name="admin_c__contact_id",
-        distinct=True,
-        label=_("Administrative Contact Contact ID"),
+        label=_("Admin-C (contact_id)"),
     )
     admin_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Administrative Contact ID"),
+        label=_("Admin-C (ID)"),
     )
 
     tech_c = django_filters.ModelMultipleChoiceFilter(
         field_name="tech_c__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Technical Contact"),
+        label=_("Tech-C (contact_id)"),
     )
     tech_c_contact_id = django_filters.CharFilter(
         field_name="tech_c__contact_id",
-        distinct=True,
-        label=_("Technical Contact Contact ID"),
+        label=_("Tech-C (contact_id)"),
     )
     tech_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Technical Contact ID"),
+        label=_("Tech-C (ID)"),
     )
 
     billing_c = django_filters.ModelMultipleChoiceFilter(
         field_name="billing_c__contact_id",
         queryset=RegistrationContact.objects.all(),
         to_field_name="contact_id",
-        label=_("Billing Contact"),
+        label=_("Billing-C (contact_id)"),
     )
     billing_c_contact_id = django_filters.CharFilter(
         field_name="billing_c__contact_id",
-        distinct=True,
-        label=_("Billing Contact Contact ID"),
+        label=_("Billing-C (contact_id)"),
     )
     billing_c_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RegistrationContact.objects.all(),
-        label=_("Billing Contact ID"),
+        label=_("Billing-C (ID)"),
     )
 
     arpa_network = MultiValueCharFilter(

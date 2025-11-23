@@ -59,51 +59,51 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         field_name="key_templates__name",
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Key Template"),
+        label=_("DNSSEC Key Template (name)"),
     )
     key_template_name = django_filters.CharFilter(
         field_name="key_templates__name",
         distinct=True,
-        label=_("DNSSEC Key Template Name"),
+        label=_("DNSSEC Key Template (name)"),
     )
     key_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates",
         queryset=DNSSECKeyTemplate.objects.all(),
-        label=_("DNSSEC Key Template ID"),
+        label=_("DNSSEC Key Template (ID)"),
     )
 
     zone = django_filters.ModelMultipleChoiceFilter(
         field_name="zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Zone (name)"),
     )
     zone_name = django_filters.CharFilter(
         field_name="zones__name",
         distinct=True,
-        label=_("Zone Name"),
+        label=_("Zone (name)"),
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Zone (ID)"),
     )
 
     zone_template = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates__name",
         queryset=ZoneTemplate.objects.all(),
         to_field_name="name",
-        label=_("Zone Template"),
+        label=_("Zone Template (name)"),
     )
     zone_template_name = django_filters.CharFilter(
         field_name="zone_templates__name",
         distinct=True,
-        label=_("Zone Template Name"),
+        label=_("Zone Template (name)"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates",
         queryset=ZoneTemplate.objects.all(),
-        label=_("Zone Template ID"),
+        label=_("Zone Template (ID)"),
     )
 
     def filter_cds_digest_types(self, queryset, name, value):

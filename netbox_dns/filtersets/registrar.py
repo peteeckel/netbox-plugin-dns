@@ -35,17 +35,17 @@ class RegistrarFilterSet(NetBoxModelFilterSet):
         field_name="zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone"),
+        label=_("Zone (name)"),
     )
     zone_name = django_filters.CharFilter(
         field_name="zones__name",
         distinct=True,
-        label=_("Zone Name"),
+        label=_("Zone (name)"),
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        label=_("Zone ID"),
+        label=_("Zone (ID)"),
     )
 
     def search(self, queryset, name, value):
