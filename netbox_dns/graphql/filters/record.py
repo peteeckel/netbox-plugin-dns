@@ -5,7 +5,7 @@ import strawberry_django
 from strawberry.scalars import ID
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filter_mixins import NetBoxModelFilterMixin
+from netbox.graphql.filters import BaseModelFilter
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
 
 if TYPE_CHECKING:
@@ -25,9 +25,7 @@ __all__ = ("NetBoxDNSRecordFilter",)
 
 
 @strawberry_django.filter_type(Record, lookups=True)
-class NetBoxDNSRecordFilter(
-    ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
-):
+class NetBoxDNSRecordFilter(ContactFilterMixin, TenancyFilterMixin, BaseModelFilter):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
     fqdn: FilterLookup[str] | None = strawberry_django.filter_field()
     description: FilterLookup[str] | None = strawberry_django.filter_field()
