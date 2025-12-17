@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import NameServer, Zone
 
@@ -11,6 +12,7 @@ from netbox_dns.models import NameServer, Zone
 __all__ = ("NameServerFilterSet",)
 
 
+@register_filterset
 class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = NameServer

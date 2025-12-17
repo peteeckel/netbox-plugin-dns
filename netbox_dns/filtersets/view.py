@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filtersets import register_filterset
 from ipam.models import Prefix
 
 from netbox_dns.models import View
@@ -13,6 +14,7 @@ from netbox_dns.models import View
 __all__ = ("ViewFilterSet",)
 
 
+@register_filterset
 class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     class Meta:
         model = View
