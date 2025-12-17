@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from netbox.plugins import PluginConfig
 from netbox.plugins.utils import get_plugin_config
 
-__version__ = "1.4.4"
+__version__ = "1.4.5"
 
 
 def _check_list(setting):
@@ -17,6 +17,7 @@ class DNSConfig(PluginConfig):
     verbose_name = _("NetBox DNS")
     description = _("NetBox plugin for DNS data")
     min_version = "4.3.2"
+    max_version = "4.4.99"
     version = __version__
     author = "Peter Eckel"
     author_email = "pete@netbox-dns.org"
