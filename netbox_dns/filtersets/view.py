@@ -29,14 +29,13 @@ class ViewFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     prefix_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Prefix.objects.all(),
         field_name="prefixes",
-        to_field_name="id",
-        label=_("Prefix ID"),
+        label=_("Prefix (ID)"),
     )
     prefix = django_filters.ModelMultipleChoiceFilter(
         queryset=Prefix.objects.all(),
         field_name="prefixes__prefix",
         to_field_name="prefix",
-        label=_("Prefix"),
+        label=_("Prefix (prefix)"),
     )
 
     def search(self, queryset, name, value):

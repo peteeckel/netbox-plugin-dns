@@ -52,49 +52,45 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=Zone.objects.all(),
         field_name="zone__name",
         to_field_name="name",
-        label=_("Parent Zone"),
+        label=_("Parent Zone (name)"),
     )
     view_id = django_filters.ModelMultipleChoiceFilter(
         queryset=View.objects.all(),
         field_name="zone__view",
-        label=_("ID of the View the Parent Zone belongs to"),
+        label=_("Parent Zone View (ID)"),
     )
     view = django_filters.ModelMultipleChoiceFilter(
         queryset=View.objects.all(),
         field_name="zone__view__name",
         to_field_name="name",
-        label=_("View the Parent Zone belongs to"),
+        label=_("Parent Zone View (name)"),
     )
     address_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="address_records",
         queryset=Record.objects.all(),
-        to_field_name="id",
-        label=_("Address Records"),
+        label=_("Address Record (id)"),
     )
     ptr_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="ptr_record",
         queryset=Record.objects.all(),
-        to_field_name="id",
-        label=_("Pointer Record"),
+        label=_("Pointer Record (ID)"),
     )
     rfc2317_cname_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="rfc2317_cname_record",
         queryset=Record.objects.all(),
-        to_field_name="id",
-        label=_("Pointer Record"),
+        label=_("RFC2317 CNAME Record (ID)"),
     )
     ipam_ip_address_id = django_filters.ModelMultipleChoiceFilter(
         field_name="ipam_ip_address",
         queryset=IPAddress.objects.all(),
-        to_field_name="id",
-        label=_("IPAM IP Address"),
+        label=_("IPAM IP Address (ID)"),
     )
     ip_address = MultiValueCharFilter(
         method="filter_ip_address",
-        label=_("IP Address"),
+        label=_("IP Address (address)"),
     )
     active = django_filters.BooleanFilter(
-        label=_("Record is active"),
+        label=_("Active"),
     )
 
     managed = django_filters.BooleanFilter()

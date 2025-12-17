@@ -253,7 +253,6 @@ class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
 
     prefixes = CSVModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
-        to_field_name="id",
         required=False,
         help_text=_("Prefix IDs assigned to the view"),
         label=_("Prefixes"),
