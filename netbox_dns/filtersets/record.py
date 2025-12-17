@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
+from utilities.filtersets import register_filterset
 
 from ipam.models import IPAddress
 
@@ -17,6 +18,7 @@ from netbox_dns.filters import TimePeriodFilter
 __all__ = ("RecordFilterSet",)
 
 
+@register_filterset
 class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = Record

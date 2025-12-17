@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
 from netbox_dns.choices import (
@@ -17,6 +18,7 @@ from netbox_dns.filters import TimePeriodFilter
 __all__ = ("DNSSECKeyTemplateFilterSet",)
 
 
+@register_filterset
 class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = DNSSECKeyTemplate

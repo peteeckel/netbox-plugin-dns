@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import (
     ZoneTemplate,
@@ -23,6 +24,7 @@ from netbox_dns.models import (
 __all__ = ("ZoneTemplateFilterSet",)
 
 
+@register_filterset
 class ZoneTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = ZoneTemplate

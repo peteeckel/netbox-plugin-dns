@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
@@ -13,6 +14,7 @@ from netbox_dns.filters import TimePeriodFilter
 __all__ = ("RecordTemplateFilterSet",)
 
 
+@register_filterset
 class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = RecordTemplate
