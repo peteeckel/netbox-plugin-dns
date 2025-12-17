@@ -1,6 +1,6 @@
 [project]
 name = "netbox-plugin-dns"
-version = "1.4.4"
+version = "1.5.0b1"
 description = "NetBox DNS is a NetBox plugin for managing DNS data."
 authors = [
     {name="Peter Eckel", email="pete@netbox-dns.org"},
@@ -11,12 +11,12 @@ license-files = [
 readme = "README.md"
 keywords = ["netbox", "netbox-plugin", "dns"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable"
+    "Development Status :: 4 - Beta"
 ]
 dependencies = [
     "dnspython",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 
 [project.urls]
 Homepage = "https://github.com/peteeckel/netbox-plugin-dns"
