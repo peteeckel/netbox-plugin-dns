@@ -63,7 +63,6 @@ class ZoneViewSet(NetBoxModelViewSet):
         "nameservers",
         "tags",
         "soa_mname",
-        "records",
         "tenant",
     )
     serializer_class = ZoneSerializer
