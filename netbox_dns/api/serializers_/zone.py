@@ -17,7 +17,7 @@ from ..field_serializers import TimePeriodField
 from netbox_dns.models import Zone
 
 
-__all__ = ("ZoneSerializer",)
+__all__ = ("ZoneSerializer", "ZoneBriefSerializer")
 
 
 class ZoneSerializer(NetBoxModelSerializer):
@@ -245,3 +245,22 @@ class ZoneSerializer(NetBoxModelSerializer):
             template.apply_to_zone_relations(zone)
 
         return zone
+
+from rest_framework import serializers
+from netbox_dns.models import Zone
+
+class ZoneBriefSerializer(serializers.ModelSerializer):
+    display = serializers.CharField(read_only=True)  # maps to the model property
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:netbox_dns-api:zone-detail"
+    )
+
+    class Meta:
+        model = Zone
+        fields = (
+            "id",
+            "url",
+            "name",
+            "display"
+            )
