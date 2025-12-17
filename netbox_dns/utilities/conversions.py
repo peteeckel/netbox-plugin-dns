@@ -117,10 +117,15 @@ def regex_from_list(names):
 
 
 def iso8601_to_int(value):
+    if value in (None, "true", "false"):
+        return None
+
     try:
         return int(value)
+
     except ValueError:
         duration = parse_duration(value)
         if duration is None:
             raise TypeError
+
         return int(duration.total_seconds())
