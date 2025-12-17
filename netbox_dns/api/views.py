@@ -1,5 +1,5 @@
 from django.utils.translation import gettext as _
-from rest_framework import serializers
+from rest_framework import serializers, viewsets
 from rest_framework.routers import APIRootView
 
 from ipam.models import Prefix
@@ -10,6 +10,7 @@ from netbox.api.viewsets import NetBoxModelViewSet
 from netbox_dns.api.serializers import (
     ViewSerializer,
     ZoneSerializer,
+    ZoneBriefSerializer,
     NameServerSerializer,
     RecordSerializer,
     RegistrarSerializer,
@@ -45,6 +46,9 @@ from netbox_dns.models import (
     DNSSECPolicy,
 )
 
+from rest_framework.response import Response
+from django.db.models import Q
+
 
 class NetBoxDNSRootView(APIRootView):
     def get_view_name(self):
@@ -56,19 +60,15 @@ class ViewViewSet(NetBoxModelViewSet):
     serializer_class = ViewSerializer
     filterset_class = ViewFilterSet
 
-
-class ZoneViewSet(NetBoxModelViewSet):
-    queryset = Zone.objects.prefetch_related(
-        "view",
-        "nameservers",
-        "tags",
-        "soa_mname",
-        "records",
-        "tenant",
-    )
+class ZoneViewSet(viewsets.ModelViewSet):
+    queryset = Zone.objects.all()
     serializer_class = ZoneSerializer
     filterset_class = ZoneFilterSet
 
+    def get_serializer_class(self):
+        if self.action == "list" and self.request.query_params.get("brief"):
+            return ZoneBriefSerializer
+        return ZoneSerializer
 
 class NameServerViewSet(NetBoxModelViewSet):
     queryset = NameServer.objects.prefetch_related("zones", "tenant")
