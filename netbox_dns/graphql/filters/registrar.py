@@ -4,7 +4,7 @@ import strawberry
 import strawberry_django
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filter_mixins import NetBoxModelFilterMixin
+from netbox.graphql.filters import BaseModelFilter
 
 if TYPE_CHECKING:
     from netbox.graphql.filter_lookups import IntegerLookup
@@ -16,7 +16,7 @@ __all__ = ("NetBoxDNSRegistrarFilter",)
 
 
 @strawberry_django.filter_type(Registrar, lookups=True)
-class NetBoxDNSRegistrarFilter(NetBoxModelFilterMixin):
+class NetBoxDNSRegistrarFilter(BaseModelFilter):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
     description: FilterLookup[str] | None = strawberry_django.filter_field()
     iana_id: (
