@@ -246,9 +246,6 @@ class ZoneSerializer(NetBoxModelSerializer):
 
         return zone
 
-from rest_framework import serializers
-from netbox_dns.models import Zone
-
 class ZoneBriefSerializer(serializers.ModelSerializer):
     display = serializers.CharField(read_only=True)  # maps to the model property
 
