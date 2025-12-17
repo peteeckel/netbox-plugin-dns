@@ -26,13 +26,12 @@ class NameServerFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        to_field_name="id",
-        label=_("Zones"),
+        label=_("Zone (ID)"),
     )
     soa_zone_id = django_filters.ModelMultipleChoiceFilter(
         method="filter_soa_zones",
         queryset=Zone.objects.all(),
-        label=_("SOA Zones"),
+        label=_("SOA Zone (ID)"),
     )
 
     def search(self, queryset, name, value):
