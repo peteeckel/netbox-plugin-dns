@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.search import SearchIndex, register_search
 
 from taggit.managers import TaggableManager
@@ -13,7 +13,7 @@ __all__ = (
 )
 
 
-class RegistrationContact(NetBoxModel):
+class RegistrationContact(PrimaryModel):
     class Meta:
         verbose_name = _("Registration Contact")
         verbose_name_plural = _("Registration Contacts")
@@ -60,11 +60,6 @@ class RegistrationContact(NetBoxModel):
         blank=True,
         max_length=100,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        blank=True,
-        max_length=200,
     )
     organization = models.CharField(
         verbose_name=_("Organization"),

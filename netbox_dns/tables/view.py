@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import ActionsColumn, BooleanColumn, NetBoxTable, TagColumn
+from netbox.tables import PrimaryModelTable, ActionsColumn, BooleanColumn, TagColumn
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import View
@@ -13,8 +13,8 @@ __all__ = (
 )
 
 
-class ViewTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class ViewTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = View
 
         fields = (
@@ -37,8 +37,8 @@ class ViewTable(TenancyColumnsMixin, NetBoxTable):
     tags = TagColumn(url_name="plugins:netbox_dns:view_list")
 
 
-class RelatedViewTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class RelatedViewTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = View
 
         fields = (

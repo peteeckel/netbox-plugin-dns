@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MaxValueValidator
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
@@ -107,7 +107,7 @@ class RecordManager(models.Manager.from_queryset(RestrictedQuerySet)):
         )
 
 
-class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
     class Meta:
         verbose_name = _("Record")
         verbose_name_plural = _("Records")
@@ -217,11 +217,6 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Disable PTR"),
         help_text=_("Disable PTR record creation"),
         default=False,
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     tenant = models.ForeignKey(
         verbose_name=_("Tenant"),

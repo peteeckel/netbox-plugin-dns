@@ -3,10 +3,10 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.forms import SimpleArrayField
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
@@ -37,19 +37,21 @@ __all__ = (
 )
 
 
-class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
+class ZoneTemplateForm(TenancyForm, PrimaryModelForm):
     class Meta:
         model = ZoneTemplate
 
         fields = (
             "name",
+            "description",
+            "owner",
+            "comments",
             "nameservers",
             "soa_mname",
             "soa_rname",
             "dnssec_policy",
             "parental_agents",
             "record_templates",
-            "description",
             "registrar",
             "registrant",
             "admin_c",
@@ -122,7 +124,7 @@ class ZoneTemplateForm(TenancyForm, NetBoxModelForm):
     )
 
 
-class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class ZoneTemplateFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
     model = ZoneTemplate
 
     fieldsets = (
@@ -130,11 +132,12 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
-            "nameserver_id",
             "description",
+            "nameserver_id",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -170,6 +173,10 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("Template Name"),
     )
+    description = forms.CharField(
+        required=False,
+        label=_("Description"),
+    )
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
@@ -191,9 +198,6 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         null_option=_("None"),
         label=_("Record Templates"),
-    )
-    description = forms.CharField(
-        required=False,
     )
     dnssec_policy_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
@@ -235,15 +239,17 @@ class ZoneTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         null_option=_("None"),
         label=_("Billing Contact"),
     )
-    tag = TagFilterField(ZoneTemplate)
+    tag = TagFilterField(model)
 
 
-class ZoneTemplateImportForm(NetBoxModelImportForm):
+class ZoneTemplateImportForm(PrimaryModelImportForm):
     class Meta:
         model = ZoneTemplate
 
         fields = (
             "name",
+            "description",
+            "comments",
             "nameservers",
             "soa_mname",
             "soa_rname",
@@ -340,7 +346,7 @@ class ZoneTemplateImportForm(NetBoxModelImportForm):
     )
 
 
-class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
+class ZoneTemplateBulkEditForm(PrimaryModelBulkEditForm):
     model = ZoneTemplate
 
     fieldsets = (
@@ -412,9 +418,6 @@ class ZoneTemplateBulkEditForm(NetBoxModelBulkEditForm):
         queryset=RecordTemplate.objects.all(),
         required=False,
         label=_("Record Templates"),
-    )
-    description = forms.CharField(
-        max_length=200, required=False, label=_("Description")
     )
     dnssec_policy = DynamicModelChoiceField(
         queryset=DNSSECPolicy.objects.all(),

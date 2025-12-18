@@ -19,7 +19,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
@@ -82,7 +82,7 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
         )
 
 
-class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
     class Meta:
         verbose_name = _("Zone")
         verbose_name_plural = _("Zones")
@@ -176,11 +176,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Name"),
         max_length=255,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     status = models.CharField(
         verbose_name=_("Status"),
@@ -362,10 +357,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         related_name="netbox_dns_zones",
         blank=True,
         null=True,
-    )
-    comments = models.TextField(
-        verbose_name=_("Comments"),
-        blank=True,
     )
 
     @property

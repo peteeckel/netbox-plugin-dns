@@ -2,9 +2,9 @@ import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import (
+    PrimaryModelTable,
     ActionsColumn,
     BooleanColumn,
-    NetBoxTable,
     TagColumn,
     TemplateColumn,
 )
@@ -20,8 +20,8 @@ __all__ = (
 )
 
 
-class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class RecordTemplateTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = RecordTemplate
 
         fields = (
@@ -72,7 +72,7 @@ class RecordTemplateTable(TenancyColumnsMixin, NetBoxTable):
 
 
 class RecordTemplateDisplayTable(RecordTemplateTable):
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = RecordTemplate
 
         fields = (

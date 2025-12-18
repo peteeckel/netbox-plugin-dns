@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from utilities.filtersets import register_filterset
 
 from netbox_dns.models import RegistrationContact
@@ -10,7 +10,7 @@ __all__ = ("RegistrationContactFilterSet",)
 
 
 @register_filterset
-class RegistrationContactFilterSet(NetBoxModelFilterSet):
+class RegistrationContactFilterSet(PrimaryModelFilterSet):
     class Meta:
         model = RegistrationContact
 

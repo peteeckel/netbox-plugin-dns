@@ -2,7 +2,7 @@ import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext as _
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filtersets import register_filterset
 
@@ -15,7 +15,7 @@ __all__ = ("RecordTemplateFilterSet",)
 
 
 @register_filterset
-class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+class RecordTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = RecordTemplate
 

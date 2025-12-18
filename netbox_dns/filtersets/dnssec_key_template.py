@@ -2,7 +2,7 @@ import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext as _
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filtersets import register_filterset
 
@@ -19,7 +19,7 @@ __all__ = ("DNSSECKeyTemplateFilterSet",)
 
 
 @register_filterset
-class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+class DNSSECKeyTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = DNSSECKeyTemplate
 

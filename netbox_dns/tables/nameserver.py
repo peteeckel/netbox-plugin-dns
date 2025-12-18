@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import NetBoxTable, TagColumn
+from netbox.tables import PrimaryModelTable, TagColumn
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import NameServer
@@ -10,8 +10,8 @@ from netbox_dns.models import NameServer
 __all__ = ("NameServerTable",)
 
 
-class NameServerTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class NameServerTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = NameServer
 
         fields = ("description",)

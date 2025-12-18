@@ -2,10 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
@@ -34,19 +34,21 @@ __all__ = (
 )
 
 
-class RecordTemplateForm(TenancyForm, NetBoxModelForm):
+class RecordTemplateForm(TenancyForm, PrimaryModelForm):
     class Meta:
         model = RecordTemplate
 
         fields = (
             "name",
+            "description",
+            "owner",
+            "comments",
             "record_name",
             "type",
             "value",
             "status",
             "ttl",
             "disable_ptr",
-            "description",
             "tenant_group",
             "tenant",
             "tags",
@@ -87,17 +89,9 @@ class RecordTemplateForm(TenancyForm, NetBoxModelForm):
         required=True,
         label=_("Type"),
     )
-    disable_ptr = forms.BooleanField(
-        required=False,
-        label=_("Disable PTR"),
-    )
-    ttl = TimePeriodField(
-        required=False,
-        label=_("TTL"),
-    )
 
 
-class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class RecordTemplateFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
     model = RecordTemplate
 
     fieldsets = (
@@ -105,9 +99,11 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
+            "description",
             "record_name",
             "type",
             "value",
@@ -128,14 +124,18 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         ),
     )
 
+    name = forms.CharField(
+        required=False,
+        label=_("Template Name"),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_("Description"),
+    )
     type = forms.MultipleChoiceField(
         choices=RecordSelectableTypeChoices,
         required=False,
         label=_("Type"),
-    )
-    name = forms.CharField(
-        required=False,
-        label=_("Template Name"),
     )
     record_name = forms.CharField(
         required=False,
@@ -158,32 +158,30 @@ class RecordTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("Disable PTR"),
     )
-    description = forms.CharField(
-        required=False,
-        label=_("Description"),
-    )
     zone_template_id = DynamicModelMultipleChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
         null_option=_("None"),
         label=_("Zone Templates"),
     )
-    tag = TagFilterField(RecordTemplate)
+    tag = TagFilterField(model)
 
 
-class RecordTemplateImportForm(NetBoxModelImportForm):
+class RecordTemplateImportForm(PrimaryModelImportForm):
     class Meta:
         model = RecordTemplate
 
         fields = (
             "name",
+            "description",
+            "owner",
+            "comments",
             "record_name",
             "type",
             "value",
             "status",
             "ttl",
             "disable_ptr",
-            "description",
             "tenant",
             "tags",
         )
@@ -214,18 +212,18 @@ class RecordTemplateImportForm(NetBoxModelImportForm):
     )
 
 
-class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
+class RecordTemplateBulkEditForm(PrimaryModelBulkEditForm):
     model = RecordTemplate
 
     fieldsets = (
         FieldSet(
+            "description",
             "record_name",
             "type",
             "value",
             "status",
             "ttl",
             "disable_ptr",
-            "description",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -267,11 +265,6 @@ class RecordTemplateBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         widget=BulkEditNullBooleanSelect(),
         label=_("Disable PTR"),
-    )
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-        label=_("Description"),
     )
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),

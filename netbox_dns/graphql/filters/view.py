@@ -4,7 +4,7 @@ import strawberry
 import strawberry_django
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filters import BaseModelFilter
+from netbox.graphql.filters import PrimaryModelFilter
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
 
 if TYPE_CHECKING:
@@ -17,10 +17,13 @@ __all__ = ("NetBoxDNSViewFilter",)
 
 
 @strawberry_django.filter_type(View, lookups=True)
-class NetBoxDNSViewFilter(ContactFilterMixin, TenancyFilterMixin, BaseModelFilter):
+class NetBoxDNSViewFilter(
+    ContactFilterMixin,
+    TenancyFilterMixin,
+    PrimaryModelFilter,
+):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
     default_view: FilterLookup[bool] | None = strawberry_django.filter_field()
-    description: FilterLookup[str] | None = strawberry_django.filter_field()
     prefixes: (
         Annotated["PrefixFilter", strawberry.lazy("ipam.graphql.filters")] | None
     ) = strawberry_django.filter_field()

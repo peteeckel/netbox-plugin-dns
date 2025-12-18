@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import NetBoxTable, TagColumn, ActionsColumn
+from netbox.tables import PrimaryModelTable, TagColumn, ActionsColumn
 from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import ZoneTemplate
@@ -13,8 +13,8 @@ __all__ = (
 )
 
 
-class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class ZoneTemplateTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = ZoneTemplate
 
         fields = (
@@ -65,7 +65,7 @@ class ZoneTemplateTable(TenancyColumnsMixin, NetBoxTable):
 
 
 class ZoneTemplateDisplayTable(ZoneTemplateTable):
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = ZoneTemplate
 
         fields = ("description",)
