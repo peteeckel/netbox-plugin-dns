@@ -807,7 +807,11 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         if not records.exists():
             return
 
-        conflicting_ttls = ", ".join({str(record.ttl) for record in records})
+        conflicting_ttls = {record.ttl for record in records}
+        if len(conflicting_ttls) == 1 and self.ttl is None:
+            self.ttl = conflicting_ttls.pop()
+            return
+
         raise ValidationError(
             {
                 "ttl": _(
@@ -816,7 +820,7 @@ class Record(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                     type=self.type,
                     name=self.name,
                     zone=self.zone,
-                    ttls=conflicting_ttls,
+                    ttls=", ".join(str(ttl) for ttl in conflicting_ttls),
                 )
             }
         )
