@@ -336,17 +336,58 @@ class DNSsyncIPAddressTestCase(TestCase):
 
         with self.assertRaises(ValidationError):
             IPAddress.objects.create(
-                address=IPNetwork("10.0.0.1/24"), dns_name="name1.zone1.example.com"
+                address=IPNetwork("10.0.0.1/24"),
+                dns_name="name1.zone1.example.com",
+                custom_field_data={"ipaddress_dns_record_ttl": 86400},
             )
         with self.assertRaises(ValidationError):
             IPAddress.objects.create(
                 address=IPNetwork("2001:db8::1/64"),
                 dns_name="name2.zone1.example.com",
+                custom_field_data={"ipaddress_dns_record_ttl": 86400},
             )
 
         self.assertFalse(Record.objects.filter(type=RecordTypeChoices.A, managed=True))
         self.assertFalse(
             Record.objects.filter(type=RecordTypeChoices.AAAA, managed=True)
+        )
+
+    def test_create_ip_address_null_ttl_rrset_set_ttl(self):
+        records = (
+            Record(
+                name="name1",
+                zone=self.zone,
+                type=RecordTypeChoices.A,
+                value="10.0.1.1",
+                ttl=43200,
+            ),
+            Record(
+                name="name2",
+                zone=self.zone,
+                type=RecordTypeChoices.AAAA,
+                value="2001:db8:1::1",
+                ttl=43200,
+            ),
+        )
+        for record in records:
+            record.save()
+
+        IPAddress.objects.create(
+            address=IPNetwork("10.0.0.1/24"),
+            dns_name="name1.zone1.example.com",
+            custom_field_data={"ipaddress_dns_record_ttl": None},
+        )
+        IPAddress.objects.create(
+            address=IPNetwork("2001:db8::1/64"),
+            dns_name="name2.zone1.example.com",
+            custom_field_data={"ipaddress_dns_record_ttl": None},
+        )
+
+        self.assertEqual(
+            Record.objects.get(type=RecordTypeChoices.A, managed=True).ttl, 43200
+        )
+        self.assertEqual(
+            Record.objects.get(type=RecordTypeChoices.AAAA, managed=True).ttl, 43200
         )
 
     def test_create_ip_address_invalid_record(self):
