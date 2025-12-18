@@ -49,6 +49,8 @@ In the same way as NetBox is not a network management application, NetBox DNS do
 
 For integration with a large number of DNS server implementations integration tools like [octodns-netbox-dns](https://pypi.org/project/octodns-netbox-dns/) are available.
 
+For RFC9432 compatible DNS Servers like BIND, a related plugin [netbox-plugin-bind-provisioner](https://github.com/Suraxius/netbox-plugin-bind-provisioner) provides direct integration using DNS native zone distribution.
+
 ## Requirements
 
 * NetBox 4.3.0 or higher
