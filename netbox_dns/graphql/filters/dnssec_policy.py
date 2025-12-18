@@ -4,7 +4,7 @@ import strawberry
 import strawberry_django
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filters import BaseModelFilter
+from netbox.graphql.filters import PrimaryModelFilter
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
 
 if TYPE_CHECKING:
@@ -23,10 +23,11 @@ __all__ = ("NetBoxDNSDNSSECPolicyFilter", "PolicyDigestArrayLookup")
 
 @strawberry_django.filter_type(DNSSECPolicy, lookups=True)
 class NetBoxDNSDNSSECPolicyFilter(
-    ContactFilterMixin, TenancyFilterMixin, BaseModelFilter
+    ContactFilterMixin,
+    TenancyFilterMixin,
+    PrimaryModelFilter,
 ):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
-    description: FilterLookup[str] | None = strawberry_django.filter_field()
     status: (
         Annotated[
             "NetBoxDNSDNSSECPolicyStatusEnum",

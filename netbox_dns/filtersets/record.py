@@ -4,7 +4,7 @@ import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext as _
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 from utilities.filtersets import register_filterset
@@ -19,7 +19,7 @@ __all__ = ("RecordFilterSet",)
 
 
 @register_filterset
-class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+class RecordFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = Record
 

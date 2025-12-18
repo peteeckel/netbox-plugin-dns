@@ -2,10 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import (
     TagFilterField,
@@ -33,13 +33,15 @@ __all__ = (
 )
 
 
-class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
+class DNSSECPolicyForm(TenancyForm, PrimaryModelForm):
     class Meta:
         model = DNSSECPolicy
 
         fields = (
             "name",
             "description",
+            "owner",
+            "comments",
             "status",
             "inline_signing",
             "key_templates",
@@ -205,7 +207,7 @@ class DNSSECPolicyForm(TenancyForm, NetBoxModelForm):
         return self.cleaned_data
 
 
-class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class DNSSECPolicyFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
     model = DNSSECPolicy
 
     fieldsets = (
@@ -213,6 +215,7 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
@@ -259,17 +262,15 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "tenant_id",
             name=_("Tenancy"),
         ),
-        FieldSet(
-            "tags",
-            name=_("Tags"),
-        ),
     )
 
     name = forms.CharField(
         required=False,
+        label=_("Template Name"),
     )
     description = forms.CharField(
         required=False,
+        label=_("Description"),
     )
     status = forms.MultipleChoiceField(
         choices=DNSSECPolicyStatusChoices,
@@ -375,17 +376,18 @@ class DNSSECPolicyFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         label=_("NSEC3 Salt Size"),
     )
+    tag = TagFilterField(model)
 
-    tag = TagFilterField(DNSSECPolicy)
 
-
-class DNSSECPolicyImportForm(NetBoxModelImportForm):
+class DNSSECPolicyImportForm(PrimaryModelImportForm):
     class Meta:
         model = DNSSECPolicy
 
         fields = (
             "name",
             "description",
+            "owner",
+            "comments",
             "inline_signing",
             "key_templates",
             "dnskey_ttl",
@@ -475,7 +477,7 @@ class DNSSECPolicyImportForm(NetBoxModelImportForm):
     )
 
 
-class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
+class DNSSECPolicyBulkEditForm(PrimaryModelBulkEditForm):
     model = DNSSECPolicy
 
     fieldsets = (
@@ -543,11 +545,6 @@ class DNSSECPolicyBulkEditForm(NetBoxModelBulkEditForm):
         "parent_propagation_delay",
     )
 
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-        label=_("Description"),
-    )
     status = forms.ChoiceField(
         choices=add_blank_choice(DNSSECPolicyStatusChoices),
         required=False,

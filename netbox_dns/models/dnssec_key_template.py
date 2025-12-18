@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.search import SearchIndex, register_search
 from netbox.models.features import ContactsMixin
 
@@ -19,7 +19,7 @@ __all__ = (
 )
 
 
-class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
+class DNSSECKeyTemplate(ContactsMixin, PrimaryModel):
     class Meta:
         verbose_name = _("DNSSEC Key Template")
         verbose_name_plural = _("DNSSEC Key Templates")
@@ -46,11 +46,6 @@ class DNSSECKeyTemplate(ContactsMixin, NetBoxModel):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
 
     type = models.CharField(

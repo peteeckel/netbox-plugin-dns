@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from netbox.api.serializers import NetBoxModelSerializer
+from netbox.api.serializers import PrimaryModelSerializer
 from tenancy.api.serializers import TenantSerializer
 
 from netbox_dns.models import RecordTemplate
@@ -13,7 +13,7 @@ from ..field_serializers import TimePeriodField
 __all__ = ("RecordTemplateSerializer",)
 
 
-class RecordTemplateSerializer(NetBoxModelSerializer):
+class RecordTemplateSerializer(PrimaryModelSerializer):
     class Meta:
         model = RecordTemplate
 

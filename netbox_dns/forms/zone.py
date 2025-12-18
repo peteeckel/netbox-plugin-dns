@@ -7,10 +7,10 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from netbox.context import events_queue
 from utilities.forms.fields import (
@@ -20,7 +20,6 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
-    CommentField,
 )
 from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker, HTMXSelect
 from utilities.forms.rendering import FieldSet
@@ -160,18 +159,20 @@ class ZoneTemplateUpdateMixin:
         return zone
 
 
-class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
+class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, PrimaryModelForm):
     class Meta:
         model = Zone
 
         fields = (
             "name",
+            "description",
+            "owner",
+            "comments",
             "view",
             "status",
             "template",
             "nameservers",
             "default_ttl",
-            "description",
             "soa_ttl",
             "soa_mname",
             "soa_rname",
@@ -221,11 +222,11 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         FieldSet(
             "view",
             "name",
+            "description",
             "template",
             "status",
             "nameservers",
             "default_ttl",
-            "description",
             name=_("Zone"),
         ),
         FieldSet(
@@ -329,19 +330,10 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         required=True,
         label=_("View"),
     )
-    name = forms.CharField(
-        required=True,
-        label=_("Name"),
-    )
     template = DynamicModelChoiceField(
         queryset=ZoneTemplate.objects.all(),
         required=False,
         label=_("Template"),
-    )
-    status = forms.ChoiceField(
-        choices=ZoneStatusChoices,
-        required=False,
-        label=_("Status"),
     )
     nameservers = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
@@ -400,21 +392,17 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
         validators=[MinValueValidator(1)],
         label=_("SOA Serial"),
     )
-
     parental_agents = SimpleArrayField(
         required=False,
         base_field=forms.GenericIPAddressField(),
         label=_("Parental Agents"),
     )
-
     rfc2317_prefix = RFC2317NetworkFormField(
         required=False,
         validators=[validate_ipv4, validate_prefix, validate_rfc2317],
         help_text=_("RFC2317 IPv4 prefix with a length of at least 25 bits"),
         label=_("RFC2317 Prefix"),
     )
-
-    comments = CommentField()
 
     def clean_default_ttl(self):
         return (
@@ -431,7 +419,7 @@ class ZoneForm(ZoneTemplateUpdateMixin, TenancyForm, NetBoxModelForm):
             return name
 
 
-class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class ZoneFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
     model = Zone
 
     fieldsets = (
@@ -439,14 +427,15 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
+            "name",
+            "description",
             "view_id",
             "status",
-            "name",
             "nameserver_id",
             "active",
-            "description",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -486,6 +475,14 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         ),
     )
 
+    name = forms.CharField(
+        required=False,
+        label=_("Name"),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_("Description"),
+    )
     view_id = DynamicModelMultipleChoiceField(
         queryset=View.objects.all(),
         required=False,
@@ -495,10 +492,6 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         choices=ZoneStatusChoices,
         required=False,
         label=_("Status"),
-    )
-    name = forms.CharField(
-        required=False,
-        label=_("Name"),
     )
     nameserver_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
@@ -510,10 +503,6 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_("Active"),
-    )
-    description = forms.CharField(
-        required=False,
-        label=_("Description"),
     )
     soa_mname_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
@@ -611,18 +600,20 @@ class ZoneFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     tag = TagFilterField(Zone)
 
 
-class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
+class ZoneImportForm(ZoneTemplateUpdateMixin, PrimaryModelImportForm):
     class Meta:
         model = Zone
 
         fields = (
             "view",
             "name",
+            "description",
+            "owner",
+            "comments",
             "status",
             "template",
             "nameservers",
             "default_ttl",
-            "description",
             "soa_ttl",
             "soa_mname",
             "soa_rname",
@@ -645,7 +636,6 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
             "tech_c",
             "billing_c",
             "tenant",
-            "comments",
             "tags",
         )
 
@@ -831,7 +821,7 @@ class ZoneImportForm(ZoneTemplateUpdateMixin, NetBoxModelImportForm):
         return nameservers
 
 
-class ZoneBulkEditForm(NetBoxModelBulkEditForm):
+class ZoneBulkEditForm(PrimaryModelBulkEditForm):
     model = Zone
 
     fieldsets = (
@@ -918,11 +908,6 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         validators=[MinValueValidator(1)],
         label=_("Default TTL"),
-    )
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-        label=_("Description"),
     )
     soa_ttl = TimePeriodField(
         required=False,
@@ -1041,4 +1026,3 @@ class ZoneBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_("Tenant"),
     )
-    comments = CommentField()

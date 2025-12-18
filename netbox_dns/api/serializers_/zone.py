@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from netbox.api.serializers import NetBoxModelSerializer
+from netbox.api.serializers import PrimaryModelSerializer
 from tenancy.api.serializers import TenantSerializer
 
 from .view import ViewSerializer
@@ -20,7 +20,7 @@ from netbox_dns.models import Zone
 __all__ = ("ZoneSerializer",)
 
 
-class ZoneSerializer(NetBoxModelSerializer):
+class ZoneSerializer(PrimaryModelSerializer):
     class Meta:
         model = Zone
 

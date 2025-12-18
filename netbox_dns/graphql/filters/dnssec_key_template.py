@@ -5,7 +5,7 @@ import strawberry_django
 from strawberry.scalars import ID
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filters import BaseModelFilter
+from netbox.graphql.filters import PrimaryModelFilter
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
 
 if TYPE_CHECKING:
@@ -25,10 +25,11 @@ __all__ = ("NetBoxDNSDNSSECKeyTemplateFilter",)
 
 @strawberry_django.filter_type(DNSSECKeyTemplate, lookups=True)
 class NetBoxDNSDNSSECKeyTemplateFilter(
-    ContactFilterMixin, TenancyFilterMixin, BaseModelFilter
+    ContactFilterMixin,
+    TenancyFilterMixin,
+    PrimaryModelFilter,
 ):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
-    description: FilterLookup[str] | None = strawberry_django.filter_field()
     type: (
         Annotated[
             "NetBoxDNSDNSSECKeyTemplateTypeEnum",

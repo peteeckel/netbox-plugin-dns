@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from netbox.api.serializers import NetBoxModelSerializer
+from netbox.api.serializers import PrimaryModelSerializer
 from tenancy.api.serializers_.tenants import TenantSerializer
 
 from netbox_dns.models import DNSSECPolicy
@@ -14,7 +14,7 @@ from ..field_serializers import TimePeriodField
 __all__ = ("DNSSECPolicySerializer",)
 
 
-class DNSSECPolicySerializer(NetBoxModelSerializer):
+class DNSSECPolicySerializer(PrimaryModelSerializer):
     class Meta:
         model = DNSSECPolicy
 

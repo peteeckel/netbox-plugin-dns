@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.context import current_request
@@ -24,7 +24,7 @@ __all__ = (
 )
 
 
-class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+class View(ObjectModificationMixin, ContactsMixin, PrimaryModel):
     class Meta:
         verbose_name = _("View")
         verbose_name_plural = _("Views")
@@ -45,11 +45,6 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         unique=True,
         max_length=255,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     default_view = models.BooleanField(
         verbose_name=_("Default View"),

@@ -2,10 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import TagFilterField
 from utilities.forms.rendering import FieldSet
@@ -21,7 +21,30 @@ __all__ = (
 )
 
 
-class RegistrationContactForm(NetBoxModelForm):
+class RegistrationContactForm(PrimaryModelForm):
+    class Meta:
+        model = RegistrationContact
+
+        fields = (
+            "name",
+            "description",
+            "owner",
+            "comments",
+            "contact_id",
+            "organization",
+            "street",
+            "city",
+            "state_province",
+            "postal_code",
+            "country",
+            "phone",
+            "phone_ext",
+            "fax",
+            "fax_ext",
+            "email",
+            "tags",
+        )
+
     fieldsets = (
         FieldSet(
             "name",
@@ -46,29 +69,8 @@ class RegistrationContactForm(NetBoxModelForm):
         ),
     )
 
-    class Meta:
-        model = RegistrationContact
 
-        fields = (
-            "name",
-            "description",
-            "contact_id",
-            "organization",
-            "street",
-            "city",
-            "state_province",
-            "postal_code",
-            "country",
-            "phone",
-            "phone_ext",
-            "fax",
-            "fax_ext",
-            "email",
-            "tags",
-        )
-
-
-class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
+class RegistrationContactFilterForm(PrimaryModelFilterSetForm):
     model = RegistrationContact
 
     fieldsets = (
@@ -76,11 +78,12 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
-            "contact_id",
             "description",
+            "contact_id",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -161,13 +164,15 @@ class RegistrationContactFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(RegistrationContact)
 
 
-class RegistrationContactImportForm(NetBoxModelImportForm):
+class RegistrationContactImportForm(PrimaryModelImportForm):
     class Meta:
         model = RegistrationContact
 
         fields = (
             "name",
             "description",
+            "owner",
+            "comments",
             "contact_id",
             "organization",
             "street",
@@ -184,7 +189,7 @@ class RegistrationContactImportForm(NetBoxModelImportForm):
         )
 
 
-class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
+class RegistrationContactBulkEditForm(PrimaryModelBulkEditForm):
     model = RegistrationContact
 
     fieldsets = (
@@ -231,10 +236,6 @@ class RegistrationContactBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(
         required=False,
         label=_("Name"),
-    )
-    description = forms.CharField(
-        required=False,
-        label=_("Description"),
     )
     organization = forms.CharField(
         required=False,
