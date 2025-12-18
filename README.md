@@ -2,17 +2,19 @@
 The NetBox DNS plugin enables NetBox to manage operational DNS data such as name servers, zones, records and views, as well as registration data for domains. It can automate tasks like creating PTR records, generating zone serial numbers, NS and SOA records, as well as validate names and values values for resource records to ensure zone data is consistent, up-to-date and compliant with to the relevant RFCs.
 
 <div align="center">
-<a href="https://pypi.org/project/netbox-plugin-dns/"><img src="https://img.shields.io/pypi/v/netbox-plugin-dns" alt="PyPi"/></a>
-<a href="https://github.com/peteeckel/netbox-plugin-dns/stargazers"><img src="https://img.shields.io/github/stars/peteeckel/netbox-plugin-dns?style=flat" alt="Stars Badge"/></a>
-<a href="https://github.com/peteeckel/netbox-plugin-dns/network/members"><img src="https://img.shields.io/github/forks/peteeckel/netbox-plugin-dns?style=flat" alt="Forks Badge"/></a>
-<a href="https://github.com/peteeckel/netbox-plugin-dns/issues"><img src="https://img.shields.io/github/issues/peteeckel/netbox-plugin-dns" alt="Issues Badge"/></a>
-<a href="https://github.com/peteeckel/netbox-plugin-dns/pulls"><img src="https://img.shields.io/github/issues-pr/peteeckel/netbox-plugin-dns" alt="Pull Requests Badge"/></a>
-<a href="https://github.com/peteeckel/netbox-plugin-dns/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/peteeckel/netbox-plugin-dns?color=2b9348"></a>
-<a href="https://github.com/peteeckel/netbox-plugin-dns/blob/master/LICENSE"><img src="https://img.shields.io/github/license/peteeckel/netbox-plugin-dns?color=2b9348" alt="License Badge"/></a>
-<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code Style Black"/></a>
-<a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads" src="https://static.pepy.tech/personalized-badge/netbox-plugin-dns?period=total&left_color=BLACK&right_color=BLUE&left_text=Downloads"></a>
-<a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Week" src="https://static.pepy.tech/personalized-badge/netbox-plugin-dns?period=monthly&left_color=BLACK&right_color=BLUE&left_text=Downloads%2fMonth"></a>
-<a href="https://pepy.tech/project/netbox-plugin-dns"><img alt="Downloads/Month" src="https://static.pepy.tech/personalized-badge/netbox-plugin-dns?period=weekly&left_color=BLACK&right_color=BLUE&left_text=Downloads%2fWeek"></a>
+
+[![PyPi](https://img.shields.io/pypi/v/netbox-plugin-dns)](https://pypi.org/project/netbox-plugin-dns/)
+[![Stars Badge](https://img.shields.io/github/stars/peteeckel/netbox-plugin-dns?style=flat)](https://github.com/peteeckel/netbox-plugin-dns/stargazers)
+[![Forks Badge](https://img.shields.io/github/forks/peteeckel/netbox-plugin-dns?style=flat)](https://github.com/peteeckel/netbox-plugin-dns/network/members)
+[![Issues Badge](https://img.shields.io/github/issues/peteeckel/netbox-plugin-dns)](https://github.com/peteeckel/netbox-plugin-dns/issues)
+[![Pull Requests Badge](https://img.shields.io/github/issues-pr/peteeckel/netbox-plugin-dns)](https://github.com/peteeckel/netbox-plugin-dns/pulls)
+[![GitHub contributors](https://img.shields.io/github/contributors/peteeckel/netbox-plugin-dns?color=2b9348)](https://github.com/peteeckel/netbox-plugin-dns/graphs/contributors)
+[![License Badge](https://img.shields.io/github/license/peteeckel/netbox-plugin-dns?color=2b9348)](https://github.com/peteeckel/netbox-plugin-dns/blob/master/LICENSE)
+[![Code Style Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Downloads](https://static.pepy.tech/personalized-badge/netbox-plugin-dns?period=total&left_color=BLACK&right_color=BLUE&left_text=Downloads)](https://pepy.tech/project/netbox-plugin-dns)
+[![Downloads/Month](https://static.pepy.tech/personalized-badge/netbox-plugin-dns?period=monthly&left_color=BLACK&right_color=BLUE&left_text=Downloads%2fMonth)](https://pepy.tech/project/netbox-plugin-dns)
+[![Downloads/Week](https://static.pepy.tech/personalized-badge/netbox-plugin-dns?period=weekly&left_color=BLACK&right_color=BLUE&left_text=Downloads%2fWeek)](https://pepy.tech/project/netbox-plugin-dns)
+
 </div>
 
 > [!WARNING]
