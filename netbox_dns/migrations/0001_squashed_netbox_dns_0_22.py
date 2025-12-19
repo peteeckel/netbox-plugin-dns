@@ -57,20 +57,6 @@ def update_record_fqdn(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("netbox_dns", "0001_squashed_netbox_dns_0_15"),
-        ("netbox_dns", "0020_netbox_3_4"),
-        ("netbox_dns", "0021_record_ip_address"),
-        ("netbox_dns", "0022_search"),
-        ("netbox_dns", "0023_alter_record_value"),
-        ("netbox_dns", "0024_tenancy"),
-        ("netbox_dns", "0025_ipam_coupling_cf"),
-        ("netbox_dns", "0026_domain_registration"),
-        ("netbox_dns", "0027_alter_registrar_iana_id"),
-        ("netbox_dns", "0028_rfc2317_fields"),
-        ("netbox_dns", "0029_record_fqdn"),
-    ]
-
     initial = True
 
     dependencies = [
