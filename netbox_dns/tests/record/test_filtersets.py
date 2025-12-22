@@ -48,6 +48,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.records = (
             Record(
                 name="name1",
+                description="Test Record 1",
                 zone=cls.zones[0],
                 type=RecordTypeChoices.AAAA,
                 value="fe80::dead:beef",
@@ -55,6 +56,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             Record(
                 name="name2",
+                description="Test Record 2",
                 zone=cls.zones[0],
                 type=RecordTypeChoices.A,
                 value="10.0.0.42",
@@ -62,6 +64,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             Record(
                 name="name3",
+                description="Test Record 3",
                 zone=cls.zones[0],
                 type=RecordTypeChoices.AAAA,
                 value="fe80::dead:beef",
@@ -70,6 +73,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             Record(
                 name="name5",
+                description="Test Record 4",
                 zone=cls.zones[0],
                 type=RecordTypeChoices.TXT,
                 value="Nothing to see here",
@@ -77,6 +81,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             Record(
                 name="name1",
+                description="Test Record 5",
                 zone=cls.zones[1],
                 type=RecordTypeChoices.AAAA,
                 value="fe80::dead:beef",
@@ -84,6 +89,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             Record(
                 name="name2",
+                description="Test Record 6",
                 zone=cls.zones[1],
                 type=RecordTypeChoices.A,
                 value="10.0.0.42",
@@ -91,6 +97,7 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             Record(
                 name="name3",
+                description="Test Record 7",
                 zone=cls.zones[1],
                 type=RecordTypeChoices.AAAA,
                 value="fe80::dead:beef",
@@ -102,30 +109,24 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             record.save()
 
     def test_name(self):
-        params = {"name": ["name1", "name2"]}
+        params = {"name__regex": r"name[12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
+
+    def test_description(self):
+        params = {"description__iregex": r"test record [1-4]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_zone(self):
         params = {"zone": [self.zones[0]]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 5)
+        params = {"zone_id": [self.zones[1].pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_fqdn(self):
-        params = {
-            "fqdn": [
-                "name1.zone1.example.com",
-                "name2.zone1.example.com",
-                "name4.zone1.example.com",
-            ]
-        }
+        params = {"fqdn__regex": r"name[124]\.zone1\..*"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {
-            "fqdn": [
-                "name1.zone2.example.com.",
-                "name2.zone2.example.com.",
-                "name2.zone1.example",
-            ]
-        }
-        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"fqdn__iew": "zone2.example.com."}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_type(self):
         params = {"type": [RecordTypeChoices.A]}
@@ -134,11 +135,11 @@ class RecordFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_value(self):
-        params = {"value": ["10.0.0.42"]}
+        params = {"value": "10.0.0.42"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {"value": ["fe80::dead:beef"]}
+        params = {"value": "fe80::dead:beef"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {"value": ["fe80::dead:beef", "10.0.0.42"]}
+        params = {"value__regex": r"(fe80::dead:beef|10.0.0.42)"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 6)
 
     def test_managed(self):

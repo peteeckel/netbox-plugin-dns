@@ -31,14 +31,18 @@ class ViewFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         Tenant.objects.bulk_create(cls.tenants)
 
         cls.views = (
-            View(name="View 1", tenant=cls.tenants[0]),
-            View(name="View 2", tenant=cls.tenants[1]),
-            View(name="View 3", tenant=cls.tenants[2]),
+            View(name="View 1", description="Test View 1", tenant=cls.tenants[0]),
+            View(name="View 2", description="Test View 2", tenant=cls.tenants[1]),
+            View(name="View 3", description="Test View 3", tenant=cls.tenants[2]),
         )
         View.objects.bulk_create(cls.views)
 
     def test_name(self):
-        params = {"name": ["View 1", "View 2"]}
+        params = {"name__regex": r"View [12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_description(self):
+        params = {"description__regex": r"Test View [12]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_default_view(self):

@@ -16,12 +16,10 @@ class NameServerFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = NameServer
 
-        fields = (
-            "id",
-            "name",
-            "description",
-        )
+        fields = ("id",)
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),

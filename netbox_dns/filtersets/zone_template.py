@@ -28,13 +28,10 @@ class ZoneTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = ZoneTemplate
 
-        fields = (
-            "id",
-            "name",
-            "description",
-            "soa_rname",
-        )
+        fields = ("id",)
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     record_template_id = django_filters.ModelMultipleChoiceFilter(
         queryset=RecordTemplate.objects.all(),
         field_name="record_templates",
@@ -62,6 +59,7 @@ class ZoneTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
         field_name="soa_mname__name",
         to_field_name="name",
     )
+    soa_rname = django_filters.CharFilter()
     dnssec_policy_id = django_filters.ModelMultipleChoiceFilter(
         queryset=DNSSECPolicy.objects.all(),
     )
