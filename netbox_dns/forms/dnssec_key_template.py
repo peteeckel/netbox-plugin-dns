@@ -141,10 +141,8 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         choices=DNSSECKeyTemplateTypeChoices,
         required=False,
     )
-    lifetime = SimpleArrayField(
-        base_field=forms.IntegerField(),
-        required=False,
-        help_text=_("Enter a list of integer lifetime values, separated by comma (,)"),
+    lifetime = TimePeriodField(
+        label=_("Lifetime"),
     )
     algorithm = forms.MultipleChoiceField(
         choices=DNSSECKeyTemplateAlgorithmChoices,

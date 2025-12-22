@@ -11,6 +11,7 @@ from netbox_dns.choices import (
     DNSSECKeyTemplateAlgorithmChoices,
     DNSSECKeyTemplateKeySizeChoices,
 )
+from netbox_dns.filters import TimePeriodFilter
 
 
 __all__ = ("DNSSECKeyTemplateFilterSet",)
@@ -24,7 +25,6 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "id",
             "name",
             "description",
-            "lifetime",
         )
 
     type = django_filters.MultipleChoiceFilter(
@@ -36,7 +36,7 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     key_size = django_filters.MultipleChoiceFilter(
         choices=DNSSECKeyTemplateKeySizeChoices,
     )
-
+    lifetime = TimePeriodFilter()
     policy_id = django_filters.ModelMultipleChoiceFilter(
         field_name="policies",
         queryset=DNSSECPolicy.objects.all(),

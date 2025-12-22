@@ -12,7 +12,7 @@ from ipam.models import IPAddress
 
 from netbox_dns.models import View, Zone, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
-
+from netbox_dns.filters import TimePeriodFilter
 
 __all__ = ("RecordFilterSet",)
 
@@ -35,6 +35,7 @@ class RecordFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     fqdn = MultiValueCharFilter(
         method="filter_fqdn",
     )
+    ttl = TimePeriodFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
     )

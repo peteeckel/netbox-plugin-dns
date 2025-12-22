@@ -7,6 +7,7 @@ from tenancy.filtersets import TenancyFilterSet
 
 from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
+from netbox_dns.filters import TimePeriodFilter
 
 
 __all__ = ("RecordTemplateFilterSet",)
@@ -26,6 +27,7 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "disable_ptr",
         )
 
+    ttl = TimePeriodFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
     )
