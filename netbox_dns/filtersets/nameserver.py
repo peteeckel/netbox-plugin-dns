@@ -1,6 +1,5 @@
 import django_filters
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
 from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -26,12 +25,10 @@ class NameServerFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        label=_("Zone (ID)"),
     )
     soa_zone_id = django_filters.ModelMultipleChoiceFilter(
         method="filter_soa_zones",
         queryset=Zone.objects.all(),
-        label=_("SOA Zone (ID)"),
     )
 
     def search(self, queryset, name, value):

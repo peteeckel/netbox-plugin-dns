@@ -1,7 +1,6 @@
 import django_filters
 
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
 from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -39,18 +38,15 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     )
     cds_digest_types = MultiValueCharFilter(
         method="filter_cds_digest_types",
-        label=_("CDS Digest Type"),
     )
     key_template = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates__name",
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Key Template (name)"),
     )
     key_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates",
         queryset=DNSSECKeyTemplate.objects.all(),
-        label=_("DNSSEC Key Template (ID)"),
     )
     dnskey_ttl = TimePeriodFilter()
     purge_keys = TimePeriodFilter()
@@ -68,23 +64,19 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
         field_name="zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zone (name)"),
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        label=_("Zone (ID)"),
     )
     zone_template = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates__name",
         queryset=ZoneTemplate.objects.all(),
         to_field_name="name",
-        label=_("Zone Template (name)"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates",
         queryset=ZoneTemplate.objects.all(),
-        label=_("Zone Template (ID)"),
     )
 
     def filter_cds_digest_types(self, queryset, name, value):
