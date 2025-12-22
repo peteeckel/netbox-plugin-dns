@@ -22,12 +22,10 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = DNSSECKeyTemplate
 
-        fields = (
-            "id",
-            "name",
-            "description",
-        )
+        fields = ("id",)
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=DNSSECKeyTemplateTypeChoices,
     )

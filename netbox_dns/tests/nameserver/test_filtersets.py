@@ -29,9 +29,21 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         Tenant.objects.bulk_create(cls.tenants)
 
         cls.nameservers = (
-            NameServer(name="ns1.example.com", tenant=cls.tenants[0]),
-            NameServer(name="ns2.example.com", tenant=cls.tenants[1]),
-            NameServer(name="ns3.example.com", tenant=cls.tenants[2]),
+            NameServer(
+                name="ns1.example.com",
+                description="Test Name Server 1",
+                tenant=cls.tenants[0],
+            ),
+            NameServer(
+                name="ns2.example.com",
+                description="Test Name Server 2",
+                tenant=cls.tenants[1],
+            ),
+            NameServer(
+                name="ns3.example.com",
+                description="Test Name Server 3",
+                tenant=cls.tenants[2],
+            ),
         )
         for nameserver in cls.nameservers:
             nameserver.save()
@@ -62,7 +74,11 @@ class NameServerFiterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
 
     def test_name(self):
-        params = {"name": ["ns1.example.com", "ns2.example.com"]}
+        params = {"name__regex": r"ns[12].example.com"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_description(self):
+        params = {"description__regex": r"Test Name Server [23]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):

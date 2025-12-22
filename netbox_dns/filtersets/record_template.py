@@ -20,14 +20,14 @@ class RecordTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
 
         fields = (
             "id",
-            "name",
             "record_name",
             "value",
-            "description",
             "ttl",
             "disable_ptr",
         )
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     ttl = TimePeriodFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,

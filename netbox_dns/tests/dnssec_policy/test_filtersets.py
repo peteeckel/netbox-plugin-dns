@@ -30,6 +30,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies = (
             DNSSECPolicy(
                 name="Test Policy 1",
+                description="Test DNSSEC Policy 1",
                 status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
                 inline_signing=True,
                 dnskey_ttl=3600,
@@ -53,6 +54,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECPolicy(
                 name="Test Policy 2",
+                description="Test DNSSEC Policy 2",
                 status=DNSSECPolicyStatusChoices.STATUS_ACTIVE,
                 inline_signing=True,
                 dnskey_ttl=7200,
@@ -76,6 +78,7 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECPolicy(
                 name="Test Policy 3",
+                description="Test DNSSEC Policy 3",
                 status=DNSSECPolicyStatusChoices.STATUS_INACTIVE,
                 inline_signing=False,
                 dnskey_ttl=3600,
@@ -154,7 +157,11 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies[2].key_templates.set([cls.dnssec_key_templates[1]])
 
     def test_name(self):
-        params = {"name": ["Test Policy 1", "Test Policy 2"]}
+        params = {"name__regex": r"Test Policy [12]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_description(self):
+        params = {"description__regex": r"Test DNSSEC Policy [12]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_status(self):
@@ -273,11 +280,11 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_nsec3_iterations(self):
-        params = {"nsec3_iterations": [1, 2, 3]}
+        params = {"nsec3_iterations__gt": 0}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_nsec3_salt_size(self):
-        params = {"nsec3_salt_size": [16, 32]}
+        params = {"nsec3_salt_size__gt": 0}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_key_template(self):

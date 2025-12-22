@@ -436,11 +436,18 @@ class ZoneFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
             "status",
             "nameserver_id",
             "active",
+            "default_ttl",
             name=_("Attributes"),
         ),
         FieldSet(
+            "soa_ttl",
             "soa_mname_id",
             "soa_rname",
+            "soa_refresh",
+            "soa_retry",
+            "soa_expire",
+            "soa_minimum",
+            "soa_serial",
             "soa_serial_auto",
             name=_("SOA"),
         ),
@@ -504,14 +511,42 @@ class ZoneFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_("Active"),
     )
+    default_ttl = TimePeriodField(
+        required=False,
+        label=_("Default TTL"),
+    )
     soa_mname_id = DynamicModelMultipleChoiceField(
         queryset=NameServer.objects.all(),
         required=False,
-        label=_("MName"),
+        label=_("SOA MName"),
     )
     soa_rname = forms.CharField(
         required=False,
-        label=_("RName"),
+        label=_("SOA RName"),
+    )
+    soa_ttl = TimePeriodField(
+        required=False,
+        label=_("SOA TTL"),
+    )
+    soa_refresh = TimePeriodField(
+        required=False,
+        label=_("SOA Refresh"),
+    )
+    soa_retry = TimePeriodField(
+        required=False,
+        label=_("SOA Retry"),
+    )
+    soa_expire = TimePeriodField(
+        required=False,
+        label=_("SOA Expire"),
+    )
+    soa_minimum = TimePeriodField(
+        required=False,
+        label=_("SOA Minimum TTL"),
+    )
+    soa_serial = forms.IntegerField(
+        required=False,
+        label=_("SOA Serial"),
     )
     soa_serial_auto = forms.NullBooleanField(
         required=False,

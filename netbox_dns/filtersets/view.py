@@ -20,11 +20,11 @@ class ViewFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
 
         fields = (
             "id",
-            "name",
             "default_view",
-            "description",
         )
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     prefix_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Prefix.objects.all(),
         field_name="prefixes",

@@ -24,21 +24,18 @@ class RecordFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
 
         fields = (
             "id",
-            "name",
-            "description",
-            "ttl",
-            "value",
             "disable_ptr",
             "managed",
         )
 
-    fqdn = MultiValueCharFilter(
-        method="filter_fqdn",
-    )
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
+    fqdn = django_filters.CharFilter()
     ttl = TimePeriodFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
     )
+    value = django_filters.CharFilter()
     status = django_filters.MultipleChoiceFilter(
         choices=RecordStatusChoices,
     )
@@ -80,18 +77,6 @@ class RecordFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     )
     active = django_filters.BooleanFilter()
     managed = django_filters.BooleanFilter()
-
-    def filter_fqdn(self, queryset, name, value):
-        if not value:
-            return queryset
-
-        fqdns = []
-        for fqdn in value:
-            if not fqdn.endswith("."):
-                fqdn = fqdn + "."
-            fqdns.append(fqdn)
-
-        return queryset.filter(fqdn__in=fqdns)
 
     def filter_ip_address(self, queryset, name, value):
         if not value:
