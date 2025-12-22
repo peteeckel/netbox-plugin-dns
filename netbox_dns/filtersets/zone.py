@@ -18,7 +18,7 @@ from netbox_dns.models import (
     DNSSECPolicy,
 )
 from netbox_dns.choices import ZoneStatusChoices, ZoneEPPStatusChoices
-
+from netbox_dns.filters import TimePeriodFilter
 
 __all__ = ("ZoneFilterSet",)
 
@@ -31,14 +31,8 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "id",
             "name",
             "description",
-            "default_ttl",
-            "soa_ttl",
             "soa_rname",
             "soa_serial",
-            "soa_refresh",
-            "soa_retry",
-            "soa_expire",
-            "soa_minimum",
             "soa_serial_auto",
             "rfc2317_parent_managed",
             "registry_domain_id",
@@ -71,6 +65,7 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("Nameserver"),
     )
+    default_ttl = TimePeriodFilter()
     soa_mname_id = django_filters.ModelMultipleChoiceFilter(
         queryset=NameServer.objects.all(),
         label=_("SOA MName ID"),
@@ -81,6 +76,11 @@ class ZoneFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="name",
         label=_("SOA MName"),
     )
+    soa_ttl = TimePeriodFilter()
+    soa_refresh = TimePeriodFilter()
+    soa_retry = TimePeriodFilter()
+    soa_expire = TimePeriodFilter()
+    soa_minimum = TimePeriodFilter()
     dnssec_policy_id = django_filters.ModelMultipleChoiceFilter(
         queryset=DNSSECPolicy.objects.all(),
         label=_("DNSSEC Policy ID"),

@@ -9,6 +9,7 @@ from utilities.filters import MultiValueCharFilter
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate, Zone, ZoneTemplate
 from netbox_dns.choices import DNSSECPolicyStatusChoices
+from netbox_dns.filters import TimePeriodFilter
 
 
 __all__ = ("DNSSECPolicyFilterSet",)
@@ -24,19 +25,7 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
             "description",
             "status",
             "inline_signing",
-            "dnskey_ttl",
-            "purge_keys",
-            "publish_safety",
-            "retire_safety",
-            "signatures_jitter",
-            "signatures_refresh",
-            "signatures_validity",
-            "signatures_validity_dnskey",
-            "max_zone_ttl",
-            "zone_propagation_delay",
             "create_cdnskey",
-            "parent_ds_ttl",
-            "parent_propagation_delay",
             "use_nsec3",
             "nsec3_iterations",
             "nsec3_opt_out",
@@ -62,6 +51,18 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         to_field_name="id",
         label=_("DNSSEC Key Template IDs"),
     )
+    dnskey_ttl = TimePeriodFilter()
+    purge_keys = TimePeriodFilter()
+    publish_safety = TimePeriodFilter()
+    retire_safety = TimePeriodFilter()
+    signatures_jitter = TimePeriodFilter()
+    signatures_refresh = TimePeriodFilter()
+    signatures_validity = TimePeriodFilter()
+    signatures_validity_dnskey = TimePeriodFilter()
+    max_zone_ttl = TimePeriodFilter()
+    zone_propagation_delay = TimePeriodFilter()
+    parent_ds_ttl = TimePeriodFilter()
+    parent_propagation_delay = TimePeriodFilter()
     zone = django_filters.ModelMultipleChoiceFilter(
         field_name="zones__name",
         queryset=Zone.objects.all(),

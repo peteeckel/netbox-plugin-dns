@@ -170,43 +170,63 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_dnskey_ttl(self):
-        params = {"dnskey_ttl": [3600]}
+        params = {"dnskey_ttl": 3600}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"dnskey_ttl": "PT1H"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_purge_keys(self):
-        params = {"purge_keys": [7776000]}
+        params = {"purge_keys": 7776000}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"purge_keys": "P90D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_publish_safety(self):
-        params = {"publish_safety": [3600]}
+        params = {"publish_safety": 3600}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"publish_safety": "PT1H"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_retire_safety(self):
-        params = {"retire_safety": [3600]}
+        params = {"retire_safety": 3600}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"retire_safety": "PT1H"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_signatures_jitter(self):
-        params = {"signatures_jitter": [43200]}
+        params = {"signatures_jitter": 43200}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"signatures_jitter": "PT12H"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_signatures_refresh(self):
-        params = {"signatures_refresh": [432000]}
+        params = {"signatures_refresh": 432000}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"signatures_refresh": "P5D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_signatures_validity(self):
-        params = {"signatures_validity": [1209600]}
+        params = {"signatures_validity": 1209600}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"signatures_validity": "P14D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_signatures_validity_dnskey(self):
-        params = {"signatures_validity_dnskey": [1209600]}
+        params = {"signatures_validity_dnskey": 1209600}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+        params = {"signatures_validity_dnskey": "P14D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_max_zone_ttl(self):
-        params = {"max_zone_ttl": [86400]}
+        params = {"max_zone_ttl": 86400}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"max_zone_ttl": "P1D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_zone_propagation_delay(self):
-        params = {"zone_propagation_delay": [300]}
+        params = {"zone_propagation_delay": 300}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"zone_propagation_delay": "PT5M"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_create_cdnskey(self):
@@ -229,11 +249,15 @@ class DNSSECPolicyFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_parent_ds_ttl(self):
-        params = {"parent_ds_ttl": [86400]}
+        params = {"parent_ds_ttl": 86400}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"parent_ds_ttl": "P1D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_parent_propagation_delay(self):
-        params = {"parent_propagation_delay": [3600, 7200]}
+        params = {"parent_propagation_delay": 3600}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"parent_propagation_delay": "PT1H"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_use_nsec3(self):
