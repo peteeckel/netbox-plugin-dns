@@ -77,7 +77,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_lifetime(self):
-        params = {"lifetime": [86400]}
+        params = {"lifetime": 86400}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_key_size(self):
