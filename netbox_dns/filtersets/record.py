@@ -2,7 +2,6 @@ import netaddr
 
 import django_filters
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
 from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -26,7 +25,6 @@ class RecordFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
         fields = (
             "id",
             "name",
-            "fqdn",
             "description",
             "ttl",
             "value",
@@ -46,53 +44,41 @@ class RecordFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
-        label=_("Parent Zone ID"),
     )
     zone = django_filters.ModelMultipleChoiceFilter(
         queryset=Zone.objects.all(),
         field_name="zone__name",
         to_field_name="name",
-        label=_("Parent Zone (name)"),
     )
     view_id = django_filters.ModelMultipleChoiceFilter(
         queryset=View.objects.all(),
         field_name="zone__view",
-        label=_("Parent Zone View (ID)"),
     )
     view = django_filters.ModelMultipleChoiceFilter(
         queryset=View.objects.all(),
         field_name="zone__view__name",
         to_field_name="name",
-        label=_("Parent Zone View (name)"),
     )
     address_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="address_records",
         queryset=Record.objects.all(),
-        label=_("Address Record (id)"),
     )
     ptr_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="ptr_record",
         queryset=Record.objects.all(),
-        label=_("Pointer Record (ID)"),
     )
     rfc2317_cname_record_id = django_filters.ModelMultipleChoiceFilter(
         field_name="rfc2317_cname_record",
         queryset=Record.objects.all(),
-        label=_("RFC2317 CNAME Record (ID)"),
     )
     ipam_ip_address_id = django_filters.ModelMultipleChoiceFilter(
         field_name="ipam_ip_address",
         queryset=IPAddress.objects.all(),
-        label=_("IPAM IP Address (ID)"),
     )
     ip_address = MultiValueCharFilter(
         method="filter_ip_address",
-        label=_("IP Address (address)"),
     )
-    active = django_filters.BooleanFilter(
-        label=_("Active"),
-    )
-
+    active = django_filters.BooleanFilter()
     managed = django_filters.BooleanFilter()
 
     def filter_fqdn(self, queryset, name, value):

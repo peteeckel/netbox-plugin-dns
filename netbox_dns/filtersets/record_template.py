@@ -1,6 +1,5 @@
 import django_filters
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
 from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
@@ -40,12 +39,10 @@ class RecordTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
         queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates__name",
         to_field_name="name",
-        label=_("Zone Template (name)"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates",
-        label=_("Zone Template (ID)"),
     )
 
     def search(self, queryset, name, value):
