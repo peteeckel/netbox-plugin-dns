@@ -80,6 +80,8 @@ class NameServer(ObjectModificationMixin, ContactsMixin, PrimaryModel):
 
         super().clean_fields(exclude=exclude)
 
+    clean_fields.alters_data = True
+
     def clean(self, *args, **kwargs):
         try:
             self.name = normalize_name(self.name)
@@ -100,6 +102,8 @@ class NameServer(ObjectModificationMixin, ContactsMixin, PrimaryModel):
             )
 
         super().clean(*args, **kwargs)
+
+    clean.alters_data = True
 
     def save(self, *args, **kwargs):
         self.full_clean()

@@ -93,6 +93,8 @@ class DNSSECKeyTemplate(ContactsMixin, PrimaryModel):
 
         validate_key_template(self)
 
+    clean.alters_data = True
+
     def save(self, *args, **kwargs):
         validate_key_template(self)
 

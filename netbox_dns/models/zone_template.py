@@ -162,6 +162,8 @@ class ZoneTemplate(PrimaryModel):
 
         return fields_changed
 
+    apply_to_zone_data.alters_data = True
+
     def apply_to_zone_relations(self, zone):
         if not zone.nameservers.all() and self.nameservers.all():
             zone.nameservers.set(self.nameservers.all())
@@ -174,6 +176,8 @@ class ZoneTemplate(PrimaryModel):
     def create_records(self, zone):
         for record_template in self.record_templates.all():
             record_template.create_record(zone=zone)
+
+    apply_to_zone_relations.alters_data = True
 
     def clean(self, *args, **kwargs):
         if self.soa_rname:

@@ -569,6 +569,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 managed=True,
             )
 
+    update_soa_record.alters_data = True
+
     def update_ns_records(self):
         ns_name = "@"
 
@@ -587,6 +589,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 value=ns,
                 managed=True,
             )
+
+    update_ns_records.alters_data = True
 
     def _check_nameserver_address_records(self, nameserver):
         name = dns_name.from_text(nameserver.name, origin=None)
@@ -701,10 +705,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
         else:
             self.soa_serial_dirty = True
 
+    update_serial.alters_data = True
+
     def save_soa_serial(self):
         if self.soa_serial_auto and self.soa_serial_dirty:
             super().save(update_fields=["soa_serial", "last_updated"])
             self.soa_serial_dirty = False
+
+    save_soa_serial.alters_data = True
 
     @property
     def network_from_name(self):
@@ -796,6 +804,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 )
 
         super().clean_fields(exclude=exclude)
+
+    clean_fields.alters_data = True
 
     def clean(self, *args, **kwargs):
         if not self.dnssec_policy:
@@ -948,6 +958,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
             self.rfc2317_parent_zone = None
 
         super().clean(*args, **kwargs)
+
+    clean.alters_data = True
 
     def save(self, *args, **kwargs):
         self.full_clean()

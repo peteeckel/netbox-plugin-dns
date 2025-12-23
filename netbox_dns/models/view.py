@@ -74,15 +74,6 @@ class View(ObjectModificationMixin, ContactsMixin, PrimaryModel):
     def get_default_view(cls):
         return cls.objects.get(default_view=True)
 
-    def delete(self, *args, **kwargs):
-        if self.default_view:
-            if current_request.get() is not None:
-                raise AbortRequest(_("The default view cannot be deleted"))
-
-            raise ValidationError(_("The default view cannot be deleted"))
-
-        super().delete(*args, **kwargs)
-
     def clean(self, *args, **kwargs):
         if (changed_fields := self.changed_fields) is None:
             return
@@ -117,6 +108,8 @@ class View(ObjectModificationMixin, ContactsMixin, PrimaryModel):
 
         super().clean(*args, **kwargs)
 
+    clean.alters_data = True
+
     def save(self, *args, **kwargs):
         self.clean()
 
@@ -146,6 +139,15 @@ class View(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 get_query_from_filter(self.ip_address_filter)
             ):
                 update_dns_records(ip_address, view=self)
+
+    def delete(self, *args, **kwargs):
+        if self.default_view:
+            if current_request.get() is not None:
+                raise AbortRequest(_("The default view cannot be deleted"))
+
+            raise ValidationError(_("The default view cannot be deleted"))
+
+        super().delete(*args, **kwargs)
 
 
 @register_search
