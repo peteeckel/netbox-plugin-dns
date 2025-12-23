@@ -489,6 +489,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
 
         self.ptr_record = ptr_record
 
+    update_ptr_record.alters_data = True
+
     def remove_from_rfc2317_cname_record(self, save_zone_serial=True):
         if self.rfc2317_cname_record.pk:
             rfc2317_ptr_records = self.rfc2317_cname_record.rfc2317_ptr_records.exclude(
@@ -504,6 +506,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 )
             else:
                 self.rfc2317_cname_record.delete()
+
+    remove_from_rfc2317_cname_record.alters_data = True
 
     def update_rfc2317_cname_record(self, save_zone_serial=True):
         if self.zone.rfc2317_parent_managed:
@@ -569,6 +573,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 self.rfc2317_cname_record.delete(save_zone_serial=save_zone_serial)
                 self.rfc2317_cname_record = None
 
+    update_rfc2317_cname_record.alters_data = True
+
     def update_from_ip_address(self, ip_address, zone=None):
         """
         Update an address record according to data from an IPAddress object.
@@ -594,6 +600,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
 
         return True, False
 
+    update_from_ip_address.alters_data = True
+
     @classmethod
     def create_from_ip_address(cls, ip_address, zone):
         data = record_data_from_ip_address(ip_address, zone)
@@ -607,6 +615,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
             ipam_ip_address=ip_address,
             **data,
         )
+
+    create_from_ip_address.alters_data = True
 
     def update_fqdn(self, zone=None):
         if zone is None:
@@ -630,6 +640,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
 
         self.name = name.relativize(_zone).to_text()
         self.fqdn = fqdn.to_text()
+
+    update_fqdn.alters_data = True
 
     def validate_name(self, new_zone=None):
         if new_zone is None:
@@ -666,6 +678,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                         "name": exc,
                     }
                 )
+
+    validate_name.alters_data = True
 
     def validate_value(self):
         try:
@@ -771,6 +785,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
             record.status = RecordStatusChoices.STATUS_INACTIVE
             record.save(update_fields=["status"])
 
+    handle_conflicting_address_records.alters_data = True
+
     def check_unique_rrset_ttl(self):
         if not self._state.adding:
             return
@@ -820,6 +836,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
             }
         )
 
+    check_unique_rrset_ttl.alters_data = True
+
     def update_rrset_ttl(self, ttl=None):
         if self._state.adding:
             return
@@ -848,12 +866,16 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
             record.ttl = ttl
             record.save(update_fields=["ttl"], update_rrset_ttl=False)
 
+    update_rrset_ttl.alters_data = True
+
     def clean_fields(self, exclude=None):
         self.type = self.type.upper()
         if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
             self.name = self.name.lower()
 
         super().clean_fields(exclude=exclude)
+
+    clean_fields.alters_data = True
 
     def clean(self, *args, new_zone=None, **kwargs):
         self.validate_name(new_zone=new_zone)
@@ -948,6 +970,8 @@ class Record(ObjectModificationMixin, ContactsMixin, PrimaryModel):
                 )
 
         super().clean(*args, **kwargs)
+
+    clean.alters_data = True
 
     def save(
         self,

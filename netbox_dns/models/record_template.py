@@ -166,12 +166,16 @@ class RecordTemplate(PrimaryModel):
         if tags := self.tags.all():
             record.tags.set(tags)
 
+    create_record.alters_data = True
+
     def clean_fields(self, exclude=None):
         self.type = self.type.upper()
         if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
             self.record_name = self.record_name.lower()
 
         super().clean_fields(exclude=exclude)
+
+    clean_fields.alters_data = True
 
     def clean(self, *args, **kwargs):
         self.validate_name()
