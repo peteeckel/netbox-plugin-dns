@@ -2,10 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import TagFilterField
 from utilities.forms.rendering import FieldSet
@@ -21,14 +21,16 @@ __all__ = (
 )
 
 
-class RegistrarForm(NetBoxModelForm):
+class RegistrarForm(PrimaryModelForm):
     class Meta:
         model = Registrar
 
         fields = (
             "name",
-            "iana_id",
             "description",
+            "owner",
+            "comments",
+            "iana_id",
             "address",
             "referral_url",
             "whois_server",
@@ -40,8 +42,8 @@ class RegistrarForm(NetBoxModelForm):
     fieldsets = (
         FieldSet(
             "name",
-            "iana_id",
             "description",
+            "iana_id",
             "address",
             "referral_url",
             "whois_server",
@@ -56,7 +58,7 @@ class RegistrarForm(NetBoxModelForm):
     )
 
 
-class RegistrarFilterForm(NetBoxModelFilterSetForm):
+class RegistrarFilterForm(PrimaryModelFilterSetForm):
     model = Registrar
 
     fieldsets = (
@@ -64,11 +66,12 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
-            "iana_id",
             "description",
+            "iana_id",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -85,13 +88,13 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_("Name"),
     )
-    address = forms.CharField(
-        required=False,
-        label=_("Address"),
-    )
     description = forms.CharField(
         required=False,
         label=_("Description"),
+    )
+    address = forms.CharField(
+        required=False,
+        label=_("Address"),
     )
     iana_id = forms.IntegerField(
         required=False,
@@ -113,17 +116,19 @@ class RegistrarFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_("Abuse Phone"),
     )
-    tag = TagFilterField(Registrar)
+    tag = TagFilterField(model)
 
 
-class RegistrarImportForm(NetBoxModelImportForm):
+class RegistrarImportForm(PrimaryModelImportForm):
     class Meta:
         model = Registrar
 
         fields = (
             "name",
-            "iana_id",
             "description",
+            "owner",
+            "comments",
+            "iana_id",
             "address",
             "referral_url",
             "whois_server",
@@ -133,7 +138,7 @@ class RegistrarImportForm(NetBoxModelImportForm):
         )
 
 
-class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
+class RegistrarBulkEditForm(PrimaryModelBulkEditForm):
     model = Registrar
 
     fieldsets = (
@@ -162,10 +167,6 @@ class RegistrarBulkEditForm(NetBoxModelBulkEditForm):
     iana_id = forms.IntegerField(
         required=False,
         label=_("IANA ID"),
-    )
-    description = forms.CharField(
-        required=False,
-        label=_("Description"),
     )
     address = forms.CharField(
         required=False,

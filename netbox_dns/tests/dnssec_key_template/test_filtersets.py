@@ -22,12 +22,14 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_key_templates = (
             DNSSECKeyTemplate(
                 name="Test KSK",
+                description="Test KSK",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_KSK,
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
                 lifetime=86400,
             ),
             DNSSECKeyTemplate(
                 name="Test ZSK",
+                description="Test ZSK",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_ZSK,
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.RSASHA256,
                 lifetime=86400,
@@ -35,6 +37,7 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             DNSSECKeyTemplate(
                 name="Test CSK",
+                description="Test CSK",
                 type=DNSSECKeyTemplateTypeChoices.TYPE_CSK,
                 algorithm=DNSSECKeyTemplateAlgorithmChoices.ED25519,
                 lifetime=864000,
@@ -51,7 +54,11 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.dnssec_policies[1].key_templates.set(cls.dnssec_key_templates[2:3])
 
     def test_name(self):
-        params = {"name": ["Test KSK", "Test CSK"]}
+        params = {"name__regex": r"Test [KC]SK"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_description(self):
+        params = {"description__regex": r"Test [KC]SK"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_type(self):
@@ -78,6 +85,8 @@ class DNSSECKeyTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
 
     def test_lifetime(self):
         params = {"lifetime": 86400}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+        params = {"lifetime": "P1D"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_key_size(self):

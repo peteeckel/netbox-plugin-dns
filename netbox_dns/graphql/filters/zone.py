@@ -5,7 +5,7 @@ import strawberry_django
 from strawberry.scalars import ID
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filter_mixins import NetBoxModelFilterMixin
+from netbox.graphql.filters import PrimaryModelFilter
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
 
 if TYPE_CHECKING:
@@ -25,10 +25,11 @@ __all__ = ("NetBoxDNSZoneFilter",)
 
 @strawberry_django.filter_type(Zone, lookups=True)
 class NetBoxDNSZoneFilter(
-    ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilterMixin
+    ContactFilterMixin,
+    TenancyFilterMixin,
+    PrimaryModelFilter,
 ):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
-    description: FilterLookup[str] | None = strawberry_django.filter_field()
     view: (
         Annotated["NetBoxDNSViewFilter", strawberry.lazy("netbox_dns.graphql.filters")]
         | None
@@ -140,8 +141,6 @@ class NetBoxDNSZoneFilter(
     ) = strawberry_django.filter_field()
     rfc2317_parent_zone_id: ID | None = strawberry_django.filter_field()
     rfc2317_parent_managed: FilterLookup[bool] | None = strawberry_django.filter_field()
-
-    comments: FilterLookup[str] | None = strawberry_django.filter_field()
 
     arpa_network: FilterLookup[str] | None = strawberry_django.filter_field()
     active: FilterLookup[bool] | None = strawberry_django.filter_field()

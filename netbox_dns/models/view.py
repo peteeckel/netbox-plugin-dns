@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.context import current_request
@@ -24,7 +24,7 @@ __all__ = (
 )
 
 
-class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+class View(ObjectModificationMixin, ContactsMixin, PrimaryModel):
     class Meta:
         verbose_name = _("View")
         verbose_name_plural = _("Views")
@@ -45,11 +45,6 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         unique=True,
         max_length=255,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     default_view = models.BooleanField(
         verbose_name=_("Default View"),
@@ -78,15 +73,6 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
     @classmethod
     def get_default_view(cls):
         return cls.objects.get(default_view=True)
-
-    def delete(self, *args, **kwargs):
-        if self.default_view:
-            if current_request.get() is not None:
-                raise AbortRequest(_("The default view cannot be deleted"))
-
-            raise ValidationError(_("The default view cannot be deleted"))
-
-        super().delete(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
         if (changed_fields := self.changed_fields) is None:
@@ -122,6 +108,8 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
 
         super().clean(*args, **kwargs)
 
+    clean.alters_data = True
+
     def save(self, *args, **kwargs):
         self.clean()
 
@@ -151,6 +139,15 @@ class View(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 get_query_from_filter(self.ip_address_filter)
             ):
                 update_dns_records(ip_address, view=self)
+
+    def delete(self, *args, **kwargs):
+        if self.default_view:
+            if current_request.get() is not None:
+                raise AbortRequest(_("The default view cannot be deleted"))
+
+            raise ValidationError(_("The default view cannot be deleted"))
+
+        super().delete(*args, **kwargs)
 
 
 @register_search

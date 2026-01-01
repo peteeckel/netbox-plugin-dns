@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.search import SearchIndex, register_search
 
 from netbox_dns.validators import validate_rname
@@ -18,7 +18,7 @@ __all__ = (
 )
 
 
-class ZoneTemplate(NetBoxModel):
+class ZoneTemplate(PrimaryModel):
     class Meta:
         verbose_name = _("Zone Template")
         verbose_name_plural = _("Zone Templates")
@@ -62,11 +62,6 @@ class ZoneTemplate(NetBoxModel):
         unique=True,
         max_length=200,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     nameservers = models.ManyToManyField(
         verbose_name=_("Nameservers"),
@@ -167,6 +162,8 @@ class ZoneTemplate(NetBoxModel):
 
         return fields_changed
 
+    apply_to_zone_data.alters_data = True
+
     def apply_to_zone_relations(self, zone):
         if not zone.nameservers.all() and self.nameservers.all():
             zone.nameservers.set(self.nameservers.all())
@@ -179,6 +176,8 @@ class ZoneTemplate(NetBoxModel):
     def create_records(self, zone):
         for record_template in self.record_templates.all():
             record_template.create_record(zone=zone)
+
+    apply_to_zone_relations.alters_data = True
 
     def clean(self, *args, **kwargs):
         if self.soa_rname:

@@ -3,10 +3,10 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import (
     TagFilterField,
@@ -37,13 +37,15 @@ __all__ = (
 )
 
 
-class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
+class DNSSECKeyTemplateForm(TenancyForm, PrimaryModelForm):
     class Meta:
         model = DNSSECKeyTemplate
 
         fields = (
             "name",
             "description",
+            "owner",
+            "comments",
             "type",
             "lifetime",
             "key_size",
@@ -90,10 +92,11 @@ class DNSSECKeyTemplateForm(TenancyForm, NetBoxModelForm):
 
     lifetime = TimePeriodField(
         required=False,
+        label=_("Lifetime"),
     )
 
 
-class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class DNSSECKeyTemplateFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
     model = DNSSECKeyTemplate
 
     fieldsets = (
@@ -101,6 +104,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
@@ -127,9 +131,11 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
     name = forms.CharField(
         required=False,
+        label=_("Template Name"),
     )
     description = forms.CharField(
         required=False,
+        label=_("Description"),
     )
     policy_id = DynamicModelMultipleChoiceField(
         queryset=DNSSECPolicy.objects.all(),
@@ -140,6 +146,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     type = forms.MultipleChoiceField(
         choices=DNSSECKeyTemplateTypeChoices,
         required=False,
+        label=_("Type"),
     )
     lifetime = TimePeriodField(
         label=_("Lifetime"),
@@ -147,6 +154,7 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     algorithm = forms.MultipleChoiceField(
         choices=DNSSECKeyTemplateAlgorithmChoices,
         required=False,
+        label=_("Algorithm"),
     )
     key_size = SimpleArrayField(
         base_field=forms.ChoiceField(
@@ -155,16 +163,18 @@ class DNSSECKeyTemplateFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         required=False,
         help_text=_("Enter a list of integer key sizes, separated by comma (,)"),
     )
-    tag = TagFilterField(DNSSECKeyTemplate)
+    tag = TagFilterField(model)
 
 
-class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
+class DNSSECKeyTemplateImportForm(PrimaryModelImportForm):
     class Meta:
         model = DNSSECKeyTemplate
 
         fields = (
             "name",
             "description",
+            "owner",
+            "comments",
             "type",
             "lifetime",
             "algorithm",
@@ -185,7 +195,7 @@ class DNSSECKeyTemplateImportForm(NetBoxModelImportForm):
     )
 
 
-class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
+class DNSSECKeyTemplateBulkEditForm(PrimaryModelBulkEditForm):
     model = DNSSECKeyTemplate
 
     fieldsets = (
@@ -209,16 +219,10 @@ class DNSSECKeyTemplateBulkEditForm(NetBoxModelBulkEditForm):
 
     nullable_fields = (
         "description",
-        "tenant",
         "lifetime",
         "key_size",
     )
 
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-        label=_("Description"),
-    )
     type = forms.ChoiceField(
         choices=add_blank_choice(DNSSECKeyTemplateTypeChoices),
         required=False,

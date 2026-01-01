@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 from netbox.tables import (
-    NetBoxTable,
+    PrimaryModelTable,
     ChoiceFieldColumn,
     TagColumn,
     ActionsColumn,
@@ -25,7 +25,7 @@ __all__ = (
 )
 
 
-class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
+class RecordBaseTable(TenancyColumnsMixin, PrimaryModelTable):
     zone = tables.Column(
         verbose_name=_("Zone"),
         linkify=True,
@@ -70,7 +70,7 @@ class RecordBaseTable(TenancyColumnsMixin, NetBoxTable):
 
 
 class RecordTable(RecordBaseTable):
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = Record
 
         fields = (
@@ -104,7 +104,7 @@ class RecordTable(RecordBaseTable):
 
 
 class ManagedRecordTable(RecordBaseTable):
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = Record
 
         fields = ()
@@ -170,7 +170,7 @@ class ManagedRecordTable(RecordBaseTable):
 
 
 class RelatedRecordTable(RecordBaseTable):
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = Record
 
         fields = ()
@@ -186,7 +186,7 @@ class RelatedRecordTable(RecordBaseTable):
 
 
 class DelegationRecordTable(RecordBaseTable):
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = Record
 
         fields = ()

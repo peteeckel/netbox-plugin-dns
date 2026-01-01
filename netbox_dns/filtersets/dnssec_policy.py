@@ -1,11 +1,11 @@
 import django_filters
 
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate, Zone, ZoneTemplate
 from netbox_dns.choices import DNSSECPolicyStatusChoices
@@ -15,41 +15,36 @@ from netbox_dns.filters import TimePeriodFilter
 __all__ = ("DNSSECPolicyFilterSet",)
 
 
-class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+@register_filterset
+class DNSSECPolicyFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = DNSSECPolicy
 
         fields = (
             "id",
-            "name",
-            "description",
             "status",
             "inline_signing",
             "create_cdnskey",
             "use_nsec3",
-            "nsec3_iterations",
             "nsec3_opt_out",
-            "nsec3_salt_size",
         )
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     status = django_filters.MultipleChoiceFilter(
         choices=DNSSECPolicyStatusChoices,
     )
     cds_digest_types = MultiValueCharFilter(
         method="filter_cds_digest_types",
-        label=_("CDS Digest Types"),
     )
     key_template = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates__name",
         queryset=DNSSECKeyTemplate.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Key Templates"),
     )
     key_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="key_templates",
         queryset=DNSSECKeyTemplate.objects.all(),
-        to_field_name="id",
-        label=_("DNSSEC Key Template IDs"),
     )
     dnskey_ttl = TimePeriodFilter()
     purge_keys = TimePeriodFilter()
@@ -63,29 +58,25 @@ class DNSSECPolicyFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     zone_propagation_delay = TimePeriodFilter()
     parent_ds_ttl = TimePeriodFilter()
     parent_propagation_delay = TimePeriodFilter()
+    nsec3_iterations = django_filters.NumberFilter()
+    nsec3_salt_size = django_filters.NumberFilter()
     zone = django_filters.ModelMultipleChoiceFilter(
         field_name="zones__name",
         queryset=Zone.objects.all(),
         to_field_name="name",
-        label=_("Zones"),
     )
     zone_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zones",
         queryset=Zone.objects.all(),
-        to_field_name="id",
-        label=_("Zone IDs"),
     )
     zone_template = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates__name",
         queryset=ZoneTemplate.objects.all(),
         to_field_name="name",
-        label=_("Zone Templates"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         field_name="zone_templates",
         queryset=ZoneTemplate.objects.all(),
-        to_field_name="id",
-        label=_("Zone Template IDs"),
     )
 
     def filter_cds_digest_types(self, queryset, name, value):

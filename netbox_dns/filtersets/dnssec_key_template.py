@@ -1,9 +1,9 @@
 import django_filters
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import DNSSECKeyTemplate, DNSSECPolicy
 from netbox_dns.choices import (
@@ -17,16 +17,15 @@ from netbox_dns.filters import TimePeriodFilter
 __all__ = ("DNSSECKeyTemplateFilterSet",)
 
 
-class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+@register_filterset
+class DNSSECKeyTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = DNSSECKeyTemplate
 
-        fields = (
-            "id",
-            "name",
-            "description",
-        )
+        fields = ("id",)
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=DNSSECKeyTemplateTypeChoices,
     )
@@ -40,14 +39,11 @@ class DNSSECKeyTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
     policy_id = django_filters.ModelMultipleChoiceFilter(
         field_name="policies",
         queryset=DNSSECPolicy.objects.all(),
-        to_field_name="id",
-        label=_("DNSSEC Policy IDs"),
     )
     policy = django_filters.ModelMultipleChoiceFilter(
         field_name="policies__name",
         queryset=DNSSECPolicy.objects.all(),
         to_field_name="name",
-        label=_("DNSSEC Policies"),
     )
 
     def search(self, queryset, name, value):

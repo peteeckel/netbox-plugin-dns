@@ -19,7 +19,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.models.features import ContactsMixin
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
@@ -82,7 +82,7 @@ class ZoneManager(models.Manager.from_queryset(RestrictedQuerySet)):
         )
 
 
-class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
+class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
     class Meta:
         verbose_name = _("Zone")
         verbose_name_plural = _("Zones")
@@ -176,11 +176,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         verbose_name=_("Name"),
         max_length=255,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     status = models.CharField(
         verbose_name=_("Status"),
@@ -362,10 +357,6 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         related_name="netbox_dns_zones",
         blank=True,
         null=True,
-    )
-    comments = models.TextField(
-        verbose_name=_("Comments"),
-        blank=True,
     )
 
     @property
@@ -578,6 +569,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 managed=True,
             )
 
+    update_soa_record.alters_data = True
+
     def update_ns_records(self):
         ns_name = "@"
 
@@ -596,6 +589,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 value=ns,
                 managed=True,
             )
+
+    update_ns_records.alters_data = True
 
     def _check_nameserver_address_records(self, nameserver):
         name = dns_name.from_text(nameserver.name, origin=None)
@@ -710,10 +705,14 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
         else:
             self.soa_serial_dirty = True
 
+    update_serial.alters_data = True
+
     def save_soa_serial(self):
         if self.soa_serial_auto and self.soa_serial_dirty:
             super().save(update_fields=["soa_serial", "last_updated"])
             self.soa_serial_dirty = False
+
+    save_soa_serial.alters_data = True
 
     @property
     def network_from_name(self):
@@ -805,6 +804,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
                 )
 
         super().clean_fields(exclude=exclude)
+
+    clean_fields.alters_data = True
 
     def clean(self, *args, **kwargs):
         if not self.dnssec_policy:
@@ -957,6 +958,8 @@ class Zone(ObjectModificationMixin, ContactsMixin, NetBoxModel):
             self.rfc2317_parent_zone = None
 
         super().clean(*args, **kwargs)
+
+    clean.alters_data = True
 
     def save(self, *args, **kwargs):
         self.full_clean()

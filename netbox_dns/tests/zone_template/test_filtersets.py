@@ -89,6 +89,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         cls.zone_templates = (
             ZoneTemplate(
                 name="Zone Template 1",
+                description="Test Zone Template 1",
                 soa_mname=cls.nameservers[0],
                 soa_rname="hostmaster.example.com",
                 tenant=cls.tenants[0],
@@ -102,6 +103,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 2",
+                description="Test Zone Template 2",
                 soa_mname=cls.nameservers[0],
                 soa_rname="hostmaster2.example.com",
                 tenant=cls.tenants[1],
@@ -115,6 +117,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 3",
+                description="Test Zone Template 3",
                 soa_mname=cls.nameservers[0],
                 soa_rname="hostmaster.example.com",
                 tenant=cls.tenants[2],
@@ -128,6 +131,7 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             ),
             ZoneTemplate(
                 name="Zone Template 4",
+                description="Test Zone Template 4",
                 soa_mname=cls.nameservers[1],
                 soa_rname="hostmaster2.example.com",
                 tenant=cls.tenants[0],
@@ -181,7 +185,11 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
             )
 
     def test_name(self):
-        params = {"name": ["Zone Template 1", "Zone Template 3", "FooBar"]}
+        params = {"name__regex": r"Zone Template [13]"}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
+
+    def test_descirption(self):
+        params = {"description__regex": r"Test Zone Template [129]"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_nameserver(self):
@@ -205,9 +213,9 @@ class ZoneTemplateFilterSetTestCase(TestCase, ChangeLoggedFilterSetTests):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_soa_rname(self):
-        params = {"soa_rname": ["hostmaster.example.com"]}
+        params = {"soa_rname": "hostmaster.example.com"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
-        params = {"soa_rname": ["hostmaster2.example.com"]}
+        params = {"soa_rname__isw": "hostmaster2"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_record_template(self):

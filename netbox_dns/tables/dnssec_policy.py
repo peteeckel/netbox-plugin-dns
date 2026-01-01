@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 from netbox.tables import (
-    NetBoxTable,
+    PrimaryModelTable,
     TagColumn,
     ChoiceFieldColumn,
     ActionsColumn,
@@ -21,8 +21,8 @@ __all__ = (
 )
 
 
-class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class DNSSECPolicyTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = DNSSECPolicy
 
         fields = (
@@ -32,7 +32,6 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
 
         default_columns = (
             "name",
-            "description",
             "status",
             "inline_signing",
             "use_nsec3",
@@ -108,8 +107,8 @@ class DNSSECPolicyTable(TenancyColumnsMixin, NetBoxTable):
     )
 
 
-class DNSSECPolicyDisplayTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class DNSSECPolicyDisplayTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = DNSSECPolicy
 
         fields = ("description",)

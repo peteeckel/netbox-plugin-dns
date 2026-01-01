@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from netbox.api.serializers import NetBoxModelSerializer
+from netbox.api.serializers import PrimaryModelSerializer
 
 from netbox_dns.models import Registrar
 
@@ -8,7 +8,7 @@ from netbox_dns.models import Registrar
 __all__ = ("RegistrarSerializer",)
 
 
-class RegistrarSerializer(NetBoxModelSerializer):
+class RegistrarSerializer(PrimaryModelSerializer):
     class Meta:
         model = Registrar
 
