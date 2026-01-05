@@ -74,7 +74,7 @@ class RegistrationContact(NetBoxModel):
     street = models.CharField(
         verbose_name=_("Street"),
         blank=True,
-        max_length=50,
+        max_length=255,
     )
     city = models.CharField(
         verbose_name=_("City"),
