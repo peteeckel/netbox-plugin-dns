@@ -1526,7 +1526,7 @@ msgstr "Enregistrements de type PTR liés"
 
 #: template_content.py:146
 msgid "Related Pointer Record"
-msgstr ""
+msgstr "Enregistrement de type PTR lié"
 
 #: template_content.py:154
 msgid "DNS Address Records"
