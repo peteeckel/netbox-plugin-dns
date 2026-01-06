@@ -19,6 +19,7 @@ class RegistrationContactSerializer(NetBoxModelSerializer):
             "display_url",
             "name",
             "description",
+            "tags",
             "contact_id",
             "organization",
             "street",
