@@ -5,10 +5,10 @@ from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelImportForm,
-    NetBoxModelForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelImportForm,
+    PrimaryModelForm,
 )
 from utilities.forms.fields import (
     TagFilterField,
@@ -94,14 +94,16 @@ class ViewPrefixUpdateMixin:
                         self.add_error("prefixes", exc.messages)
 
 
-class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
+class ViewForm(ViewPrefixUpdateMixin, TenancyForm, PrimaryModelForm):
     class Meta:
         model = View
 
         fields = (
             "name",
-            "default_view",
             "description",
+            "owner",
+            "comments",
+            "default_view",
             "prefixes",
             "ip_address_filter",
             "tenant_group",
@@ -112,8 +114,8 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
     fieldsets = (
         FieldSet(
             "name",
-            "default_view",
             "description",
+            "default_view",
             name=_("View"),
         ),
         FieldSet(
@@ -181,7 +183,7 @@ class ViewForm(ViewPrefixUpdateMixin, TenancyForm, NetBoxModelForm):
         return ip_address_filter
 
 
-class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class ViewFilterForm(TenancyFilterForm, PrimaryModelFilterSetForm):
     model = View
 
     fieldsets = (
@@ -189,11 +191,12 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
             "q",
             "filter_id",
             "tag",
+            "owner_id",
         ),
         FieldSet(
             "name",
-            "default_view",
             "description",
+            "default_view",
             name=_("Attributes"),
         ),
         FieldSet(
@@ -214,13 +217,16 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
 
     name = forms.CharField(
         required=False,
+        label=_("Name"),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_("Description"),
     )
     default_view = forms.NullBooleanField(
         required=False,
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
-    )
-    description = forms.CharField(
-        required=False,
+        label=_("Default View"),
     )
     prefix_id = PrefixDynamicModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
@@ -230,16 +236,18 @@ class ViewFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
         },
         label=_("Prefix"),
     )
-    tag = TagFilterField(View)
+    tag = TagFilterField(model)
 
 
-class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
+class ViewImportForm(ViewPrefixUpdateMixin, PrimaryModelImportForm):
     class Meta:
         model = View
 
         fields = (
             "name",
             "description",
+            "owner",
+            "comments",
             "prefixes",
             "tenant",
             "tags",
@@ -253,7 +261,6 @@ class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
 
     prefixes = CSVModelMultipleChoiceField(
         queryset=Prefix.objects.all(),
-        to_field_name="id",
         required=False,
         help_text=_("Prefix IDs assigned to the view"),
         label=_("Prefixes"),
@@ -266,7 +273,7 @@ class ViewImportForm(ViewPrefixUpdateMixin, NetBoxModelImportForm):
     )
 
 
-class ViewBulkEditForm(NetBoxModelBulkEditForm):
+class ViewBulkEditForm(PrimaryModelBulkEditForm):
     model = View
 
     fieldsets = (
@@ -286,11 +293,6 @@ class ViewBulkEditForm(NetBoxModelBulkEditForm):
         "tenant",
     )
 
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-        label=_("Description"),
-    )
     tenant_group = DynamicModelChoiceField(
         queryset=TenantGroup.objects.all(),
         required=False,

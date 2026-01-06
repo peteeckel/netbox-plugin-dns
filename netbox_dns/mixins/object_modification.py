@@ -35,6 +35,8 @@ class ObjectModificationMixin:
 
         self._save_field_values()
 
+    save.alters_data = True
+
     @property
     def changed_fields(self):
         if self._state.adding:

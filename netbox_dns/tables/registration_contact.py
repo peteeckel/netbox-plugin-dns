@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import NetBoxTable, TagColumn
+from netbox.tables import PrimaryModelTable, TagColumn
 
 from netbox_dns.models import RegistrationContact
 
@@ -9,8 +9,8 @@ from netbox_dns.models import RegistrationContact
 __all__ = ("RegistrationContactTable",)
 
 
-class RegistrationContactTable(NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class RegistrationContactTable(PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = RegistrationContact
 
         fields = (

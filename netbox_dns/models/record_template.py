@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MaxValueValidator
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.search import SearchIndex, register_search
 from netbox.plugins.utils import get_plugin_config
 
@@ -22,7 +22,7 @@ __all__ = (
 )
 
 
-class RecordTemplate(NetBoxModel):
+class RecordTemplate(PrimaryModel):
     class Meta:
         verbose_name = _("Record Template")
         verbose_name_plural = _("Record Templates")
@@ -62,11 +62,6 @@ class RecordTemplate(NetBoxModel):
         verbose_name=_("Name"),
         max_length=255,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        max_length=200,
-        blank=True,
     )
     type = models.CharField(
         verbose_name=_("Type"),
@@ -171,12 +166,16 @@ class RecordTemplate(NetBoxModel):
         if tags := self.tags.all():
             record.tags.set(tags)
 
+    create_record.alters_data = True
+
     def clean_fields(self, exclude=None):
         self.type = self.type.upper()
         if get_plugin_config("netbox_dns", "convert_names_to_lowercase", False):
             self.record_name = self.record_name.lower()
 
         super().clean_fields(exclude=exclude)
+
+    clean_fields.alters_data = True
 
     def clean(self, *args, **kwargs):
         self.validate_name()

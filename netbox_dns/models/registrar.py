@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from netbox.models import NetBoxModel
+from netbox.models import PrimaryModel
 from netbox.search import SearchIndex, register_search
 
 
@@ -11,7 +11,7 @@ __all__ = (
 )
 
 
-class Registrar(NetBoxModel):
+class Registrar(PrimaryModel):
     class Meta:
         verbose_name = _("Registrar")
         verbose_name_plural = _("Registrars")
@@ -32,11 +32,6 @@ class Registrar(NetBoxModel):
         unique=True,
         max_length=255,
         db_collation="natural_sort",
-    )
-    description = models.CharField(
-        verbose_name=_("Description"),
-        blank=True,
-        max_length=200,
     )
     iana_id = models.IntegerField(
         verbose_name=_("IANA ID"),

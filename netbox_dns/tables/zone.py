@@ -2,8 +2,8 @@ import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import (
+    PrimaryModelTable,
     ChoiceFieldColumn,
-    NetBoxTable,
     TagColumn,
     ActionsColumn,
     columns,
@@ -19,8 +19,8 @@ __all__ = (
 )
 
 
-class ZoneTable(TenancyColumnsMixin, NetBoxTable):
-    class Meta(NetBoxTable.Meta):
+class ZoneTable(TenancyColumnsMixin, PrimaryModelTable):
+    class Meta(PrimaryModelTable.Meta):
         model = Zone
 
         fields = (

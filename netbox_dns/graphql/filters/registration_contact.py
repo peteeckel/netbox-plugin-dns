@@ -1,7 +1,7 @@
 import strawberry_django
 from strawberry_django import FilterLookup
 
-from netbox.graphql.filter_mixins import NetBoxModelFilterMixin
+from netbox.graphql.filters import PrimaryModelFilter
 
 from netbox_dns.models import RegistrationContact
 
@@ -10,9 +10,8 @@ __all__ = ("NetBoxDNSRegistrationContactFilter",)
 
 
 @strawberry_django.filter_type(RegistrationContact, lookups=True)
-class NetBoxDNSRegistrationContactFilter(NetBoxModelFilterMixin):
+class NetBoxDNSRegistrationContactFilter(PrimaryModelFilter):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
-    description: FilterLookup[str] | None = strawberry_django.filter_field()
     contact_id: FilterLookup[str] | None = strawberry_django.filter_field()
     organization: FilterLookup[str] | None = strawberry_django.filter_field()
     street: FilterLookup[str] | None = strawberry_django.filter_field()

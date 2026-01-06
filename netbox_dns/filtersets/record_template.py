@@ -1,9 +1,9 @@
 import django_filters
 from django.db.models import Q
-from django.utils.translation import gettext as _
 
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import PrimaryModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
@@ -13,20 +13,21 @@ from netbox_dns.filters import TimePeriodFilter
 __all__ = ("RecordTemplateFilterSet",)
 
 
-class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
+@register_filterset
+class RecordTemplateFilterSet(TenancyFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = RecordTemplate
 
         fields = (
             "id",
-            "name",
             "record_name",
             "value",
-            "description",
             "ttl",
             "disable_ptr",
         )
 
+    name = django_filters.CharFilter()
+    description = django_filters.CharFilter()
     ttl = TimePeriodFilter()
     type = django_filters.MultipleChoiceFilter(
         choices=RecordTypeChoices,
@@ -38,13 +39,10 @@ class RecordTemplateFilterSet(TenancyFilterSet, NetBoxModelFilterSet):
         queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates__name",
         to_field_name="name",
-        label=_("Zone Template"),
     )
     zone_template_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ZoneTemplate.objects.all(),
         field_name="zone_templates",
-        to_field_name="id",
-        label=_("Zone Template ID"),
     )
 
     def search(self, queryset, name, value):
