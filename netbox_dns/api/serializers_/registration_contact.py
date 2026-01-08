@@ -19,6 +19,7 @@ class RegistrationContactSerializer(PrimaryModelSerializer):
             "display_url",
             "name",
             "description",
+            "comments",
             "tags",
             "contact_id",
             "organization",
