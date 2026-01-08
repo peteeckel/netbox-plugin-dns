@@ -34,7 +34,12 @@ from .filters import (
 )
 
 
-@strawberry_django.type(NameServer, fields="__all__", filters=NetBoxDNSNameServerFilter)
+@strawberry_django.type(
+    NameServer,
+    fields="__all__",
+    filters=NetBoxDNSNameServerFilter,
+    pagination=True,
+)
 class NetBoxDNSNameServerType(NetBoxObjectType):
     name: str
     description: str
@@ -47,7 +52,12 @@ class NetBoxDNSNameServerType(NetBoxObjectType):
     ]
 
 
-@strawberry_django.type(View, fields="__all__", filters=NetBoxDNSViewFilter)
+@strawberry_django.type(
+    View,
+    fields="__all__",
+    filters=NetBoxDNSViewFilter,
+    pagination=True,
+)
 class NetBoxDNSViewType(NetBoxObjectType):
     name: str
     description: str
@@ -59,7 +69,12 @@ class NetBoxDNSViewType(NetBoxObjectType):
     ]
 
 
-@strawberry_django.type(Zone, fields="__all__", filters=NetBoxDNSZoneFilter)
+@strawberry_django.type(
+    Zone,
+    fields="__all__",
+    filters=NetBoxDNSZoneFilter,
+    pagination=True,
+)
 class NetBoxDNSZoneType(NetBoxObjectType):
     name: str
     description: str | None
@@ -143,7 +158,12 @@ class NetBoxDNSZoneType(NetBoxObjectType):
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
 
 
-@strawberry_django.type(Record, fields="__all__", filters=NetBoxDNSRecordFilter)
+@strawberry_django.type(
+    Record,
+    fields="__all__",
+    filters=NetBoxDNSRecordFilter,
+    pagination=True,
+)
 class NetBoxDNSRecordType(NetBoxObjectType):
     name: str
     zone: Annotated["NetBoxDNSZoneType", strawberry.lazy("netbox_dns.graphql.types")]
@@ -177,7 +197,10 @@ class NetBoxDNSRecordType(NetBoxObjectType):
 
 
 @strawberry_django.type(
-    DNSSECKeyTemplate, fields="__all__", filters=NetBoxDNSDNSSECKeyTemplateFilter
+    DNSSECKeyTemplate,
+    fields="__all__",
+    filters=NetBoxDNSDNSSECKeyTemplateFilter,
+    pagination=True,
 )
 class NetBoxDNSDNSSECKeyTemplateType(NetBoxObjectType):
     name: str
@@ -190,7 +213,10 @@ class NetBoxDNSDNSSECKeyTemplateType(NetBoxObjectType):
 
 
 @strawberry_django.type(
-    DNSSECPolicy, fields="__all__", filters=NetBoxDNSDNSSECPolicyFilter
+    DNSSECPolicy,
+    fields="__all__",
+    filters=NetBoxDNSDNSSECPolicyFilter,
+    pagination=True,
 )
 class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
     name: str
@@ -225,7 +251,10 @@ class NetBoxDNSDNSSECPolicyType(NetBoxObjectType):
 
 
 @strawberry_django.type(
-    RegistrationContact, fields="__all__", filters=NetBoxDNSRegistrationContactFilter
+    RegistrationContact,
+    fields="__all__",
+    filters=NetBoxDNSRegistrationContactFilter,
+    pagination=True,
 )
 class NetBoxDNSRegistrationContactType(NetBoxObjectType):
     name: str
@@ -256,7 +285,12 @@ class NetBoxDNSRegistrationContactType(NetBoxObjectType):
     ]
 
 
-@strawberry_django.type(Registrar, fields="__all__", filters=NetBoxDNSRegistrarFilter)
+@strawberry_django.type(
+    Registrar,
+    fields="__all__",
+    filters=NetBoxDNSRegistrarFilter,
+    pagination=True,
+)
 class NetBoxDNSRegistrarType(NetBoxObjectType):
     name: str
     description: str
@@ -272,7 +306,10 @@ class NetBoxDNSRegistrarType(NetBoxObjectType):
 
 
 @strawberry_django.type(
-    ZoneTemplate, fields="__all__", filters=NetBoxDNSZoneTemplateFilter
+    ZoneTemplate,
+    fields="__all__",
+    filters=NetBoxDNSZoneTemplateFilter,
+    pagination=True,
 )
 class NetBoxDNSZoneTemplateType(NetBoxObjectType):
     name: str
@@ -337,7 +374,10 @@ class NetBoxDNSZoneTemplateType(NetBoxObjectType):
 
 
 @strawberry_django.type(
-    RecordTemplate, fields="__all__", filters=NetBoxDNSRecordTemplateFilter
+    RecordTemplate,
+    fields="__all__",
+    filters=NetBoxDNSRecordTemplateFilter,
+    pagination=True,
 )
 class NetBoxDNSRecordTemplateType(NetBoxObjectType):
     name: str
