@@ -24,6 +24,7 @@ class DNSSECKeyTemplateSerializer(PrimaryModelSerializer):
             "display_url",
             "name",
             "description",
+            "comments",
             "tags",
             "policies",
             "type",

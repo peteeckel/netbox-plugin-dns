@@ -25,6 +25,7 @@ class ZoneTemplateSerializer(PrimaryModelSerializer):
             "url",
             "name",
             "description",
+            "comments",
             "tags",
             "display",
             "display_url",

@@ -25,6 +25,7 @@ class DNSSECPolicySerializer(PrimaryModelSerializer):
             "display_url",
             "name",
             "description",
+            "comments",
             "tags",
             "status",
             "inline_signing",

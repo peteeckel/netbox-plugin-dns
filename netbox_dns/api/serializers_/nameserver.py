@@ -23,6 +23,7 @@ class NameServerSerializer(PrimaryModelSerializer):
             "display_url",
             "name",
             "description",
+            "comments",
             "tags",
             "zones",
             "created",

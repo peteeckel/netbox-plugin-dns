@@ -19,6 +19,7 @@ class RegistrarSerializer(PrimaryModelSerializer):
             "display_url",
             "name",
             "description",
+            "comments",
             "tags",
             "iana_id",
             "address",
