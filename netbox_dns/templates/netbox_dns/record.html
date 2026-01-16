@@ -175,13 +175,19 @@
         {% if not object.managed %}
         {% include 'inc/panels/custom_fields.html' %}
         {% include 'inc/panels/comments.html' %}
+        {% plugin_left_page object %}
         {% endif %}
     </div>
     {% if not object.managed %}
     <div class="col col-md-4">
         {% include 'inc/panels/tags.html' %}
     </div>
+    {% plugin_right_page object %}
     {% endif %}
 </div>
-
+<div class="row">
+    <div class="col col-md-12">
+        {% plugin_full_width_page object %}
+    </div>
+</div>
 {% endblock %}

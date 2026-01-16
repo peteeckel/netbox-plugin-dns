@@ -1,4 +1,5 @@
 {% extends 'generic/object.html' %}
+{% load plugins %}
 {% load render_table from django_tables2 %}
 {% load i18n %}
 
@@ -49,9 +50,11 @@
             </div>
             {% include 'inc/panels/custom_fields.html' %}
             {% include 'inc/panels/comments.html' %}
+            {% plugin_left_page object %}
         </div>
         <div class="col col-md-6">
             {% include 'inc/panels/tags.html' %}
+            {% plugin_right_page object %}
         </div>
     </div>
     {% if policy_table %}
@@ -68,4 +71,9 @@
             </div>
         </div>
     {% endif %}
+    <div class="row">
+        <div class="col col-md-12">
+            {% plugin_full_width_page object %}
+        </div>
+    </div>
 {% endblock %}
