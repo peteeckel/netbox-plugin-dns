@@ -74,9 +74,11 @@
         </div>
         {% include 'inc/panels/custom_fields.html' %}
         {% include 'inc/panels/comments.html' %}
+        {% plugin_left_page object %}
     </div>
     <div class="col col-md-4">
         {% include 'inc/panels/tags.html' %}
+        {% plugin_right_page object %}
     </div>
     {% if zone_template_table %}
         <div class="col col-md-12">
@@ -93,5 +95,9 @@
         </div>
     {% endif %}
 </div>
-
+<div class="row">
+    <div class="col col-md-12">
+        {% plugin_full_width_page object %}
+    </div>
+</div>
 {% endblock %}

@@ -78,6 +78,7 @@
         {% include 'inc/panels/custom_fields.html' %}
         {% include 'inc/panels/tags.html' %}
         {% include 'inc/panels/comments.html' %}
+        {% plugin_left_page object %}
     </div>
     <div class="col col-md-6">
         <div class="card">
@@ -121,5 +122,11 @@
             </div>
         </div>
     {% endif %}
+    {% plugin_right_page object %}
+</div>
+<div class="row">
+    <div class="col col-md-12">
+        {% plugin_full_width_page object %}
+    </div>
 </div>
 {% endblock %}
