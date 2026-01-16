@@ -1,4 +1,5 @@
 {% extends 'generic/object.html' %}
+{% load plugins %}
 {% load i18n %}
 
 {% block content %}
@@ -37,9 +38,17 @@
                 </table>
             </div>
             {% include 'inc/panels/custom_fields.html' %}
+            {% plugin_left_page object %}
         </div>
         <div class="col col-md-6">
             {% include 'inc/panels/tags.html' %}
+            {% plugin_right_page object %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col col-md-12">
+            {% plugin_full_width_page object %}
         </div>
     </div>
 {% endblock %}
