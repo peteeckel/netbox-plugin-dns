@@ -1,6 +1,9 @@
 version: 0.1
 package_name: netbox-plugin-dns
 compatibility:
+  - release: 1.5.1
+    netbox_min: 4.5.0
+    netbox_max: 4.5.1
   - release: 1.5.0
     netbox_min: 4.5.0
     netbox_max: 4.5.1
@@ -139,60 +142,3 @@ compatibility:
   - release: 1.0.0
     netbox_min: 4.0.0
     netbox_max: 4.1.11
-  - release: 0.22.9
-    netbox_min: 3.5.0
-    netbox_max: 3.7.8
-  - release: 0.22.8
-    netbox_min: 3.5.0
-    netbox_max: 3.7.8
-  - release: 0.22.6
-    netbox_min: 3.5.0
-    netbox_max: 3.7.8
-  - release: 0.22.5
-    netbox_min: 3.5.0
-    netbox_max: 3.7.8
-  - release: 0.22.4
-    netbox_min: 3.5.0
-    netbox_max: 3.7.8
-  - release: 0.22.3
-    netbox_min: 3.5.0
-    netbox_max: 3.7.8
-  - release: 0.22.2
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.22.1
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.22.0
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.17
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.16
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.15
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.14
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.13
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.12
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.11
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.10
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.9
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
-  - release: 0.21.8
-    netbox_min: 3.5.0
-    netbox_max: 3.7.2
