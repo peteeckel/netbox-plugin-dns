@@ -11,7 +11,6 @@ from netbox_dns.forms import (
 )
 from netbox_dns.tables import ZoneTemplateTable, RecordTemplateDisplayTable
 
-
 __all__ = (
     "ZoneTemplateView",
     "ZoneTemplateListView",

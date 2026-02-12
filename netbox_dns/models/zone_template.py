@@ -11,7 +11,6 @@ from netbox.search import SearchIndex, register_search
 
 from netbox_dns.validators import validate_rname
 
-
 __all__ = (
     "ZoneTemplate",
     "ZoneTemplateIndex",

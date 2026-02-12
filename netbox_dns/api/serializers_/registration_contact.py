@@ -4,7 +4,6 @@ from netbox.api.serializers import PrimaryModelSerializer
 
 from netbox_dns.models import RegistrationContact
 
-
 __all__ = ("RegistrationContactSerializer",)
 
 

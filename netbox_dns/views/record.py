@@ -21,7 +21,6 @@ from netbox_dns.utilities import (
     regex_from_list,
 )
 
-
 __all__ = (
     "RecordView",
     "RecordListView",

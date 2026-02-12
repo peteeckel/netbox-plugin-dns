@@ -28,7 +28,6 @@ from netbox_dns.models import (
     DNSSECPolicy,
 )
 
-
 __all__ = (
     "ZoneTemplateForm",
     "ZoneTemplateFilterForm",

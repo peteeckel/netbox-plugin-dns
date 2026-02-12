@@ -20,7 +20,6 @@ from netbox_dns.tables import (
     DelegationRecordTable,
 )
 
-
 __all__ = (
     "ZoneView",
     "ZoneListView",

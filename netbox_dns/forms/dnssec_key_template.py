@@ -28,7 +28,6 @@ from netbox_dns.choices import (
 )
 from netbox_dns.fields import TimePeriodField
 
-
 __all__ = (
     "DNSSECKeyTemplateForm",
     "DNSSECKeyTemplateFilterForm",

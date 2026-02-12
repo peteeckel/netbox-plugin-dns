@@ -55,7 +55,6 @@ from .record import Record
 from .view import View
 from .nameserver import NameServer
 
-
 __all__ = (
     "Zone",
     "ZoneIndex",

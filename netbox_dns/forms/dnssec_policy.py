@@ -24,7 +24,6 @@ from netbox_dns.models import DNSSECPolicy, DNSSECKeyTemplate, Zone, ZoneTemplat
 from netbox_dns.choices import DNSSECPolicyDigestChoices, DNSSECPolicyStatusChoices
 from netbox_dns.fields import TimePeriodField
 
-
 __all__ = (
     "DNSSECPolicyForm",
     "DNSSECPolicyFilterForm",

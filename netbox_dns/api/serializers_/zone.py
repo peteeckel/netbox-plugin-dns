@@ -16,7 +16,6 @@ from ..field_serializers import TimePeriodField
 
 from netbox_dns.models import Zone
 
-
 __all__ = ("ZoneSerializer",)
 
 

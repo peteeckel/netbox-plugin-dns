@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 from netbox_dns.models import DNSSECKeyTemplate
 
-
 __all__ = ("NetBoxDNSDNSSECKeyTemplateFilter",)
 
 

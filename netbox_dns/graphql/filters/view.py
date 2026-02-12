@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 from netbox_dns.models import View
 
-
 __all__ = ("NetBoxDNSViewFilter",)
 
 

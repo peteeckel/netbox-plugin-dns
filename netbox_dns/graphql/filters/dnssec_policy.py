@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 from netbox_dns.models import DNSSECPolicy
 from netbox_dns.graphql.filter_lookups import PolicyDigestArrayLookup
 
-
 __all__ = ("NetBoxDNSDNSSECPolicyFilter", "PolicyDigestArrayLookup")
 
 

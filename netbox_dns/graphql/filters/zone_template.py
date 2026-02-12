@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 from netbox_dns.models import ZoneTemplate
 
-
 __all__ = ("NetBoxDNSZoneTemplateFilter",)
 
 

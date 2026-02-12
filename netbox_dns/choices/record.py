@@ -7,7 +7,6 @@ from netbox.plugins.utils import get_plugin_config
 
 from .utilities import initialize_choice_names
 
-
 __all__ = (
     "RecordTypeChoices",
     "RecordSelectableTypeChoices",

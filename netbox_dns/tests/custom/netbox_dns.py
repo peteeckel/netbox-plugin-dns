@@ -6,7 +6,6 @@ from extras.choices import CustomFieldTypeChoices
 from extras.models import CustomField
 from ipam.models import IPAddress
 
-
 __all__ = ("CustomFieldTargetAPIMixin",)
 
 

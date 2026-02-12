@@ -16,7 +16,6 @@ from core.models import ObjectType
 from netbox_dns.models import View, Zone, NameServer, Record
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 
-
 zone_defaults = settings.PLUGINS_CONFIG.get("netbox_dns")
 
 

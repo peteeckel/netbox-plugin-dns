@@ -12,7 +12,6 @@ from netbox_dns.choices import (
 )
 from netbox_dns.validators import validate_key_template
 
-
 __all__ = (
     "DNSSECKeyTemplate",
     "DNSSECKeyTemplateIndex",

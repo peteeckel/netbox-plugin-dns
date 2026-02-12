@@ -15,7 +15,6 @@ from netbox_dns.forms import (
 )
 from netbox_dns.tables import RegistrationContactTable, ZoneTable
 
-
 __all__ = (
     "RegistrationContactView",
     "RegistrationContactEditView",

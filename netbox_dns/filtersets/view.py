@@ -9,7 +9,6 @@ from ipam.models import Prefix
 
 from netbox_dns.models import View
 
-
 __all__ = ("ViewFilterSet",)
 
 

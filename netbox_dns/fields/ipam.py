@@ -1,7 +1,6 @@
 from utilities.forms.fields import DynamicModelMultipleChoiceField
 from utilities.forms.widgets import APISelectMultiple
 
-
 __all__ = ("PrefixDynamicModelMultipleChoiceField",)
 
 

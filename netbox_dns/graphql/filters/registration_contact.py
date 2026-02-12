@@ -5,7 +5,6 @@ from netbox.graphql.filters import PrimaryModelFilter
 
 from netbox_dns.models import RegistrationContact
 
-
 __all__ = ("NetBoxDNSRegistrationContactFilter",)
 
 

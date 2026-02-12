@@ -9,7 +9,6 @@ from netbox.plugins.utils import get_plugin_config
 from netbox_dns.choices import DNSSECPolicyDigestChoices, DNSSECPolicyStatusChoices
 from netbox_dns.fields import ChoiceArrayField
 
-
 __all__ = (
     "DNSSECPolicy",
     "DNSSECPolicyIndex",

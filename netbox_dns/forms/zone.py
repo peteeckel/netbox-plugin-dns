@@ -45,7 +45,6 @@ from netbox_dns.utilities import name_to_unicode, network_to_reverse
 from netbox_dns.fields import RFC2317NetworkFormField, TimePeriodField
 from netbox_dns.validators import validate_ipv4, validate_prefix, validate_rfc2317
 
-
 __all__ = (
     "ZoneForm",
     "ZoneFilterForm",

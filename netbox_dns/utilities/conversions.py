@@ -8,7 +8,6 @@ from django.utils.dateparse import parse_duration
 
 from netbox.plugins.utils import get_plugin_config
 
-
 __all__ = (
     "NameFormatError",
     "arpa_to_prefix",
