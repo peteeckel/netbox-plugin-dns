@@ -16,7 +16,7 @@ jobs:
             uses: actions/checkout@main
 
           - name: Check conformance to Black standards
-            uses: psf/black@903bef54aa72e111c034ccec9997aac82bafbacc
+            uses: psf/black@e015af4a681dd2ac847188b13a81dc4a573d4dcb
             with:
                 options: "--check"
                 src: "netbox_dns"
