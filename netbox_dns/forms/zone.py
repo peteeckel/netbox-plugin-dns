@@ -119,6 +119,7 @@ class ZoneTemplateUpdateMixin:
 
                     zone_data.pop("template", None)
                     zone_data.pop("tenant_group", None)
+                    zone_data.pop("owner_group", None)
                     zone_data.pop("_init_time", None)
 
                     nameservers = zone_data.pop("nameservers")
