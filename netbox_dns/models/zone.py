@@ -135,6 +135,7 @@ class Zone(ObjectModificationMixin, ContactsMixin, PrimaryModel):
         "rfc2317_parent_managed",
         "tenant",
         "comments",
+        "owner",
     }
 
     objects = ZoneManager()
