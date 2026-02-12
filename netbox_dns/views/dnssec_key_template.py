@@ -11,7 +11,6 @@ from netbox_dns.forms import (
 from netbox_dns.models import DNSSECKeyTemplate
 from netbox_dns.tables import DNSSECKeyTemplateTable, DNSSECPolicyDisplayTable
 
-
 __all__ = (
     "DNSSECKeyTemplateView",
     "DNSSECKeyTemplateListView",

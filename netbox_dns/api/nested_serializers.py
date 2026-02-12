@@ -6,7 +6,6 @@ from netbox.api.serializers import WritableNestedSerializer
 from netbox_dns.models import Zone, Record, ZoneTemplate, RecordTemplate, DNSSECPolicy
 from netbox_dns.api.serializers_.view import ViewSerializer
 
-
 __all__ = (
     "NestedZoneSerializer",
     "NestedRecordSerializer",

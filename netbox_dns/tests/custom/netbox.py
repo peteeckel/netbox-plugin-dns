@@ -14,7 +14,6 @@ from utilities.testing.api import APITestCase as NetBoxAPITestCase
 from utilities.testing.views import ModelViewTestCase as NetBoxModelViewTestCase
 from netbox.api.exceptions import GraphQLTypeNotFound
 
-
 __all__ = (
     "NetBoxDNSGraphQLMixin",
     "ModelViewTestCase",

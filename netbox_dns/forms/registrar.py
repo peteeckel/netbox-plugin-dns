@@ -12,7 +12,6 @@ from utilities.forms.rendering import FieldSet
 
 from netbox_dns.models import Registrar
 
-
 __all__ = (
     "RegistrarForm",
     "RegistrarFilterForm",

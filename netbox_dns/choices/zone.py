@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 
 from utilities.choices import ChoiceSet
 
-
 __all__ = (
     "ZoneStatusChoices",
     "ZoneEPPStatusChoices",

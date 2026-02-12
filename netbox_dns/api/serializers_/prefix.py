@@ -2,7 +2,6 @@ from rest_framework.serializers import HyperlinkedIdentityField
 
 from ipam.api.serializers import PrefixSerializer as IPAMPrefixSerializer
 
-
 __all__ = ("PrefixSerializer",)
 
 

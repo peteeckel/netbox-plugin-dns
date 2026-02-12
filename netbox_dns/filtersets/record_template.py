@@ -9,7 +9,6 @@ from netbox_dns.models import RecordTemplate, ZoneTemplate
 from netbox_dns.choices import RecordTypeChoices, RecordStatusChoices
 from netbox_dns.filters import TimePeriodFilter
 
-
 __all__ = ("RecordTemplateFilterSet",)
 
 

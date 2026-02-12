@@ -15,7 +15,6 @@ from netbox_dns.choices import RecordStatusChoices, RecordTypeChoices
 from .dns import get_parent_zone_names
 from .conversions import regex_from_list
 
-
 __all__ = (
     "get_zones",
     "check_dns_records",

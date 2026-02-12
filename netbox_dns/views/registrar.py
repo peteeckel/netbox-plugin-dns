@@ -14,7 +14,6 @@ from netbox_dns.forms import (
 )
 from netbox_dns.tables import RegistrarTable, ZoneTable
 
-
 __all__ = (
     "RegistrarView",
     "RegistrarListView",

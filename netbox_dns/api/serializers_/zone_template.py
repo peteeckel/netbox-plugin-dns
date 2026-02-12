@@ -12,7 +12,6 @@ from .registrar import RegistrarSerializer
 from .registration_contact import RegistrationContactSerializer
 from .dnssec_policy import DNSSECPolicySerializer
 
-
 __all__ = ("ZoneTemplateSerializer",)
 
 

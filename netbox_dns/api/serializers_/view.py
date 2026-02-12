@@ -7,7 +7,6 @@ from ipam.api.serializers import PrefixSerializer
 
 from netbox_dns.models import View
 
-
 __all__ = ("ViewSerializer",)
 
 

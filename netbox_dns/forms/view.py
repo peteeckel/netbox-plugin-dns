@@ -34,7 +34,6 @@ from netbox_dns.utilities import (
     get_query_from_filter,
 )
 
-
 __all__ = (
     "ViewForm",
     "ViewFilterForm",

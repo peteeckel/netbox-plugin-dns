@@ -21,7 +21,6 @@ from tenancy.forms import TenancyForm, TenancyFilterForm
 from netbox_dns.models import NameServer, Zone
 from netbox_dns.utilities import name_to_unicode
 
-
 __all__ = (
     "NameServerForm",
     "NameServerFilterForm",

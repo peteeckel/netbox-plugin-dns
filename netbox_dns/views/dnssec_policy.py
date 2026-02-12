@@ -23,7 +23,6 @@ from netbox_dns.tables import (
 from netbox_dns.validators import validate_key_template_lifetime
 from netbox_dns.choices import DNSSECKeyTemplateTypeChoices
 
-
 __all__ = (
     "DNSSECPolicyView",
     "DNSSECPolicyListView",

@@ -25,7 +25,6 @@ from netbox_dns.choices import RecordSelectableTypeChoices, RecordStatusChoices
 from netbox_dns.utilities import name_to_unicode
 from netbox_dns.fields import TimePeriodField
 
-
 __all__ = (
     "RecordForm",
     "RecordFilterForm",

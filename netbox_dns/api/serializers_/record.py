@@ -10,7 +10,6 @@ from netbox_dns.models import Record
 from ..nested_serializers import NestedZoneSerializer, NestedRecordSerializer
 from ..field_serializers import TimePeriodField
 
-
 __all__ = ("RecordSerializer",)
 
 

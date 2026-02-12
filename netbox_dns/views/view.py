@@ -16,7 +16,6 @@ from netbox_dns.forms import (
 from netbox_dns.tables import ViewTable, ZoneTable
 from netbox_dns.utilities import get_views_by_prefix
 
-
 __all__ = (
     "ViewView",
     "ViewListView",

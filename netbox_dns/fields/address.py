@@ -7,7 +7,6 @@ from netaddr import AddrFormatError, IPAddress
 
 from ipam.formfields import IPAddressFormField
 
-
 __all__ = ("AddressField",)
 
 

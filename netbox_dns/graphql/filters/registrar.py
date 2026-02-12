@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 
 from netbox_dns.models import Registrar
 
-
 __all__ = ("NetBoxDNSRegistrarFilter",)
 
 

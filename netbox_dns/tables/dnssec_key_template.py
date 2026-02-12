@@ -10,7 +10,6 @@ from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import DNSSECKeyTemplate
 
-
 __all__ = ("DNSSECKeyTemplateTable",)
 
 

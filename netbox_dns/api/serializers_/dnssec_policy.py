@@ -10,7 +10,6 @@ from .dnssec_key_template import DNSSECKeyTemplateSerializer
 from ..nested_serializers import NestedZoneSerializer, NestedZoneTemplateSerializer
 from ..field_serializers import TimePeriodField
 
-
 __all__ = ("DNSSECPolicySerializer",)
 
 

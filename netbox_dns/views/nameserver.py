@@ -15,7 +15,6 @@ from netbox_dns.forms import (
 from netbox_dns.models import Zone, NameServer
 from netbox_dns.tables import NameServerTable, ZoneTable
 
-
 __all__ = (
     "NameServerView",
     "NameServerListView",

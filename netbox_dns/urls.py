@@ -8,7 +8,6 @@ from utilities.urls import get_model_urls
 # -
 from .views import *  # noqa: F401
 
-
 app_name = "netbox_dns"
 
 urlpatterns = (

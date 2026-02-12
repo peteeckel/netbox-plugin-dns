@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 
 from netbox.plugins.utils import get_plugin_config
 
-
 __all__ = (
     "validate_fqdn",
     "validate_rname",

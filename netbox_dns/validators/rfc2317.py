@@ -1,7 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
-
 __all__ = (
     "validate_prefix",
     "validate_ipv4",

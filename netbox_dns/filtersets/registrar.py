@@ -7,7 +7,6 @@ from utilities.filtersets import register_filterset
 
 from netbox_dns.models import Registrar
 
-
 __all__ = ("RegistrarFilterSet",)
 
 

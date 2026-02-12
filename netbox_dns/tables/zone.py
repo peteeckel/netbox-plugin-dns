@@ -12,7 +12,6 @@ from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import Zone
 
-
 __all__ = (
     "ZoneTable",
     "ZoneDisplayTable",

@@ -14,7 +14,6 @@ from tenancy.tables import TenancyColumnsMixin
 
 from netbox_dns.models import DNSSECPolicy
 
-
 __all__ = (
     "DNSSECPolicyTable",
     "DNSSECPolicyDisplayTable",

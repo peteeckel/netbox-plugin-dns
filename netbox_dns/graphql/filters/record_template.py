@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 from netbox_dns.models import RecordTemplate
 
-
 __all__ = ("NetBoxDNSRecordTemplateFilter",)
 
 

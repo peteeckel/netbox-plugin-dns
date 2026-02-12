@@ -13,7 +13,6 @@ from netbox_dns.choices import (
 )
 from netbox_dns.filters import TimePeriodFilter
 
-
 __all__ = ("DNSSECKeyTemplateFilterSet",)
 
 

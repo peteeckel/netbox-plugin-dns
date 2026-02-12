@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from netbox.models import PrimaryModel
 from netbox.search import SearchIndex, register_search
 
-
 __all__ = (
     "Registrar",
     "RegistrarIndex",

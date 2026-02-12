@@ -9,7 +9,6 @@ from netbox_dns.models import DNSSECKeyTemplate
 from ..nested_serializers import NestedDNSSECPolicySerializer
 from ..field_serializers import TimePeriodField
 
-
 __all__ = ("DNSSECKeyTemplateSerializer",)
 
 
