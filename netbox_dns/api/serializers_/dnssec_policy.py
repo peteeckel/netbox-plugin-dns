@@ -52,6 +52,7 @@ class DNSSECPolicySerializer(PrimaryModelSerializer):
             "last_updated",
             "custom_fields",
             "tenant",
+            "owner",
         )
 
         brief_fields = (

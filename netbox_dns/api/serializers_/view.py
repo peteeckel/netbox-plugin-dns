@@ -29,6 +29,7 @@ class ViewSerializer(PrimaryModelSerializer):
             "tenant",
             "prefixes",
             "ip_address_filter",
+            "owner",
         )
 
         brief_fields = (
