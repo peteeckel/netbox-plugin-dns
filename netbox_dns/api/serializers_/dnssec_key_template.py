@@ -33,6 +33,7 @@ class DNSSECKeyTemplateSerializer(PrimaryModelSerializer):
             "last_updated",
             "custom_fields",
             "tenant",
+            "owner",
         )
 
         brief_fields = (

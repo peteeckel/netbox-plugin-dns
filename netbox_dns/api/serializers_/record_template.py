@@ -35,6 +35,7 @@ class RecordTemplateSerializer(PrimaryModelSerializer):
             "custom_fields",
             "tenant",
             "zone_templates",
+            "owner",
         )
 
         brief_fields = (
