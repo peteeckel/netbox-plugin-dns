@@ -43,6 +43,7 @@ class RecordSerializer(PrimaryModelSerializer):
             "absolute_value",
             "expiration_date",
             "expired",
+            "owner",
         )
 
         brief_fields = (

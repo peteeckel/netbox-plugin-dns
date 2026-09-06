@@ -43,6 +43,7 @@ class ZoneTemplateSerializer(PrimaryModelSerializer):
             "custom_fields",
             "tenant",
             "record_templates",
+            "owner",
         )
 
         brief_fields = (

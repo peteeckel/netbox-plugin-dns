@@ -65,6 +65,7 @@ class ZoneSerializer(PrimaryModelSerializer):
             "custom_fields",
             "tenant",
             "template",
+            "owner",
         )
 
         brief_fields = (
