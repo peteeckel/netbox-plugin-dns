@@ -34,6 +34,7 @@ class RegistrationContactSerializer(PrimaryModelSerializer):
             "created",
             "last_updated",
             "custom_fields",
+            "owner",
         )
         brief_fields = (
             "id",
